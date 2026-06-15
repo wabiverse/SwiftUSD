@@ -19,128 +19,146 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialNodeSchemaTokens, HD_MATERIAL_NODE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialNodeSchemaTokens,
+    HD_MATERIAL_NODE_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdMaterialNodeParameterContainerSchema HdMaterialNodeSchema::GetParameters() const
+HdMaterialNodeParameterContainerSchema
+HdMaterialNodeSchema::GetParameters() const
 {
-  return HdMaterialNodeParameterContainerSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMaterialNodeSchemaTokens->parameters));
+    return HdMaterialNodeParameterContainerSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNodeSchemaTokens->parameters));
 }
 
-HdMaterialConnectionVectorContainerSchema HdMaterialNodeSchema::GetInputConnections() const
+HdMaterialConnectionVectorContainerSchema
+HdMaterialNodeSchema::GetInputConnections() const
 {
-  return HdMaterialConnectionVectorContainerSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMaterialNodeSchemaTokens->inputConnections));
+    return HdMaterialConnectionVectorContainerSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNodeSchemaTokens->inputConnections));
 }
 
-HdTokenDataSourceHandle HdMaterialNodeSchema::GetNodeIdentifier() const
+HdTokenDataSourceHandle
+HdMaterialNodeSchema::GetNodeIdentifier() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdMaterialNodeSchemaTokens->nodeIdentifier);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdMaterialNodeSchemaTokens->nodeIdentifier);
 }
 
-HdContainerDataSourceHandle HdMaterialNodeSchema::GetRenderContextNodeIdentifiers() const
+HdContainerDataSourceHandle
+HdMaterialNodeSchema::GetRenderContextNodeIdentifiers() const
 {
-  return _GetTypedDataSource<HdContainerDataSource>(
-      HdMaterialNodeSchemaTokens->renderContextNodeIdentifiers);
+    return _GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNodeSchemaTokens->renderContextNodeIdentifiers);
 }
 
-HdContainerDataSourceHandle HdMaterialNodeSchema::GetNodeTypeInfo() const
+HdContainerDataSourceHandle
+HdMaterialNodeSchema::GetNodeTypeInfo() const
 {
-  return _GetTypedDataSource<HdContainerDataSource>(HdMaterialNodeSchemaTokens->nodeTypeInfo);
+    return _GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNodeSchemaTokens->nodeTypeInfo);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdMaterialNodeSchema::BuildRetained(
-    const HdContainerDataSourceHandle &parameters,
-    const HdContainerDataSourceHandle &inputConnections,
-    const HdTokenDataSourceHandle &nodeIdentifier,
-    const HdContainerDataSourceHandle &renderContextNodeIdentifiers,
-    const HdContainerDataSourceHandle &nodeTypeInfo)
+HdContainerDataSourceHandle
+HdMaterialNodeSchema::BuildRetained(
+        const HdContainerDataSourceHandle &parameters,
+        const HdContainerDataSourceHandle &inputConnections,
+        const HdTokenDataSourceHandle &nodeIdentifier,
+        const HdContainerDataSourceHandle &renderContextNodeIdentifiers,
+        const HdContainerDataSourceHandle &nodeTypeInfo
+)
 {
-  TfToken _names[5];
-  HdDataSourceBaseHandle _values[5];
+    TfToken _names[5];
+    HdDataSourceBaseHandle _values[5];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (parameters) {
-    _names[_count] = HdMaterialNodeSchemaTokens->parameters;
-    _values[_count++] = parameters;
-  }
+    if (parameters) {
+        _names[_count] = HdMaterialNodeSchemaTokens->parameters;
+        _values[_count++] = parameters;
+    }
 
-  if (inputConnections) {
-    _names[_count] = HdMaterialNodeSchemaTokens->inputConnections;
-    _values[_count++] = inputConnections;
-  }
+    if (inputConnections) {
+        _names[_count] = HdMaterialNodeSchemaTokens->inputConnections;
+        _values[_count++] = inputConnections;
+    }
 
-  if (nodeIdentifier) {
-    _names[_count] = HdMaterialNodeSchemaTokens->nodeIdentifier;
-    _values[_count++] = nodeIdentifier;
-  }
+    if (nodeIdentifier) {
+        _names[_count] = HdMaterialNodeSchemaTokens->nodeIdentifier;
+        _values[_count++] = nodeIdentifier;
+    }
 
-  if (renderContextNodeIdentifiers) {
-    _names[_count] = HdMaterialNodeSchemaTokens->renderContextNodeIdentifiers;
-    _values[_count++] = renderContextNodeIdentifiers;
-  }
+    if (renderContextNodeIdentifiers) {
+        _names[_count] = HdMaterialNodeSchemaTokens->renderContextNodeIdentifiers;
+        _values[_count++] = renderContextNodeIdentifiers;
+    }
 
-  if (nodeTypeInfo) {
-    _names[_count] = HdMaterialNodeSchemaTokens->nodeTypeInfo;
-    _values[_count++] = nodeTypeInfo;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (nodeTypeInfo) {
+        _names[_count] = HdMaterialNodeSchemaTokens->nodeTypeInfo;
+        _values[_count++] = nodeTypeInfo;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdMaterialNodeSchema::Builder &HdMaterialNodeSchema::Builder::SetParameters(
+HdMaterialNodeSchema::Builder &
+HdMaterialNodeSchema::Builder::SetParameters(
     const HdContainerDataSourceHandle &parameters)
 {
-  _parameters = parameters;
-  return *this;
+    _parameters = parameters;
+    return *this;
 }
 
-HdMaterialNodeSchema::Builder &HdMaterialNodeSchema::Builder::SetInputConnections(
+HdMaterialNodeSchema::Builder &
+HdMaterialNodeSchema::Builder::SetInputConnections(
     const HdContainerDataSourceHandle &inputConnections)
 {
-  _inputConnections = inputConnections;
-  return *this;
+    _inputConnections = inputConnections;
+    return *this;
 }
 
-HdMaterialNodeSchema::Builder &HdMaterialNodeSchema::Builder::SetNodeIdentifier(
+HdMaterialNodeSchema::Builder &
+HdMaterialNodeSchema::Builder::SetNodeIdentifier(
     const HdTokenDataSourceHandle &nodeIdentifier)
 {
-  _nodeIdentifier = nodeIdentifier;
-  return *this;
+    _nodeIdentifier = nodeIdentifier;
+    return *this;
 }
 
-HdMaterialNodeSchema::Builder &HdMaterialNodeSchema::Builder::SetRenderContextNodeIdentifiers(
+HdMaterialNodeSchema::Builder &
+HdMaterialNodeSchema::Builder::SetRenderContextNodeIdentifiers(
     const HdContainerDataSourceHandle &renderContextNodeIdentifiers)
 {
-  _renderContextNodeIdentifiers = renderContextNodeIdentifiers;
-  return *this;
+    _renderContextNodeIdentifiers = renderContextNodeIdentifiers;
+    return *this;
 }
 
-HdMaterialNodeSchema::Builder &HdMaterialNodeSchema::Builder::SetNodeTypeInfo(
+HdMaterialNodeSchema::Builder &
+HdMaterialNodeSchema::Builder::SetNodeTypeInfo(
     const HdContainerDataSourceHandle &nodeTypeInfo)
 {
-  _nodeTypeInfo = nodeTypeInfo;
-  return *this;
+    _nodeTypeInfo = nodeTypeInfo;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdMaterialNodeSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdMaterialNodeSchema::Builder::Build()
 {
-  return HdMaterialNodeSchema::BuildRetained(_parameters,
-                                             _inputConnections,
-                                             _nodeIdentifier,
-                                             _renderContextNodeIdentifiers,
-                                             _nodeTypeInfo);
-}
+    return HdMaterialNodeSchema::BuildRetained(
+        _parameters,
+        _inputConnections,
+        _nodeIdentifier,
+        _renderContextNodeIdentifiers,
+        _nodeTypeInfo
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

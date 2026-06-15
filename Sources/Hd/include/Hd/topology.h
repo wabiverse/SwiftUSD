@@ -7,29 +7,31 @@
 #ifndef PXR_IMAGING_HD_TOPOLOGY_H
 #define PXR_IMAGING_HD_TOPOLOGY_H
 
-#include "Arch/inttypes.h"
+#include "pxr/pxrns.h"
 #include "Hd/api.h"
 #include "Hd/version.h"
-#include "pxr/pxrns.h"
+#include "Arch/inttypes.h"
 
 #include <ostream>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdTopology {
- public:
-  typedef uint64_t ID;
+public:
+    typedef uint64_t ID;
 
-  HdTopology() {};
-  virtual ~HdTopology() {};
+    HdTopology() {};
+    virtual ~HdTopology() {};
 
-  /// Returns the hash value of this topology to be used for instancing.
-  virtual ID ComputeHash() const = 0;
+    /// Returns the hash value of this topology to be used for instancing.
+    virtual ID ComputeHash() const = 0;
 };
 
 HD_API
-std::ostream &operator<<(std::ostream &out, HdTopology const &);
+std::ostream& operator << (std::ostream &out, HdTopology const &);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_TOPOLOGY_H
+#endif // PXR_IMAGING_HD_TOPOLOGY_H
+

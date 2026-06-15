@@ -6,85 +6,106 @@
 
 #include "UsdImaging/unloadedDrawModeSceneIndex.h"
 
-#include "Hd/overlayContainerDataSource.h"
-#include "Hd/retainedDataSource.h"
 #include "UsdImaging/geomModelSchema.h"
 #include "UsdImaging/usdPrimInfoSchema.h"
+#include "Hd/overlayContainerDataSource.h"
+#include "Hd/retainedDataSource.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdImagingUnloadedDrawModeSceneIndexRefPtr UsdImagingUnloadedDrawModeSceneIndex::New(
+UsdImagingUnloadedDrawModeSceneIndexRefPtr
+UsdImagingUnloadedDrawModeSceneIndex::New(
     HdSceneIndexBaseRefPtr const &inputSceneIndex)
 {
-  return TfCreateRefPtr(new UsdImagingUnloadedDrawModeSceneIndex(inputSceneIndex));
+    return TfCreateRefPtr(
+        new UsdImagingUnloadedDrawModeSceneIndex(inputSceneIndex));
 }
 
 UsdImagingUnloadedDrawModeSceneIndex::UsdImagingUnloadedDrawModeSceneIndex(
     HdSceneIndexBaseRefPtr const &inputSceneIndex)
-    : HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
+  : HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
 {
 }
 
-UsdImagingUnloadedDrawModeSceneIndex::~UsdImagingUnloadedDrawModeSceneIndex() = default;
+UsdImagingUnloadedDrawModeSceneIndex::
+~UsdImagingUnloadedDrawModeSceneIndex() = default;
 
-static bool _IsPrimLoaded(HdContainerDataSourceHandle const &primSource)
+static
+bool
+_IsPrimLoaded(HdContainerDataSourceHandle const &primSource)
 {
-  UsdImagingUsdPrimInfoSchema schema = UsdImagingUsdPrimInfoSchema::GetFromParent(primSource);
-  if (HdBoolDataSourceHandle const ds = schema.GetIsLoaded()) {
-    return ds->GetTypedValue(0.0f);
-  }
-  return true;
+    UsdImagingUsdPrimInfoSchema schema =
+        UsdImagingUsdPrimInfoSchema::GetFromParent(primSource);
+    if (HdBoolDataSourceHandle const ds = schema.GetIsLoaded()) {
+        return ds->GetTypedValue(0.0f);
+    }
+    return true;
 }
 
-static HdContainerDataSourceHandle const &_DataSourceForcingBoundsDrawMode()
+static
+HdContainerDataSourceHandle const &
+_DataSourceForcingBoundsDrawMode()
 {
-  static HdContainerDataSourceHandle result = HdRetainedContainerDataSource::New(
-      UsdImagingGeomModelSchema::GetSchemaToken(),
-      UsdImagingGeomModelSchema::Builder()
-          .SetApplyDrawMode(HdRetainedTypedSampledDataSource<bool>::New(true))
-          .SetDrawMode(HdRetainedTypedSampledDataSource<TfToken>::New(
-              UsdImagingGeomModelSchemaTokens->bounds))
-          .Build());
-  return result;
+    static HdContainerDataSourceHandle result =
+        HdRetainedContainerDataSource::New(
+            UsdImagingGeomModelSchema::GetSchemaToken(),
+            UsdImagingGeomModelSchema::Builder()
+                .SetApplyDrawMode(
+                    HdRetainedTypedSampledDataSource<bool>::New(true))
+                .SetDrawMode(
+                    HdRetainedTypedSampledDataSource<TfToken>::New(
+                        UsdImagingGeomModelSchemaTokens->bounds))
+                .Build());
+    return result;
 }
 
-HdSceneIndexPrim UsdImagingUnloadedDrawModeSceneIndex::GetPrim(const SdfPath &primPath) const
-{
-  HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
-
-  if (!_IsPrimLoaded(prim.dataSource)) {
-    prim.dataSource = HdOverlayContainerDataSource::New(_DataSourceForcingBoundsDrawMode(),
-                                                        prim.dataSource);
-  }
-
-  return prim;
-}
-
-SdfPathVector UsdImagingUnloadedDrawModeSceneIndex::GetChildPrimPaths(
+HdSceneIndexPrim
+UsdImagingUnloadedDrawModeSceneIndex::GetPrim(
     const SdfPath &primPath) const
 {
-  return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+    HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
+
+    if (!_IsPrimLoaded(prim.dataSource)) {
+        prim.dataSource = HdOverlayContainerDataSource::New(
+            _DataSourceForcingBoundsDrawMode(),
+            prim.dataSource);
+    }
+
+    return prim;
 }
 
-void UsdImagingUnloadedDrawModeSceneIndex::_PrimsAdded(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::AddedPrimEntries &entries)
+SdfPathVector
+UsdImagingUnloadedDrawModeSceneIndex::GetChildPrimPaths(
+    const SdfPath &primPath) const
 {
-  _SendPrimsAdded(entries);
+    return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
 }
 
-void UsdImagingUnloadedDrawModeSceneIndex::_PrimsDirtied(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+void
+UsdImagingUnloadedDrawModeSceneIndex::_PrimsAdded(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::AddedPrimEntries &entries)
 {
-  // Loading/unloading prims forces a resync (prims removed
-  // and added). So nothing to do here.
-
-  _SendPrimsDirtied(entries);
+    _SendPrimsAdded(entries);
 }
 
-void UsdImagingUnloadedDrawModeSceneIndex::_PrimsRemoved(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::RemovedPrimEntries &entries)
+void
+UsdImagingUnloadedDrawModeSceneIndex::_PrimsDirtied(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::DirtiedPrimEntries &entries)
 {
-  _SendPrimsRemoved(entries);
+    // Loading/unloading prims forces a resync (prims removed
+    // and added). So nothing to do here.
+
+    _SendPrimsDirtied(entries);
+}
+
+void
+UsdImagingUnloadedDrawModeSceneIndex::_PrimsRemoved(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::RemovedPrimEntries &entries)
+{
+    _SendPrimsRemoved(entries);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

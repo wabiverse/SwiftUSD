@@ -5,26 +5,24 @@
 // https://openusd.org/license.
 //
 
-#include "Arch/api.h"
 #include "pxr/pxrns.h"
+#include "Arch/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct ArchAbiBase1 {
-  void *dummy;
+    void* dummy;
 };
 
 struct ArchAbiBase2 {
-  virtual ~ArchAbiBase2() {}
-  virtual const char *name() const = 0;
+    virtual ~ArchAbiBase2() { }
+    virtual const char* name() const = 0;
 };
 
-template<class T> struct ArchAbiDerived : public ArchAbiBase1, public ArchAbiBase2 {
-  virtual ~ArchAbiDerived() {}
-  virtual const char *name() const
-  {
-    return "ArchAbiDerived";
-  }
+template <class T>
+struct ArchAbiDerived : public ArchAbiBase1, public ArchAbiBase2 {
+    virtual ~ArchAbiDerived() { }
+    virtual const char* name() const { return "ArchAbiDerived"; }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

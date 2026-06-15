@@ -4,48 +4,64 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Pcp/mapExpression.h"
 #include "pxr/pxrns.h"
+#include "Pcp/mapExpression.h"
 
 #include <string>
 
-using namespace boost::python;
 using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static string _Str(const PcpMapExpression &e)
+static string
+_Str(const PcpMapExpression& e)
 {
-  return e.GetString();
+    return e.GetString();
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapMapExpression()
+void
+wrapMapExpression()
 {
-  typedef PcpMapExpression This;
+    typedef PcpMapExpression This;
 
-  class_<This>("MapExpression")
-      .def("__str__", _Str)
+    class_<This>("MapExpression")
+        .def("__str__", _Str)
 
-      .def("Evaluate", &This::Evaluate, return_value_policy<return_by_value>())
-      .def("Identity", &This::Identity, return_value_policy<return_by_value>())
-      .staticmethod("Identity")
-      .def("Constant", &This::Constant, return_value_policy<return_by_value>())
-      .staticmethod("Constant")
-      .def("Inverse", &This::Inverse, return_value_policy<return_by_value>())
-      .staticmethod("Inverse")
-      .def("AddRootIdentity", &This::AddRootIdentity, return_value_policy<return_by_value>())
-      .def("Compose", &This::Compose, return_value_policy<return_by_value>())
-      .def("MapSourceToTarget", &This::MapSourceToTarget, (arg("path")))
-      .def("MapTargetToSource", &This::MapTargetToSource, (arg("path")))
+        .def("Evaluate", &This::Evaluate,
+             return_value_policy<return_by_value>())
+        .def("Identity", &This::Identity,
+             return_value_policy<return_by_value>())
+        .staticmethod("Identity")
+        .def("Constant", &This::Constant,
+             return_value_policy<return_by_value>())
+        .staticmethod("Constant")
+        .def("ImpliedClass", &This::ImpliedClass)
+        .staticmethod("ImpliedClass")
+        .def("Inverse", &This::Inverse,
+             return_value_policy<return_by_value>())
+        .def("AddRootIdentity", &This::AddRootIdentity,
+             return_value_policy<return_by_value>())
+        .def("Compose", &This::Compose,
+             return_value_policy<return_by_value>())
+        .def("MapSourceToTarget", &This::MapSourceToTarget,
+            (arg("path")))
+        .def("MapTargetToSource", &This::MapTargetToSource,
+            (arg("path")))
 
-      .add_property("timeOffset",
-                    make_function(&This::GetTimeOffset, return_value_policy<return_by_value>()))
-      .add_property("isIdentity", &This::IsIdentity)
-      .add_property("isNull", &This::IsNull);
+        .add_property("timeOffset",
+            make_function(&This::GetTimeOffset,
+                          return_value_policy<return_by_value>()) )
+        .add_property("isIdentity", &This::IsIdentity)
+        .add_property("isNull", &This::IsNull)
+        ;
 }

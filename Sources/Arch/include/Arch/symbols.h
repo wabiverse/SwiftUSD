@@ -11,8 +11,8 @@
 /// \ingroup group_arch_Diagnostics
 /// Architecture-specific symbol lookup routines.
 
-#include "Arch/api.h"
 #include "pxr/pxrns.h"
+#include "Arch/api.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -20,7 +20,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Returns information about the address \p address in the running program.
 ///
 /// Returns \c false if no information can be found, otherwise returns \c true
-/// and modifies the other arguments: \p objectPath is set to the absolute path
+/// and modifies the other arguments: \p objectPath is set to the absolute path 
 /// to the executable or library the address is found in, \p baseAddress is the
 /// address where that object is loaded, \p symbolName is the symbolic name of
 /// the thing containing the address, and \p symbolAddress is the starting
@@ -31,12 +31,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \ingroup group_arch_Diagnostics
 ARCH_API
-bool ArchGetAddressInfo(void *address,
-                        std::string *objectPath,
-                        void **baseAddress,
-                        std::string *symbolName,
-                        void **symbolAddress);
+bool ArchGetAddressInfo(void* address,
+                        std::string* objectPath, void** baseAddress,
+                        std::string* symbolName, void** symbolAddress);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_SYMBOLS_H
+#endif // PXR_BASE_ARCH_SYMBOLS_H

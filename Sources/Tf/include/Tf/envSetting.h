@@ -97,9 +97,9 @@
 /// ignored.  If the file itself cannot be read, no error is printed; however,
 /// if the file is malformed, errors are printed to stderr.
 
+#include "pxr/pxrns.h"
 #include "Arch/hints.h"
 #include "Tf/registryManager.h"
-#include "pxr/pxrns.h"
 
 #include <atomic>
 #include <string>
@@ -111,34 +111,40 @@ PXR_NAMESPACE_OPEN_SCOPE
 // We store the atomic_value separately and refer to it via pointer because we
 // cannot use aggregate-initialization on a struct holding an atomic, but we
 // can value-initialize a single std::atomic.
-template<class T> struct TfEnvSetting {
-  std::atomic<T *> *_value;
-  T _default;
-  char const *_name;
-  char const *_description;
+template <class T>
+struct TfEnvSetting
+{
+    std::atomic<T*> *_value;
+    T _default;
+    char const * _name;
+    char const * _description;
 };
 
 // Specialize for string, default is stored as char const * (pointing to a
 // literal).
-template<> struct TfEnvSetting<std::string> {
-  std::atomic<std::string *> *_value;
-  char const *_default;
-  char const *_name;
-  char const *_description;
+template <>
+struct TfEnvSetting<std::string>
+{
+    std::atomic<std::string*> *_value;
+    char const * _default;
+    char const * _name;
+    char const * _description;
 };
 
-template<class T> void Tf_InitializeEnvSetting(TfEnvSetting<T> *);
+template <class T>
+void Tf_InitializeEnvSetting(TfEnvSetting<T> *);
 
 /// Returns the value of the specified env setting, registered using
 /// \c TF_DEFINE_ENV_SETTING.
-template<class T> inline T const &TfGetEnvSetting(TfEnvSetting<T> &setting)
-{
-  T *val = setting._value->load();
-  if (ARCH_UNLIKELY(!val)) {
-    Tf_InitializeEnvSetting(&setting);
-    val = setting._value->load();
-  }
-  return *val;
+template <class T>
+inline T const &
+TfGetEnvSetting(TfEnvSetting<T>& setting) {
+    T *val = setting._value->load();
+    if (ARCH_UNLIKELY(!val)) {
+        Tf_InitializeEnvSetting(&setting);
+        val = setting._value->load();
+    }
+    return *val;
 }
 
 // Ensure that we only allow bool, int, and string, and map char * and char
@@ -153,15 +159,15 @@ class Tf_EnvSettingRegistry;
 /// Define an env setting named \p envVar with default value \p defValue and a
 /// descriptive string \p description.
 /// \hideinitializer
-#define TF_DEFINE_ENV_SETTING(envVar, defValue, description) \
-  std::atomic<decltype(Tf_ChooseEnvSettingType(defValue)) *> envVar##_value; \
-  TfEnvSetting<decltype(Tf_ChooseEnvSettingType(defValue))> envVar = { \
-      &envVar##_value, defValue, #envVar, description}; \
-  TF_REGISTRY_FUNCTION_WITH_TAG(Tf_EnvSettingRegistry, envVar) \
-  { \
-    (void)TfGetEnvSetting(envVar); \
-  }
+#define TF_DEFINE_ENV_SETTING(envVar, defValue, description)                  \
+    std::atomic< decltype(Tf_ChooseEnvSettingType(defValue))*>                \
+        envVar##_value;                                                       \
+    TfEnvSetting<decltype(Tf_ChooseEnvSettingType(defValue))> envVar = {      \
+        &envVar##_value, defValue, #envVar, description };                    \
+    TF_REGISTRY_FUNCTION_WITH_TAG(Tf_EnvSettingRegistry, envVar) {            \
+        (void)TfGetEnvSetting(envVar);                                        \
+    }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_ENV_SETTING_H
+#endif // PXR_BASE_TF_ENV_SETTING_H

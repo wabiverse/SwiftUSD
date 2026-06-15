@@ -7,28 +7,30 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/scriptModuleLoader.h"
 #include "Tf/weakPtr.h"
+#include "Tf/scriptModuleLoader.h"
 
-#include "Tf/pyResultConversions.h"
 #include "Tf/pySingleton.h"
+#include "Tf/pyResultConversions.h"
 
-#include <boost/python/class.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapScriptModuleLoader()
-{
-  typedef TfScriptModuleLoader This;
-  class_<This, TfWeakPtr<This>, boost::noncopyable>("ScriptModuleLoader", no_init)
-      .def(TfPySingleton())
-      .def("GetModuleNames", &This::GetModuleNames, return_value_policy<TfPySequenceToList>())
-      .def("GetModulesDict", &This::GetModulesDict)
-      .def("WriteDotFile", &This::WriteDotFile)
+using namespace pxr_boost::python;
 
-      // For testing purposes only.
-      .def("_RegisterLibrary", &This::RegisterLibrary)
-      .def("_LoadModulesForLibrary", &This::LoadModulesForLibrary);
+void wrapScriptModuleLoader() {
+    typedef TfScriptModuleLoader This;
+    class_<This, TfWeakPtr<This>,
+        noncopyable>("ScriptModuleLoader", no_init)
+        .def(TfPySingleton())
+        .def("GetModulesDict", &This::GetModulesDict)
+        .def("WriteDotFile", &This::WriteDotFile)
+
+        // For testing purposes only.
+        .def("_RegisterLibrary", &This::RegisterLibrary)
+        .def("_LoadModulesForLibrary", &This::LoadModulesForLibrary)
+        ;
 }

@@ -19,108 +19,129 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdInstanceSchemaTokens, HD_INSTANCE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdInstanceSchemaTokens,
+    HD_INSTANCE_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathDataSourceHandle HdInstanceSchema::GetInstancer() const
+HdPathDataSourceHandle
+HdInstanceSchema::GetInstancer() const
 {
-  return _GetTypedDataSource<HdPathDataSource>(HdInstanceSchemaTokens->instancer);
+    return _GetTypedDataSource<HdPathDataSource>(
+        HdInstanceSchemaTokens->instancer);
 }
 
-HdIntDataSourceHandle HdInstanceSchema::GetPrototypeIndex() const
+HdIntDataSourceHandle
+HdInstanceSchema::GetPrototypeIndex() const
 {
-  return _GetTypedDataSource<HdIntDataSource>(HdInstanceSchemaTokens->prototypeIndex);
+    return _GetTypedDataSource<HdIntDataSource>(
+        HdInstanceSchemaTokens->prototypeIndex);
 }
 
-HdIntDataSourceHandle HdInstanceSchema::GetInstanceIndex() const
+HdIntDataSourceHandle
+HdInstanceSchema::GetInstanceIndex() const
 {
-  return _GetTypedDataSource<HdIntDataSource>(HdInstanceSchemaTokens->instanceIndex);
+    return _GetTypedDataSource<HdIntDataSource>(
+        HdInstanceSchemaTokens->instanceIndex);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdInstanceSchema::BuildRetained(
-    const HdPathDataSourceHandle &instancer,
-    const HdIntDataSourceHandle &prototypeIndex,
-    const HdIntDataSourceHandle &instanceIndex)
+HdContainerDataSourceHandle
+HdInstanceSchema::BuildRetained(
+        const HdPathDataSourceHandle &instancer,
+        const HdIntDataSourceHandle &prototypeIndex,
+        const HdIntDataSourceHandle &instanceIndex
+)
 {
-  TfToken _names[3];
-  HdDataSourceBaseHandle _values[3];
+    TfToken _names[3];
+    HdDataSourceBaseHandle _values[3];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (instancer) {
-    _names[_count] = HdInstanceSchemaTokens->instancer;
-    _values[_count++] = instancer;
-  }
+    if (instancer) {
+        _names[_count] = HdInstanceSchemaTokens->instancer;
+        _values[_count++] = instancer;
+    }
 
-  if (prototypeIndex) {
-    _names[_count] = HdInstanceSchemaTokens->prototypeIndex;
-    _values[_count++] = prototypeIndex;
-  }
+    if (prototypeIndex) {
+        _names[_count] = HdInstanceSchemaTokens->prototypeIndex;
+        _values[_count++] = prototypeIndex;
+    }
 
-  if (instanceIndex) {
-    _names[_count] = HdInstanceSchemaTokens->instanceIndex;
-    _values[_count++] = instanceIndex;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (instanceIndex) {
+        _names[_count] = HdInstanceSchemaTokens->instanceIndex;
+        _values[_count++] = instanceIndex;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdInstanceSchema::Builder &HdInstanceSchema::Builder::SetInstancer(
+HdInstanceSchema::Builder &
+HdInstanceSchema::Builder::SetInstancer(
     const HdPathDataSourceHandle &instancer)
 {
-  _instancer = instancer;
-  return *this;
+    _instancer = instancer;
+    return *this;
 }
 
-HdInstanceSchema::Builder &HdInstanceSchema::Builder::SetPrototypeIndex(
+HdInstanceSchema::Builder &
+HdInstanceSchema::Builder::SetPrototypeIndex(
     const HdIntDataSourceHandle &prototypeIndex)
 {
-  _prototypeIndex = prototypeIndex;
-  return *this;
+    _prototypeIndex = prototypeIndex;
+    return *this;
 }
 
-HdInstanceSchema::Builder &HdInstanceSchema::Builder::SetInstanceIndex(
+HdInstanceSchema::Builder &
+HdInstanceSchema::Builder::SetInstanceIndex(
     const HdIntDataSourceHandle &instanceIndex)
 {
-  _instanceIndex = instanceIndex;
-  return *this;
+    _instanceIndex = instanceIndex;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdInstanceSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdInstanceSchema::Builder::Build()
 {
-  return HdInstanceSchema::BuildRetained(_instancer, _prototypeIndex, _instanceIndex);
-}
-
-/*static*/
-HdInstanceSchema HdInstanceSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdInstanceSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(HdInstanceSchemaTokens->instance)) :
-          nullptr);
+    return HdInstanceSchema::BuildRetained(
+        _instancer,
+        _prototypeIndex,
+        _instanceIndex
+    );
 }
 
 /*static*/
-const TfToken &HdInstanceSchema::GetSchemaToken()
+HdInstanceSchema
+HdInstanceSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdInstanceSchemaTokens->instance;
+    return HdInstanceSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdInstanceSchemaTokens->instance))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdInstanceSchema::GetDefaultLocator()
+const TfToken &
+HdInstanceSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdInstanceSchemaTokens->instance;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdInstanceSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

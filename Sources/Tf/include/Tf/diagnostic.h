@@ -18,19 +18,19 @@
 /// in this file is appropriate, (and more importantly, when they're not!)
 /// see \ref page_tf_Diagnostic.
 
-#include "Arch/function.h"
-#include "Tf/api.h"
-#include "Tf/diagnosticLite.h"
 #include "pxr/pxrns.h"
+#include "Arch/function.h"
+#include "Tf/diagnosticLite.h"
+#include "Tf/api.h"
 
-#if defined(__cplusplus) || defined(doxygen)
+#if defined(__cplusplus) || defined (doxygen)
 
-#  include "Arch/hints.h"
-#  include "Tf/diagnosticHelper.h"
+#include "Arch/hints.h"
+#include "Tf/diagnosticHelper.h"
 
-#  include <stdarg.h>
-#  include <stddef.h>
-#  include <string>
+#include <stddef.h>
+#include <stdarg.h>
+#include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,7 +38,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 // them here.  The following block is only for doxygen, not seen by a real
 // compile.  To see the actual macro definition, look in diagnosticLite.h.
 
-#  if defined(doxygen)
+#if defined(doxygen)
 
 /// \addtogroup group_tf_Diagnostic
 ///@{
@@ -51,7 +51,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is safe to call in secondary threads.
 ///
 /// \hideinitializer
-#    define TF_ERROR(...)
+#define TF_ERROR(...)
 
 /// Issue an internal programming error, but continue execution.
 ///
@@ -65,7 +65,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is safe to call in secondary threads.
 ///
 /// \hideinitializer
-#    define TF_CODING_ERROR(fmt, args)
+#define TF_CODING_ERROR(fmt, args)
 
 /// Issue a generic runtime error, but continue execution.
 ///
@@ -80,7 +80,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is safe to call in secondary threads.
 ///
 /// \hideinitializer
-#    define TF_RUNTIME_ERROR(fmt, args)
+#define TF_RUNTIME_ERROR(fmt, args)
 
 /// Issue a fatal error and end the program.
 ///
@@ -88,7 +88,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// program will generally terminate upon a fatal error.
 ///
 /// \hideinitializer
-#    define TF_FATAL_ERROR(fmt, args)
+#define TF_FATAL_ERROR(fmt, args)
 
 /// Issue a warning, but continue execution.
 ///
@@ -129,7 +129,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is safe to call in secondary threads.
 ///
 /// \hideinitializer
-#    define TF_WARN(...)
+#define TF_WARN(...)
 
 /// Issue a status message, but continue execution.
 ///
@@ -170,7 +170,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is safe to call in secondary threads.
 ///
 /// \hideinitializer
-#    define TF_STATUS(...)
+#define TF_STATUS(...)
 
 /// Aborts if the condition \c cond is not met.
 ///
@@ -190,7 +190,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// of side effects.
 ///
 /// \hideinitializer
-#    define TF_AXIOM(cond)
+#define TF_AXIOM(cond)
 
 /// The same as TF_AXIOM, but compiled only in dev builds.
 ///
@@ -202,7 +202,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// known (not just suspected!) to be performance critical.
 ///
 /// \hideinitializer
-#    define TF_DEV_AXIOM(cond)
+#define TF_DEV_AXIOM(cond)
 
 /// Checks a condition and reports an error if it evaluates false.
 ///
@@ -229,7 +229,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///     // recovery code to execute since condition was not met.
 /// }
 /// \endcode
-///
+/// 
 /// Here are some examples:
 /// \code
 /// // List should be empty.  If not, issue an error, clear it out and continue.
@@ -240,7 +240,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// }
 ///
 /// // Only add to string if ptr is valid.
-/// string result = ...;
+/// string result = ...; 
 /// if (TF_VERIFY(ptr != NULL)) {
 ///     result += ptr->Method();
 /// }
@@ -263,15 +263,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is safe to call in secondary threads.
 ///
 /// \hideinitializer
-#    define TF_VERIFY(cond[, format, ...])
+#define TF_VERIFY(cond [, format, ...])
 
-#  endif /* defined(doxygen) */
-
+#endif  /* defined(doxygen) */
+           
 //
 // The rest of this is seen by a regular compile (or doxygen).
 //
 
-#  if defined(__cplusplus) || defined(doxygen)
+#if defined(__cplusplus) || defined(doxygen)
 
 /// Get the name of the current function as a \c std::string.
 ///
@@ -289,62 +289,72 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// "Debugging info about function YourClass::SomeMethod."
 ///
 /// \hideinitializer
-#    define TF_FUNC_NAME() ArchGetPrettierFunctionName(__ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__)
+#define TF_FUNC_NAME()                                 \
+    ArchGetPrettierFunctionName(__ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__)
 
 void Tf_TerminateHandler();
 
-#    if !defined(doxygen)
+#if !defined(doxygen)
 
 // Redefine these macros from DiagnosticLite to versions that will accept
 // either string or printf-like args.
 
-#      ifdef TF_CODING_ERROR
-#        undef TF_CODING_ERROR
-#      endif
-#      define TF_CODING_ERROR(...) \
-        Tf_PostErrorHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_CODING_ERROR_TYPE, __VA_ARGS__)
+#ifdef TF_CODING_ERROR
+#undef TF_CODING_ERROR
+#endif
+#define TF_CODING_ERROR(...)                            \
+    Tf_PostErrorHelper(TF_CALL_CONTEXT,                 \
+        TF_DIAGNOSTIC_CODING_ERROR_TYPE, __VA_ARGS__)
 
-#      ifdef TF_FATAL_CODING_ERROR
-#        undef TF_FATAL_CODING_ERROR
-#      endif
-#      define TF_FATAL_CODING_ERROR \
-        Tf_DiagnosticHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_CODING_ERROR_TYPE).IssueFatalError
+#ifdef TF_FATAL_CODING_ERROR
+#undef TF_FATAL_CODING_ERROR
+#endif
+#define TF_FATAL_CODING_ERROR                                \
+    Tf_DiagnosticHelper(TF_CALL_CONTEXT,                \
+        TF_DIAGNOSTIC_CODING_ERROR_TYPE).IssueFatalError
 
-#      ifdef TF_CODING_WARNING
-#        undef TF_CODING_WARNING
-#      endif
-#      define TF_CODING_WARNING(...) \
-        Tf_PostWarningHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_CODING_ERROR_TYPE, __VA_ARGS__)
 
-#      ifdef TF_DIAGNOSTIC_WARNING
-#        undef TF_DIAGNOSTIC_WARNING
-#      endif
-#      define TF_DIAGNOSTIC_WARNING \
-        Tf_DiagnosticHelper(TF_CALL_CONTEXT.Hide(), TF_DIAGNOSTIC_WARNING_TYPE).IssueWarning
+#ifdef TF_CODING_WARNING
+#undef TF_CODING_WARNING
+#endif
+#define TF_CODING_WARNING(...)                   \
+    Tf_PostWarningHelper(TF_CALL_CONTEXT,               \
+        TF_DIAGNOSTIC_CODING_ERROR_TYPE, __VA_ARGS__)
 
-#      ifdef TF_RUNTIME_ERROR
-#        undef TF_RUNTIME_ERROR
-#      endif  // TF_RUNTIME_ERROR
-#      define TF_RUNTIME_ERROR(...) \
-        Tf_PostErrorHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_RUNTIME_ERROR_TYPE, __VA_ARGS__)
+#ifdef TF_DIAGNOSTIC_WARNING
+#undef TF_DIAGNOSTIC_WARNING
+#endif
+#define TF_DIAGNOSTIC_WARNING                                \
+    Tf_DiagnosticHelper(TF_CALL_CONTEXT.Hide(),                \
+        TF_DIAGNOSTIC_WARNING_TYPE).IssueWarning
 
-#      ifdef TF_FATAL_ERROR
-#        undef TF_FATAL_ERROR
-#      endif  // TF_FATAL_ERROR
-#      define TF_FATAL_ERROR \
-        Tf_DiagnosticHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_FATAL_ERROR_TYPE).IssueFatalError
+#ifdef TF_RUNTIME_ERROR
+#undef TF_RUNTIME_ERROR
+#endif // TF_RUNTIME_ERROR
+#define TF_RUNTIME_ERROR(...)                           \
+    Tf_PostErrorHelper(TF_CALL_CONTEXT,                 \
+        TF_DIAGNOSTIC_RUNTIME_ERROR_TYPE, __VA_ARGS__)
 
-#      ifdef TF_DIAGNOSTIC_FATAL_ERROR
-#        undef TF_DIAGNOSTIC_FATAL_ERROR
-#      endif  // TF_DIAGNOSTIC_FATAL_ERROR
-#      define TF_DIAGNOSTIC_FATAL_ERROR \
-        Tf_DiagnosticHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_RUNTIME_ERROR_TYPE).IssueFatalError
+#ifdef TF_FATAL_ERROR
+#undef TF_FATAL_ERROR
+#endif // TF_FATAL_ERROR
+#define TF_FATAL_ERROR                                  \
+    Tf_DiagnosticHelper(TF_CALL_CONTEXT,                \
+        TF_DIAGNOSTIC_FATAL_ERROR_TYPE).IssueFatalError
 
-#      ifdef TF_DIAGNOSTIC_NONFATAL_ERROR
-#        undef TF_DIAGNOSTIC_NONFATAL_ERROR
-#      endif  // TF_DIAGNOSTIC_NONFATAL_ERROR
-#      define TF_DIAGNOSTIC_NONFATAL_ERROR \
-        Tf_DiagnosticHelper(TF_CALL_CONTEXT, TF_DIAGNOSTIC_WARNING_TYPE).IssueWarning
+#ifdef TF_DIAGNOSTIC_FATAL_ERROR
+#undef TF_DIAGNOSTIC_FATAL_ERROR
+#endif // TF_DIAGNOSTIC_FATAL_ERROR
+#define TF_DIAGNOSTIC_FATAL_ERROR                       \
+    Tf_DiagnosticHelper(TF_CALL_CONTEXT,                \
+        TF_DIAGNOSTIC_RUNTIME_ERROR_TYPE).IssueFatalError
+
+#ifdef TF_DIAGNOSTIC_NONFATAL_ERROR
+#undef TF_DIAGNOSTIC_NONFATAL_ERROR
+#endif // TF_DIAGNOSTIC_NONFATAL_ERROR
+#define TF_DIAGNOSTIC_NONFATAL_ERROR                        \
+    Tf_DiagnosticHelper(TF_CALL_CONTEXT,                 \
+        TF_DIAGNOSTIC_WARNING_TYPE).IssueWarning
 
 // Redefine the following three macros from DiagnosticLite to versions that will
 // accept the following sets of arguments:
@@ -355,86 +365,85 @@ void Tf_TerminateHandler();
 // * MACRO(TfDiagnosticInfo, ENUM, const char *, ...)
 // * MACRO(TfDiagnosticInfo, ENUM, const std::string *msg)
 
-#      ifdef TF_WARN
-#        undef TF_WARN
-#      endif  // TF_WARN
-#      define TF_WARN(...) Tf_PostWarningHelper(TF_CALL_CONTEXT, __VA_ARGS__)
+#ifdef TF_WARN
+#undef TF_WARN
+#endif // TF_WARN
+#define TF_WARN(...)                                \
+    Tf_PostWarningHelper(TF_CALL_CONTEXT, __VA_ARGS__)
 
-#      ifdef TF_STATUS
-#        undef TF_STATUS
-#      endif  // TF_STATUS
-#      define TF_STATUS(...) Tf_PostStatusHelper(TF_CALL_CONTEXT, __VA_ARGS__)
+#ifdef TF_STATUS
+#undef TF_STATUS
+#endif // TF_STATUS
+#define TF_STATUS(...)                              \
+    Tf_PostStatusHelper(TF_CALL_CONTEXT, __VA_ARGS__)
 
-#      ifdef TF_ERROR
-#        undef TF_ERROR
-#      endif  // TF_ERROR
-#      define TF_ERROR(...) Tf_PostErrorHelper(TF_CALL_CONTEXT, __VA_ARGS__)
+#ifdef TF_ERROR
+#undef TF_ERROR
+#endif // TF_ERROR
+#define TF_ERROR(...)                              \
+    Tf_PostErrorHelper(TF_CALL_CONTEXT, __VA_ARGS__)
 
-#      ifdef TF_QUIET_ERROR
-#        undef TF_QUIET_ERROR
-#      endif  // TF_ERROR
-#      define TF_QUIET_ERROR(...) Tf_PostQuietlyErrorHelper(TF_CALL_CONTEXT, __VA_ARGS__)
+#ifdef TF_QUIET_ERROR
+#undef TF_QUIET_ERROR
+#endif // TF_ERROR
+#define TF_QUIET_ERROR(...)                              \
+    Tf_PostQuietlyErrorHelper(TF_CALL_CONTEXT, __VA_ARGS__)
 
 // See documentation above.
-#      define TF_VERIFY(cond, ...) \
-        (ARCH_LIKELY(cond) ? \
-             true : \
-             Tf_FailedVerifyHelper(TF_CALL_CONTEXT, #cond, Tf_VerifyStringFormat(__VA_ARGS__)))
+#define TF_VERIFY(cond, ...)                                                   \
+    (ARCH_LIKELY(cond) ? true :                                                \
+     Tf_FailedVerifyHelper(TF_CALL_CONTEXT, # cond,                            \
+                           Tf_VerifyStringFormat(__VA_ARGS__)))
 
 // Helpers for TF_VERIFY.
-TF_API bool Tf_FailedVerifyHelper(TfCallContext const &context,
-                                  char const *condition,
-                                  char const *msg);
+TF_API  bool
+Tf_FailedVerifyHelper(TfCallContext const &context,
+                      char const *condition, char const *msg);
 
 // Helpers for TF_VERIFY.
-inline char const *Tf_VerifyStringFormat()
-{
-  return nullptr;
-}
-TF_API char const *Tf_VerifyStringFormat(const char *format, ...) ARCH_PRINTF_FUNCTION(1, 2);
+inline char const *
+Tf_VerifyStringFormat() { return nullptr; }
+TF_API char const *
+Tf_VerifyStringFormat(const char *format, ...) ARCH_PRINTF_FUNCTION(1, 2);
 
-#    endif  // !doxygen
+#endif // !doxygen
 
-#  endif  // __cplusplus || doxygen
+#endif // __cplusplus || doxygen
 
 /// Sets program name for reporting errors.
 ///
 /// This function simply calls to ArchSetProgramNameForErrors().
-void TfSetProgramNameForErrors(std::string const &programName);
+void TfSetProgramNameForErrors(std::string const& programName);
 
-/// Returns currently set program info.
+/// Returns currently set program info. 
 ///
 /// This function simply calls to ArchGetProgramNameForErrors().
 std::string TfGetProgramNameForErrors();
 
 /// \private
 struct Tf_DiagnosticHelper {
-  Tf_DiagnosticHelper(TfCallContext const &context, TfDiagnosticType type)
-      : _context(context), _type(type)
-  {
-  }
+    Tf_DiagnosticHelper(TfCallContext const &context,
+                        TfDiagnosticType type) :
+        _context(context),
+        _type(type)
+    {
+    }
+    
+    TfCallContext const &GetContext() const { return _context; }
+    TfDiagnosticType GetType() const { return _type; }
 
-  TfCallContext const &GetContext() const
-  {
-    return _context;
-  }
-  TfDiagnosticType GetType() const
-  {
-    return _type;
-  }
+    TF_API void IssueError(std::string const &msg) const;
+    TF_API void IssueError(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2,3);
+    TF_API void IssueFatalError(std::string const &msg) const;
+    TF_API void IssueFatalError(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2,3);
+    TF_API void IssueWarning(std::string const &msg) const;
+    TF_API void IssueWarning(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2,3);
+    TF_API void IssueStatus(std::string const &msg) const;
+    TF_API void IssueStatus(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2,3);
 
-  TF_API void IssueError(std::string const &msg) const;
-  TF_API void IssueError(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
-  TF_API void IssueFatalError(std::string const &msg) const;
-  TF_API void IssueFatalError(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
-  TF_API void IssueWarning(std::string const &msg) const;
-  TF_API void IssueWarning(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
-  TF_API void IssueStatus(std::string const &msg) const;
-  TF_API void IssueStatus(char const *fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
-
- private:
-  TfCallContext _context;
-  TfDiagnosticType _type;
+  private:
+    TfCallContext _context;
+    TfDiagnosticType _type;
 };
 
 #endif
@@ -454,4 +463,4 @@ void TfInstallTerminateAndCrashHandlers();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_DIAGNOSTIC_H
+#endif // PXR_BASE_TF_DIAGNOSTIC_H

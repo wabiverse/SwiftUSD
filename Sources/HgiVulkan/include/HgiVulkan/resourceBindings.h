@@ -7,14 +7,16 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_RESOURCEBINDINGS_H
 #define PXR_IMAGING_HGI_VULKAN_RESOURCEBINDINGS_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/resourceBindings.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
-#include "pxr/pxrns.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiVulkanDevice;
+
 
 ///
 /// \class HgiVulkanResourceBindings
@@ -22,41 +24,48 @@ class HgiVulkanDevice;
 /// Vulkan implementation of HgiResourceBindings.
 ///
 ///
-class HgiVulkanResourceBindings final : public HgiResourceBindings {
- public:
-  HGIVULKAN_API
-  ~HgiVulkanResourceBindings() override;
+class HgiVulkanResourceBindings final : public HgiResourceBindings
+{
+public:
+    HGIVULKAN_API
+    ~HgiVulkanResourceBindings() override;
 
-  /// Binds the resources to GPU.
-  HGIVULKAN_API
-  void BindResources(VkCommandBuffer cb, VkPipelineBindPoint bindPoint, VkPipelineLayout layout);
+    /// Binds the resources to GPU.
+    HGIVULKAN_API
+    void BindResources(
+        VkCommandBuffer cb,
+        VkPipelineBindPoint bindPoint,
+        VkPipelineLayout layout);
 
-  /// Returns the device used to create this object.
-  HGIVULKAN_API
-  HgiVulkanDevice *GetDevice() const;
+    /// Returns the device used to create this object.
+    HGIVULKAN_API
+    HgiVulkanDevice* GetDevice() const;
 
-  /// Returns the (writable) inflight bits of when this object was trashed.
-  HGIVULKAN_API
-  uint64_t &GetInflightBits();
+    /// Returns the (writable) inflight bits of when this object was trashed.
+    HGIVULKAN_API
+    uint64_t & GetInflightBits();
 
- protected:
-  friend class HgiVulkan;
+protected:
+    friend class HgiVulkan;
 
-  HGIVULKAN_API
-  HgiVulkanResourceBindings(HgiVulkanDevice *device, HgiResourceBindingsDesc const &desc);
+    HGIVULKAN_API
+    HgiVulkanResourceBindings(
+        HgiVulkanDevice* device,
+        HgiResourceBindingsDesc const& desc);
 
- private:
-  HgiVulkanResourceBindings() = delete;
-  HgiVulkanResourceBindings &operator=(const HgiVulkanResourceBindings &) = delete;
-  HgiVulkanResourceBindings(const HgiVulkanResourceBindings &) = delete;
+private:
+    HgiVulkanResourceBindings() = delete;
+    HgiVulkanResourceBindings & operator=(const HgiVulkanResourceBindings&) = delete;
+    HgiVulkanResourceBindings(const HgiVulkanResourceBindings&) = delete;
 
-  HgiVulkanDevice *_device;
-  uint64_t _inflightBits;
+    HgiVulkanDevice* _device;
+    uint64_t _inflightBits;
 
-  VkDescriptorPool _vkDescriptorPool;
-  VkDescriptorSetLayout _vkDescriptorSetLayout;
-  VkDescriptorSet _vkDescriptorSet;
+    VkDescriptorPool _vkDescriptorPool;
+    VkDescriptorSetLayout _vkDescriptorSetLayout;
+    VkDescriptorSet _vkDescriptorSet;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

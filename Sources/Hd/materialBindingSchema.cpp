@@ -19,49 +19,58 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialBindingSchemaTokens, HD_MATERIAL_BINDING_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialBindingSchemaTokens,
+    HD_MATERIAL_BINDING_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathDataSourceHandle HdMaterialBindingSchema::GetPath() const
+HdPathDataSourceHandle
+HdMaterialBindingSchema::GetPath() const
 {
-  return _GetTypedDataSource<HdPathDataSource>(HdMaterialBindingSchemaTokens->path);
+    return _GetTypedDataSource<HdPathDataSource>(
+        HdMaterialBindingSchemaTokens->path);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdMaterialBindingSchema::BuildRetained(
+HdContainerDataSourceHandle
+HdMaterialBindingSchema::BuildRetained(
+        const HdPathDataSourceHandle &path
+)
+{
+    TfToken _names[1];
+    HdDataSourceBaseHandle _values[1];
+
+    size_t _count = 0;
+
+    if (path) {
+        _names[_count] = HdMaterialBindingSchemaTokens->path;
+        _values[_count++] = path;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdMaterialBindingSchema::Builder &
+HdMaterialBindingSchema::Builder::SetPath(
     const HdPathDataSourceHandle &path)
 {
-  TfToken _names[1];
-  HdDataSourceBaseHandle _values[1];
-
-  size_t _count = 0;
-
-  if (path) {
-    _names[_count] = HdMaterialBindingSchemaTokens->path;
-    _values[_count++] = path;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    _path = path;
+    return *this;
 }
 
-HdMaterialBindingSchema::Builder &HdMaterialBindingSchema::Builder::SetPath(
-    const HdPathDataSourceHandle &path)
+HdContainerDataSourceHandle
+HdMaterialBindingSchema::Builder::Build()
 {
-  _path = path;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdMaterialBindingSchema::Builder::Build()
-{
-  return HdMaterialBindingSchema::BuildRetained(_path);
-}
+    return HdMaterialBindingSchema::BuildRetained(
+        _path
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

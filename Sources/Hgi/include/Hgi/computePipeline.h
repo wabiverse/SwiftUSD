@@ -7,6 +7,7 @@
 #ifndef PXR_IMAGING_HGI_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGI_COMPUTE_PIPELINE_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/api.h"
 #include "Hgi/attachmentDesc.h"
 #include "Hgi/enums.h"
@@ -14,12 +15,12 @@
 #include "Hgi/resourceBindings.h"
 #include "Hgi/shaderProgram.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \struct HgiComputeShaderConstantsDesc
 ///
@@ -31,19 +32,21 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// </ul>
 ///
 struct HgiComputeShaderConstantsDesc {
-  HGI_API
-  HgiComputeShaderConstantsDesc();
+    HGI_API
+    HgiComputeShaderConstantsDesc();
 
-  uint32_t byteSize;
+    uint32_t byteSize;
 };
 
 HGI_API
-bool operator==(const HgiComputeShaderConstantsDesc &lhs,
-                const HgiComputeShaderConstantsDesc &rhs);
+bool operator==(
+    const HgiComputeShaderConstantsDesc& lhs,
+    const HgiComputeShaderConstantsDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiComputeShaderConstantsDesc &lhs,
-                const HgiComputeShaderConstantsDesc &rhs);
+bool operator!=(
+    const HgiComputeShaderConstantsDesc& lhs,
+    const HgiComputeShaderConstantsDesc& rhs);
 
 /// \struct HgiComputePipelineDesc
 ///
@@ -56,20 +59,26 @@ bool operator!=(const HgiComputeShaderConstantsDesc &lhs,
 ///   Describes the shader uniforms.</li>
 /// </ul>
 ///
-struct HgiComputePipelineDesc {
-  HGI_API
-  HgiComputePipelineDesc();
+struct HgiComputePipelineDesc
+{
+    HGI_API
+    HgiComputePipelineDesc();
 
-  std::string debugName;
-  HgiShaderProgramHandle shaderProgram;
-  HgiComputeShaderConstantsDesc shaderConstantsDesc;
+    std::string debugName;
+    HgiShaderProgramHandle shaderProgram;
+    HgiComputeShaderConstantsDesc shaderConstantsDesc;
 };
 
 HGI_API
-bool operator==(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc &rhs);
+bool operator==(
+    const HgiComputePipelineDesc& lhs,
+    const HgiComputePipelineDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc &rhs);
+bool operator!=(
+    const HgiComputePipelineDesc& lhs,
+    const HgiComputePipelineDesc& rhs);
+
 
 ///
 /// \class HgiComputePipeline
@@ -80,29 +89,31 @@ bool operator!=(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc 
 /// To the client (HdSt) compute pipeline resources are referred to via
 /// opaque, stateless handles (HgiComputePipelineHandle).
 ///
-class HgiComputePipeline {
- public:
-  HGI_API
-  virtual ~HgiComputePipeline();
+class HgiComputePipeline
+{
+public:
+    HGI_API
+    virtual ~HgiComputePipeline();
 
-  /// The descriptor describes the object.
-  HGI_API
-  HgiComputePipelineDesc const &GetDescriptor() const;
+    /// The descriptor describes the object.
+    HGI_API
+    HgiComputePipelineDesc const& GetDescriptor() const;
 
- protected:
-  HGI_API
-  HgiComputePipeline(HgiComputePipelineDesc const &desc);
+protected:
+    HGI_API
+    HgiComputePipeline(HgiComputePipelineDesc const& desc);
 
-  HgiComputePipelineDesc _descriptor;
+    HgiComputePipelineDesc _descriptor;
 
- private:
-  HgiComputePipeline() = delete;
-  HgiComputePipeline &operator=(const HgiComputePipeline &) = delete;
-  HgiComputePipeline(const HgiComputePipeline &) = delete;
+private:
+    HgiComputePipeline() = delete;
+    HgiComputePipeline & operator=(const HgiComputePipeline&) = delete;
+    HgiComputePipeline(const HgiComputePipeline&) = delete;
 };
 
 using HgiComputePipelineHandle = HgiHandle<class HgiComputePipeline>;
 using HgiComputePipelineHandleVector = std::vector<HgiComputePipelineHandle>;
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

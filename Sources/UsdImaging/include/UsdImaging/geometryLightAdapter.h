@@ -9,11 +9,12 @@
 
 /// \file usdImaging/geometryLightAdapter.h
 
+#include "pxr/pxrns.h"
 #include "UsdImaging/api.h"
 #include "UsdImaging/lightAdapter.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 class UsdPrim;
 
@@ -22,26 +23,30 @@ class UsdPrim;
 /// Adapter class for lights of type GeometryLight
 ///
 class UsdImagingGeometryLightAdapter : public UsdImagingLightAdapter {
- public:
-  typedef UsdImagingLightAdapter BaseAdapter;
+public:
+    typedef UsdImagingLightAdapter BaseAdapter;
 
-  UsdImagingGeometryLightAdapter() : UsdImagingLightAdapter() {}
+    UsdImagingGeometryLightAdapter()
+        : UsdImagingLightAdapter()
+    {}
 
-  USDIMAGING_API
-  virtual ~UsdImagingGeometryLightAdapter();
+    USDIMAGING_API
+    virtual ~UsdImagingGeometryLightAdapter();
 
-  USDIMAGING_API
-  virtual SdfPath Populate(UsdPrim const &prim,
-                           UsdImagingIndexProxy *index,
-                           UsdImagingInstancerContext const *instancerContext = NULL);
+    USDIMAGING_API
+    virtual SdfPath Populate(UsdPrim const& prim,
+                     UsdImagingIndexProxy* index,
+                     UsdImagingInstancerContext const* instancerContext = NULL);
 
-  USDIMAGING_API
-  virtual bool IsSupported(UsdImagingIndexProxy const *index) const;
-
- protected:
-  virtual void _RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index) final;
+    USDIMAGING_API
+    virtual bool IsSupported(UsdImagingIndexProxy const* index) const;
+    
+protected:
+    virtual void _RemovePrim(SdfPath const& cachePath,
+                             UsdImagingIndexProxy* index) final;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_GEOMETRY_LIGHT_ADAPTER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_GEOMETRY_LIGHT_ADAPTER_H

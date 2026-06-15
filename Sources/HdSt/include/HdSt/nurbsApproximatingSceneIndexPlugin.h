@@ -11,14 +11,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdSt_NurbsApproximatingSceneIndexPlugin : public HdSceneIndexPlugin {
- public:
-  HdSt_NurbsApproximatingSceneIndexPlugin();
-  ~HdSt_NurbsApproximatingSceneIndexPlugin() override;
+class HdSt_NurbsApproximatingSceneIndexPlugin : public HdSceneIndexPlugin
+{
+public:
+    HdSt_NurbsApproximatingSceneIndexPlugin();
+    ~HdSt_NurbsApproximatingSceneIndexPlugin() override;
 
- protected:  // HdSceneIndexPlugin overrides
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
-                                           const HdContainerDataSourceHandle &inputArgs) override;
+protected: // HdSceneIndexPlugin overrides
+    HdSceneIndexBaseRefPtr _AppendSceneIndex(
+        const HdSceneIndexBaseRefPtr& inputScene,
+        const HdContainerDataSourceHandle& inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

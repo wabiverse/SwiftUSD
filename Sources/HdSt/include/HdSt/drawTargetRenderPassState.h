@@ -7,16 +7,18 @@
 #ifndef PXR_IMAGING_HD_ST_DRAW_TARGET_RENDER_PASS_STATE_H
 #define PXR_IMAGING_HD_ST_DRAW_TARGET_RENDER_PASS_STATE_H
 
+#include "pxr/pxrns.h"
+#include "HdSt/api.h"
 #include "Hd/enums.h"
 #include "Hd/rprimCollection.h"
-#include "HdSt/api.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class VtValue;
-using HdRenderPassAovBindingVector = std::vector<struct HdRenderPassAovBinding>;
+using HdRenderPassAovBindingVector =
+    std::vector<struct HdRenderPassAovBinding>;
 
 /// \class HdStDrawTargetRenderPassState
 ///
@@ -27,72 +29,68 @@ using HdRenderPassAovBindingVector = std::vector<struct HdRenderPassAovBinding>;
 /// to major changes.  It is likely this functionality will be absorbed into
 /// the base class.
 ///
-class HdStDrawTargetRenderPassState final {
- public:
-  HDST_API
-  HdStDrawTargetRenderPassState();
-  HDST_API
-  ~HdStDrawTargetRenderPassState();  // final no need to be virtual
+class HdStDrawTargetRenderPassState final
+{
+public:
+    HDST_API
+    HdStDrawTargetRenderPassState();
+    HDST_API
+    ~HdStDrawTargetRenderPassState();  // final no need to be virtual
 
-  const HdRenderPassAovBindingVector &GetAovBindings() const
-  {
-    return _aovBindings;
-  }
+    const HdRenderPassAovBindingVector &GetAovBindings() const {
+        return _aovBindings;
+    }
 
-  HDST_API
-  void SetAovBindings(const HdRenderPassAovBindingVector &aovBindings);
+    HDST_API
+    void SetAovBindings(const HdRenderPassAovBindingVector &aovBindings);
 
-  /// Sets the priority of values in the depth buffer.
-  /// i.e. should pixels closer or further from the camera win.
-  HDST_API
-  void SetDepthPriority(HdDepthPriority priority);
+    /// Sets the priority of values in the depth buffer.
+    /// i.e. should pixels closer or further from the camera win.
+    HDST_API
+    void SetDepthPriority(HdDepthPriority priority);
 
-  /// Set the path to the camera to use to draw this render path from.
-  HDST_API
-  void SetCamera(const SdfPath &cameraId);
+    /// Set the path to the camera to use to draw this render path from.
+    HDST_API
+    void SetCamera(const SdfPath &cameraId);
 
-  HDST_API
-  void SetRprimCollection(HdRprimCollection const &col);
+    HDST_API
+    void SetRprimCollection(HdRprimCollection const& col);
 
-  HdDepthPriority GetDepthPriority() const
-  {
-    return _depthPriority;
-  }
+    HdDepthPriority GetDepthPriority() const { return _depthPriority; }
 
-  /// Returns the path to the camera to render from.
-  const SdfPath &GetCamera() const
-  {
-    return _cameraId;
-  }
 
-  /// Returns an increasing version number for when the collection object
-  /// is changed.
-  /// Note: This tracks the actual object and not the contents of the
-  /// collection.
-  unsigned int GetRprimCollectionVersion() const
-  {
-    return _rprimCollectionVersion;
-  }
+    /// Returns the path to the camera to render from.
+    const SdfPath &GetCamera() const { return _cameraId; }
 
-  /// Returns the collection associated with this draw target.
-  const HdRprimCollection &GetRprimCollection() const
-  {
-    return _rprimCollection;
-  }
+    /// Returns an increasing version number for when the collection object
+    /// is changed.
+    /// Note: This tracks the actual object and not the contents of the
+    /// collection.
+    unsigned int       GetRprimCollectionVersion() const
+    {
+        return _rprimCollectionVersion;
+    }
 
- private:
-  HdRenderPassAovBindingVector _aovBindings;
-  HdDepthPriority _depthPriority;
+    /// Returns the collection associated with this draw target.
+    const HdRprimCollection &GetRprimCollection() const
+    {
+        return _rprimCollection;
+    }
 
-  SdfPath _cameraId;
+private:
+    HdRenderPassAovBindingVector _aovBindings;
+    HdDepthPriority      _depthPriority;
 
-  HdRprimCollection _rprimCollection;
-  unsigned int _rprimCollectionVersion;
+    SdfPath              _cameraId;
 
-  HdStDrawTargetRenderPassState(const HdStDrawTargetRenderPassState &) = delete;
-  HdStDrawTargetRenderPassState &operator=(const HdStDrawTargetRenderPassState &) = delete;
+    HdRprimCollection    _rprimCollection;
+    unsigned int         _rprimCollectionVersion;
+
+    HdStDrawTargetRenderPassState(const HdStDrawTargetRenderPassState &) = delete;
+    HdStDrawTargetRenderPassState &operator =(const HdStDrawTargetRenderPassState &) = delete;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_DRAW_TARGET_RENDER_PASS_STATE_H
+#endif // PXR_IMAGING_HD_ST_DRAW_TARGET_RENDER_PASS_STATE_H

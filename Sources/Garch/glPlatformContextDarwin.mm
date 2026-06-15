@@ -4,23 +4,17 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "Garch/glPlatformContextDarwin.h"
+
 #include "Arch/defines.h"
 
-#if defined(__APPLE__)
-#  include "pxr/pxrns.h"
-#  include "Garch/GarchDarwin/glPlatformContextDarwin.h"
-#  import <Foundation/Foundation.h>
-#  if defined(PXR_GL_SUPPORT_ENABLED)
-#    if defined(ARCH_OS_OSX)
-#      import <AppKit/NSOpenGL.h>
-typedef NSOpenGLContext NSGLContext;
-#    elif defined(ARCH_OS_IPHONE)
-#      import <UIKit/UIKit.h>
-typedef EAGLContext NSGLContext;
-#    endif // defined(ARCH_OS_IPHONE)
-#  else // !defined(PXR_GL_SUPPORT_ENABLED)
-typedef void* NSGLContext;
-#  endif // defined(PXR_GL_SUPPORT_ENABLED)
+#import <Foundation/Foundation.h>
+#if defined(ARCH_OS_OSX)
+#import <AppKit/NSOpenGL.h>
+using NSGLContext = NSOpenGLContext;
+#else
+using NSGLContext = void;
+#endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -28,7 +22,7 @@ class GarchNSGLContextState::Detail
 {
 public:
     Detail() {
-#if defined(PXR_GL_SUPPORT_ENABLED)
+#if defined(ARCH_OS_OSX)
         context = [NSGLContext currentContext];
 #else
         context = nil;
@@ -83,25 +77,17 @@ GarchNSGLContextState::IsValid() const
 void
 GarchNSGLContextState::MakeCurrent()
 {
-#if defined(PXR_GL_SUPPORT_ENABLED)
-#  if defined(ARCH_OS_IPHONE)
-    [EAGLContext setCurrentContext:_detail->context];
-#  else // !defined(ARCH_OS_IPHONE)
+#if defined(ARCH_OS_OSX)
     [_detail->context makeCurrentContext];
-#  endif // defined(ARCH_OS_IPHONE)
-#endif // defined(PXR_GL_SUPPORT_ENABLED)
+#endif
 }
 
 /// Make no context current.
 void
 GarchNSGLContextState::DoneCurrent()
 {
-#if defined(PXR_GL_SUPPORT_ENABLED)
-#  if defined(ARCH_OS_IPHONE)
-    [EAGLContext setCurrentContext:nil];
-#  else // !defined(ARCH_OS_IPHONE)
+#if defined(ARCH_OS_OSX)
     [NSGLContext clearCurrentContext];
-#  endif // defined(ARCH_OS_IPHONE)
 #endif
 }
 
@@ -124,11 +110,9 @@ GarchSelectCoreProfileMacVisual()
     attribs[c++] = 0;
 
     return (__bridge void*)[[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
-#else // !defined(ARCH_OS_OSX)
-    return NULL;
-#endif // defined(ARCH_OS_OSX)
+#else // ARCH_OS_MACOS
+    return nullptr;
+#endif
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif /* defined(__APPLE__) */

@@ -10,29 +10,34 @@
 #include "Tf/pyStaticTokens.h"
 #include "Vt/valueFromPython.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <string>
-
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static std::string _SdfOpaqueValueRepr(const SdfOpaqueValue &self)
+using namespace pxr_boost::python;
+
+
+static std::string
+_SdfOpaqueValueRepr(const SdfOpaqueValue &self)
 {
-  return TF_PY_REPR_PREFIX + "OpaqueValue()";
+    return TF_PY_REPR_PREFIX + "OpaqueValue()";
 }
 
-static size_t _SdfOpaqueValueHash(const SdfOpaqueValue &self)
+static size_t
+_SdfOpaqueValueHash(const SdfOpaqueValue &self)
 {
-  return TfHash()(self);
+    return TfHash()(self);
 }
 
 void wrapOpaqueValue()
 {
-  class_<SdfOpaqueValue>("OpaqueValue")
-      .def(self == self)
-      .def(self != self)
-      .def("__repr__", _SdfOpaqueValueRepr)
-      .def("__hash__", _SdfOpaqueValueHash);
-  VtValueFromPython<SdfOpaqueValue>();
+    class_<SdfOpaqueValue>("OpaqueValue")
+        .def(self == self)
+        .def(self != self)
+        .def("__repr__", _SdfOpaqueValueRepr)
+        .def("__hash__", _SdfOpaqueValueHash);
+    VtValueFromPython<SdfOpaqueValue>();
 }

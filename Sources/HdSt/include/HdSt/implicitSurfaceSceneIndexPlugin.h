@@ -7,9 +7,9 @@
 #ifndef PXR_IMAGING_HD_ST_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HD_ST_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H
 
-#include "Hd/sceneIndexPlugin.h"
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
+#include "Hd/sceneIndexPlugin.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -20,15 +20,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \note Storm does _not_ natively support implicit geometry such
 /// as spheres or cubes, so they need to be transformed into meshes.
 ///
-class HdSt_ImplicitSurfaceSceneIndexPlugin : public HdSceneIndexPlugin {
- public:
-  HdSt_ImplicitSurfaceSceneIndexPlugin();
+class HdSt_ImplicitSurfaceSceneIndexPlugin : public HdSceneIndexPlugin
+{
+public:
+    HdSt_ImplicitSurfaceSceneIndexPlugin();
 
- protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
-                                           const HdContainerDataSourceHandle &inputArgs) override;
+protected:
+    HdSceneIndexBaseRefPtr _AppendSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputScene,
+        const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H
+#endif // PXR_IMAGING_HD_ST_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H

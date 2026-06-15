@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HD_ENUMS_H
 #define PXR_IMAGING_HD_ENUMS_H
 
-#include "Hd/api.h"
 #include "pxr/pxrns.h"
+#include "Hd/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -16,76 +16,80 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Abstraction of the Graphics compare functions.
 ///
-enum HdCompareFunction {
-  HdCmpFuncNever,
-  HdCmpFuncLess,
-  HdCmpFuncEqual,
-  HdCmpFuncLEqual,
-  HdCmpFuncGreater,
-  HdCmpFuncNotEqual,
-  HdCmpFuncGEqual,
-  HdCmpFuncAlways,
+enum HdCompareFunction
+{
+    HdCmpFuncNever,
+    HdCmpFuncLess,
+    HdCmpFuncEqual,
+    HdCmpFuncLEqual,
+    HdCmpFuncGreater,
+    HdCmpFuncNotEqual,
+    HdCmpFuncGEqual,
+    HdCmpFuncAlways,
 
-  HdCmpFuncLast
+    HdCmpFuncLast
 };
 
 /// \enum HdStencilOp
 ///
 /// Abstraction of the Graphics stencil test operations.
 ///
-enum HdStencilOp {
-  HdStencilOpKeep,
-  HdStencilOpZero,
-  HdStencilOpReplace,
-  HdStencilOpIncrement,
-  HdStencilOpIncrementWrap,
-  HdStencilOpDecrement,
-  HdStencilOpDecrementWrap,
-  HdStencilOpInvert,
+enum HdStencilOp
+{
+    HdStencilOpKeep,
+    HdStencilOpZero,
+    HdStencilOpReplace,
+    HdStencilOpIncrement,
+    HdStencilOpIncrementWrap,
+    HdStencilOpDecrement,
+    HdStencilOpDecrementWrap,
+    HdStencilOpInvert,
 
-  HdStencilOpLast
+    HdStencilOpLast
 };
 
 /// \enum HdBlendOp
 ///
 /// Abstraction of the Graphics blend operations.
 ///
-enum HdBlendOp {
-  HdBlendOpAdd,
-  HdBlendOpSubtract,
-  HdBlendOpReverseSubtract,
-  HdBlendOpMin,
-  HdBlendOpMax,
+enum HdBlendOp
+{
+    HdBlendOpAdd,
+    HdBlendOpSubtract,
+    HdBlendOpReverseSubtract,
+    HdBlendOpMin,
+    HdBlendOpMax,
 
-  HdBlendOpLast
+    HdBlendOpLast
 };
 
 /// \enum HdBlendFactor
 ///
 /// Abstraction of the Graphics blend factors.
 ///
-enum HdBlendFactor {
-  HdBlendFactorZero,
-  HdBlendFactorOne,
-  HdBlendFactorSrcColor,
-  HdBlendFactorOneMinusSrcColor,
-  HdBlendFactorDstColor,
-  HdBlendFactorOneMinusDstColor,
-  HdBlendFactorSrcAlpha,
-  HdBlendFactorOneMinusSrcAlpha,
-  HdBlendFactorDstAlpha,
-  HdBlendFactorOneMinusDstAlpha,
-  HdBlendFactorConstantColor,
-  HdBlendFactorOneMinusConstantColor,
-  HdBlendFactorConstantAlpha,
-  HdBlendFactorOneMinusConstantAlpha,
-  HdBlendFactorSrcAlphaSaturate,
-  HdBlendFactorSrc1Color,
-  HdBlendFactorOneMinusSrc1Color,
-  HdBlendFactorSrc1Alpha,
-  HdBlendFactorOneMinusSrc1Alpha,
+enum HdBlendFactor
+{
+    HdBlendFactorZero,
+    HdBlendFactorOne,
+    HdBlendFactorSrcColor,
+    HdBlendFactorOneMinusSrcColor,
+    HdBlendFactorDstColor,
+    HdBlendFactorOneMinusDstColor,
+    HdBlendFactorSrcAlpha,
+    HdBlendFactorOneMinusSrcAlpha,
+    HdBlendFactorDstAlpha,
+    HdBlendFactorOneMinusDstAlpha,
+    HdBlendFactorConstantColor,
+    HdBlendFactorOneMinusConstantColor,
+    HdBlendFactorConstantAlpha,
+    HdBlendFactorOneMinusConstantAlpha,
+    HdBlendFactorSrcAlphaSaturate,
+    HdBlendFactorSrc1Color,
+    HdBlendFactorOneMinusSrc1Color,
+    HdBlendFactorSrc1Alpha,
+    HdBlendFactorOneMinusSrc1Alpha,
 
-  HdBlendFactorLast
+    HdBlendFactorLast
 };
 
 /// \enum HdCullStyle
@@ -98,13 +102,14 @@ enum HdBlendFactor {
 /// BackUnlessDoubleSided and FrontUnlessDoubleSided will only cull back or
 /// front faces if prim isn't marked as doubleSided.
 ///
-enum HdCullStyle {
-  HdCullStyleDontCare,
-  HdCullStyleNothing,
-  HdCullStyleBack,
-  HdCullStyleFront,
-  HdCullStyleBackUnlessDoubleSided,
-  HdCullStyleFrontUnlessDoubleSided
+enum HdCullStyle
+{
+    HdCullStyleDontCare,
+    HdCullStyleNothing,
+    HdCullStyleBack,
+    HdCullStyleFront,
+    HdCullStyleBackUnlessDoubleSided,
+    HdCullStyleFrontUnlessDoubleSided
 };
 
 /// Returns the opposite of the given cullstyle; backface culling becomes
@@ -112,31 +117,38 @@ enum HdCullStyle {
 HD_API
 HdCullStyle HdInvertCullStyle(HdCullStyle cs);
 
-enum HdPolygonMode { HdPolygonModeFill, HdPolygonModeLine };
+enum HdPolygonMode
+{
+    HdPolygonModeFill,
+    HdPolygonModeLine
+};
 
 /// \enum HdMeshGeomStyle
 ///
 /// Hydra native geom styles.
 ///
 enum HdMeshGeomStyle {
-  HdMeshGeomStyleInvalid,
-  HdMeshGeomStyleSurf,
-  HdMeshGeomStyleEdgeOnly,
-  HdMeshGeomStyleEdgeOnSurf,
-  HdMeshGeomStyleHull,
-  HdMeshGeomStyleHullEdgeOnly,
-  HdMeshGeomStyleHullEdgeOnSurf,
-  HdMeshGeomStylePoints
+    HdMeshGeomStyleInvalid,
+    HdMeshGeomStyleSurf,
+    HdMeshGeomStyleEdgeOnly,
+    HdMeshGeomStyleEdgeOnSurf,
+    HdMeshGeomStyleHull,
+    HdMeshGeomStyleHullEdgeOnly,
+    HdMeshGeomStyleHullEdgeOnSurf,
+    HdMeshGeomStylePoints
 };
 
 enum HdBasisCurvesGeomStyle {
-  HdBasisCurvesGeomStyleInvalid,
-  HdBasisCurvesGeomStyleWire,
-  HdBasisCurvesGeomStylePatch,
-  HdBasisCurvesGeomStylePoints
+    HdBasisCurvesGeomStyleInvalid,
+    HdBasisCurvesGeomStyleWire,
+    HdBasisCurvesGeomStylePatch,
+    HdBasisCurvesGeomStylePoints
 };
 
-enum HdPointsGeomStyle { HdPointsGeomStyleInvalid, HdPointsGeomStylePoints };
+enum HdPointsGeomStyle {
+    HdPointsGeomStyleInvalid,
+    HdPointsGeomStylePoints
+};
 
 ///
 /// \enum HdInterpolation
@@ -162,15 +174,16 @@ enum HdPointsGeomStyle { HdPointsGeomStyleInvalid, HdPointsGeomStylePoints };
 ///
 /// Instance:    One value remains constant across each instance.
 ///
-enum HdInterpolation {
-  HdInterpolationConstant = 0,
-  HdInterpolationUniform,
-  HdInterpolationVarying,
-  HdInterpolationVertex,
-  HdInterpolationFaceVarying,
-  HdInterpolationInstance,
+enum HdInterpolation
+{
+    HdInterpolationConstant = 0,
+    HdInterpolationUniform,
+    HdInterpolationVarying,
+    HdInterpolationVertex,
+    HdInterpolationFaceVarying,
+    HdInterpolationInstance,
 
-  HdInterpolationCount
+    HdInterpolationCount
 };
 
 /// \enum HdDepthPriority
@@ -181,13 +194,14 @@ enum HdInterpolation {
 ///     <li>HdDepthPriorityFarthest    Prioritize objects farthest from the camera</li>
 /// </ul>
 ///
-enum HdDepthPriority {
-  HdDepthPriorityNearest = 0,
-  HdDepthPriorityFarthest,
+enum HdDepthPriority
+{
+    HdDepthPriorityNearest = 0,
+    HdDepthPriorityFarthest,
 
-  HdDepthPriorityCount
+    HdDepthPriorityCount
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ENUMS_H
+#endif // PXR_IMAGING_HD_ENUMS_H

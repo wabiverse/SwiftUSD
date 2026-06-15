@@ -7,14 +7,15 @@
 #ifndef PXR_USD_IMAGING_USDVIEWQ_UTILS_H
 #define PXR_USD_IMAGING_USDVIEWQ_UTILS_H
 
+#include "pxr/pxrns.h"
+#include "UsdViewQ/api.h"
 #include "Usd/prim.h"
 #include "Usd/timeCode.h"
-#include "UsdViewQ/api.h"
-#include "pxr/pxrns.h"
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 class UsdStage;
 
@@ -23,43 +24,47 @@ class UsdStage;
 /// Performance enhancing utilities for usdview.
 ///
 class UsdviewqUtils {
- public:
-  struct PrimInfo {
-    PrimInfo(const UsdPrim &prim, const UsdTimeCode time);
+public:
 
-    bool hasCompositionArcs;
-    bool isActive;
-    bool isImageable;
-    bool isDefined;
-    bool isAbstract;
-    bool isInPrototype;
-    bool isInstance;
-    bool supportsGuides;
-    bool supportsDrawMode;
-    bool isVisibilityInherited;
-    bool visVaries;
-    std::string name;
-    std::string typeName;
-    std::string displayName;
-  };
+    struct PrimInfo {
+        PrimInfo(const UsdPrim &prim, const UsdTimeCode time);
 
-  /// For the given \p stage and \p schemaType, return all active, defined
-  /// prims that either match the schemaType exactly or are a descendant type.
-  //
-  //      Furthermore, this method is not intended to be used publically,
-  //      ultimately Usd will have better core support for fast prim
-  //      filtering by typeName.
-  USDVIEWQ_API
-  static std::vector<UsdPrim> _GetAllPrimsOfType(UsdStagePtr const &stage,
-                                                 TfType const &schemaType);
+        bool hasCompositionArcs;  
+        bool isActive;  
+        bool isImageable;
+        bool isDefined;
+        bool isAbstract;
+        bool isInPrototype;
+        bool isInstance;
+        bool supportsGuides;
+        bool supportsDrawMode;
+        bool isVisibilityInherited;
+        bool visVaries;
+        std::string name;
+        std::string typeName;
+        std::string displayName;
+    };
 
-  /// Fetch prim-related data in batch to to speed up Qt treeview item
-  /// population.  Takes a time argument so that we can evaluate the prim's
-  /// visibiity if it is imageable.
-  USDVIEWQ_API
-  static UsdviewqUtils::PrimInfo GetPrimInfo(const UsdPrim &prim, const UsdTimeCode time);
+    /// For the given \p stage and \p schemaType, return all active, defined
+    /// prims that either match the schemaType exactly or are a descendant type.
+    //
+    //      Furthermore, this method is not intended to be used publically,
+    //      ultimately Usd will have better core support for fast prim
+    //      filtering by typeName. 
+    USDVIEWQ_API
+    static
+    std::vector<UsdPrim> _GetAllPrimsOfType(UsdStagePtr const &stage, 
+                                            TfType const& schemaType);
+
+    /// Fetch prim-related data in batch to to speed up Qt treeview item
+    /// population.  Takes a time argument so that we can evaluate the prim's
+    /// visibiity if it is imageable.
+    USDVIEWQ_API
+    static UsdviewqUtils::PrimInfo GetPrimInfo(const UsdPrim &prim, 
+                                               const UsdTimeCode time);
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USDVIEWQ_UTILS_H
+#endif //PXR_USD_IMAGING_USDVIEWQ_UTILS_H

@@ -6,145 +6,164 @@
 //
 #include "Hdx/package.h"
 
-#include "Hio/imageRegistry.h"
 #include "Plug/plugin.h"
 #include "Plug/thisPlugin.h"
 #include "Tf/diagnostic.h"
 #include "Tf/fileUtils.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
+#include "Hio/imageRegistry.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static TfToken _GetShaderPath(char const *shader)
-{
-  static PlugPluginPtr plugin = PLUG_THIS_PLUGIN;
-  const std::string path = PlugFindPluginResource(plugin, TfStringCatPaths("shaders", shader));
-  TF_VERIFY(!path.empty(), "Could not find shader: %s\n", shader);
 
-  return TfToken(path);
+static TfToken
+_GetShaderPath(char const * shader)
+{
+    static PlugPluginPtr plugin = PLUG_THIS_PLUGIN;
+    const std::string path =
+        PlugFindPluginResource(plugin, TfStringCatPaths("shaders", shader));
+    TF_VERIFY(!path.empty(), "Could not find shader: %s\n", shader);
+
+    return TfToken(path);
 }
 
-static TfToken _GetTexturePath(char const *texture)
+static TfToken
+_GetTexturePath(char const * texture)
 {
-  static PlugPluginPtr plugin = PLUG_THIS_PLUGIN;
-  const std::string path = PlugFindPluginResource(plugin, TfStringCatPaths("textures", texture));
-  TF_VERIFY(!path.empty(), "Could not find texture: %s\n", texture);
+    static PlugPluginPtr plugin = PLUG_THIS_PLUGIN;
+    const std::string path =
+        PlugFindPluginResource(plugin, TfStringCatPaths("textures", texture));
+    TF_VERIFY(!path.empty(), "Could not find texture: %s\n", texture);
 
-  return TfToken(path);
+    return TfToken(path);
 }
 
-TfToken HdxPackageFullscreenShader()
+TfToken
+HdxPackageFullscreenShader()
 {
-  static TfToken shader = _GetShaderPath("fullscreen.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("fullscreen.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassColorShader()
+TfToken
+HdxPackageRenderPassColorShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassColorShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("renderPassColorShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassColorAndSelectionShader()
+TfToken
+HdxPackageRenderPassColorAndSelectionShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassColorAndSelectionShader.glslfx");
-  return shader;
+    static TfToken shader =
+        _GetShaderPath("renderPassColorAndSelectionShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassColorWithOccludedSelectionShader()
+TfToken
+HdxPackageRenderPassColorWithOccludedSelectionShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassColorWithOccludedSelectionShader.glslfx");
-  return shader;
+    static TfToken shader =
+        _GetShaderPath("renderPassColorWithOccludedSelectionShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassIdShader()
+TfToken
+HdxPackageRenderPassPickingShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassIdShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("renderPassPickingShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassPickingShader()
+TfToken
+HdxPackageRenderPassShadowShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassPickingShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("renderPassShadowShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassShadowShader()
+TfToken
+HdxPackageColorChannelShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassShadowShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("colorChannel.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageColorChannelShader()
+TfToken
+HdxPackageColorCorrectionShader()
 {
-  static TfToken shader = _GetShaderPath("colorChannel.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("colorCorrection.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageColorCorrectionShader()
+TfToken
+HdxPackageVisualizeAovShader()
 {
-  static TfToken shader = _GetShaderPath("colorCorrection.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("visualize.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageVisualizeAovShader()
+TfToken
+HdxPackageRenderPassOitShader()
 {
-  static TfToken shader = _GetShaderPath("visualize.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("renderPassOitShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassOitShader()
+TfToken
+HdxPackageRenderPassOitOpaqueShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassOitShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("renderPassOitOpaqueShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassOitOpaqueShader()
+TfToken
+HdxPackageRenderPassOitVolumeShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassOitOpaqueShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("renderPassOitVolumeShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageRenderPassOitVolumeShader()
+TfToken
+HdxPackageOitResolveImageShader()
 {
-  static TfToken shader = _GetShaderPath("renderPassOitVolumeShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("oitResolveImageShader.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageOitResolveImageShader()
+TfToken
+HdxPackageOutlineShader()
 {
-  static TfToken shader = _GetShaderPath("oitResolveImageShader.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("outline.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageOutlineShader()
+TfToken
+HdxPackageSkydomeShader()
 {
-  static TfToken shader = _GetShaderPath("outline.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("skydome.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageSkydomeShader()
+TfToken
+HdxPackageBoundingBoxShader()
 {
-  static TfToken shader = _GetShaderPath("skydome.glslfx");
-  return shader;
+    static TfToken shader = _GetShaderPath("boundingBox.glslfx");
+    return shader;
 }
 
-TfToken HdxPackageBoundingBoxShader()
+TfToken
+HdxPackageDefaultDomeLightTexture()
 {
-  static TfToken shader = _GetShaderPath("boundingBox.glslfx");
-  return shader;
-}
+    // Use the tex version of the Domelight's environment map if supported
+    HioImageRegistry &hioImageReg = HioImageRegistry::GetInstance();
+    static bool useTex = hioImageReg.IsSupportedImageFile("StinsonBeach.tex");
 
-TfToken HdxPackageDefaultDomeLightTexture()
-{
-  // Use the tex version of the Domelight's environment map if supported
-  HioImageRegistry &hioImageReg = HioImageRegistry::GetInstance();
-  static bool useTex = hioImageReg.IsSupportedImageFile("StinsonBeach.tex");
-
-  static TfToken domeLightTexture = (useTex) ? _GetTexturePath("StinsonBeach.tex") :
-                                               _GetTexturePath("StinsonBeach.hdr");
-  return domeLightTexture;
+    static TfToken domeLightTexture = (useTex)
+        ? _GetTexturePath("StinsonBeach.tex")
+        : _GetTexturePath("StinsonBeach.hdr");
+    return domeLightTexture;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

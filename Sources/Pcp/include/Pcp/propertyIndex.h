@@ -7,11 +7,11 @@
 #ifndef PXR_USD_PCP_PROPERTY_INDEX_H
 #define PXR_USD_PCP_PROPERTY_INDEX_H
 
+#include "pxr/pxrns.h"
 #include "Pcp/api.h"
 #include "Pcp/errors.h"
 #include "Pcp/iterator.h"
 #include "Pcp/node.h"
-#include "pxr/pxrns.h"
 
 #include "Sdf/path.h"
 #include "Sdf/propertySpec.h"
@@ -26,18 +26,17 @@ class PcpCache;
 
 /// \class Pcp_PropertyInfo
 ///
-/// Private helper structure containing information about a property in the
+/// Private helper structure containing information about a property in the 
 /// property stack.
 ///
-struct Pcp_PropertyInfo {
-  Pcp_PropertyInfo() {}
-  Pcp_PropertyInfo(const SdfPropertySpecHandle &prop, const PcpNodeRef &node)
-      : propertySpec(prop), originatingNode(node)
-  {
-  }
+struct Pcp_PropertyInfo
+{
+    Pcp_PropertyInfo() { }
+    Pcp_PropertyInfo(const SdfPropertySpecHandle& prop, const PcpNodeRef& node) 
+        : propertySpec(prop), originatingNode(node) { }
 
-  SdfPropertySpecHandle propertySpec;
-  PcpNodeRef originatingNode;
+    SdfPropertySpecHandle propertySpec;
+    PcpNodeRef originatingNode;
 };
 
 /// \class PcpPropertyIndex
@@ -46,75 +45,77 @@ struct Pcp_PropertyInfo {
 /// contribute opinions to a specific property, under composition
 /// semantics.
 ///
-class PcpPropertyIndex {
- public:
-  /// Construct an empty property index.
-  PCP_API
-  PcpPropertyIndex();
+class PcpPropertyIndex
+{
+public:
+    /// Construct an empty property index.
+    PCP_API
+    PcpPropertyIndex();
 
-  /// Copy-construct a property index.
-  PCP_API
-  PcpPropertyIndex(const PcpPropertyIndex &rhs);
+    /// Copy-construct a property index.
+    PCP_API
+    PcpPropertyIndex(const PcpPropertyIndex &rhs);
 
-  /// Swap the contents of this property index with \p index.
-  PCP_API
-  void Swap(PcpPropertyIndex &index);
+    /// Swap the contents of this property index with \p index.
+    PCP_API
+    void Swap(PcpPropertyIndex& index);
 
-  /// Returns true if this property index contains no opinions, false
-  /// otherwise.
-  PCP_API
-  bool IsEmpty() const;
+    /// Returns true if this property index contains no opinions, false
+    /// otherwise.
+    PCP_API
+    bool IsEmpty() const;
 
-  /// Returns range of iterators that encompasses properties in this
-  /// index's property stack.
-  ///
-  /// By default, this returns a range encompassing all properties in the
-  /// index. If \p localOnly is specified, the range will only include
-  /// properties from local nodes in its owning prim's graph.
-  PCP_API
-  PcpPropertyRange GetPropertyRange(bool localOnly = false) const;
+    /// Returns range of iterators that encompasses properties in this
+    /// index's property stack.
+    /// 
+    /// By default, this returns a range encompassing all properties in the
+    /// index. If \p localOnly is specified, the range will only include
+    /// properties from local nodes in its owning prim's graph.
+    PCP_API
+    PcpPropertyRange GetPropertyRange(bool localOnly = false) const;
 
-  /// Return the list of errors local to this property.
-  PcpErrorVector GetLocalErrors() const
-  {
-    return _localErrors ? *_localErrors.get() : PcpErrorVector();
-  }
+    /// Return the list of errors local to this property.
+    PcpErrorVector GetLocalErrors() const {
+        return _localErrors ? *_localErrors.get() : PcpErrorVector();
+    }
 
-  /// Returns the number of local properties in this prim index.
-  PCP_API
-  size_t GetNumLocalSpecs() const;
+    /// Returns the number of local properties in this prim index.
+    PCP_API
+    size_t GetNumLocalSpecs() const;
 
- private:
-  friend class PcpPropertyIterator;
-  friend class Pcp_PropertyIndexer;
+private:
+    friend class PcpPropertyIterator;
+    friend class Pcp_PropertyIndexer;
 
-  // The property stack is a list of Pcp_PropertyInfo objects in
-  // strong-to-weak order.
-  std::vector<Pcp_PropertyInfo> _propertyStack;
+    // The property stack is a list of Pcp_PropertyInfo objects in
+    // strong-to-weak order.
+    std::vector<Pcp_PropertyInfo> _propertyStack;
 
-  /// List of errors local to this property, encountered during computation.
-  /// NULL if no errors were found (the expected common case).
-  std::unique_ptr<PcpErrorVector> _localErrors;
+    /// List of errors local to this property, encountered during computation.
+    /// NULL if no errors were found (the expected common case).
+    std::unique_ptr<PcpErrorVector> _localErrors;
 };
 
 /// Builds a property index for the property at \p path,
 /// internally computing and caching an owning prim index as necessary.
 /// \p allErrors will contain any errors encountered.
 PCP_API
-void PcpBuildPropertyIndex(const SdfPath &propertyPath,
-                           PcpCache *cache,
-                           PcpPropertyIndex *propertyIndex,
-                           PcpErrorVector *allErrors);
+void
+PcpBuildPropertyIndex( const SdfPath& propertyPath, 
+                       PcpCache *cache,
+                       PcpPropertyIndex *propertyIndex,
+                       PcpErrorVector *allErrors );
 
 /// Builds a prim property index for the property at \p propertyPath.
 /// \p allErrors will contain any errors encountered.
 PCP_API
-void PcpBuildPrimPropertyIndex(const SdfPath &propertyPath,
-                               const PcpCache &cache,
-                               const PcpPrimIndex &owningPrimIndex,
-                               PcpPropertyIndex *propertyIndex,
-                               PcpErrorVector *allErrors);
+void
+PcpBuildPrimPropertyIndex( const SdfPath& propertyPath,
+                           const PcpCache& cache,
+                           const PcpPrimIndex& owningPrimIndex,
+                           PcpPropertyIndex *propertyIndex,
+                           PcpErrorVector *allErrors );
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_PCP_PROPERTY_INDEX_H
+#endif // PXR_USD_PCP_PROPERTY_INDEX_H

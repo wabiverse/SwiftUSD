@@ -10,31 +10,41 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdStDrawItemInstance::HdStDrawItemInstance(HdStDrawItem const *drawItem)
-    : _batch(nullptr), _drawItem(drawItem), _batchIndex(0), _visible(drawItem->GetVisible())
+
+HdStDrawItemInstance::HdStDrawItemInstance(HdStDrawItem const* drawItem)
+    : _batch(nullptr)
+    , _drawItem(drawItem)
+    , _batchIndex(0)
+    , _visible(drawItem->GetVisible())
 {
 }
 
-HdStDrawItemInstance::~HdStDrawItemInstance() {}
-
-void HdStDrawItemInstance::SetVisible(bool visible)
+HdStDrawItemInstance::~HdStDrawItemInstance()
 {
-  if (_visible != visible) {
-    _visible = visible;
-    if (_batch) {
-      _batch->DrawItemInstanceChanged(this);
+}
+
+void
+HdStDrawItemInstance::SetVisible(bool visible)
+{
+    if (_visible != visible) {
+        _visible = visible;
+        if (_batch) {
+            _batch->DrawItemInstanceChanged(this);
+        }
     }
-  }
 }
 
-void HdStDrawItemInstance::SetBatchIndex(size_t batchIndex)
+void
+HdStDrawItemInstance::SetBatchIndex(size_t batchIndex)
 {
-  _batchIndex = batchIndex;
+    _batchIndex = batchIndex;
 }
 
-void HdStDrawItemInstance::SetBatch(HdSt_DrawBatch *batch)
+void
+HdStDrawItemInstance::SetBatch(HdSt_DrawBatch *batch)
 {
-  _batch = batch;
+    _batch = batch;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

@@ -6,66 +6,76 @@
 //
 /// \file wrapLayerStackIdentifier.cpp
 
-#include "Pcp/expressionVariables.h"
+#include "pxr/pxrns.h"
 #include "Pcp/layerStackIdentifier.h"
+#include "Pcp/expressionVariables.h"
 #include "Sdf/layer.h"
 #include "Tf/pyUtils.h"
 #include "Tf/stringUtils.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static std::string _Repr(const PcpLayerStackIdentifier &x)
+static
+std::string
+_Repr(const PcpLayerStackIdentifier& x)
 {
-  return TfStringPrintf("%sLayerStackIdentifier(%s, %s, %s, %s)",
-                        TF_PY_REPR_PREFIX.c_str(),
-                        TfPyRepr(x.rootLayer).c_str(),
-                        TfPyRepr(x.sessionLayer).c_str(),
-                        TfPyRepr(x.pathResolverContext).c_str(),
-                        TfPyRepr(x.expressionVariablesOverrideSource).c_str());
+    return TfStringPrintf(
+        "%sLayerStackIdentifier(%s, %s, %s, %s)",
+        TF_PY_REPR_PREFIX.c_str(),
+        TfPyRepr(x.rootLayer).c_str(),
+        TfPyRepr(x.sessionLayer).c_str(),
+        TfPyRepr(x.pathResolverContext).c_str(),
+        TfPyRepr(x.expressionVariablesOverrideSource).c_str());
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapLayerStackIdentifier()
 {
-  typedef PcpLayerStackIdentifier This;
+    typedef PcpLayerStackIdentifier This;
 
-  class_<This>("LayerStackIdentifier")
-      .def(init<>())
-      .def(init<const SdfLayerHandle &,
-                const SdfLayerHandle &,
-                const ArResolverContext &,
-                const PcpExpressionVariablesSource &>(
-          (args("rootLayer"),
-           args("sessionLayer") = SdfLayerHandle(),
-           args("pathResolverContext") = ArResolverContext(),
-           args("expressionVariablesOverrideSource") = PcpExpressionVariablesSource())))
+    class_<This>("LayerStackIdentifier")
+        .def(init<>())
+        .def(init<
+             const SdfLayerHandle &,
+             const SdfLayerHandle &,
+             const ArResolverContext &,
+             const PcpExpressionVariablesSource &>
+             ((args("rootLayer"),
+               args("sessionLayer") = SdfLayerHandle(),
+               args("pathResolverContext") = ArResolverContext(),
+               args("expressionVariablesOverrideSource") = 
+                   PcpExpressionVariablesSource())))
 
-      .add_property("sessionLayer",
-                    make_getter(&This::sessionLayer, return_value_policy<return_by_value>()))
-      .add_property("rootLayer",
-                    make_getter(&This::rootLayer, return_value_policy<return_by_value>()))
-      .add_property(
-          "pathResolverContext",
-          make_getter(&This::pathResolverContext, return_value_policy<return_by_value>()))
-      .add_property("expressionVariablesOverrideSource",
-                    make_getter(&This::expressionVariablesOverrideSource,
-                                return_value_policy<return_by_value>()))
+        .add_property("sessionLayer", 
+                      make_getter(&This::sessionLayer, 
+                                  return_value_policy<return_by_value>()))
+        .add_property("rootLayer", 
+                      make_getter(&This::rootLayer, 
+                                  return_value_policy<return_by_value>()))
+        .add_property("pathResolverContext", 
+                      make_getter(&This::pathResolverContext, 
+                                  return_value_policy<return_by_value>()))
+        .add_property("expressionVariablesOverrideSource", 
+                      make_getter(&This::expressionVariablesOverrideSource, 
+                                  return_value_policy<return_by_value>()))
 
-      .def("__repr__", &_Repr)
-      .def("__hash__", &This::GetHash)
-      .def(!self)
-      .def(self == self)
-      .def(self != self)
-      .def(self < self)
-      .def(self <= self)
-      .def(self > self)
-      .def(self >= self);
+        .def("__repr__", &_Repr)
+        .def("__hash__", &This::GetHash)
+        .def(!self)
+        .def(self == self)
+        .def(self != self)
+        .def(self <  self)
+        .def(self <= self)
+        .def(self >  self)
+        .def(self >= self)
+        ;
 }

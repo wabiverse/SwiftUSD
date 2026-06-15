@@ -15,25 +15,47 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace Sdf_VariableExpressionImpl {
-class Node;
+namespace SdfVariableExpressionASTNodes
+{
+    class Node;
+}
+
+namespace Sdf_VariableExpressionImpl
+{
+    class Node;
 }
 
 /// \class Sdf_VariableExpressionParserResult
 /// Object containing results of parsing an expression.
-class Sdf_VariableExpressionParserResult {
- public:
-  std::unique_ptr<Sdf_VariableExpressionImpl::Node> expression;
-  std::vector<std::string> errors;
+class Sdf_VariableExpressionParserResult
+{
+public:
+    std::unique_ptr<Sdf_VariableExpressionImpl::Node> expression;
+    std::vector<std::string> errors;
 };
 
 /// Parse the given expression.
-Sdf_VariableExpressionParserResult Sdf_ParseVariableExpression(const std::string &expr);
+Sdf_VariableExpressionParserResult
+Sdf_ParseVariableExpression(const std::string& expr);
+
+/// \class Sdf_VariableExpressionASTParserResult
+/// Object containing results of parsing an expression into an AST.
+class Sdf_VariableExpressionASTParserResult
+{
+public:
+    std::unique_ptr<SdfVariableExpressionASTNodes::Node> astRoot;
+    std::vector<std::string> errors;
+};
+
+/// Parse the given expression.
+Sdf_VariableExpressionASTParserResult
+Sdf_ParseVariableExpressionAST(const std::string& expr);
 
 /// Returns true if \p s is recognized as a variable expression.
 /// This does not check the syntax of the expression.
-bool Sdf_IsVariableExpression(const std::string &s);
+bool Sdf_IsVariableExpression(const std::string& s);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif
+

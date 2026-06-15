@@ -5,12 +5,13 @@
 // https://openusd.org/license.
 //
 #include "Glf/glContext.h"
-#include "Garch/glPlatformContext.h"
 #include "Glf/glContextRegistry.h"
+#include "Garch/glPlatformContext.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 //
 // GlfGLContext
@@ -18,103 +19,117 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 GlfGLContext::GlfGLContext()
 {
-  // Do nothing
+    // Do nothing
 }
 
 GlfGLContext::~GlfGLContext()
 {
-  GlfGLContextRegistry::GetInstance().Remove(this);
+    GlfGLContextRegistry::GetInstance().Remove(this);
 }
 
-GlfGLContextSharedPtr GlfGLContext::GetCurrentGLContext()
+GlfGLContextSharedPtr
+GlfGLContext::GetCurrentGLContext()
 {
-  return GlfGLContextRegistry::GetInstance().GetCurrent();
+    return GlfGLContextRegistry::GetInstance().GetCurrent();
 }
 
-GlfGLContextSharedPtr GlfGLContext::GetSharedGLContext()
+GlfGLContextSharedPtr
+GlfGLContext::GetSharedGLContext()
 {
-  return GlfGLContextRegistry::GetInstance().GetShared();
+    return GlfGLContextRegistry::GetInstance().GetShared();
 }
 
-void GlfGLContext::MakeCurrent(const GlfGLContextSharedPtr &context)
+void
+GlfGLContext::MakeCurrent(const GlfGLContextSharedPtr& context)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  if (context && context->IsValid()) {
-    context->_MakeCurrent();
+    if (context && context->IsValid()) {
+        context->_MakeCurrent();
 
-    // Now that this context is current add it to the registry for
-    // later lookup.
-    GlfGLContextRegistry::GetInstance().DidMakeCurrent(context);
-  }
-  else {
-    DoneCurrent();
-  }
+        // Now that this context is current add it to the registry for
+        // later lookup.
+        GlfGLContextRegistry::GetInstance().DidMakeCurrent(context);
+    }
+    else {
+        DoneCurrent();
+    }
 }
 
-bool GlfGLContext::AreSharing(GlfGLContextSharedPtr const &context1,
-                              GlfGLContextSharedPtr const &context2)
+bool
+GlfGLContext::AreSharing(GlfGLContextSharedPtr const & context1,
+                         GlfGLContextSharedPtr const & context2)
 {
-  return (context1 && context1->IsSharing(context2));
+    return (context1 && context1->IsSharing(context2));
 }
 
-bool GlfGLContext::IsInitialized()
+bool
+GlfGLContext::IsInitialized()
 {
-  return GlfGLContextRegistry::GetInstance().IsInitialized();
+    return GlfGLContextRegistry::GetInstance().IsInitialized();
 }
 
-bool GlfGLContext::IsCurrent() const
+bool
+GlfGLContext::IsCurrent() const
 {
-  return IsValid() && _IsEqual(GetCurrentGLContext());
+    return IsValid() && _IsEqual(GetCurrentGLContext());
 }
 
-void GlfGLContext::MakeCurrent()
+void
+GlfGLContext::MakeCurrent()
 {
-  if (IsValid()) {
-    _MakeCurrent();
-  }
+    if (IsValid()) {
+        _MakeCurrent();
+    }
 }
 
-void GlfGLContext::DoneCurrent()
+void
+GlfGLContext::DoneCurrent()
 {
-  GarchGLPlatformContextState::DoneCurrent();
+    GarchGLPlatformContextState::DoneCurrent();
 }
 
-bool GlfGLContext::IsSharing(GlfGLContextSharedPtr const &otherContext)
+bool
+GlfGLContext::IsSharing(GlfGLContextSharedPtr const & otherContext)
 {
-  return otherContext && IsValid() && otherContext->IsValid() && _IsSharing(otherContext);
+    return otherContext && IsValid() &&
+           otherContext->IsValid() && _IsSharing(otherContext);
 }
 
 //
 // GlfGLContextScopeHolder
 //
 
-GlfGLContextScopeHolder::GlfGLContextScopeHolder(const GlfGLContextSharedPtr &newContext)
-    : _newContext(newContext)
+GlfGLContextScopeHolder::GlfGLContextScopeHolder(
+    const GlfGLContextSharedPtr& newContext) :
+    _newContext(newContext)
 {
-  if (_newContext) {
-    _oldContext = GlfGLContext::GetCurrentGLContext();
-  }
-  _MakeNewContextCurrent();
+    if (_newContext) {
+        _oldContext = GlfGLContext::GetCurrentGLContext();
+    }
+    _MakeNewContextCurrent();
 }
 
 GlfGLContextScopeHolder::~GlfGLContextScopeHolder()
 {
-  _RestoreOldContext();
+    _RestoreOldContext();
 }
 
-void GlfGLContextScopeHolder::_MakeNewContextCurrent()
+void
+GlfGLContextScopeHolder::_MakeNewContextCurrent()
 {
-  if (_newContext) {
-    GlfGLContext::MakeCurrent(_newContext);
-  }
+    if (_newContext) {
+        GlfGLContext::MakeCurrent(_newContext);
+    }
 }
 
-void GlfGLContextScopeHolder::_RestoreOldContext()
+void
+GlfGLContextScopeHolder::_RestoreOldContext()
 {
-  if (_newContext) {
-    GlfGLContext::MakeCurrent(_oldContext);
-  }
+    if (_newContext) {
+        GlfGLContext::MakeCurrent(_oldContext);
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

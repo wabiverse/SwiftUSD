@@ -13,7 +13,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace UsdImaging_NiInstanceAggregationSceneIndex_Impl {
+namespace UsdImaging_NiInstanceAggregationSceneIndex_Impl
+{
 TF_DECLARE_WEAK_PTRS(_InstanceObserver);
 }
 
@@ -121,8 +122,7 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiInstanceAggregationSceneIndex);
 ///         instancerTopology:
 ///             instanceIndices:
 ///                 i0: [ 0 ]
-///             prototypes: [
-///             /UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype ]
+///             prototypes: [ /UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype ]
 ///             instanceLocations: [ /Cube_1 ] # for picking
 ///         primvars:
 ///             hydra:instanceTransforms:
@@ -137,14 +137,15 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiInstanceAggregationSceneIndex);
 /// {
 ///     def Cube "MyCube"
 ///     {
-///          rel:material:binding = </MyMaterial>
 ///     }
 /// }
 ///
 /// def "Cube_1" (
 ///     instanceable = true
 ///     references = </MyPrototype>
+///     prepend apiSchemas = ["MaterialBindingAPI"]
 /// {
+///     rel:material:binding = </Cube_1/MyMaterial>
 /// }
 ///
 /// UsdImaging_NiInstanceAggregationSceneIndex (with empty prototype root)
@@ -157,7 +158,7 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiInstanceAggregationSceneIndex);
 ///     primType: ""
 ///     dataSource:
 ///         materialBinding:
-///             "": /MyMaterial
+///             "": /UsdNiPropagatedPrototypes/Binding312...436/__Prototype_1/UsdNiInstancer/MyMaterial # Note that it was translated to point into the propagated prototype by the UsdImagingRerootingContainerDataSource.
 /// /UsdNiPropagatedPrototypes/Binding312...436/__Prototype_1
 ///     primType: ""
 /// /UsdNiPropagatedPrototypes/Binding312...436/__Prototype_1/UsdNiInstancer
@@ -166,9 +167,8 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiInstanceAggregationSceneIndex);
 ///         instancerTopology:
 ///             instanceIndices:
 ///                 i0: 0
-///             prototypes: [
-///             /UsdNiPropagatedPrototypes/Binding312...436/__Prototype_1/UsdNiInstancer/UsdNiPrototype
-///             ] instanceLocations: [ /Cube_1 ] # for picking
+///             prototypes: [ /UsdNiPropagatedPrototypes/Binding312...436/__Prototype_1/UsdNiInstancer/UsdNiPrototype ]
+///             instanceLocations: [ /Cube_1 ] # for picking
 ///         primvars:
 ///             hydra:instanceTransforms:
 ///                 primvarValue: [ identity matrix ]
@@ -201,15 +201,12 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiInstanceAggregationSceneIndex);
 ///
 /// /MyPointInstancer
 /// /MyPointInstancer/MyPointPrototype
-/// /MyPointInstancer/MyPointPrototype/ForInstancer434...256 # Where point instancer inserted copy
-/// of /MyPointPrototype
-///                                                          # It will be the enclosing prototype
-///                                                          root for the instance.
+/// /MyPointInstancer/MyPointPrototype/ForInstancer434...256 # Where point instancer inserted copy of /MyPointPrototype
+///                                                          # It will be the enclosing prototype root for the instance.
 ///     primType: ""
 ///     dataSource:
 ///         instance:
-///             instancer:
-///             /MyPointInstancer/MyPointPrototype/ForInstancer434...256/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer
+///             instancer: /MyPointInstancer/MyPointPrototype/ForInstancer434...256/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer
 ///             prototypeId: 0
 ///             instanceId: 0
 /// /MyPointInstancer/MyPointPrototype/ForInstancer434...256/UsdNiPropagatedPrototypes
@@ -221,83 +218,102 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiInstanceAggregationSceneIndex);
 ///         instancerTopology:
 ///             instanceIndices:
 ///                 i0: [ 0 ]
-///             prototypes: [
-///             /MyPointInstancer/MyPointPrototype/ForInstancer434...256/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype
-///             ] instanceLocations: [ /Cube_1 ] # for picking
+///             prototypes: [ /MyPointInstancer/MyPointPrototype/ForInstancer434...256/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype ]
+///             instanceLocations: [ /Cube_1 ] # for picking
 ///         primvars:
 ///             hydra:instanceTransforms:
 ///                 primvarValue: [ identity matrix ]
 ///                 interpolation: instance
 ///
-class UsdImaging_NiInstanceAggregationSceneIndex final : public HdFilteringSceneIndexBase {
- public:
-  // forNativePrototype = false indicates that this scene index is
-  // instantiated for the USD stage with all USD prototypes filtered out.
-  // forNativePrototype = true indicates that it is instantiated for a USD
-  // prototype and the instancers it adds for the instancers within this
-  // prototype need to have the instancedBy data source populated in turn.
-  //
-  // instanceDataSourceNames are the names of the data sources of a native
-  // instance prim that need to have the same values for the instances to
-  // be aggregated. A copy of these data sources is bundled into the
-  // prim data source for the binding scope.
-  //
-  static UsdImaging_NiInstanceAggregationSceneIndexRefPtr New(
-      HdSceneIndexBaseRefPtr const &inputScene,
-      const bool forNativePrototype,
-      const TfTokenVector &instanceDataSourceNames)
-  {
-    return TfCreateRefPtr(new UsdImaging_NiInstanceAggregationSceneIndex(
-        inputScene, forNativePrototype, instanceDataSourceNames));
-  }
+class UsdImaging_NiInstanceAggregationSceneIndex final
+                : public HdFilteringSceneIndexBase
+                , public HdEncapsulatingSceneIndexBase
+{
+public:
+    // forNativePrototype = false indicates that this scene index is
+    // instantiated for the USD stage with all USD prototypes filtered out.
+    // forNativePrototype = true indicates that it is instantiated for a USD
+    // prototype and the instancers it adds for the instancers within this
+    // prototype need to have the instancedBy data source populated in turn.
+    //
+    // instanceDataSourceNames are the names of the data sources of a native
+    // instance prim that need to have the same values for the instances to
+    // be aggregated. A copy of these data sources is bundled into the
+    // prim data source for the binding scope.
+    // 
+    static UsdImaging_NiInstanceAggregationSceneIndexRefPtr New(
+            HdSceneIndexBaseRefPtr const &inputScene,
+            const bool forNativePrototype,
+            const TfTokenVector &instanceDataSourceNames)
+    {
+        return TfCreateRefPtr(
+            new UsdImaging_NiInstanceAggregationSceneIndex(
+                inputScene, forNativePrototype, instanceDataSourceNames));
+    }
 
-  ~UsdImaging_NiInstanceAggregationSceneIndex() override;
+    ~UsdImaging_NiInstanceAggregationSceneIndex() override;
 
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
-  std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const override;
+    std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const override;
 
-  // If the given path is for an instancer in this scene index, returns the
-  // name of the prototype that this instancer is meant to instance.
-  // Otherwise, return empty token.
-  static TfToken GetPrototypeNameFromInstancerPath(const SdfPath &primPath);
+    std::vector<HdSceneIndexBaseRefPtr> GetEncapsulatedScenes() const override;
 
-  // If the given path is for an instancer in this scene index, returns
-  // the path of the scope containing the bindings that need to be
-  // applied to the prototype. Otherwise, return empty token.
-  //
-  // That is the data source of that scope needs to be used when resolving
-  // the opinions on the prototype that this instancer is meant to instance.
-  static SdfPath GetBindingScopeFromInstancerPath(const SdfPath &primPath);
+    // If the given path is for an instancer in this scene index, returns the
+    // name of the prototype that this instancer is meant to instance.
+    // Otherwise, return empty token.
+    static
+    TfToken GetPrototypeNameFromInstancerPath(const SdfPath &primPath);
 
- private:
-  friend class _RetainedSceneIndexObserver;
-  class _RetainedSceneIndexObserver : public HdSceneIndexObserver {
-   public:
-    _RetainedSceneIndexObserver(UsdImaging_NiInstanceAggregationSceneIndex *owner);
+    // If the given path is for an instancer in this scene index, returns
+    // the path of the scope containing the bindings that need to be
+    // applied to the prototype. Otherwise, return empty token.
+    //
+    // That is the data source of that scope needs to be used when resolving
+    // the opinions on the prototype that this instancer is meant to instance.
+    static
+    SdfPath GetBindingScopeFromInstancerPath(const SdfPath &primPath);
 
-    void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
-    void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
-    void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
-    void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
+private:
+    friend class _RetainedSceneIndexObserver;
+    class _RetainedSceneIndexObserver : public HdSceneIndexObserver
+    {
+    public:
+        _RetainedSceneIndexObserver(
+            UsdImaging_NiInstanceAggregationSceneIndex * owner);
 
-   private:
-    UsdImaging_NiInstanceAggregationSceneIndex *const _owner;
-  };
+        void PrimsAdded(
+            const HdSceneIndexBase &sender,
+            const AddedPrimEntries &entries) override;
+        void PrimsDirtied(
+            const HdSceneIndexBase &sender,
+            const DirtiedPrimEntries &entries) override;
+        void PrimsRemoved(
+            const HdSceneIndexBase &sender,
+            const RemovedPrimEntries &entries) override;
+        void PrimsRenamed(
+            const HdSceneIndexBase &sender,
+            const RenamedPrimEntries &entries) override;
 
-  UsdImaging_NiInstanceAggregationSceneIndex(HdSceneIndexBaseRefPtr const &inputScene,
-                                             bool forNativePrototype,
-                                             const TfTokenVector &instanceDataSourceNames);
+    private:
+        UsdImaging_NiInstanceAggregationSceneIndex * const _owner;
+    };
 
-  const TfTokenVector _instanceDataSourceNames;
+    UsdImaging_NiInstanceAggregationSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputScene,
+        bool forNativePrototype,
+        const TfTokenVector &instanceDataSourceNames);
 
-  std::unique_ptr<UsdImaging_NiInstanceAggregationSceneIndex_Impl::_InstanceObserver> const
-      _instanceObserver;
-  _RetainedSceneIndexObserver _retainedSceneIndexObserver;
+    const TfTokenVector _instanceDataSourceNames;
+
+    std::unique_ptr<
+        UsdImaging_NiInstanceAggregationSceneIndex_Impl::
+        _InstanceObserver> const _instanceObserver;
+    _RetainedSceneIndexObserver _retainedSceneIndexObserver;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_INSTANCE_AGGREGATION_SCENE_INDEX_H
+#endif // PXR_USD_IMAGING_INSTANCE_AGGREGATION_SCENE_INDEX_H

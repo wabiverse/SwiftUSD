@@ -19,245 +19,383 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdLegacyDisplayStyleSchemaTokens, HD_LEGACY_DISPLAY_STYLE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdLegacyDisplayStyleSchemaTokens,
+    HD_LEGACY_DISPLAY_STYLE_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdIntDataSourceHandle HdLegacyDisplayStyleSchema::GetRefineLevel() const
+HdIntDataSourceHandle
+HdLegacyDisplayStyleSchema::GetRefineLevel() const
 {
-  return _GetTypedDataSource<HdIntDataSource>(HdLegacyDisplayStyleSchemaTokens->refineLevel);
+    return _GetTypedDataSource<HdIntDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->refineLevel);
 }
 
-HdBoolDataSourceHandle HdLegacyDisplayStyleSchema::GetFlatShadingEnabled() const
+HdBoolDataSourceHandle
+HdLegacyDisplayStyleSchema::GetFlatShadingEnabled() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(
-      HdLegacyDisplayStyleSchemaTokens->flatShadingEnabled);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->flatShadingEnabled);
 }
 
-HdBoolDataSourceHandle HdLegacyDisplayStyleSchema::GetDisplacementEnabled() const
+HdBoolDataSourceHandle
+HdLegacyDisplayStyleSchema::GetDisplacementEnabled() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(
-      HdLegacyDisplayStyleSchemaTokens->displacementEnabled);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->displacementEnabled);
 }
 
-HdBoolDataSourceHandle HdLegacyDisplayStyleSchema::GetOccludedSelectionShowsThrough() const
+HdBoolDataSourceHandle
+HdLegacyDisplayStyleSchema::GetDisplayInOverlay() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(
-      HdLegacyDisplayStyleSchemaTokens->occludedSelectionShowsThrough);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->displayInOverlay);
 }
 
-HdBoolDataSourceHandle HdLegacyDisplayStyleSchema::GetPointsShadingEnabled() const
+HdBoolDataSourceHandle
+HdLegacyDisplayStyleSchema::GetOccludedSelectionShowsThrough() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(
-      HdLegacyDisplayStyleSchemaTokens->pointsShadingEnabled);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->occludedSelectionShowsThrough);
 }
 
-HdBoolDataSourceHandle HdLegacyDisplayStyleSchema::GetMaterialIsFinal() const
+HdBoolDataSourceHandle
+HdLegacyDisplayStyleSchema::GetPointsShadingEnabled() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdLegacyDisplayStyleSchemaTokens->materialIsFinal);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->pointsShadingEnabled);
 }
 
-HdTokenDataSourceHandle HdLegacyDisplayStyleSchema::GetShadingStyle() const
+HdBoolDataSourceHandle
+HdLegacyDisplayStyleSchema::GetMaterialIsFinal() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdLegacyDisplayStyleSchemaTokens->shadingStyle);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->materialIsFinal);
 }
 
-HdTokenArrayDataSourceHandle HdLegacyDisplayStyleSchema::GetReprSelector() const
+HdTokenDataSourceHandle
+HdLegacyDisplayStyleSchema::GetShadingStyle() const
 {
-  return _GetTypedDataSource<HdTokenArrayDataSource>(
-      HdLegacyDisplayStyleSchemaTokens->reprSelector);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->shadingStyle);
 }
 
-HdTokenDataSourceHandle HdLegacyDisplayStyleSchema::GetCullStyle() const
+HdTokenArrayDataSourceHandle
+HdLegacyDisplayStyleSchema::GetReprSelector() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdLegacyDisplayStyleSchemaTokens->cullStyle);
+    return _GetTypedDataSource<HdTokenArrayDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->reprSelector);
+}
+
+HdTokenDataSourceHandle
+HdLegacyDisplayStyleSchema::GetCullStyle() const
+{
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdLegacyDisplayStyleSchemaTokens->cullStyle);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdLegacyDisplayStyleSchema::BuildRetained(
-    const HdIntDataSourceHandle &refineLevel,
-    const HdBoolDataSourceHandle &flatShadingEnabled,
-    const HdBoolDataSourceHandle &displacementEnabled,
-    const HdBoolDataSourceHandle &occludedSelectionShowsThrough,
-    const HdBoolDataSourceHandle &pointsShadingEnabled,
-    const HdBoolDataSourceHandle &materialIsFinal,
-    const HdTokenDataSourceHandle &shadingStyle,
-    const HdTokenArrayDataSourceHandle &reprSelector,
-    const HdTokenDataSourceHandle &cullStyle)
+HdContainerDataSourceHandle
+HdLegacyDisplayStyleSchema::BuildRetained(
+        const HdIntDataSourceHandle &refineLevel,
+        const HdBoolDataSourceHandle &flatShadingEnabled,
+        const HdBoolDataSourceHandle &displacementEnabled,
+        const HdBoolDataSourceHandle &displayInOverlay,
+        const HdBoolDataSourceHandle &occludedSelectionShowsThrough,
+        const HdBoolDataSourceHandle &pointsShadingEnabled,
+        const HdBoolDataSourceHandle &materialIsFinal,
+        const HdTokenDataSourceHandle &shadingStyle,
+        const HdTokenArrayDataSourceHandle &reprSelector,
+        const HdTokenDataSourceHandle &cullStyle
+)
 {
-  TfToken _names[9];
-  HdDataSourceBaseHandle _values[9];
+    TfToken _names[10];
+    HdDataSourceBaseHandle _values[10];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (refineLevel) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->refineLevel;
-    _values[_count++] = refineLevel;
-  }
+    if (refineLevel) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->refineLevel;
+        _values[_count++] = refineLevel;
+    }
 
-  if (flatShadingEnabled) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->flatShadingEnabled;
-    _values[_count++] = flatShadingEnabled;
-  }
+    if (flatShadingEnabled) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->flatShadingEnabled;
+        _values[_count++] = flatShadingEnabled;
+    }
 
-  if (displacementEnabled) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->displacementEnabled;
-    _values[_count++] = displacementEnabled;
-  }
+    if (displacementEnabled) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->displacementEnabled;
+        _values[_count++] = displacementEnabled;
+    }
 
-  if (occludedSelectionShowsThrough) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->occludedSelectionShowsThrough;
-    _values[_count++] = occludedSelectionShowsThrough;
-  }
+    if (displayInOverlay) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->displayInOverlay;
+        _values[_count++] = displayInOverlay;
+    }
 
-  if (pointsShadingEnabled) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->pointsShadingEnabled;
-    _values[_count++] = pointsShadingEnabled;
-  }
+    if (occludedSelectionShowsThrough) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->occludedSelectionShowsThrough;
+        _values[_count++] = occludedSelectionShowsThrough;
+    }
 
-  if (materialIsFinal) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->materialIsFinal;
-    _values[_count++] = materialIsFinal;
-  }
+    if (pointsShadingEnabled) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->pointsShadingEnabled;
+        _values[_count++] = pointsShadingEnabled;
+    }
 
-  if (shadingStyle) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->shadingStyle;
-    _values[_count++] = shadingStyle;
-  }
+    if (materialIsFinal) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->materialIsFinal;
+        _values[_count++] = materialIsFinal;
+    }
 
-  if (reprSelector) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->reprSelector;
-    _values[_count++] = reprSelector;
-  }
+    if (shadingStyle) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->shadingStyle;
+        _values[_count++] = shadingStyle;
+    }
 
-  if (cullStyle) {
-    _names[_count] = HdLegacyDisplayStyleSchemaTokens->cullStyle;
-    _values[_count++] = cullStyle;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (reprSelector) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->reprSelector;
+        _values[_count++] = reprSelector;
+    }
+
+    if (cullStyle) {
+        _names[_count] = HdLegacyDisplayStyleSchemaTokens->cullStyle;
+        _values[_count++] = cullStyle;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetRefineLevel(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetRefineLevel(
     const HdIntDataSourceHandle &refineLevel)
 {
-  _refineLevel = refineLevel;
-  return *this;
+    _refineLevel = refineLevel;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetFlatShadingEnabled(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetFlatShadingEnabled(
     const HdBoolDataSourceHandle &flatShadingEnabled)
 {
-  _flatShadingEnabled = flatShadingEnabled;
-  return *this;
+    _flatShadingEnabled = flatShadingEnabled;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetDisplacementEnabled(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetDisplacementEnabled(
     const HdBoolDataSourceHandle &displacementEnabled)
 {
-  _displacementEnabled = displacementEnabled;
-  return *this;
+    _displacementEnabled = displacementEnabled;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::
-    SetOccludedSelectionShowsThrough(const HdBoolDataSourceHandle &occludedSelectionShowsThrough)
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetDisplayInOverlay(
+    const HdBoolDataSourceHandle &displayInOverlay)
 {
-  _occludedSelectionShowsThrough = occludedSelectionShowsThrough;
-  return *this;
+    _displayInOverlay = displayInOverlay;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetPointsShadingEnabled(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetOccludedSelectionShowsThrough(
+    const HdBoolDataSourceHandle &occludedSelectionShowsThrough)
+{
+    _occludedSelectionShowsThrough = occludedSelectionShowsThrough;
+    return *this;
+}
+
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetPointsShadingEnabled(
     const HdBoolDataSourceHandle &pointsShadingEnabled)
 {
-  _pointsShadingEnabled = pointsShadingEnabled;
-  return *this;
+    _pointsShadingEnabled = pointsShadingEnabled;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetMaterialIsFinal(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetMaterialIsFinal(
     const HdBoolDataSourceHandle &materialIsFinal)
 {
-  _materialIsFinal = materialIsFinal;
-  return *this;
+    _materialIsFinal = materialIsFinal;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetShadingStyle(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetShadingStyle(
     const HdTokenDataSourceHandle &shadingStyle)
 {
-  _shadingStyle = shadingStyle;
-  return *this;
+    _shadingStyle = shadingStyle;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetReprSelector(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetReprSelector(
     const HdTokenArrayDataSourceHandle &reprSelector)
 {
-  _reprSelector = reprSelector;
-  return *this;
+    _reprSelector = reprSelector;
+    return *this;
 }
 
-HdLegacyDisplayStyleSchema::Builder &HdLegacyDisplayStyleSchema::Builder::SetCullStyle(
+HdLegacyDisplayStyleSchema::Builder &
+HdLegacyDisplayStyleSchema::Builder::SetCullStyle(
     const HdTokenDataSourceHandle &cullStyle)
 {
-  _cullStyle = cullStyle;
-  return *this;
+    _cullStyle = cullStyle;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdLegacyDisplayStyleSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdLegacyDisplayStyleSchema::Builder::Build()
 {
-  return HdLegacyDisplayStyleSchema::BuildRetained(_refineLevel,
-                                                   _flatShadingEnabled,
-                                                   _displacementEnabled,
-                                                   _occludedSelectionShowsThrough,
-                                                   _pointsShadingEnabled,
-                                                   _materialIsFinal,
-                                                   _shadingStyle,
-                                                   _reprSelector,
-                                                   _cullStyle);
-}
-
-/*static*/
-HdLegacyDisplayStyleSchema HdLegacyDisplayStyleSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdLegacyDisplayStyleSchema(fromParentContainer ?
-                                        HdContainerDataSource::Cast(fromParentContainer->Get(
-                                            HdLegacyDisplayStyleSchemaTokens->displayStyle)) :
-                                        nullptr);
+    return HdLegacyDisplayStyleSchema::BuildRetained(
+        _refineLevel,
+        _flatShadingEnabled,
+        _displacementEnabled,
+        _displayInOverlay,
+        _occludedSelectionShowsThrough,
+        _pointsShadingEnabled,
+        _materialIsFinal,
+        _shadingStyle,
+        _reprSelector,
+        _cullStyle
+    );
 }
 
 /*static*/
-const TfToken &HdLegacyDisplayStyleSchema::GetSchemaToken()
+HdLegacyDisplayStyleSchema
+HdLegacyDisplayStyleSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdLegacyDisplayStyleSchemaTokens->displayStyle;
+    return HdLegacyDisplayStyleSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdLegacyDisplayStyleSchemaTokens->displayStyle))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdLegacyDisplayStyleSchema::GetDefaultLocator()
+const TfToken &
+HdLegacyDisplayStyleSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdLegacyDisplayStyleSchemaTokens->displayStyle;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdLegacyDisplayStyleSchema::GetReprSelectorLocator()
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetRefineLevelLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdLegacyDisplayStyleSchemaTokens->reprSelector);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->refineLevel);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdLegacyDisplayStyleSchema::GetCullStyleLocator()
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetFlatShadingEnabledLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdLegacyDisplayStyleSchemaTokens->cullStyle);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->flatShadingEnabled);
+    return locator;
 }
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetDisplacementEnabledLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->displacementEnabled);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetDisplayInOverlayLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->displayInOverlay);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetOccludedSelectionShowsThroughLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->occludedSelectionShowsThrough);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetPointsShadingEnabledLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->pointsShadingEnabled);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetMaterialIsFinalLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->materialIsFinal);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetShadingStyleLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->shadingStyle);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetReprSelectorLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->reprSelector);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdLegacyDisplayStyleSchema::GetCullStyleLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdLegacyDisplayStyleSchemaTokens->cullStyle);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

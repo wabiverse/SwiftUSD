@@ -9,10 +9,10 @@
 
 /// \file ar/assetInfo.h
 
+#include "pxr/pxrns.h"
 #include "Ar/api.h"
 #include "Tf/hash.h"
 #include "Vt/value.h"
-#include "pxr/pxrns.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -21,51 +21,57 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Contains information about a resolved asset.
 ///
-class ArAssetInfo {
- public:
-  /// Version of the resolved asset, if any.
-  std::string version;
+class ArAssetInfo 
+{
+public:
+    /// Version of the resolved asset, if any.
+    std::string version;
 
-  /// The name of the asset represented by the resolved
-  /// asset, if any.
-  std::string assetName;
+    /// The name of the asset represented by the resolved
+    /// asset, if any.
+    std::string assetName;
 
-  /// \deprecated
-  /// The repository path corresponding to the resolved asset.
-  std::string repoPath;
+    /// \deprecated
+    /// The repository path corresponding to the resolved asset.
+    std::string repoPath;
 
-  /// Additional information specific to the active plugin
-  /// asset resolver implementation.
-  VtValue resolverInfo;
+    /// Additional information specific to the active plugin
+    /// asset resolver implementation.
+    VtValue resolverInfo;
 };
 
-template<class HashState> void TfHashAppend(HashState &h, const ArAssetInfo &info)
+template <class HashState>
+void TfHashAppend(HashState& h, const ArAssetInfo& info)
 {
-  h.Append(info.version, info.assetName, info.repoPath, info.resolverInfo);
+    h.Append(info.version, info.assetName, info.repoPath, info.resolverInfo);
 }
 
-inline size_t hash_value(const ArAssetInfo &info)
+inline
+size_t hash_value(const ArAssetInfo& info)
 {
-  return TfHash()(info);
+    return TfHash()(info);
 }
 
 /// \relates ArAssetInfo
-inline void swap(ArAssetInfo &lhs, ArAssetInfo &rhs)
+inline
+void swap(ArAssetInfo& lhs, ArAssetInfo& rhs)
 {
-  lhs.version.swap(rhs.version);
-  lhs.assetName.swap(rhs.assetName);
-  lhs.repoPath.swap(rhs.repoPath);
-  lhs.resolverInfo.Swap(rhs.resolverInfo);
+    lhs.version.swap(rhs.version);
+    lhs.assetName.swap(rhs.assetName);
+    lhs.repoPath.swap(rhs.repoPath);
+    lhs.resolverInfo.Swap(rhs.resolverInfo);
 }
 
 /// \relates ArAssetInfo
 AR_API
-bool operator==(const ArAssetInfo &lhs, const ArAssetInfo &rhs);
+bool 
+operator==(const ArAssetInfo& lhs, const ArAssetInfo& rhs);
 
 /// \relates ArAssetInfo
 AR_API
-bool operator!=(const ArAssetInfo &lhs, const ArAssetInfo &rhs);
+bool 
+operator!=(const ArAssetInfo& lhs, const ArAssetInfo& rhs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_ASSET_INFO_H
+#endif // PXR_USD_AR_ASSET_INFO_H

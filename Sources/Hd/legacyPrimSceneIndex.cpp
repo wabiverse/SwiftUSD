@@ -5,45 +5,67 @@
 // https://openusd.org/license.
 //
 #include "Hd/legacyPrimSceneIndex.h"
+
 #include "Hd/dataSourceLegacyPrim.h"
-#include "Trace/traceImpl.h"
+#include "Hd/dataSourceLegacyTaskPrim.h"
+#include "Hd/retainedDataSource.h"
+#include "Hd/tokens.h"
+
+#include "Trace/trace.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void HdLegacyPrimSceneIndex::AddLegacyPrim(SdfPath const &id,
-                                           TfToken const &type,
-                                           HdSceneDelegate *sceneDelegate)
+void
+HdLegacyPrimSceneIndex::AddLegacyPrim(SdfPath const &id, TfToken const &type,
+                                      HdSceneDelegate *sceneDelegate)
 {
-  AddPrims({{id, type, HdDataSourceLegacyPrim::New(id, type, sceneDelegate)}});
+    AddPrims({{id, type,
+        HdDataSourceLegacyPrim::New(id, type, sceneDelegate)}});
 }
 
-void HdLegacyPrimSceneIndex::RemovePrim(SdfPath const &id)
+void
+HdLegacyPrimSceneIndex::AddLegacyTask(
+    SdfPath const &id,
+    HdSceneDelegate * const sceneDelegate,
+    HdLegacyTaskFactorySharedPtr factory)
 {
-  if (!GetChildPrimPaths(id).empty()) {
-    AddPrims({{id, TfToken(), nullptr}});
-  }
-  else {
-    RemovePrims({id});
-  }
+    AddPrims({{id, HdPrimTypeTokens->task,
+        HdDataSourceLegacyTaskPrim::New(id, sceneDelegate, factory)}});
 }
 
-void HdLegacyPrimSceneIndex::DirtyPrims(const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+void
+HdLegacyPrimSceneIndex::RemovePrim(SdfPath const &id)
 {
-  TRACE_FUNCTION();
+    if (!GetChildPrimPaths(id).empty()) {
+        static HdContainerDataSourceHandle const empty =
+            HdRetainedContainerDataSource::New();
+        AddPrims({{id, TfToken(), empty}});
+    }
+    else {
+        RemovePrims({id});
+    }
+}
 
-  for (auto const &entry : entries) {
-    if (!entry.dirtyLocators.Intersects(HdDataSourceLegacyPrim::GetCachedLocators())) {
-      // If none of the locators are cached by the datasource,
-      // PrimDirtied will be a no-op so we can skip the map lookup...
-      continue;
+void
+HdLegacyPrimSceneIndex::DirtyPrims(
+    const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+{
+    TRACE_FUNCTION();
+
+    for (auto const &entry : entries) {
+        if (!entry.dirtyLocators.Intersects(
+                HdDataSourceLegacyPrim::GetCachedLocators())) {
+            // If none of the locators are cached by the datasource,
+            // PrimDirtied will be a no-op so we can skip the map lookup...
+            continue;
+        }
+        HdDataSourceLegacyPrimHandle legacyDs =
+            HdDataSourceLegacyPrim::Cast(GetPrim(entry.primPath).dataSource);
+        if (legacyDs) {
+            legacyDs->PrimDirtied(entry.dirtyLocators);
+        }
     }
-    HdDataSourceLegacyPrimHandle legacyDs = HdDataSourceLegacyPrim::Cast(
-        GetPrim(entry.primPath).dataSource);
-    if (legacyDs) {
-      legacyDs->PrimDirtied(entry.dirtyLocators);
-    }
-  }
-  HdRetainedSceneIndex::DirtyPrims(entries);
+    HdRetainedSceneIndex::DirtyPrims(entries);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

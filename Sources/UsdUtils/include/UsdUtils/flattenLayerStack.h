@@ -7,15 +7,15 @@
 #ifndef PXR_USD_USD_UTILS_FLATTEN_LAYER_STACK_H
 #define PXR_USD_USD_UTILS_FLATTEN_LAYER_STACK_H
 
-/// \file usdUtils/flattenLayerStack.h
+/// \file usdUtils/flattenLayerStack.h 
 ///
 /// Utilities for flattening layer stacks into a single layer.
 
-#include "Pcp/layerStackIdentifier.h"
-#include "Sdf/declareHandles.h"
+#include "pxr/pxrns.h"
 #include "Usd/stage.h"
 #include "UsdUtils/api.h"
-#include "pxr/pxrns.h"
+#include "Sdf/declareHandles.h"
+#include "Pcp/layerStackIdentifier.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -46,8 +46,9 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// will be discarded.
 ///
 USDUTILS_API
-SdfLayerRefPtr UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
-                                         const std::string &tag = std::string());
+SdfLayerRefPtr
+UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
+                          const std::string& tag = std::string());
 
 /// Callback function for overloaded version of \c UsdUtilsFlattenLayerStack.
 ///
@@ -56,14 +57,15 @@ SdfLayerRefPtr UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
 /// the flattened layer.
 ///
 /// \sa UsdUtilsFlattenLayerStackResolveAssetPath
-using UsdUtilsResolveAssetPathFn =
-    std::function<std::string(const SdfLayerHandle &sourceLayer, const std::string &assetPath)>;
+using UsdUtilsResolveAssetPathFn = std::function<std::string(
+        const SdfLayerHandle& sourceLayer, 
+        const std::string& assetPath)>;
 
 /// Flatten the root layer stack of the given \p stage into a single layer with
 /// the given optional \p tag and using the \p resolveAssetPathFn to resolve
-/// asset paths that are encountered.
+/// asset paths that are encountered.  
 ///
-/// This is an advanced version of the above function.
+/// This is an advanced version of the above function.  
 ///
 ///
 /// One use case for this version of the function is to flatten a layer stack
@@ -87,9 +89,10 @@ using UsdUtilsResolveAssetPathFn =
 /// computes a new relative path (based on where it will eventually be
 /// exported).
 USDUTILS_API
-SdfLayerRefPtr UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
-                                         const UsdUtilsResolveAssetPathFn &resolveAssetPathFn,
-                                         const std::string &tag = std::string());
+SdfLayerRefPtr
+UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
+                          const UsdUtilsResolveAssetPathFn& resolveAssetPathFn,
+                          const std::string& tag = std::string());
 
 /// The default \c UsdUtilsResolvePathFn used by \c UsdUtilsFlattenLayerStack.
 /// For paths that the current ArResolver identifies as searchpaths or absolute
@@ -98,8 +101,11 @@ SdfLayerRefPtr UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
 /// not know if the flattened layer's containing directory will be the same as
 /// any given source layer's in the incoming layerStack.
 USDUTILS_API
-std::string UsdUtilsFlattenLayerStackResolveAssetPath(const SdfLayerHandle &sourceLayer,
-                                                      const std::string &assetPath);
+std::string
+UsdUtilsFlattenLayerStackResolveAssetPath(
+    const SdfLayerHandle& sourceLayer,
+    const std::string& assetPath);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

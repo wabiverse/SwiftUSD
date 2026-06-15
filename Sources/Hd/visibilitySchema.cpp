@@ -19,72 +19,85 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdVisibilitySchemaTokens, HD_VISIBILITY_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdVisibilitySchemaTokens,
+    HD_VISIBILITY_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdBoolDataSourceHandle HdVisibilitySchema::GetVisibility() const
+HdBoolDataSourceHandle
+HdVisibilitySchema::GetVisibility() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdVisibilitySchemaTokens->visibility);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdVisibilitySchemaTokens->visibility);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdVisibilitySchema::BuildRetained(
+HdContainerDataSourceHandle
+HdVisibilitySchema::BuildRetained(
+        const HdBoolDataSourceHandle &visibility
+)
+{
+    TfToken _names[1];
+    HdDataSourceBaseHandle _values[1];
+
+    size_t _count = 0;
+
+    if (visibility) {
+        _names[_count] = HdVisibilitySchemaTokens->visibility;
+        _values[_count++] = visibility;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdVisibilitySchema::Builder &
+HdVisibilitySchema::Builder::SetVisibility(
     const HdBoolDataSourceHandle &visibility)
 {
-  TfToken _names[1];
-  HdDataSourceBaseHandle _values[1];
-
-  size_t _count = 0;
-
-  if (visibility) {
-    _names[_count] = HdVisibilitySchemaTokens->visibility;
-    _values[_count++] = visibility;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    _visibility = visibility;
+    return *this;
 }
 
-HdVisibilitySchema::Builder &HdVisibilitySchema::Builder::SetVisibility(
-    const HdBoolDataSourceHandle &visibility)
+HdContainerDataSourceHandle
+HdVisibilitySchema::Builder::Build()
 {
-  _visibility = visibility;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdVisibilitySchema::Builder::Build()
-{
-  return HdVisibilitySchema::BuildRetained(_visibility);
+    return HdVisibilitySchema::BuildRetained(
+        _visibility
+    );
 }
 
 /*static*/
-HdVisibilitySchema HdVisibilitySchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdVisibilitySchema
+HdVisibilitySchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdVisibilitySchema(fromParentContainer ?
-                                HdContainerDataSource::Cast(fromParentContainer->Get(
-                                    HdVisibilitySchemaTokens->visibility)) :
-                                nullptr);
+    return HdVisibilitySchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdVisibilitySchemaTokens->visibility))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdVisibilitySchema::GetSchemaToken()
+const TfToken &
+HdVisibilitySchema::GetSchemaToken()
 {
-  return HdVisibilitySchemaTokens->visibility;
+    return HdVisibilitySchemaTokens->visibility;
 }
 
 /*static*/
-const HdDataSourceLocator &HdVisibilitySchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdVisibilitySchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
-}
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

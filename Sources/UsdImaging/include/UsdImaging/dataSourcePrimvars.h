@@ -21,85 +21,89 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Data source representing USD primvars. This is a container for all
 /// primvars.
 ///
-class UsdImagingDataSourcePrimvars : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourcePrimvars);
+class UsdImagingDataSourcePrimvars : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourcePrimvars);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
- private:
-  UsdImagingDataSourcePrimvars(const SdfPath &sceneIndexPath,
-                               UsdPrim const &usdPrim,
-                               UsdGeomPrimvarsAPI usdPrimvars,
-                               const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourcePrimvars(
+            const SdfPath &sceneIndexPath,
+            UsdPrim const &usdPrim,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  static TfToken _GetPrefixedName(const TfToken &name);
+private:
+    static TfToken _GetPrefixedName(const TfToken &name);
 
-  // Path of the owning prim.
-  SdfPath _sceneIndexPath;
+    // Path of the owning prim.
+    SdfPath _sceneIndexPath;
 
-  UsdPrim _usdPrim;
+    UsdPrim _usdPrim;
 
-  // Stage globals handle.
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
-
-  using _NamespacedPrimvarsMap = std::map<TfToken, UsdGeomPrimvar>;
-  _NamespacedPrimvarsMap _namespacedPrimvars;
+    // Stage globals handle.
+    const UsdImagingDataSourceStageGlobals &_stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePrimvars);
 
 // ----------------------------------------------------------------------------
 
-class UsdImagingDataSourceCustomPrimvars : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceCustomPrimvars);
+class UsdImagingDataSourceCustomPrimvars : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceCustomPrimvars);
 
-  USDIMAGING_API
-  TfTokenVector GetNames() override;
+    USDIMAGING_API
+    TfTokenVector GetNames() override;
+    
+    USDIMAGING_API
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
-  USDIMAGING_API
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
-
-  struct Mapping {
-    Mapping(const TfToken &primvarName,
+    struct Mapping {
+        Mapping(
+            const TfToken &primvarName,
             const TfToken &usdAttrName,
             const TfToken &interpolation = TfToken())
-        : primvarName(primvarName), usdAttrName(usdAttrName), interpolation(interpolation)
-    {
-    }
+          : primvarName(primvarName)
+          , usdAttrName(usdAttrName)
+            , interpolation(interpolation)
+        { }
 
-    TfToken primvarName;
-    TfToken usdAttrName;
-    TfToken interpolation;
-  };
+        TfToken primvarName;
+        TfToken usdAttrName;
+        TfToken interpolation;
+    };
 
-  // This map is passed to the constructor to specify non-"primvars:"
-  // attributes to include as primvars (e.g., "points" and "normals").
-  // The first token is the datasource name, and the second the USD name.
-  using Mappings = std::vector<Mapping>;
+    // This map is passed to the constructor to specify non-"primvars:"
+    // attributes to include as primvars (e.g., "points" and "normals").
+    // The first token is the datasource name, and the second the USD name.
+    using Mappings = std::vector<Mapping>;
 
-  USDIMAGING_API
-  static HdDataSourceLocatorSet Invalidate(const TfTokenVector &properties,
-                                           const Mappings &mappings);
+    USDIMAGING_API
+    static HdDataSourceLocatorSet Invalidate(
+            const TfTokenVector &properties,
+            const Mappings &mappings);
 
- private:
-  UsdImagingDataSourceCustomPrimvars(const SdfPath &sceneIndexPath,
-                                     UsdPrim const &usdPrim,
-                                     const Mappings &mappings,
-                                     const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    USDIMAGING_API
+    UsdImagingDataSourceCustomPrimvars(
+            const SdfPath &sceneIndexPath,
+            UsdPrim const &usdPrim,
+            const Mappings &mappings,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
-  // Path of the owning prim.
-  SdfPath _sceneIndexPath;
+    // Path of the owning prim.
+    SdfPath _sceneIndexPath;
 
-  UsdPrim _usdPrim;
+    UsdPrim _usdPrim;
 
-  // Stage globals handle.
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+    // Stage globals handle.
+    const UsdImagingDataSourceStageGlobals &_stageGlobals;
 
-  const Mappings _mappings;
+    const Mappings _mappings;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceCustomPrimvars);
@@ -118,32 +122,38 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceCustomPrimvars);
 /// logic, we check whether indices are present and then return only one of
 /// "primvarValue" or "indexedPrimvarValue" from the result of valueQuery.
 ///
-class UsdImagingDataSourcePrimvar : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourcePrimvar);
+class UsdImagingDataSourcePrimvar : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourcePrimvar);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken & name) override;
 
- private:
-  UsdImagingDataSourcePrimvar(const SdfPath &sceneIndexPath,
-                              const TfToken &name,
-                              const UsdImagingDataSourceStageGlobals &stageGlobals,
-                              UsdAttributeQuery valueQuery,
-                              UsdAttributeQuery indicesQuery,
-                              HdTokenDataSourceHandle interpolation,
-                              HdTokenDataSourceHandle role);
+private:
+    UsdImagingDataSourcePrimvar(
+            const SdfPath &sceneIndexPath,
+            const TfToken &name,
+            const UsdImagingDataSourceStageGlobals &stageGlobals,
+            UsdAttributeQuery valueQuery,
+            UsdAttributeQuery indicesQuery,
+            HdTokenDataSourceHandle interpolation,
+            HdTokenDataSourceHandle role,
+            HdTokenDataSourceHandle colorSpace = nullptr,
+            HdIntDataSourceHandle elementSize = nullptr);
 
- private:
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
-  UsdAttributeQuery _valueQuery;
-  UsdAttributeQuery _indicesQuery;
-  HdTokenDataSourceHandle _interpolation;
-  HdTokenDataSourceHandle _role;
+private:
+    const UsdImagingDataSourceStageGlobals &_stageGlobals;
+    UsdAttributeQuery _valueQuery;
+    UsdAttributeQuery _indicesQuery;
+    HdTokenDataSourceHandle _interpolation;
+    HdTokenDataSourceHandle _role;
+    HdTokenDataSourceHandle _colorSpace;
+    HdIntDataSourceHandle _elementSize;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePrimvar);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_PRIMVARS_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_PRIMVARS_H

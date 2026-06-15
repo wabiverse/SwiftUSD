@@ -14,9 +14,9 @@
 #include "pxr/pxrns.h"
 
 #include "Tf/api.h"
+#include "Tf/singleton.h"
 #include "Tf/hash.h"
 #include "Tf/hashmap.h"
-#include "Tf/singleton.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -70,59 +70,56 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// (Most library test functions shouldn't need any arguments.)
 ///
 class TfRegTest {
- public:
-  /// Run a single regression test function, returning 0 if the function
-  /// succeeded and 1 otherwise.
-  ///
-  /// This function is intended to be called as follows:
-  /// \code
-  ///     int main(int argc, char *argv[]) {
-  ///         return TfRegTest::Main(argc, argv);
-  ///     }
-  /// \endcode
-  ///
-  /// The first argument is the name of the test to be run.  If the
-  /// registered test function run takes no arguments, then no arguments
-  /// other than the test name should be supplied.  Otherwise, the \c Main()
-  /// passes \c argc-1 and \c argv+1 to the test function, and the test
-  /// function is responsible for argument checking.
-  static int Main(int argc, char *argv[])
-  {
-    return GetInstance()._Main(argc, argv);
-  }
+public:
+    /// Run a single regression test function, returning 0 if the function
+    /// succeeded and 1 otherwise.
+    ///
+    /// This function is intended to be called as follows:
+    /// \code
+    ///     int main(int argc, char *argv[]) {
+    ///         return TfRegTest::Main(argc, argv);
+    ///     }
+    /// \endcode
+    ///
+    /// The first argument is the name of the test to be run.  If the
+    /// registered test function run takes no arguments, then no arguments
+    /// other than the test name should be supplied.  Otherwise, the \c Main()
+    /// passes \c argc-1 and \c argv+1 to the test function, and the test
+    /// function is responsible for argument checking.
+    static int Main(int argc, char *argv[]) {
+        return GetInstance()._Main(argc, argv);
+    }
 
-  TF_API
-  static TfRegTest &GetInstance();
+    TF_API
+    static TfRegTest& GetInstance();
 
-  /// Type of a function with no arguments.
-  typedef bool (*RegFunc)();
+    /// Type of a function with no arguments.
+    typedef bool (*RegFunc)();
 
-  /// Type of a function with arguments.
-  ///
-  /// When \c Main(argc,argv) is requested to run a function of type
-  /// \c RegFuncWithArgs, it invokes the function with arguments \c argc-1
-  /// and \c argv+1.
-  typedef bool (*RegFuncWithArgs)(int argc, char *argv[]);
+    /// Type of a function with arguments.
+    ///
+    /// When \c Main(argc,argv) is requested to run a function of type
+    /// \c RegFuncWithArgs, it invokes the function with arguments \c argc-1
+    /// and \c argv+1.
+    typedef bool (*RegFuncWithArgs)(int argc, char *argv[]);
 
-  TF_API
-  bool Register(const char *name, RegFunc);
-  TF_API
-  bool Register(const char *name, RegFuncWithArgs);
+    TF_API
+    bool Register(const char* name, RegFunc);
+    TF_API
+    bool Register(const char* name, RegFuncWithArgs);
 
- private:
-  friend class TfSingleton<TfRegTest>;
-  TF_API
-  int _Main(int argc, char *argv[]);
+private:
+    friend class TfSingleton<TfRegTest>;
+    TF_API
+    int _Main(int argc, char *argv[]);
 
-  void _PrintTestNames();
+    void _PrintTestNames();
 
-  typedef TfHashMap<std::string, RegFunc, TfHash> _Hash;
-  typedef TfHashMap<std::string, RegFuncWithArgs, TfHash> _HashWithArgs;
-  _Hash _functionTable;
-  _HashWithArgs _functionTableWithArgs;
+    typedef TfHashMap<std::string, RegFunc, TfHash> _Hash;
+    typedef TfHashMap<std::string, RegFuncWithArgs, TfHash> _HashWithArgs;
+    _Hash _functionTable;
+    _HashWithArgs _functionTableWithArgs;
 };
-
-TF_API_TEMPLATE_CLASS(TfSingleton<TfRegTest>);
 
 /// Adds the function Test_\p name, under name \p name, as a runnable
 /// regression test. Test_\p name must be of type \c RegFunc or
@@ -130,8 +127,8 @@ TF_API_TEMPLATE_CLASS(TfSingleton<TfRegTest>);
 ///
 /// \ingroup group_tf_Internal
 /// \hideinitializer
-#define TF_ADD_REGTEST(name) \
-  bool Tf_RegTst##name = TfRegTest::GetInstance().Register(#name, Test_##name)
+#define TF_ADD_REGTEST(name)    \
+    bool Tf_RegTst##name = TfRegTest::GetInstance().Register(#name, Test_##name)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

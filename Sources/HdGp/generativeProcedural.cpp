@@ -8,39 +8,46 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdGpGenerativeProceduralTokens, HDGPGENERATIVEPROCEDURAL_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdGpGenerativeProceduralTokens,
+    HDGPGENERATIVEPROCEDURAL_TOKENS);
 
-HdGpGenerativeProcedural::HdGpGenerativeProcedural(const SdfPath &proceduralPrimPath)
-    : _proceduralPrimPath(proceduralPrimPath)
+HdGpGenerativeProcedural::HdGpGenerativeProcedural(
+    const SdfPath &proceduralPrimPath)
+: _proceduralPrimPath(proceduralPrimPath)
 {
 }
 
 HdGpGenerativeProcedural::~HdGpGenerativeProcedural() = default;
 
-const SdfPath &HdGpGenerativeProcedural::_GetProceduralPrimPath()
+const SdfPath &
+HdGpGenerativeProcedural::_GetProceduralPrimPath()
 {
-  return _proceduralPrimPath;
+    return _proceduralPrimPath;
 }
+
 
 /*static*/
 
-const HdDataSourceLocator &HdGpGenerativeProcedural::GetChildNamesDependencyKey()
+const HdDataSourceLocator &
+HdGpGenerativeProcedural::GetChildNamesDependencyKey()
 {
-  static const HdDataSourceLocator loc(TfToken("__childNames"));
-  return loc;
+    static const HdDataSourceLocator loc(TfToken("__childNames"));
+    return loc;
 }
 
-bool HdGpGenerativeProcedural::AsyncBegin(bool asyncEnabled)
+bool
+HdGpGenerativeProcedural::AsyncBegin(bool asyncEnabled)
 {
-  return false;
+    return false;
 }
 
-HdGpGenerativeProcedural::AsyncState HdGpGenerativeProcedural::AsyncUpdate(
+HdGpGenerativeProcedural::AsyncState
+HdGpGenerativeProcedural::AsyncUpdate(
     const ChildPrimTypeMap &previousResult,
     ChildPrimTypeMap *outputPrimTypes,
     HdSceneIndexObserver::DirtiedPrimEntries *outputDirtiedPrims)
 {
-  return Finished;
+    return Finished;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -9,10 +9,10 @@
 
 /// \file sdf/layerTree.h
 
+#include "pxr/pxrns.h"
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/layerOffset.h"
-#include "pxr/pxrns.h"
 
 #include <vector>
 
@@ -38,36 +38,36 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// to pass them around as immutable trees without worrying about lifetime.
 ///
 class SdfLayerTree : public TfRefBase, public TfWeakBase {
-  SdfLayerTree(const SdfLayerTree &) = delete;
-  SdfLayerTree &operator=(const SdfLayerTree &) = delete;
+    SdfLayerTree(const SdfLayerTree&) = delete;
+    SdfLayerTree& operator=(const SdfLayerTree&) = delete;
+public:
+    /// Create a new layer tree node.
+    SDF_API
+    static SdfLayerTreeHandle
+    New( const SdfLayerHandle & layer,
+         const SdfLayerTreeHandleVector & childTrees,
+         const SdfLayerOffset & cumulativeOffset = SdfLayerOffset() );
 
- public:
-  /// Create a new layer tree node.
-  SDF_API
-  static SdfLayerTreeHandle New(const SdfLayerHandle &layer,
-                                const SdfLayerTreeHandleVector &childTrees,
-                                const SdfLayerOffset &cumulativeOffset = SdfLayerOffset());
+    /// Returns the layer handle this tree node represents.
+    SDF_API const SdfLayerHandle & GetLayer() const;
 
-  /// Returns the layer handle this tree node represents.
-  SDF_API const SdfLayerHandle &GetLayer() const;
+    /// Returns the cumulative layer offset from the root of the tree.
+    SDF_API const SdfLayerOffset & GetOffset() const;
 
-  /// Returns the cumulative layer offset from the root of the tree.
-  SDF_API const SdfLayerOffset &GetOffset() const;
+    /// Returns the children of this tree node.
+    SDF_API const SdfLayerTreeHandleVector & GetChildTrees() const;
 
-  /// Returns the children of this tree node.
-  SDF_API const SdfLayerTreeHandleVector &GetChildTrees() const;
+private:
+    SdfLayerTree( const SdfLayerHandle & layer,
+                  const SdfLayerTreeHandleVector & childTrees,
+                  const SdfLayerOffset & cumulativeOffset );
 
- private:
-  SdfLayerTree(const SdfLayerHandle &layer,
-               const SdfLayerTreeHandleVector &childTrees,
-               const SdfLayerOffset &cumulativeOffset);
-
- private:
-  const SdfLayerHandle _layer;
-  const SdfLayerOffset _offset;
-  const SdfLayerTreeHandleVector _childTrees;
+private:
+    const SdfLayerHandle _layer;
+    const SdfLayerOffset _offset;
+    const SdfLayerTreeHandleVector _childTrees;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_SDF_LAYER_TREE_H
+#endif // PXR_USD_SDF_LAYER_TREE_H

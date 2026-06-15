@@ -11,14 +11,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdSt_MaterialBindingResolvingSceneIndexPlugin : public HdSceneIndexPlugin {
- public:
-  HdSt_MaterialBindingResolvingSceneIndexPlugin();
-  ~HdSt_MaterialBindingResolvingSceneIndexPlugin() override;
+class HdSt_MaterialBindingResolvingSceneIndexPlugin : public HdSceneIndexPlugin
+{
+public:
+    HdSt_MaterialBindingResolvingSceneIndexPlugin();
+    ~HdSt_MaterialBindingResolvingSceneIndexPlugin() override;
 
- protected:  // HdSceneIndexPlugin overrides
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
-                                           const HdContainerDataSourceHandle &inputArgs) override;
+protected: // HdSceneIndexPlugin overrides
+    HdSceneIndexBaseRefPtr _AppendSceneIndex(
+        const HdSceneIndexBaseRefPtr& inputScene,
+        const HdContainerDataSourceHandle& inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

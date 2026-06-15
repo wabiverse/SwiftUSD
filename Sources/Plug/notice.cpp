@@ -5,30 +5,38 @@
 // https://openusd.org/license.
 //
 
-#include "Plug/notice.h"
-#include "Tf/registryManager.h"
-#include "Tf/type.h"
 #include "pxr/pxrns.h"
+#include "Plug/notice.h"
+#include "Tf/type.h"
+#include "Tf/registryManager.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<PlugNotice::Base, TfType::Bases<TfNotice>>();
-  TfType::Define<PlugNotice::DidRegisterPlugins, TfType::Bases<PlugNotice::Base>>();
+    TfType::Define< PlugNotice::Base,
+                    TfType::Bases<TfNotice> >();
+    TfType::Define< PlugNotice::DidRegisterPlugins,
+                    TfType::Bases<PlugNotice::Base> >();
 }
 
 ////////////////////////////////////////////////////////////
 
-PlugNotice::Base::~Base() {}
+PlugNotice::Base::~Base() 
+{ 
+}
 
 ////////////////////////////////////////////////////////////
 
-PlugNotice::DidRegisterPlugins::DidRegisterPlugins(const PlugPluginPtrVector &newPlugins)
+PlugNotice::
+DidRegisterPlugins::DidRegisterPlugins(const PlugPluginPtrVector& newPlugins)
     : _plugins(newPlugins)
 {
 }
 
-PlugNotice::DidRegisterPlugins::~DidRegisterPlugins() {}
+PlugNotice::
+DidRegisterPlugins::~DidRegisterPlugins()
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

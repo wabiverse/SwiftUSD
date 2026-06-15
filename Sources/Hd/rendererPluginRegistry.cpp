@@ -5,92 +5,114 @@
 // https://openusd.org/license.
 //
 #include "Hd/rendererPluginRegistry.h"
-#include "Hd/pluginRenderDelegateUniqueHandle.h"
 #include "Hd/rendererPlugin.h"
 #include "Hd/rendererPluginHandle.h"
+#include "Hd/pluginRenderDelegateUniqueHandle.h"
 
 #include "Tf/instantiateSingleton.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_INSTANTIATE_SINGLETON(HdRendererPluginRegistry);
 
-HdRendererPluginRegistry &HdRendererPluginRegistry::GetInstance()
+TF_INSTANTIATE_SINGLETON( HdRendererPluginRegistry );
+
+HdRendererPluginRegistry &
+HdRendererPluginRegistry::GetInstance()
 {
-  return TfSingleton<HdRendererPluginRegistry>::GetInstance();
+    return TfSingleton< HdRendererPluginRegistry >::GetInstance();
 }
+
 
 HdRendererPluginRegistry::HdRendererPluginRegistry()
-    : HfPluginRegistry(TfType::Find<HdRendererPlugin>())
+ : HfPluginRegistry(TfType::Find<HdRendererPlugin>())
 {
 }
+
 
 HdRendererPluginRegistry::~HdRendererPluginRegistry() = default;
 
-TfToken HdRendererPluginRegistry::GetDefaultPluginId(bool gpuEnabled)
+TfToken 
+HdRendererPluginRegistry::GetDefaultPluginId(bool gpuEnabled)
 {
-  // Get all the available plugins to see if any of them is supported on this
-  // platform and use the first one as the default.
-  //
-  // Important note, we want to avoid loading plugins as much as possible,
-  // we would prefer to only load plugins when the user asks for them.  So
-  // we will only load plugins until we find the first one that works.
-  HfPluginDescVector pluginDescriptors;
-  GetPluginDescs(&pluginDescriptors);
-  for (const HfPluginDesc &desc : pluginDescriptors) {
+    HdRendererCreateArgs rendererCreateArgs;
+    rendererCreateArgs.gpuEnabled = gpuEnabled;
+    return GetDefaultPluginId(rendererCreateArgs);
+}
 
-    HdRendererPlugin *plugin = HdRendererPluginRegistry::GetInstance().GetRendererPlugin(desc.id);
+TfToken 
+HdRendererPluginRegistry::GetDefaultPluginId(
+    HdRendererCreateArgs const &rendererCreateArgs)
+{
+    // Get all the available plugins to see if any of them is supported on this
+    // platform and use the first one as the default.
+    // 
+    // Important note, we want to avoid loading plugins as much as possible, 
+    // we would prefer to only load plugins when the user asks for them.  So
+    // we will only load plugins until we find the first one that works.
+    HfPluginDescVector pluginDescriptors;
+    GetPluginDescs(&pluginDescriptors);
+    for (const HfPluginDesc &desc : pluginDescriptors) {
+        
+        HdRendererPlugin *plugin = HdRendererPluginRegistry::GetInstance().
+            GetRendererPlugin(desc.id);
 
-    // Important to bail out as soon as we found a plugin that works to
-    // avoid loading plugins unnecessary as that can be arbitrarily
-    // expensive.
-    if (plugin && plugin->IsSupported(gpuEnabled)) {
-      HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
+        // Important to bail out as soon as we found a plugin that works to
+        // avoid loading plugins unnecessary as that can be arbitrarily
+        // expensive.
+        if (plugin && plugin->IsSupported(rendererCreateArgs)) {
+            HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
 
-      TF_DEBUG(HD_RENDERER_PLUGIN)
-          .Msg("Default renderer plugin (gpu: %s): %s\n",
-               gpuEnabled ? "y" : "n",
-               desc.id.GetText());
-      return desc.id;
+            TF_DEBUG(HD_RENDERER_PLUGIN).Msg(
+                "Default renderer plugin: %s\n", desc.id.GetText());
+            return desc.id;
+        }
+
+        HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
     }
 
-    HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
-  }
-
-  TF_DEBUG(HD_RENDERER_PLUGIN)
-      .Msg("Default renderer plugin (gpu: %s): none\n", gpuEnabled ? "y" : "n");
-  return TfToken();
+    TF_DEBUG(HD_RENDERER_PLUGIN).Msg(
+        "Default renderer plugin: none\n");
+    return TfToken();
 }
 
-HdRendererPlugin *HdRendererPluginRegistry::GetRendererPlugin(const TfToken &pluginId)
+HdRendererPlugin *
+HdRendererPluginRegistry::GetRendererPlugin(const TfToken &pluginId)
 {
-  return static_cast<HdRendererPlugin *>(GetPlugin(pluginId));
+    return static_cast<HdRendererPlugin *>(GetPlugin(pluginId));
 }
 
-HdRendererPluginHandle HdRendererPluginRegistry::GetOrCreateRendererPlugin(const TfToken &pluginId)
+HdRendererPluginHandle
+HdRendererPluginRegistry::GetOrCreateRendererPlugin(const TfToken &pluginId)
 {
-  return HdRendererPluginHandle(static_cast<HdRendererPlugin *>(GetPlugin(pluginId)));
+    return HdRendererPluginHandle(
+            static_cast<HdRendererPlugin*>(GetPlugin(pluginId)));
 }
 
-HdPluginRenderDelegateUniqueHandle HdRendererPluginRegistry::CreateRenderDelegate(
-    const TfToken &pluginId, HdRenderSettingsMap const &settingsMap)
+HdPluginRenderDelegateUniqueHandle
+HdRendererPluginRegistry::CreateRenderDelegate(
+    const TfToken &pluginId,
+    HdRenderSettingsMap const & settingsMap)
 {
-  HdRendererPluginHandle plugin = GetOrCreateRendererPlugin(pluginId);
-  if (!plugin) {
-    TF_CODING_ERROR("Couldn't find plugin for id %s", pluginId.GetText());
-    return nullptr;
-  }
+    HdRendererPluginHandle plugin = GetOrCreateRendererPlugin(pluginId);
+    if (!plugin) {
+        TF_CODING_ERROR("Couldn't find plugin for id %s", pluginId.GetText());
+        return nullptr;
+    }
 
-  HdPluginRenderDelegateUniqueHandle result = plugin->CreateDelegate(settingsMap);
+    HdPluginRenderDelegateUniqueHandle result =
+        plugin->CreateDelegate(settingsMap);
 
-  return result;
+    return result;
 }
 
-void HdRendererPluginRegistry::_CollectAdditionalMetadata(const PlugRegistry &plugRegistry,
-                                                          const TfType &pluginType)
+void
+HdRendererPluginRegistry::_CollectAdditionalMetadata(
+    const PlugRegistry &plugRegistry, const TfType &pluginType)
 {
-  TF_DEBUG(HD_RENDERER_PLUGIN)
-      .Msg("Renderer plugin discovery: %s\n", pluginType.GetTypeName().c_str());
+    TF_DEBUG(HD_RENDERER_PLUGIN).Msg(
+        "Renderer plugin discovery: %s\n",
+        pluginType.GetTypeName().c_str());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

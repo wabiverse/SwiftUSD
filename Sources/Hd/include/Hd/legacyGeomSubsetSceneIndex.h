@@ -18,7 +18,7 @@
 
 #include "pxr/pxrns.h"
 
-#include <unordered_map>
+#include <map>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,42 +38,51 @@ TF_DECLARE_REF_PTRS(HdLegacyGeomSubsetSceneIndex);
 /// it has added (organized by parent) so it can be more precise about
 /// invalidation. Having this cache incidentally provides a few other
 /// shortcuts to avoid expensive operations.
-class HdLegacyGeomSubsetSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  HD_API
-  static HdLegacyGeomSubsetSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+class HdLegacyGeomSubsetSceneIndex
+  : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    HD_API
+    static HdLegacyGeomSubsetSceneIndexRefPtr New(
+        const HdSceneIndexBaseRefPtr& inputSceneIndex);
 
-  HD_API
-  ~HdLegacyGeomSubsetSceneIndex() override;
+    HD_API
+    ~HdLegacyGeomSubsetSceneIndex() override;
 
-  HD_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HD_API
+    HdSceneIndexPrim GetPrim(const SdfPath& primPath) const override;
 
-  HD_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    HD_API
+    SdfPathVector GetChildPrimPaths(const SdfPath& primPath) const override;
 
- protected:
-  HdLegacyGeomSubsetSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+protected:
+    HdLegacyGeomSubsetSceneIndex(
+        const HdSceneIndexBaseRefPtr& inputSceneIndex);
 
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    void _PrimsAdded(
+        const HdSceneIndexBase& sender,
+        const HdSceneIndexObserver::AddedPrimEntries& entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase& sender,
+        const HdSceneIndexObserver::RemovedPrimEntries& entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase& sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries& entries) override;
 
- private:
-  static SdfPathVector _ListDelegateSubsets(const SdfPath &parentPath,
-                                            const HdSceneIndexPrim &parentPrim);
+private:
+    static SdfPathVector
+    _ListDelegateSubsets(
+        const SdfPath& parentPath,
+        const HdSceneIndexPrim& parentPrim);
 
-  // Unordered map of parent path -> [subset paths...]
-  // XXX: Do not use SdfPathTable because we do not want it
-  // to implicitly include the extra ancestor paths.
-  std::unordered_map<SdfPath, SdfPathVector, SdfPath::Hash> _parentPrims;
+    // Unordered map of parent path -> [subset paths...]
+    // XXX: Do not use SdfPathTable because we do not want it
+    // to implicitly include the extra ancestor paths.
+    std::map<SdfPath, SdfPathVector> _parentPrims;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_LEGACY_GEOM_SUBSET_SCENE_INDEX_H
+#endif // PXR_IMAGING_HD_LEGACY_GEOM_SUBSET_SCENE_INDEX_H

@@ -32,74 +32,78 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_EXT_COMPUTATION_OUTPUT_SCHEMA_TOKENS (name)(valueType)
+#define HD_EXT_COMPUTATION_OUTPUT_SCHEMA_TOKENS \
+    (valueType) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationOutputSchemaTokens,
-                         HD_API,
-                         HD_EXT_COMPUTATION_OUTPUT_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationOutputSchemaTokens, HD_API,
+    HD_EXT_COMPUTATION_OUTPUT_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationOutputSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdExtComputationOutputSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdExtComputationOutputSchema
+///
+class HdExtComputationOutputSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdExtComputationOutputSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdTokenDataSourceHandle GetName() const;
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  HdTupleTypeDataSourceHandle GetValueType() const;
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(const HdTokenDataSourceHandle &name,
-                                                   const HdTupleTypeDataSourceHandle &valueType);
-
-  /// \class HdExtComputationOutputSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetName(const HdTokenDataSourceHandle &name);
+    HdTupleTypeDataSourceHandle GetValueType() const; 
+
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
     HD_API
-    Builder &SetValueType(const HdTupleTypeDataSourceHandle &valueType);
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdTupleTypeDataSourceHandle &valueType
+    );
 
-    /// Returns a container data source containing the members set thus far.
-    HD_API
-    HdContainerDataSourceHandle Build();
+    /// \class HdExtComputationOutputSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetValueType(
+            const HdTupleTypeDataSourceHandle &valueType);
 
-   private:
-    HdTokenDataSourceHandle _name;
-    HdTupleTypeDataSourceHandle _valueType;
-  };
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
 
-  /// @}
+    private:
+        HdTupleTypeDataSourceHandle _valueType;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -20,24 +20,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 ////////////////////////////////////////////////////////////////////////////////
 /// \class TraceReporterDataSourceBase
 ///
-/// This class is a base class for TraceReporterBase data sources.
-/// TraceReporterBase uses an instance of a TraceReporterDataSourceBase derived
+/// This class is a base class for TraceReporterBase data sources. 
+/// TraceReporterBase uses an instance of a TraceReporterDataSourceBase derived 
 /// class to access TraceCollections.
 ///
 class TraceReporterDataSourceBase {
- public:
-  using CollectionPtr = std::shared_ptr<TraceCollection>;
+public:
+    using CollectionPtr = std::shared_ptr<TraceCollection>;
 
-  /// Destructor
-  TRACE_API virtual ~TraceReporterDataSourceBase();
+    /// Destructor
+    TRACE_API virtual ~TraceReporterDataSourceBase();
 
-  /// Removes all references to TraceCollections.
-  virtual void Clear() = 0;
+    /// Removes all references to TraceCollections.
+    virtual void Clear() = 0;
 
-  /// Returns the next TraceCollections which need to be processed.
-  virtual std::vector<CollectionPtr> ConsumeData() = 0;
+    /// Returns the next TraceCollections which need to be processed.
+    virtual std::vector<CollectionPtr> ConsumeData() = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_BASE_H
+#endif // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_BASE_H

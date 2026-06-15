@@ -33,67 +33,77 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_DEPENDENCIES_SCHEMA_TOKENS (__dependencies)
+#define HD_DEPENDENCIES_SCHEMA_TOKENS \
+    (__dependencies) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdDependenciesSchemaTokens, HD_API, HD_DEPENDENCIES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdDependenciesSchemaTokens, HD_API,
+    HD_DEPENDENCIES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdDependenciesSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdDependenciesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdDependenciesSchema
+///
+class HdDependenciesSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "__dependencies" from the parent container and constructs a
-  /// HdDependenciesSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdDependenciesSchema GetFromParent(
-      const HdContainerDataSourceHandle &fromParentContainer);
+    HdDependenciesSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
+    /// Retrieves a container data source with the schema's default name token
+    /// "__dependencies" from the parent container and constructs a
+    /// HdDependenciesSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
+    HD_API
+    static HdDependenciesSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  using EntryPair = std::pair<TfToken, HdDependencySchema>;
-  using EntryVector = TfSmallVector<EntryPair, 8>;
+// --(BEGIN CUSTOM CODE: Schema Methods)--
 
-  EntryVector GetEntries();
+    using EntryPair = std::pair<TfToken, HdDependencySchema>;
+    using EntryVector = TfSmallVector<EntryPair, 8>;
 
-  // --(END CUSTOM CODE: Schema Methods)--
+    HD_API
+    EntryVector GetEntries();
 
-  /// \name Member accessor
-  /// @{
+// --(END CUSTOM CODE: Schema Methods)--
 
-  /// @}
+    /// \name Member accessor
+    /// @{ 
 
-  /// \name Schema location
-  /// @{
+    /// @}
 
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
+    /// \name Schema location
+    /// @{
 
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
 
-  /// @}
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
 
-  /// \name Schema construction
-  /// @{
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(size_t count,
-                                                   const TfToken *names,
-                                                   const HdDataSourceBaseHandle *values);
+    /// @} 
 
-  /// @}
+    /// \name Schema construction
+    /// @{
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        size_t count,
+        const TfToken *names,
+        const HdDataSourceBaseHandle *values);
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

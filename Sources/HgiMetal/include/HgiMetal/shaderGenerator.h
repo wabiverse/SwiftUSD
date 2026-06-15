@@ -9,24 +9,24 @@
 #define PXR_IMAGING_HGIMETAL_SHADERGENERATOR_H
 
 #include "Hgi/shaderGenerator.h"
-#include "HgiMetal/api.h"
 #include "HgiMetal/shaderSection.h"
+#include "HgiMetal/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-// Shader program structure
+//Shader program structure
 
-// Global scope includes
-// Global scope macros
-// Global scope struct defs
-// Global scope member decls
-// Global scope function defs
-// Stage program scope struct defs
-// Stage program scope member decls
-// Stage program scope function defs
-// Stage program scope main program
-// Stage function entryPoint definition
-// Stage function implementation
+//Global scope includes
+//Global scope macros
+//Global scope struct defs
+//Global scope member decls
+//Global scope function defs
+//Stage program scope struct defs
+//Stage program scope member decls
+//Stage program scope function defs
+//Stage program scope main program
+//Stage function entryPoint definition
+//Stage function implementation
 
 class HgiMetal;
 
@@ -38,33 +38,40 @@ using HgiMetalShaderStageEntryPointUniquePtr =
 /// Takes in a descriptor and spits out metal code through it's Execute function
 ///
 
-class HgiMetalShaderGenerator final : public HgiShaderGenerator {
- public:
-  HGIMETAL_API
-  HgiMetalShaderGenerator(HgiMetal const *hgi, const HgiShaderFunctionDesc &descriptor);
+class HgiMetalShaderGenerator final: public HgiShaderGenerator
+{
+public:
+    HGIMETAL_API
+    HgiMetalShaderGenerator(
+        HgiMetal const *hgi,
+        const HgiShaderFunctionDesc &descriptor);
 
-  HGIMETAL_API
-  ~HgiMetalShaderGenerator() override;
+    HGIMETAL_API
+    ~HgiMetalShaderGenerator() override;
 
-  HGIMETAL_API
-  HgiMetalShaderSectionUniquePtrVector *GetShaderSections();
+    HGIMETAL_API
+    HgiMetalShaderSectionUniquePtrVector* GetShaderSections();
 
-  template<typename SectionType, typename... T> SectionType *CreateShaderSection(T &&...t);
+    template<typename SectionType, typename ...T>
+    SectionType * CreateShaderSection(T && ...t);
 
- protected:
-  HGIMETAL_API
-  void _Execute(std::ostream &ss) override;
+protected:
+    HGIMETAL_API
+    void _Execute(std::ostream &ss) override;
 
- private:
-  HgiMetalShaderStageEntryPointUniquePtr _BuildShaderStageEntryPoints(
-      const HgiShaderFunctionDesc &descriptor);
+private:
+    HgiMetalShaderStageEntryPointUniquePtr
+    _BuildShaderStageEntryPoints(
+        const HgiShaderFunctionDesc &descriptor);
 
-  void _BuildKeywordInputShaderSections(const HgiShaderFunctionDesc &descriptor);
+    void _BuildKeywordInputShaderSections(const HgiShaderFunctionDesc &descriptor);
 
-  HgiMetal const *_hgi;
-  HgiMetalShaderSectionUniquePtrVector _shaderSections;
-  HgiMetalShaderStageEntryPointUniquePtr _generatorShaderSections;
+    HgiMetal const *_hgi;
+    HgiMetalShaderSectionUniquePtrVector _shaderSections;
+    HgiMetalShaderStageEntryPointUniquePtr _generatorShaderSections;
 };
+
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

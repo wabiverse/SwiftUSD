@@ -7,13 +7,13 @@
 #ifndef PXR_IMAGING_HD_ST_DISPATCH_BUFFER_H
 #define PXR_IMAGING_HD_ST_DISPATCH_BUFFER_H
 
+#include "pxr/pxrns.h"
+#include "Hd/version.h"
 #include "Hd/bufferArray.h"
 #include "Hd/bufferSpec.h"
-#include "Hd/version.h"
 #include "HdSt/api.h"
 #include "HdSt/bufferArrayRange.h"
 #include "HdSt/bufferResource.h"
-#include "pxr/pxrns.h"
 
 #include <memory>
 
@@ -71,96 +71,89 @@ using HdStDispatchBufferSharedPtr = std::shared_ptr<class HdStDispatchBuffer>;
 /// XXX: it would be better to generalize this class not only for dispatch
 /// buffer, if we see other similar use-cases.
 ///
-class HdStDispatchBuffer : public HdBufferArray {
- public:
-  /// Constructor. commandNumUints is given in how many integers.
-  HDST_API
-  HdStDispatchBuffer(HdStResourceRegistry *resourceRegistry,
-                     TfToken const &role,
-                     int count,
-                     unsigned int commandNumUints);
+class HdStDispatchBuffer : public HdBufferArray
+{
+public:
+    /// Constructor. commandNumUints is given in how many integers.
+    HDST_API
+    HdStDispatchBuffer(HdStResourceRegistry* resourceRegistry,
+                       TfToken const &role,
+                       int count,
+                       unsigned int commandNumUints);
 
-  /// Destructor.
-  HDST_API
-  ~HdStDispatchBuffer() override;
+    /// Destructor.
+    HDST_API
+    ~HdStDispatchBuffer() override;
 
-  /// Update entire buffer data
-  HDST_API
-  void CopyData(std::vector<uint32_t> const &data);
+    /// Update entire buffer data
+    HDST_API
+    void CopyData(std::vector<uint32_t> const &data);
 
-  /// Add an interleaved view to this buffer.
-  HDST_API
-  void AddBufferResourceView(TfToken const &name, HdTupleType tupleType, int offset);
+    /// Add an interleaved view to this buffer.
+    HDST_API
+    void AddBufferResourceView(TfToken const &name,
+                               HdTupleType tupleType, int offset);
 
-  /// Returns the dispatch count
-  int GetCount() const
-  {
-    return _count;
-  }
+    /// Returns the dispatch count
+    int GetCount() const { return _count; }
 
-  /// Returns the number of uints in a single draw command.
-  unsigned int GetCommandNumUints() const
-  {
-    return _commandNumUints;
-  }
+    /// Returns the number of uints in a single draw command.
+    unsigned int GetCommandNumUints() const { return _commandNumUints; }
 
-  /// Returns a bar which locates all interleaved resources of the entire
-  /// buffer.
-  HdStBufferArrayRangeSharedPtr GetBufferArrayRange() const
-  {
-    return _bar;
-  }
+    /// Returns a bar which locates all interleaved resources of the entire
+    /// buffer.
+    HdStBufferArrayRangeSharedPtr GetBufferArrayRange() const {
+        return _bar;
+    }
 
-  /// Returns entire buffer as a single HdStBufferResource.
-  HdStBufferResourceSharedPtr GetEntireResource() const
-  {
-    return _entireResource;
-  }
+    /// Returns entire buffer as a single HdStBufferResource.
+    HdStBufferResourceSharedPtr GetEntireResource() const {
+        return _entireResource;
+    }
 
-  // HdBufferArray overrides. they are not supported in this class.
-  HDST_API
-  bool GarbageCollect() override;
-  HDST_API
-  void Reallocate(std::vector<HdBufferArrayRangeSharedPtr> const &,
-                  HdBufferArraySharedPtr const &) override;
+    // HdBufferArray overrides. they are not supported in this class.
+    HDST_API
+    bool GarbageCollect() override;
+    HDST_API
+    void Reallocate(
+        std::vector<HdBufferArrayRangeSharedPtr> const &,
+        HdBufferArraySharedPtr const &) override;
 
-  HDST_API
-  void DebugDump(std::ostream &out) const override;
+    HDST_API
+    void DebugDump(std::ostream &out) const override;
 
-  /// Returns the GPU resource. If the buffer array contains more than one
-  /// resource, this method raises a coding error.
-  HDST_API
-  HdStBufferResourceSharedPtr GetResource() const;
+    /// Returns the GPU resource. If the buffer array contains more than one
+    /// resource, this method raises a coding error.
+    HDST_API
+    HdStBufferResourceSharedPtr GetResource() const;
 
-  /// Returns the named GPU resource. This method returns the first found
-  /// resource. In HDST_SAFE_MODE it checks all underlying GPU buffers
-  /// in _resourceMap and raises a coding error if there are more than
-  /// one GPU buffers exist.
-  HDST_API
-  HdStBufferResourceSharedPtr GetResource(TfToken const &name);
+    /// Returns the named GPU resource. This method returns the first found
+    /// resource. In HDST_SAFE_MODE it checks all underlying GPU buffers
+    /// in _resourceMap and raises a coding error if there are more than
+    /// one GPU buffers exist.
+    HDST_API
+    HdStBufferResourceSharedPtr GetResource(TfToken const& name);
 
-  /// Returns the list of all named GPU resources for this bufferArray.
-  HdStBufferResourceNamedList const &GetResources() const
-  {
-    return _resourceList;
-  }
+    /// Returns the list of all named GPU resources for this bufferArray.
+    HdStBufferResourceNamedList const& GetResources() const {return _resourceList;}
 
- protected:
-  /// Adds a new, named GPU resource and returns it.
-  HDST_API
-  HdStBufferResourceSharedPtr _AddResource(TfToken const &name,
-                                           HdTupleType tupleType,
-                                           int offset,
-                                           int stride);
+protected:
+    /// Adds a new, named GPU resource and returns it.
+    HDST_API
+    HdStBufferResourceSharedPtr _AddResource(TfToken const& name,
+                                               HdTupleType tupleType,
+                                               int offset,
+                                               int stride);
 
- private:
-  HdStResourceRegistry *_resourceRegistry;
-  int _count;
-  unsigned int _commandNumUints;
-  HdStBufferResourceNamedList _resourceList;
-  HdStBufferResourceSharedPtr _entireResource;
-  HdStBufferArrayRangeSharedPtr _bar;  // Alternative to range list in base class
+private:
+    HdStResourceRegistry *_resourceRegistry;
+    int _count;
+    unsigned int _commandNumUints;
+    HdStBufferResourceNamedList _resourceList;
+    HdStBufferResourceSharedPtr _entireResource;
+    HdStBufferArrayRangeSharedPtr _bar;  // Alternative to range list in base class
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

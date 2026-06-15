@@ -5,29 +5,34 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Pcp/dynamicFileFormatDependencyData.h"
 #include "Tf/pyResultConversions.h"
 #include "Vt/value.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python/class.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapDynamicFileFormatDependencyData()
+using namespace pxr_boost::python;
+
+void 
+wrapDynamicFileFormatDependencyData()
 {
-  using This = PcpDynamicFileFormatDependencyData;
-  class_<This>("DynamicFileFormatDependencyData", no_init)
-      .def("GetRelevantFieldNames",
-           make_function(&This::GetRelevantFieldNames, return_value_policy<TfPySequenceToList>()))
-      .def("GetRelevantAttributeNames",
-           make_function(&This::GetRelevantAttributeNames,
-                         return_value_policy<TfPySequenceToList>()))
-      .def("CanFieldChangeAffectFileFormatArguments",
-           &This::CanFieldChangeAffectFileFormatArguments)
-      .def("CanAttributeDefaultValueChangeAffectFileFormatArguments",
-           &This::CanAttributeDefaultValueChangeAffectFileFormatArguments)
-      .def("IsEmpty", &This::IsEmpty);
+    using This = PcpDynamicFileFormatDependencyData;
+    class_<This>("DynamicFileFormatDependencyData", no_init)     
+        .def("GetRelevantFieldNames",
+             make_function(&This::GetRelevantFieldNames,
+                           return_value_policy< TfPySequenceToList >()))
+        .def("GetRelevantAttributeNames",
+             make_function(&This::GetRelevantAttributeNames,
+                           return_value_policy< TfPySequenceToList >()))
+        .def("CanFieldChangeAffectFileFormatArguments", 
+             &This::CanFieldChangeAffectFileFormatArguments)
+        .def("CanAttributeDefaultValueChangeAffectFileFormatArguments", 
+             &This::CanAttributeDefaultValueChangeAffectFileFormatArguments)
+        .def("IsEmpty", &This::IsEmpty)
+        ;
 }

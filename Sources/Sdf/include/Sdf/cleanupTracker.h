@@ -9,15 +9,15 @@
 
 /// \file sdf/cleanupTracker.h
 
+#include "pxr/pxrns.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/spec.h"
-#include "pxr/pxrns.h"
-
-#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 SDF_DECLARE_HANDLES(SdfSpec);
+
+#include <vector>
 
 /// \class Sdf_CleanupTracker
 ///
@@ -26,27 +26,30 @@ SDF_DECLARE_HANDLES(SdfSpec);
 /// When the last Sdf_CleanupEnabler goes out of scope, the specs are removed
 /// from the layer if they are inert.
 ///
-class Sdf_CleanupTracker : public TfWeakBase {
- public:
-  /// Retrieves singleton instance.
-  static Sdf_CleanupTracker &GetInstance();
+class Sdf_CleanupTracker : public TfWeakBase
+{
+public:
+    
+    /// Retrieves singleton instance.
+    static Sdf_CleanupTracker &GetInstance();
 
-  /// Adds the spec to the vector of tracked specs if there is at least one
-  /// Sdf_CleanupEnabler on the stack.
-  void AddSpecIfTracking(SdfSpecHandle const &spec);
+    /// Adds the spec to the vector of tracked specs if there is at least one
+    /// Sdf_CleanupEnabler on the stack.
+    void AddSpecIfTracking(SdfSpecHandle const &spec);
 
-  /// Return the authoring monitor identified by the index
-  void CleanupSpecs();
+    /// Return the authoring monitor identified by the index
+    void CleanupSpecs();
 
- private:
-  Sdf_CleanupTracker();
-  ~Sdf_CleanupTracker();
+private:
+    
+    Sdf_CleanupTracker();
+    ~Sdf_CleanupTracker();
 
-  std::vector<SdfSpecHandle> _specs;
-
-  friend class TfSingleton<Sdf_CleanupTracker>;
+    std::vector<SdfSpecHandle> _specs;
+    
+    friend class TfSingleton<Sdf_CleanupTracker>;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_SDF_CLEANUP_TRACKER_H
+#endif // PXR_USD_SDF_CLEANUP_TRACKER_H

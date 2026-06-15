@@ -8,8 +8,8 @@
 #ifndef PXR_BASE_TRACE_JSON_SERIALIZATION_H
 #define PXR_BASE_TRACE_JSON_SERIALIZATION_H
 
-#include "Trace/collection.h"
 #include "pxr/pxrns.h"
+#include "Trace/collection.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -19,19 +19,19 @@ class JsWriter;
 ///////////////////////////////////////////////////////////////////////////////
 /// \class Trace_JSONSerialization
 ///
-/// This class contains methods to read and write TraceCollections in JSON
+/// This class contains methods to read and write TraceCollections in JSON 
 /// format.  This JSON format for a TraceCollection is an extension of the
-/// Chrome Tracing format.
+/// Chrome Tracing format. 
 class Trace_JSONSerialization {
- public:
-  /// Write a JSON representation of \p collections.
-  static bool WriteCollectionsToJSON(
-      JsWriter &js, const std::vector<std::shared_ptr<TraceCollection>> &collections);
+public:
+    /// Write a JSON representation of \p collections.
+    static bool WriteCollectionsToJSON(JsWriter& js,
+        const std::vector<std::shared_ptr<TraceCollection>>& collections);
 
-  /// Creates a TraceCollection from a JSON value if possible.
-  static std::unique_ptr<TraceCollection> CollectionFromJSON(const JsValue &);
+    /// Creates a TraceCollection from a JSON value if possible.
+    static std::unique_ptr<TraceCollection> CollectionFromJSON(JsValue&&);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TRACE_JSON_SERIALIZATION_H
+#endif // PXR_BASE_TRACE_JSON_SERIALIZATION_H

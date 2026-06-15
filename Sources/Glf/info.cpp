@@ -9,8 +9,8 @@
 
 #include "Garch/glApi.h"
 
-#include "Glf/glContext.h"
 #include "Glf/info.h"
+#include "Glf/glContext.h"
 
 #include "Tf/stringUtils.h"
 
@@ -20,42 +20,47 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 using std::set;
 using std::string;
 using std::vector;
 
-static set<string> Glf_BuildAvailableExtensions()
+static set<string>
+Glf_BuildAvailableExtensions()
 {
-  GlfSharedGLContextScopeHolder sharedContextScopeHolder;
+    GlfSharedGLContextScopeHolder sharedContextScopeHolder;
 
-  set<string> availableExtensions;
+    set<string> availableExtensions;
 
-  // Get the available extensions from OpenGL if we haven't yet.
-  if (const char *extensions = (const char *)glGetString(GL_EXTENSIONS)) {
-    const vector<string> extensionsList = TfStringTokenize(extensions);
-    for (std::string const &extension : extensionsList) {
-      availableExtensions.insert(extension);
+    // Get the available extensions from OpenGL if we haven't yet.
+    if (const char *extensions = (const char*) glGetString(GL_EXTENSIONS)) {
+        const vector<string> extensionsList = TfStringTokenize(extensions);
+        for (std::string const& extension : extensionsList) {
+            availableExtensions.insert(extension);
+        }
     }
-  }
-  return availableExtensions;
+    return availableExtensions;
 }
 
-bool GlfHasExtensions(string const &queryExtensions)
+bool
+GlfHasExtensions(string const & queryExtensions)
 {
-  static set<string> availableExtensions = Glf_BuildAvailableExtensions();
+    static set<string> availableExtensions = Glf_BuildAvailableExtensions();
 
-  // Tokenize the queried extensions.
-  const vector<string> extensionsList = TfStringTokenize(queryExtensions);
+    // Tokenize the queried extensions.
+    const vector<string> extensionsList = TfStringTokenize(queryExtensions);
 
-  // Return false if any queried extension is not available.
-  for (std::string const &extension : extensionsList) {
-    if (!availableExtensions.count(extension)) {
-      return false;
+    // Return false if any queried extension is not available.
+    for (std::string const& extension : extensionsList) {
+        if (!availableExtensions.count(extension)) {
+            return false;
+        }
     }
-  }
 
-  // All queried extensions were found.
-  return true;
+    // All queried extensions were found.
+    return true;
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

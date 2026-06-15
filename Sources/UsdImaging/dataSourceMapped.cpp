@@ -7,11 +7,21 @@
 
 #include "UsdImaging/dataSourceMapped.h"
 
-#include <variant>
+#include "Usd/relationship.h"
+
+#include "Hd/retainedDataSource.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace UsdImagingDataSourceMapped_Impl {
+namespace UsdImagingDataSourceMapped_Impl
+{
+
+using AttributeMapping =
+    UsdImagingDataSourceMapped::AttributeMapping;
+using RelationshipMapping =
+    UsdImagingDataSourceMapped::RelationshipMapping;
+using DataSourceRelationshipFactoryFn =
+    UsdImagingDataSourceMapped::DataSourceRelationshipFactoryFn;
 
 // For a given location within UsdImagingDataSourceMapped,
 // information what data source to create.
@@ -19,32 +29,93 @@ namespace UsdImagingDataSourceMapped_Impl {
 // Such a data source is either an HdSampledDataSource giving
 // the value of an Usd attribute. Or a container data source.
 using _DataSourceInfo =
-    std::variant<UsdImagingDataSourceMapped::AttributeMapping, _ContainerMappingsSharedPtr>;
+    std::variant<AttributeMapping,
+                 RelationshipMapping,
+                 _ContainerMappingsSharedPtr>;
 
 // Data for a container data source.
-struct _ContainerMappings {
-  // Names within the container data source - sorted lexicographically.
-  TfTokenVector hdNames;
-  // What data source should be returned for the above name.
-  // This vector runs in parallel with hdNames.
-  //
-  // _DataSourceInfo can store another _ContainerMappings so this
-  // data structure is a tree mirroring the tree of given data source
-  // locators.
-  std::vector<_DataSourceInfo> dataSourceInfos;
+struct _ContainerMappings
+{
+    // Names within the container data source - sorted lexicographically.
+    TfTokenVector hdNames;
+    // What data source should be returned for the above name.
+    // This vector runs in parallel with hdNames.
+    //
+    // _DataSourceInfo can store another _ContainerMappings so this
+    // data structure is a tree mirroring the tree of given data source
+    // locators.
+    std::vector<_DataSourceInfo> dataSourceInfos;
 };
 
-}  // namespace UsdImagingDataSourceMapped_Impl
+HdDataSourceBaseHandle
+_PathFromRelationshipFactory(
+    const UsdRelationship &rel,
+    const UsdImagingDataSourceStageGlobals &,
+    const SdfPath &,
+    const HdDataSourceLocator &)
+{
+    SdfPathVector result;
+    rel.GetForwardedTargets(&result);
+    if (result.empty()) {
+        return nullptr;
+    }
+    return HdRetainedTypedSampledDataSource<SdfPath>::New(std::move(result[0]));
+}
 
+VtArray<SdfPath>
+_ToArray(SdfPathVector &&v)
+{
+    return VtArray<SdfPath>(
+        std::make_move_iterator(v.begin()),
+        std::make_move_iterator(v.end()));
+}
+
+HdDataSourceBaseHandle
+_PathArrayFromRelationshipFactory(
+    const UsdRelationship &rel,
+    const UsdImagingDataSourceStageGlobals &,
+    const SdfPath &,
+    const HdDataSourceLocator &)
+{
+    SdfPathVector result;
+    rel.GetForwardedTargets(&result);
+    return
+        HdRetainedTypedSampledDataSource<VtArray<SdfPath>>::New(
+            _ToArray(std::move(result)));
+}
+
+}
+   
 using namespace UsdImagingDataSourceMapped_Impl;
+
+/* static */
+const DataSourceRelationshipFactoryFn&
+UsdImagingDataSourceMapped::GetPathFromRelationshipDataSourceFactory()
+{
+    static const DataSourceRelationshipFactoryFn result(
+        _PathFromRelationshipFactory);
+    return result;
+}
+
+/* static */
+const DataSourceRelationshipFactoryFn&
+UsdImagingDataSourceMapped::GetPathArrayFromRelationshipDataSourceFactory()
+{
+    static const DataSourceRelationshipFactoryFn result(
+        _PathArrayFromRelationshipFactory);
+    return result;
+}
 
 UsdImagingDataSourceMapped::UsdImagingDataSourceMapped(
     UsdPrim const &usdPrim,
     const SdfPath &sceneIndexPath,
-    const AttributeMappings &mappings,
+    const PropertyMappings &mappings,
     const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : UsdImagingDataSourceMapped(
-          usdPrim, sceneIndexPath, mappings._containerMappings, stageGlobals)
+  : UsdImagingDataSourceMapped(
+      usdPrim,
+      sceneIndexPath,
+      mappings._containerMappings,
+      stageGlobals)
 {
 }
 
@@ -53,157 +124,244 @@ UsdImagingDataSourceMapped::UsdImagingDataSourceMapped(
     const SdfPath &sceneIndexPath,
     const _ContainerMappingsSharedPtr &containerMappings,
     const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : _usdPrim(usdPrim),
-      _sceneIndexPath(sceneIndexPath),
-      _containerMappings(containerMappings),
-      _stageGlobals(stageGlobals)
+  : _usdPrim(usdPrim)
+  , _sceneIndexPath(sceneIndexPath)
+  , _containerMappings(containerMappings)
+  , _stageGlobals(stageGlobals)
 {
 }
 
 UsdImagingDataSourceMapped::~UsdImagingDataSourceMapped() = default;
 
-TfTokenVector UsdImagingDataSourceMapped::GetNames()
+TfTokenVector
+UsdImagingDataSourceMapped::GetNames()
 {
-  return _containerMappings->hdNames;
+    return _containerMappings->hdNames;
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourceMapped::Get(const TfToken &name)
+HdDataSourceBaseHandle
+UsdImagingDataSourceMapped::Get(const TfToken &name)
 {
-  // Look for name in hdNames.
-
-  const auto itName = std::lower_bound(
-      _containerMappings->hdNames.begin(), _containerMappings->hdNames.end(), name);
-
-  if (!(itName != _containerMappings->hdNames.end() && *itName == name)) {
-    return nullptr;
-  }
-
-  const auto itInfo = _containerMappings->dataSourceInfos.begin() +
-                      (itName - _containerMappings->hdNames.begin());
-
-  const _DataSourceInfo &info = *itInfo;
-  if (auto const mapping = std::get_if<AttributeMapping>(&info)) {
-    // We create a data source from the UsdAttribute.
-    UsdAttribute attr = _usdPrim.GetAttribute(mapping->usdName);
-    if (!attr) {
-      TF_CODING_ERROR(
-          "Expected usd attribute '%s' on prim '%s' to serve "
-          "data source at locator '%s'.",
-          mapping->usdName.GetText(),
-          _usdPrim.GetPath().GetText(),
-          mapping->hdLocator.GetString().c_str());
-      return nullptr;
+    if (!_usdPrim) {
+        return nullptr;
     }
-    return mapping->factory(attr, _stageGlobals, _sceneIndexPath, mapping->hdLocator);
-  }
-  else {
-    // We are in the nested case.
-    return UsdImagingDataSourceMapped::New(
-        _usdPrim, _sceneIndexPath, std::get<_ContainerMappingsSharedPtr>(info), _stageGlobals);
-  }
+
+    // Look for name in hdNames.
+
+    const auto itName = std::lower_bound(
+        _containerMappings->hdNames.begin(),
+        _containerMappings->hdNames.end(),
+        name);
+
+    if (!(itName != _containerMappings->hdNames.end() &&
+          *itName == name)) {
+        return nullptr;
+    }
+    
+    const auto itInfo =
+        _containerMappings->dataSourceInfos.begin() +
+        (itName - _containerMappings->hdNames.begin()); 
+
+    const _DataSourceInfo &info = *itInfo;
+    if (auto const attrMapping = std::get_if<AttributeMapping>(&info)) {
+        // We create a data source from the UsdAttribute.
+        const UsdAttribute attr = _usdPrim.GetAttribute(attrMapping->usdName);
+        if (!attr) {
+            TF_CODING_ERROR(
+                "Expected usd attribute '%s' on prim '%s' to serve "
+                "data source at locator '%s'.",
+                attrMapping->usdName.GetText(),
+                _usdPrim.GetPath().GetText(),
+                attrMapping->hdLocator.GetString().c_str());
+            return nullptr;
+        }
+        if (!attrMapping->factory) {
+            TF_CODING_ERROR(
+                "No factory given to convert usd attribute '%s' on prim '%s' "
+                "to serve data source at locator '%s'.",
+                attrMapping->usdName.GetText(),
+                _usdPrim.GetPath().GetText(),
+                attrMapping->hdLocator.GetString().c_str());
+            return nullptr;
+        }
+        return attrMapping->factory(
+            attr, _stageGlobals, _sceneIndexPath, attrMapping->hdLocator);
+    } else if (auto const relMapping =
+                                std::get_if<RelationshipMapping>(&info)) {
+        const UsdRelationship rel =
+            _usdPrim.GetRelationship(relMapping->usdName);
+        if (!rel) {
+            TF_CODING_ERROR(
+                "Expected usd relationship '%s' on prim '%s' to serve "
+                "data source at locator '%s'.",
+                relMapping->usdName.GetText(),
+                _usdPrim.GetPath().GetText(),
+                relMapping->hdLocator.GetString().c_str());
+            return nullptr;
+        }
+        if (!relMapping->factory) {
+            TF_CODING_ERROR(
+                "No factory given to convert usd relationship '%s' on prim '%s' "
+                "to serve data source at locator '%s'.",
+                relMapping->usdName.GetText(),
+                _usdPrim.GetPath().GetText(),
+                relMapping->hdLocator.GetString().c_str());
+            return nullptr;
+        }
+        return relMapping->factory(
+            rel, _stageGlobals, _sceneIndexPath, relMapping->hdLocator);
+    } else {
+        // We are in the nested case.
+        return UsdImagingDataSourceMapped::New(
+            _usdPrim,
+            _sceneIndexPath,
+            std::get<_ContainerMappingsSharedPtr>(info),
+            _stageGlobals);
+    }
 }
 
-HdDataSourceLocatorSet UsdImagingDataSourceMapped::Invalidate(const TfTokenVector &usdNames,
-                                                              const AttributeMappings &mappings)
+HdDataSourceLocatorSet
+UsdImagingDataSourceMapped::Invalidate(
+    const TfTokenVector &usdNames, const PropertyMappings &mappings)
 {
-  HdDataSourceLocatorSet locators;
-
-  for (const TfToken &usdName : usdNames) {
-    for (const AttributeMapping &mapping : mappings._absoluteMappings) {
-      if (mapping.usdName == usdName) {
-        locators.insert(mapping.hdLocator);
-      }
+    HdDataSourceLocatorSet locators;
+    
+    for (const TfToken &usdName : usdNames) {
+        for (const PropertyMappingBase &mapping : mappings._absoluteMappings) {
+            if (mapping.usdName == usdName) {
+                locators.insert(mapping.hdLocator);
+            }
+        }
     }
-  }
 
-  return locators;
+    return locators;
+}
+
+static
+TfToken
+_GetUsdName(const _DataSourceInfo &info)
+{
+    if (auto const attrMapping = std::get_if<AttributeMapping>(&info)) {
+        return attrMapping->usdName;
+    }
+    if (auto const relMapping = std::get_if<RelationshipMapping>(&info)) {
+        return relMapping->usdName;
+    }
+    return TfToken("<UNKNOWN>");
 }
 
 // Find or add name as key to given containerMappings - returning the
 // _ContainerMappings at that key.
-_ContainerMappingsSharedPtr _FindOrCreateChild(
-    const TfToken &name, _ContainerMappingsSharedPtr const &containerMappings)
+static
+_ContainerMappingsSharedPtr
+_FindOrCreateChild(const TfToken &name,
+                  _ContainerMappingsSharedPtr const &containerMappings)
 {
-  const auto itName = std::lower_bound(
-      containerMappings->hdNames.begin(), containerMappings->hdNames.end(), name);
-  const auto itInfo = containerMappings->dataSourceInfos.begin() +
-                      (itName - containerMappings->hdNames.begin());
+    const auto itName = std::lower_bound(
+        containerMappings->hdNames.begin(),
+        containerMappings->hdNames.end(),
+        name);
+    const auto itInfo =
+        containerMappings->dataSourceInfos.begin() +
+        (itName - containerMappings->hdNames.begin()); 
 
-  if (itName != containerMappings->hdNames.end() && *itName == name) {
-    const _DataSourceInfo &info = *itInfo;
-    auto *const child = std::get_if<_ContainerMappingsSharedPtr>(&info);
-    if (!child) {
-      const auto &mapping = std::get<UsdImagingDataSourceMapped::AttributeMapping>(info);
-      TF_CODING_ERROR(
-          "Adding data source locator when there was already an "
-          "ascendant locator added for a Usd attribute with name '%s'.",
-          mapping.usdName.GetText());
-      return nullptr;
+    if (itName != containerMappings->hdNames.end() && *itName == name) {
+        const _DataSourceInfo &info = *itInfo;
+        auto * const child = std::get_if<_ContainerMappingsSharedPtr>(&info);
+        if (!child) {
+            TF_CODING_ERROR(
+                "Adding data source locator when there was already an "
+                "ascendant locator added for a Usd attribute with name '%s'.",
+                _GetUsdName(info).GetText());
+            return nullptr;
+        }
+        return *child;
     }
-    return *child;
-  }
 
-  // Create new item.
-  _ContainerMappingsSharedPtr child = std::make_shared<_ContainerMappings>();
+    // Create new item.
+    _ContainerMappingsSharedPtr child = std::make_shared<_ContainerMappings>();
 
-  containerMappings->hdNames.insert(itName, name);
-  containerMappings->dataSourceInfos.insert(itInfo, child);
+    containerMappings->hdNames.insert(itName, name);
+    containerMappings->dataSourceInfos.insert(itInfo, child);
 
-  return child;
+    return child;
 }
 
 // Add mapping to containerMappins at given locator.
-void _Add(const HdDataSourceLocator &locator,
-          const UsdImagingDataSourceMapped::AttributeMapping &mapping,
-          _ContainerMappingsSharedPtr containerMappings)
+static
+void
+_Add(const HdDataSourceLocator &locator,
+     _DataSourceInfo &&info,
+     _ContainerMappingsSharedPtr containerMappings)
 {
-  const size_t n = locator.GetElementCount();
-  if (n == 0) {
-    TF_CODING_ERROR(
-        "Expected non-trivial data source locator for "
-        "attribute %s.",
-        mapping.usdName.GetText());
-    return;
-  }
-
-  // Find or create the nested container data sources.
-  for (size_t i = 0; i < n - 1; ++i) {
-    const TfToken &hdName = locator.GetElement(i);
-    containerMappings = _FindOrCreateChild(hdName, containerMappings);
-    if (!containerMappings) {
-      return;
+    const size_t n = locator.GetElementCount();
+    if (n == 0) {
+        TF_CODING_ERROR("Expected non-trivial data source locator for "
+                        "attribute %s.", _GetUsdName(info).GetText());
+        return;
     }
-  }
 
-  const TfToken &name = mapping.hdLocator.GetLastElement();
+    // Find or create the nested container data sources.
+    for (size_t i = 0; i < n - 1; ++i) {
+        const TfToken &hdName = locator.GetElement(i);
+        containerMappings = _FindOrCreateChild(hdName, containerMappings);
+        if (!containerMappings) {
+            return;
+        }
+    }
 
-  // And add the AttributeMapping as leaf.
-  const auto itName = std::lower_bound(
-      containerMappings->hdNames.begin(), containerMappings->hdNames.end(), name);
-  const auto itInfo = containerMappings->dataSourceInfos.begin() +
-                      (itName - containerMappings->hdNames.begin());
+    const TfToken &name = locator.GetLastElement();
+    
+    // And add the AttributeMapping as leaf.
+    const auto itName = std::lower_bound(
+        containerMappings->hdNames.begin(),
+        containerMappings->hdNames.end(),
+        name);
+    const auto itInfo =
+        containerMappings->dataSourceInfos.begin() +
+        (itName - containerMappings->hdNames.begin()); 
 
-  containerMappings->hdNames.insert(itName, name);
-  containerMappings->dataSourceInfos.insert(itInfo, mapping);
+    containerMappings->hdNames.insert(itName, name);
+    containerMappings->dataSourceInfos.insert(itInfo, std::move(info));
 }
 
-UsdImagingDataSourceMapped::AttributeMappings::AttributeMappings(
-    const std::vector<AttributeMapping> &mappings, const HdDataSourceLocator &dataSourcePrefix)
+UsdImagingDataSourceMapped::PropertyMappings::PropertyMappings(
+    const std::vector<PropertyMapping> &mappings,
+    const HdDataSourceLocator &dataSourcePrefix)
 {
-  _absoluteMappings.reserve(mappings.size());
-  _containerMappings = std::make_shared<_ContainerMappings>();
+    _absoluteMappings.reserve(mappings.size());
+    _containerMappings = std::make_shared<_ContainerMappings>();
 
-  for (const AttributeMapping &mapping : mappings) {
-    // Making locator absolute.
-    const AttributeMapping absoluteMapping{
-        mapping.usdName, dataSourcePrefix.Append(mapping.hdLocator), mapping.factory};
-
-    _absoluteMappings.push_back(absoluteMapping);
-
-    _Add(mapping.hdLocator, absoluteMapping, _containerMappings);
-  }
+    for (const PropertyMapping &mapping : mappings) {
+        if (auto const attrMapping = std::get_if<AttributeMapping>(&mapping)) {
+            // Making locator absolute. 
+           const HdDataSourceLocator locator =
+                dataSourcePrefix.Append(attrMapping->hdLocator);
+            _absoluteMappings.push_back(
+                { attrMapping->usdName, locator });
+            _Add(
+                attrMapping->hdLocator,
+                AttributeMapping{
+                    { attrMapping->usdName, locator }, attrMapping->factory
+                },
+                _containerMappings);
+        } else if (auto const &relMapping =
+                                std::get_if<RelationshipMapping>(&mapping)) {
+            // Making locator absolute. 
+           const HdDataSourceLocator locator =
+                dataSourcePrefix.Append(relMapping->hdLocator);
+            _absoluteMappings.push_back(
+                { relMapping->usdName, locator });
+            _Add(
+                relMapping->hdLocator,
+                RelationshipMapping{
+                    { relMapping->usdName, locator }, relMapping->factory
+                },
+                _containerMappings);
+        }
+    }
 }
 
-UsdImagingDataSourceMapped::AttributeMappings::~AttributeMappings() = default;
+UsdImagingDataSourceMapped::PropertyMappings::~PropertyMappings() = default;
 
 PXR_NAMESPACE_CLOSE_SCOPE

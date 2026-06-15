@@ -8,10 +8,9 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/Hdx/shaders/renderPassShadowShader.glslfx
+--- #import $TOOLS/hdx/shaders/renderPassShadowShader.glslfx
 
-#import $TOOLS/HdSt/shaders/renderPass.glslfx
-#import $TOOLS/Hdx/shaders/renderPass.glslfx
+#import $TOOLS/hdSt/shaders/renderPass.glslfx
 
 -- configuration
 {
@@ -44,7 +43,10 @@
                             "RenderPass.CameraFS",
                             "RenderPass.NoSelection",
                             "RenderPass.NoColorOverrides",
-                            "RenderPass.RenderColor" ]
+                            "RenderPass.RenderColor",
+                            "RenderPass.RenderIdNoOp",
+                            "RenderPass.RenderNeyeNoOp",
+                            "RenderPass.RenderOutput" ]
             }
         }
     }

@@ -1,39 +1,23 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file alembicData.cpp
 
+#include "pxr/pxrns.h"
 #include "UsdAbc/alembicData.h"
-#include "Sdf/schema.h"
-#include "Tf/envSetting.h"
-#include "Tf/fileUtils.h"
-#include "Trace/traceImpl.h"
 #include "UsdAbc/alembicReader.h"
 #include "UsdAbc/alembicUtil.h"
 #include "UsdAbc/alembicWriter.h"
-#include <pxr/pxrns.h>
+#include "Sdf/schema.h"
+#include "Trace/trace.h"
+#include "Tf/envSetting.h"
+#include "Tf/fileUtils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 // Note: The Alembic translator has a few major parts.  Here's a
 //       quick description.
@@ -90,12 +74,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 using namespace UsdAbc_AlembicUtil;
 
-TF_DEFINE_ENV_SETTING(USD_ABC_EXPAND_INSTANCES, false, "Force Alembic instances to be expanded.");
-TF_DEFINE_ENV_SETTING(USD_ABC_DISABLE_INSTANCING,
-                      false,
+TF_DEFINE_ENV_SETTING(USD_ABC_EXPAND_INSTANCES, false,
+                      "Force Alembic instances to be expanded.");
+TF_DEFINE_ENV_SETTING(USD_ABC_DISABLE_INSTANCING, false,
                       "Disable instancing on prototypes created from Alembic.");
-TF_DEFINE_ENV_SETTING(USD_ABC_PARENT_INSTANCES,
-                      true,
+TF_DEFINE_ENV_SETTING(USD_ABC_PARENT_INSTANCES, true,
                       "Make parent of instance source into prototype where possible.");
 
 // The SdfAbstractData time samples type.
@@ -115,223 +98,288 @@ UsdAbc_AlembicData::UsdAbc_AlembicData(SdfFileFormat::FileFormatArguments args)
 
 UsdAbc_AlembicData::~UsdAbc_AlembicData()
 {
-  // Do nothing
+    // Do nothing
 }
 
-UsdAbc_AlembicDataRefPtr UsdAbc_AlembicData::New(SdfFileFormat::FileFormatArguments args)
+UsdAbc_AlembicDataRefPtr
+UsdAbc_AlembicData::New(SdfFileFormat::FileFormatArguments args)
 {
-  return TfCreateRefPtr(new UsdAbc_AlembicData(std::move(args)));
+    return TfCreateRefPtr(new UsdAbc_AlembicData(std::move(args)));
 }
 
-bool UsdAbc_AlembicData::Open(const std::string &filePath)
+bool
+UsdAbc_AlembicData::Open(const std::string& filePath)
 {
-  TfAutoMallocTag2 tag("UsdAbc_AlembicData", "UsdAbc_AlembicData::Open");
-  TRACE_FUNCTION();
+    TfAutoMallocTag2 tag("UsdAbc_AlembicData", "UsdAbc_AlembicData::Open");
+    TRACE_FUNCTION();
 
-  // Prepare the reader.
-  _reader.reset(new UsdAbc_AlembicDataReader);
-  // Suppress instancing support.
-  if (TfGetEnvSetting(USD_ABC_EXPAND_INSTANCES)) {
-    _reader->SetFlag(UsdAbc_AlembicContextFlagNames->expandInstances);
-  }
-  // Create instances but disallow instancing on the prototype.
-  if (TfGetEnvSetting(USD_ABC_DISABLE_INSTANCING)) {
-    _reader->SetFlag(UsdAbc_AlembicContextFlagNames->disableInstancing);
-  }
-  // Use the parent of instance sources as the Usd prototype prim, where
-  // possible.
-  if (TfGetEnvSetting(USD_ABC_PARENT_INSTANCES)) {
-    _reader->SetFlag(UsdAbc_AlembicContextFlagNames->promoteInstances);
-  }
-  //_reader->SetFlag(UsdAbc_AlembicContextFlagNames->verbose);
+    // Prepare the reader.
+    _reader.reset(new UsdAbc_AlembicDataReader);
+    // Suppress instancing support.
+    if (TfGetEnvSetting(USD_ABC_EXPAND_INSTANCES)) {
+        _reader->SetFlag(UsdAbc_AlembicContextFlagNames->expandInstances);
+    }
+    // Create instances but disallow instancing on the prototype.
+    if (TfGetEnvSetting(USD_ABC_DISABLE_INSTANCING)) {
+        _reader->SetFlag(UsdAbc_AlembicContextFlagNames->disableInstancing);
+    }
+    // Use the parent of instance sources as the Usd prototype prim, where
+    // possible.
+    if (TfGetEnvSetting(USD_ABC_PARENT_INSTANCES)) {
+        _reader->SetFlag(UsdAbc_AlembicContextFlagNames->promoteInstances);
+    }
+    //_reader->SetFlag(UsdAbc_AlembicContextFlagNames->verbose);
 
-  // Open the archive.
-  if (_reader->Open(filePath, _arguments)) {
+    // Open the archive.
+    if (_reader->Open(filePath, _arguments)) {
+        return true;
+    }
+
+    TF_RUNTIME_ERROR("Failed to open Alembic archive \"%s\": %s",
+                     filePath.c_str(),
+                     _reader->GetErrors().c_str());
+    Close();
+    return false;
+}
+
+void
+UsdAbc_AlembicData::Close()
+{
+    _reader.reset();
+}
+
+bool
+UsdAbc_AlembicData::Write(
+    const SdfAbstractDataConstPtr& data,
+    const std::string& filePath,
+    const std::string& comment)
+{
+    TfAutoMallocTag2 tag("UsdAbc_AlembicData", "UsdAbc_AlembicData::Write");
+    TRACE_FUNCTION();
+
+    std::string finalComment = comment;
+    if (data && finalComment.empty()) {
+        VtValue value = data->Get(
+            SdfPath::AbsoluteRootPath(), SdfFieldKeys->Comment);
+        if (value.IsHolding<std::string>()) {
+            finalComment = value.UncheckedGet<std::string>();
+        }
+    }
+
+    // Prepare the writer.
+    UsdAbc_AlembicDataWriter writer;
+    //writer.SetFlag(UsdAbc_AlembicContextFlagNames->verbose);
+
+    // Write the archive.
+    if (writer.Open(filePath, finalComment)) {
+        if (writer.Write(data) && writer.Close()) {
+            return true;
+        }
+        TfDeleteFile(filePath);
+    }
+    TF_RUNTIME_ERROR("Alembic error: %s", writer.GetErrors().c_str());
+    return false;
+}
+
+bool
+UsdAbc_AlembicData::StreamsData() const
+{
     return true;
-  }
-
-  TF_RUNTIME_ERROR(
-      "Failed to open Alembic archive \"%s\": %s", filePath.c_str(), _reader->GetErrors().c_str());
-  Close();
-  return false;
 }
 
-void UsdAbc_AlembicData::Close()
+void
+UsdAbc_AlembicData::CreateSpec(const SdfPath &path, SdfSpecType specType)
 {
-  _reader.reset();
+    XXX_UNSUPPORTED(CreateSpec);
 }
 
-bool UsdAbc_AlembicData::Write(const SdfAbstractDataConstPtr &data,
-                               const std::string &filePath,
-                               const std::string &comment)
+bool
+UsdAbc_AlembicData::HasSpec(const SdfPath& path) const
 {
-  TfAutoMallocTag2 tag("UsdAbc_AlembicData", "UsdAbc_AlembicData::Write");
-  TRACE_FUNCTION();
+    return _reader ? _reader->HasSpec(path)
+                   : (path == SdfPath::AbsoluteRootPath());
+}
 
-  std::string finalComment = comment;
-  if (data && finalComment.empty()) {
-    VtValue value = data->Get(SdfPath::AbsoluteRootPath(), SdfFieldKeys->Comment);
-    if (value.IsHolding<std::string>()) {
-      finalComment = value.UncheckedGet<std::string>();
+void
+UsdAbc_AlembicData::EraseSpec(const SdfPath& path)
+{
+    XXX_UNSUPPORTED(EraseSpec);
+}
+
+void
+UsdAbc_AlembicData::MoveSpec(
+    const SdfPath& oldPath,
+    const SdfPath& newPath)
+{
+    XXX_UNSUPPORTED(MoveSpec);
+}
+
+SdfSpecType
+UsdAbc_AlembicData::GetSpecType(const SdfPath& path) const
+{
+    if (_reader) {
+        return _reader->GetSpecType(path);
     }
-  }
-
-  // Prepare the writer.
-  UsdAbc_AlembicDataWriter writer;
-  // writer.SetFlag(UsdAbc_AlembicContextFlagNames->verbose);
-
-  // Write the archive.
-  if (writer.Open(filePath, finalComment)) {
-    if (writer.Write(data) && writer.Close()) {
-      return true;
+    if (path == SdfPath::AbsoluteRootPath()) {
+        return SdfSpecTypePseudoRoot;
     }
-    TfDeleteFile(filePath);
-  }
-  TF_RUNTIME_ERROR("Alembic error: %s", writer.GetErrors().c_str());
-  return false;
+    return SdfSpecTypeUnknown;
 }
 
-bool UsdAbc_AlembicData::StreamsData() const
+void
+UsdAbc_AlembicData::_VisitSpecs(SdfAbstractDataSpecVisitor* visitor) const
 {
-  return true;
+    if (_reader) {
+        _reader->VisitSpecs(*this, visitor);
+    }
 }
 
-void UsdAbc_AlembicData::CreateSpec(const SdfPath &path, SdfSpecType specType)
+bool
+UsdAbc_AlembicData::Has(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    SdfAbstractDataValue* value) const
 {
-  XXX_UNSUPPORTED(CreateSpec);
+    return _reader ? _reader->HasField(path, fieldName, value) : false;
 }
 
-bool UsdAbc_AlembicData::HasSpec(const SdfPath &path) const
+bool
+UsdAbc_AlembicData::Has(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    VtValue* value) const
 {
-  return _reader ? _reader->HasSpec(path) : (path == SdfPath::AbsoluteRootPath());
+    return _reader ? _reader->HasField(path, fieldName, value) : false;
 }
 
-void UsdAbc_AlembicData::EraseSpec(const SdfPath &path)
+VtValue
+UsdAbc_AlembicData::Get(
+    const SdfPath& path,
+    const TfToken& fieldName) const
 {
-  XXX_UNSUPPORTED(EraseSpec);
+    VtValue result;
+    if (_reader) {
+        _reader->HasField(path, fieldName, &result);
+    }
+    return result;
 }
 
-void UsdAbc_AlembicData::MoveSpec(const SdfPath &oldPath, const SdfPath &newPath)
+void
+UsdAbc_AlembicData::Set(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    const VtValue& value)
 {
-  XXX_UNSUPPORTED(MoveSpec);
+    XXX_UNSUPPORTED(Set);
 }
 
-SdfSpecType UsdAbc_AlembicData::GetSpecType(const SdfPath &path) const
+void
+UsdAbc_AlembicData::Set(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    const SdfAbstractDataConstValue& value)
 {
-  if (_reader) {
-    return _reader->GetSpecType(path);
-  }
-  if (path == SdfPath::AbsoluteRootPath()) {
-    return SdfSpecTypePseudoRoot;
-  }
-  return SdfSpecTypeUnknown;
+    XXX_UNSUPPORTED(Set);
 }
 
-void UsdAbc_AlembicData::_VisitSpecs(SdfAbstractDataSpecVisitor *visitor) const
+void
+UsdAbc_AlembicData::Erase(
+    const SdfPath& path,
+    const TfToken& fieldName)
 {
-  if (_reader) {
-    _reader->VisitSpecs(*this, visitor);
-  }
+    XXX_UNSUPPORTED(Erase);
 }
 
-bool UsdAbc_AlembicData::Has(const SdfPath &path,
-                             const TfToken &fieldName,
-                             SdfAbstractDataValue *value) const
+std::vector<TfToken>
+UsdAbc_AlembicData::List(const SdfPath& path) const
 {
-  return _reader ? _reader->HasField(path, fieldName, value) : false;
+    return _reader ? _reader->List(path) : std::vector<TfToken>();
 }
 
-bool UsdAbc_AlembicData::Has(const SdfPath &path, const TfToken &fieldName, VtValue *value) const
+std::set<double>
+UsdAbc_AlembicData::ListAllTimeSamples() const
 {
-  return _reader ? _reader->HasField(path, fieldName, value) : false;
+    return _reader ? _reader->ListAllTimeSamples() : std::set<double>();
 }
 
-VtValue UsdAbc_AlembicData::Get(const SdfPath &path, const TfToken &fieldName) const
+std::set<double>
+UsdAbc_AlembicData::ListTimeSamplesForPath(const SdfPath& path) const
 {
-  VtValue result;
-  if (_reader) {
-    _reader->HasField(path, fieldName, &result);
-  }
-  return result;
+    return _reader ? _reader->ListTimeSamplesForPath(path).GetTimes()
+                   : std::set<double>();
 }
 
-void UsdAbc_AlembicData::Set(const SdfPath &path, const TfToken &fieldName, const VtValue &value)
+bool
+UsdAbc_AlembicData::GetBracketingTimeSamples(
+    double time, double* tLower, double* tUpper) const
 {
-  XXX_UNSUPPORTED(Set);
+    const std::set<double>& samples = _reader->ListAllTimeSamples();
+    return UsdAbc_AlembicDataReader::TimeSamples::Bracket(samples, time,
+                                                          tLower, tUpper);
 }
 
-void UsdAbc_AlembicData::Set(const SdfPath &path,
-                             const TfToken &fieldName,
-                             const SdfAbstractDataConstValue &value)
+size_t
+UsdAbc_AlembicData::GetNumTimeSamplesForPath(
+    const SdfPath& path) const
 {
-  XXX_UNSUPPORTED(Set);
+    return _reader ? _reader->ListTimeSamplesForPath(path).GetSize() : 0u;
 }
 
-void UsdAbc_AlembicData::Erase(const SdfPath &path, const TfToken &fieldName)
+bool
+UsdAbc_AlembicData::GetBracketingTimeSamplesForPath(
+    const SdfPath& path,
+    double time, double* tLower, double* tUpper) const
 {
-  XXX_UNSUPPORTED(Erase);
+    return _reader &&
+           _reader->ListTimeSamplesForPath(path).Bracket(time, tLower, tUpper);
 }
 
-std::vector<TfToken> UsdAbc_AlembicData::List(const SdfPath &path) const
+bool
+UsdAbc_AlembicData::GetPreviousTimeSampleForPath(
+    const SdfPath& path,
+    double time, double* tPrevious) const
 {
-  return _reader ? _reader->List(path) : std::vector<TfToken>();
+    return _reader &&
+           _reader->ListTimeSamplesForPath(path).PreviousTime(time, tPrevious);
 }
 
-std::set<double> UsdAbc_AlembicData::ListAllTimeSamples() const
+bool
+UsdAbc_AlembicData::QueryTimeSample(
+    const SdfPath& path,
+    double time,
+    SdfAbstractDataValue* value) const
 {
-  return _reader ? _reader->ListAllTimeSamples() : std::set<double>();
+    UsdAbc_AlembicDataReader::Index index;
+    return _reader &&
+           _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) && 
+           _reader->HasValue(path, index, value);
 }
 
-std::set<double> UsdAbc_AlembicData::ListTimeSamplesForPath(const SdfPath &path) const
+bool
+UsdAbc_AlembicData::QueryTimeSample(
+    const SdfPath& path,
+    double time,
+    VtValue* value) const
 {
-  return _reader ? _reader->ListTimeSamplesForPath(path).GetTimes() : std::set<double>();
+    UsdAbc_AlembicDataReader::Index index;
+    return _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) && 
+           _reader->HasValue(path, index, value);
 }
 
-bool UsdAbc_AlembicData::GetBracketingTimeSamples(double time,
-                                                  double *tLower,
-                                                  double *tUpper) const
+void
+UsdAbc_AlembicData::SetTimeSample(
+    const SdfPath& path,
+    double time,
+    const VtValue& value)
 {
-  const std::set<double> &samples = _reader->ListAllTimeSamples();
-  return UsdAbc_AlembicDataReader::TimeSamples::Bracket(samples, time, tLower, tUpper);
+    XXX_UNSUPPORTED(SetTimeSample);
 }
 
-size_t UsdAbc_AlembicData::GetNumTimeSamplesForPath(const SdfPath &path) const
+void
+UsdAbc_AlembicData::EraseTimeSample(const SdfPath& path, double time)
 {
-  return _reader ? _reader->ListTimeSamplesForPath(path).GetSize() : 0u;
-}
-
-bool UsdAbc_AlembicData::GetBracketingTimeSamplesForPath(const SdfPath &path,
-                                                         double time,
-                                                         double *tLower,
-                                                         double *tUpper) const
-{
-  return _reader && _reader->ListTimeSamplesForPath(path).Bracket(time, tLower, tUpper);
-}
-
-bool UsdAbc_AlembicData::QueryTimeSample(const SdfPath &path,
-                                         double time,
-                                         SdfAbstractDataValue *value) const
-{
-  UsdAbc_AlembicDataReader::Index index;
-  return _reader && _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) &&
-         _reader->HasValue(path, index, value);
-}
-
-bool UsdAbc_AlembicData::QueryTimeSample(const SdfPath &path, double time, VtValue *value) const
-{
-  UsdAbc_AlembicDataReader::Index index;
-  return _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) &&
-         _reader->HasValue(path, index, value);
-}
-
-void UsdAbc_AlembicData::SetTimeSample(const SdfPath &path, double time, const VtValue &value)
-{
-  XXX_UNSUPPORTED(SetTimeSample);
-}
-
-void UsdAbc_AlembicData::EraseTimeSample(const SdfPath &path, double time)
-{
-  XXX_UNSUPPORTED(EraseTimeSample);
+    XXX_UNSUPPORTED(EraseTimeSample);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

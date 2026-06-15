@@ -7,26 +7,33 @@
 ///
 /// \file camera/wrapScreenWindowParameters.h
 
+
 #include "CameraUtil/screenWindowParameters.h"
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapScreenWindowParameters()
+using namespace pxr_boost::python;
+
+void
+wrapScreenWindowParameters()
 {
-  object getScreenWindowFunc = make_function(&CameraUtilScreenWindowParameters::GetScreenWindow,
-                                             return_value_policy<copy_const_reference>());
+    object getScreenWindowFunc =
+        make_function(&CameraUtilScreenWindowParameters::GetScreenWindow,
+                      return_value_policy<copy_const_reference>());
 
-  object getZFacingViewMatrixFunc = make_function(
-      &CameraUtilScreenWindowParameters::GetZFacingViewMatrix,
-      return_value_policy<copy_const_reference>());
+    object getZFacingViewMatrixFunc =
+        make_function(&CameraUtilScreenWindowParameters::GetZFacingViewMatrix,
+                      return_value_policy<copy_const_reference>());
 
-  class_<CameraUtilScreenWindowParameters>("ScreenWindowParameters", no_init)
-      .def(init<const GfCamera &>())
-      .add_property("screenWindow", getScreenWindowFunc)
-      .add_property("fieldOfView", &CameraUtilScreenWindowParameters::GetFieldOfView)
-      .add_property("zFacingViewMatrix", getZFacingViewMatrixFunc);
+    class_<CameraUtilScreenWindowParameters>("ScreenWindowParameters", no_init)
+        .def(init<const GfCamera&>())
+        .add_property("screenWindow", getScreenWindowFunc)
+        .add_property("fieldOfView",
+                      &CameraUtilScreenWindowParameters::GetFieldOfView)
+        .add_property("zFacingViewMatrix", getZFacingViewMatrixFunc);
+
 }

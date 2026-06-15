@@ -7,16 +7,16 @@
 #ifndef PXR_IMAGING_HD_TOKENS_H
 #define PXR_IMAGING_HD_TOKENS_H
 
+#include "pxr/pxrns.h"
 #include "Hd/api.h"
 #include "Hd/version.h"
-#include "Tf/envSetting.h"
 #include "Tf/staticTokens.h"
-#include "pxr/pxrns.h"
+#include "Tf/envSetting.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HD_TOKENS \
-  (accelerations)                             \
+#define HD_TOKENS                               \
+    (accelerations)                             \
     (adjacency)                                 \
     (angularVelocities)                         \
     (bboxLocalMin)                              \
@@ -112,106 +112,261 @@ PXR_NAMESPACE_OPEN_SCOPE
     /* capital letters. */                      \
     ((bSpline, "bspline"))
 
-#define HD_INSTANCER_TOKENS \
-  (culledInstanceIndices)(instancer)( \
-      instancerTransform)(instancerTransformInverse)(instanceIndices)(instanceIndexBase) \
-\
-      /* New instance xform tokens */ \
-      ((instanceTransforms, "hydra:instanceTransforms"))( \
-          (instanceRotations, "hydra:instanceRotations"))( \
-          (instanceScales, "hydra:instanceScales"))( \
-          (instanceTranslations, "hydra:instanceTranslations"))
+#define HD_INSTANCER_TOKENS                                \
+    (culledInstanceIndices)                                \
+    (instancer)                                            \
+    (instancerTransform)                                   \
+    (instancerTransformInverse)                            \
+    (instanceIndices)                                      \
+    (instanceIndexBase)                                    \
+                                                           \
+    /* New instance xform tokens */                        \
+    ((instanceTransforms,   "hydra:instanceTransforms"))   \
+    ((instanceRotations,    "hydra:instanceRotations"))    \
+    ((instanceScales,       "hydra:instanceScales"))       \
+    ((instanceTranslations, "hydra:instanceTranslations"))
 
-#define HD_REPR_TOKENS \
-  (disabled)(hull)(points)(smoothHull)(refined)(refinedWire)(refinedWireOnSurf)(wire)(wireOnSurf)
+#define HD_REPR_TOKENS                          \
+    (disabled)                                  \
+    (hull)                                      \
+    (points)                                    \
+    (smoothHull)                                \
+    (refined)                                   \
+    (refinedWire)                               \
+    (refinedWireOnSurf)                         \
+    (refinedSolidWireOnSurf)                    \
+    (wire)                                      \
+    (wireOnSurf)                                \
+    (solidWireOnSurf)
 
 #define HD_CULLSTYLE_TOKENS \
-  (dontCare)(nothing)(back)(front)(backUnlessDoubleSided)(frontUnlessDoubleSided)
+    (dontCare) \
+    (nothing) \
+    (back) \
+    (front) \
+    (backUnlessDoubleSided) \
+    (frontUnlessDoubleSided)
 
-#define HD_MODEL_DRAWMODE_TOKENS \
-  (inherited)(origin)(bounds)(cards)((default_, "default"))(cross)(box)(fromTexture)
+#define HD_MODEL_DRAWMODE_TOKENS                \
+    (inherited)                                 \
+    (origin)                                    \
+    (bounds)                                    \
+    (cards)                                     \
+    ((default_, "default"))                     \
+    (cross)                                     \
+    (box)                                       \
+    (fromTexture)
 
-#define HD_PERF_TOKENS \
-  (adjacencyBufSize)(basisCurvesTopology)( \
-      bufferSourcesResolved)(bufferArrayRangeMigrated)(bufferArrayRangeContainerResized)(computationsCommited)(drawBatches)(drawCalls)(dirtyLists)(dirtyListsRebuilt)(garbageCollected)(garbageCollectedSsbo)(garbageCollectedUbo)(garbageCollectedVbo)(gpuMemoryUsed)(instBasisCurvesTopology)(instBasisCurvesTopologyRange)(instExtComputationDataRange)(instMeshTopology)(instMeshTopologyRange)(instPrimvarRange)(instVertexAdjacency)(meshTopology)(nonUniformSize)(numCompletedSamples)(quadrangulateCPU)(quadrangulateGPU)(quadrangulateFaceVarying)(quadrangulatedVerts)(rebuildBatches)(singleBufferSize)(ssboSize)(skipInvisibleRprimSync)(subdivisionRefineCPU)(subdivisionRefineGPU)(textureMemory)(triangulateFaceVarying)(uboSize)(vboRelocated)
+#define HD_PERF_TOKENS                          \
+    (adjacencyBufSize)                          \
+    (basisCurvesTopology)                       \
+    (bufferSourcesResolved)                     \
+    (bufferArrayRangeMigrated)                  \
+    (bufferArrayRangeContainerResized)          \
+    (committed)                                 \
+    (computationsCommitted)                     \
+    (drawBatches)                               \
+    (drawCalls)                                 \
+    (dirtyLists)                                \
+    (dirtyListsRebuilt)                         \
+    (garbageCollected)                          \
+    (garbageCollectedSsbo)                      \
+    (garbageCollectedUbo)                       \
+    (garbageCollectedVbo)                       \
+    (gpuMemoryUsed)                             \
+    (instBasisCurvesTopology)                   \
+    (instBasisCurvesTopologyRange)              \
+    (instExtComputationDataRange)               \
+    (instMeshTopology)                          \
+    (instMeshTopologyRange)                     \
+    (instPrimvarRange)                          \
+    (instVertexAdjacency)                       \
+    (meshTopology)                              \
+    (nonUniformSize)                            \
+    (numCompletedSamples)                       \
+    (quadrangulateCPU)                          \
+    (quadrangulateGPU)                          \
+    (quadrangulateFaceVarying)                  \
+    (quadrangulatedVerts)                       \
+    (rebuildBatches)                            \
+    (singleBufferSize)                          \
+    (ssboSize)                                  \
+    (skipInvisibleRprimSync)                    \
+    (sourcesCommitted)                          \
+    (subdivisionRefineCPU)                      \
+    (subdivisionRefineGPU)                      \
+    (textureMemory)                             \
+    (triangulateFaceVarying)                    \
+    (uboSize)                                   \
+    (vboRelocated)
 
 // XXX Move to hdSt.
-#define HD_SHADER_TOKENS \
-  (alphaThreshold)(clipPlanes)(commonShaderSource)(computeShader)(cullStyle)(drawRange)(environmentMap)(displacementShader)(fragmentShader)(geometryShader)(imageToWorldMatrix)(imageToHorizontallyNormalizedFilmback)(indicatorColor)(lightingBlendAmount)(overrideColor)(maskColor)(projectionMatrix)(pointColor)(pointSize)(pointSelectedSize)(materialTag)(numClipPlanes)(tessControlShader)(tessEvalShader)(postTessControlShader)(postTessVertexShader)(tessLevel)(viewport)(vertexShader)(wireframeColor)(worldToViewMatrix)(worldToViewInverseMatrix)(stepSize)(stepSizeLighting)
+#define HD_SHADER_TOKENS                        \
+    (alphaThreshold)                            \
+    (clipPlanes)                                \
+    (commonShaderSource)                        \
+    (computeShader)                             \
+    (cullStyle)                                 \
+    (drawRange)                                 \
+    (environmentMap)                            \
+    (linearExposure)                            \
+    (displacementShader)                        \
+    (fragmentShader)                            \
+    (geometryShader)                            \
+    (imageToWorldMatrix)                        \
+    (imageToHorizontallyNormalizedFilmback)     \
+    (indicatorColor)                            \
+    (lightingBlendAmount)                       \
+    (overrideColor)                             \
+    (maskColor)                                 \
+    (projectionMatrix)                          \
+    (pointColor)                                \
+    (pointSize)                                 \
+    (pointSelectedSize)                         \
+    (materialTag)                               \
+    (numClipPlanes)                             \
+    (tessControlShader)                         \
+    (tessEvalShader)                            \
+    (postTessControlShader)                     \
+    (postTessVertexShader)                      \
+    (tessLevel)                                 \
+    (viewport)                                  \
+    (vertexShader)                              \
+    (wireframeColor)                            \
+    (worldToViewMatrix)                         \
+    (worldToViewInverseMatrix)                  \
+    (stepSize)                                  \
+    (stepSizeLighting)                          \
+    (multisampleCount)
 
 // Deprecated. Use: HdStMaterialTagTokens
-#define HD_MATERIALTAG_TOKENS (defaultMaterialTag)
+#define HD_MATERIALTAG_TOKENS                   \
+    (defaultMaterialTag)
 
 /* Terminal keys used in material networks.
  */
-#define HD_MATERIAL_TERMINAL_TOKENS \
-  (surface)(displacement)(volume)(light)(lightFilter)(imageShader)
+#define HD_MATERIAL_TERMINAL_TOKENS             \
+    (surface)                                   \
+    (displacement)                              \
+    (volume)                                    \
+    (volumeFilter)                              \
+    (light)                                     \
+    (lightFilter)                               \
+    (imageShader)
 
-#define HD_RENDERTAG_TOKENS (geometry)(guide)(hidden)(proxy)(render)(widget)
+#define HD_RENDERTAG_TOKENS                     \
+    (geometry)                                  \
+    (guide)                                     \
+    (hidden)                                    \
+    (proxy)                                     \
+    (render)
 
-#define HD_RENDER_CONTEXT_TOKENS ((universal, ""))
+#define HD_RENDER_CONTEXT_TOKENS                \
+    ((universal, ""))
 
-#define HD_OPTION_TOKENS (parallelRprimSync)
+#define HD_OPTION_TOKENS                        \
+    (parallelRprimSync)
 
-#define HD_RPRIMTYPE_TOKENS \
-  /* Rprims */ \
-  (capsule)(capsule_1)( \
-      cone)(cube)(cylinder)(cylinder_1)(geomSubset)(mesh)(tetMesh)(nurbsPatch)(basisCurves)(nurbsCurves)(points)(sphere)(volume)(model)
+#define HD_RPRIMTYPE_TOKENS                     \
+    /* Rprims */                                \
+    (capsule)                                   \
+    (cone)                                      \
+    (cube)                                      \
+    (cylinder)                                  \
+    (geomSubset)                                \
+    (mesh)                                      \
+    (tetMesh)                                   \
+    (nurbsPatch)                                \
+    (basisCurves)                               \
+    (nurbsCurves)                               \
+    (particleField)                             \
+    (plane)                                     \
+    (points)                                    \
+    (sphere)                                    \
+    (volume)                                    \
+    (model)
 
 // XXX Unfortunately, we export a function of the name HdLightPrimTypeTokens.
 //     Omit 'Prim' from the name.
-#define HD_LIGHT_TYPE_TOKENS \
-  (cylinderLight)(diskLight)( \
-      distantLight)(domeLight)(light)(meshLight)(pluginLight)(rectLight)(simpleLight)(sphereLight)
+#define HD_LIGHT_TYPE_TOKENS                    \
+    (cylinderLight)                             \
+    (diskLight)                                 \
+    (distantLight)                              \
+    (domeLight)                                 \
+    (light)                                     \
+    (meshLight)                                 \
+    (pluginLight)                               \
+    (rectLight)                                 \
+    (simpleLight)                               \
+    (sphereLight)
 
-#define HD_LIGHT_FILTER_TYPE_TOKENS (lightFilter)
+#define HD_LIGHT_FILTER_TYPE_TOKENS             \
+    (lightFilter)
 
-#define HD_SPRIMTYPE_TOKENS \
-  /* Sprims */ \
-  (camera)(drawTarget)( \
-      material)(coordSys)(instancer)(instance)(integrator)(sampleFilter)(displayFilter)(imageShader) \
-\
-      HD_LIGHT_TYPE_TOKENS HD_LIGHT_FILTER_TYPE_TOKENS \
-\
-      /* Sprims ExtComputations */ \
-      (extComputation)
+#define HD_SPRIMTYPE_TOKENS                     \
+    /* Sprims */                                \
+    (camera)                                    \
+    (drawTarget)                                \
+    (material)                                  \
+    (coordSys)                                  \
+    (instancer)                                 \
+    (instance)                                  \
+    (integrator)                                \
+    (sampleFilter)                              \
+    (displayFilter)                             \
+    (imageShader)                               \
+                                                \
+    HD_LIGHT_TYPE_TOKENS                        \
+    HD_LIGHT_FILTER_TYPE_TOKENS                 \
+                                                \
+    /* Sprims ExtComputations */                \
+    (extComputation)                            \
 
-#define HD_BPRIMTYPE_TOKENS \
-  /* Bprims */ \
-  (renderBuffer)(renderSettings)
+#define HD_BPRIMTYPE_TOKENS                     \
+    /* Bprims */                                \
+    (renderBuffer)                              \
+    (renderSettings)
 
-#define HD_PRIMTYPE_TOKENS \
-  HD_RPRIMTYPE_TOKENS \
-  HD_SPRIMTYPE_TOKENS \
-  HD_BPRIMTYPE_TOKENS /* Scene-index-only prim types */ \
-      (renderPass)
+#define HD_PRIMTYPE_TOKENS                      \
+    HD_RPRIMTYPE_TOKENS                         \
+    HD_SPRIMTYPE_TOKENS                         \
+    HD_BPRIMTYPE_TOKENS                         \
+    /* Scene-index-only prim types */           \
+    (renderPass)                                \
+    (task)
 
 HD_API
-bool HdPrimTypeIsGprim(TfToken const &primType);
+bool HdPrimTypeIsGprim(TfToken const& primType);
 
 HD_API
-bool HdPrimTypeIsLight(TfToken const &primType);
+bool HdPrimTypeIsLight(TfToken const& primType);
 
 HD_API
-bool HdPrimTypeSupportsGeomSubsets(const TfToken &primType);
+bool HdPrimTypeSupportsGeomSubsets(const TfToken& primType);
 
 HD_API
 const TfTokenVector &HdLightPrimTypeTokens();
 
-#define HD_PRIMVAR_ROLE_TOKENS ((none, ""))(color)(vector)(normal)(point)(textureCoordinate)
+#define HD_PRIMVAR_ROLE_TOKENS                  \
+    ((none, ""))                                \
+    (color)                                     \
+    (vector)                                    \
+    (normal)                                    \
+    (point)                                     \
+    (textureCoordinate)
 
 /* Schema for "Alternate Output Values" rendering,
  * describing which values a renderpass should
  * compute and write at render time.
  */
-#define HD_AOV_TOKENS \
-  /* Standard rendering outputs */ \
-\
-  /* HdAovTokens->color represents the final \
-   * fragment RGBA color. For correct compositing \
-   * using Hydra, it should have pre-multiplied alpha. \
-   */ \
-  (color)                                     \
+#define HD_AOV_TOKENS                           \
+    /* Standard rendering outputs */            \
+                                                \
+    /* HdAovTokens->color represents the final
+     * fragment RGBA color. For correct compositing
+     * using Hydra, it should have pre-multiplied alpha.
+     */                                         \
+    (color)                                     \
     /* HdAovTokens->depth represents the clip-space
      * depth of the final fragment.
      */                                         \
@@ -271,59 +426,130 @@ const TfTokenVector &HdLightPrimTypeTokens();
     ((shader, "shader:"))
 
 HD_API
-TfToken HdAovTokensMakePrimvar(TfToken const &primvar);
+TfToken HdAovTokensMakePrimvar(TfToken const& primvar);
 
 HD_API
-TfToken HdAovTokensMakeLpe(TfToken const &lpe);
+TfToken HdAovTokensMakeLpe(TfToken const& lpe);
 
 HD_API
-TfToken HdAovTokensMakeShader(TfToken const &shader);
+TfToken HdAovTokensMakeShader(TfToken const& shader);
 
 /* Schema for application-configurable render settings. */
-#define HD_RENDER_SETTINGS_TOKENS \
-  /* General graphical options */ \
-  (enableShadows)(enableSceneMaterials)( \
-      enableSceneLights)(domeLightCameraVisibility) /* Raytracer sampling settings */ \
-      (convergedVariance)(convergedSamplesPerPixel) /* thread limit settings */ \
-      (threadLimit)                                 /* interactive vs offline */ \
-      (enableInteractive)
+#define HD_RENDER_SETTINGS_TOKENS                     \
+    /* General graphical options */                   \
+    (enableShadows)                                   \
+    (enableSceneMaterials)                            \
+    (enableSceneLights)                               \
+    (enableExposureCompensation)                      \
+    (domeLightCameraVisibility)                       \
+    /* Raytracer sampling settings */                 \
+    (convergedVariance)                               \
+    (convergedSamplesPerPixel)                        \
+    /* thread limit settings */                       \
+    (threadLimit)                                     \
+    /* interactive vs offline */                      \
+    (enableInteractive)                               \
+    /* To pass HdRendererCreateArgs to HdRendererPlugin::CreateDelegate */ \
+    (rendererCreateArgs)
 
-#define HD_RENDER_SETTINGS_PRIM_TOKENS \
-  (active)(namespacedSettings)( \
-      renderProducts)(includedPurposes)(materialBindingPurposes)(renderingColorSpace)(shutterInterval)
+#define HD_RENDER_SETTINGS_PRIM_TOKENS                \
+    (active)                                          \
+    (namespacedSettings)                              \
+    (renderProducts)                                  \
+    (includedPurposes)                                \
+    (materialBindingPurposes)                         \
+    (renderingColorSpace)                             \
+    (unionedSamplingInterval)                         \
+    (camera)                                          \
+    (disableDepthOfField)                             \
+    (disableMotionBlur)
 
 /* Aspect Ratio Conform Policy Tokens used on render settings prims
  * Note that these mirror the conform policy tokens in UsdRenderTokens */
-#define HD_ASPECT_RATIO_CONFORM_POLICY \
-  (adjustApertureWidth)(adjustApertureHeight)(expandAperture)(cropAperture)(adjustPixelAspectRatio)
+#define HD_ASPECT_RATIO_CONFORM_POLICY                \
+    (adjustApertureWidth)                             \
+    (adjustApertureHeight)                            \
+    (expandAperture)                                  \
+    (cropAperture)                                    \
+    (adjustPixelAspectRatio)                          \
 
-#define HD_RESOURCE_TYPE_TOKENS (texture)(shaderFile)
+#define HD_RESOURCE_TYPE_TOKENS                       \
+    (texture)                                         \
+    (shaderFile)
 
-#define HD_SCENE_INDEX_EMULATION_TOKENS (sceneDelegate)
+#define HD_SCENE_INDEX_EMULATION_TOKENS               \
+    (sceneDelegate)                                   \
 
 /* Tokens used to emulate collections for light linking. The collection names
    match the UsdLuxLightAPI. Hydra 1.0 uses lightFilterLink instead of
    filterLink.
 */
-#define HD_COLLECTION_EMULATION_TOKENS \
-  ((lightLinkCollection, "lightLink"))((shadowLinkCollection, "shadowLink"))( \
-      (filterLinkCollection, "filterLink"))( \
-      lightLinkCollectionMembershipExpression)(shadowLinkCollectionMembershipExpression)(filterLinkCollectionMembershipExpression)
+#define HD_COLLECTION_EMULATION_TOKENS                \
+    ((lightLinkCollection,  "lightLink"))             \
+    ((shadowLinkCollection, "shadowLink"))            \
+    ((filterLinkCollection, "filterLink"))            \
+    (lightLinkCollectionMembershipExpression)         \
+    (shadowLinkCollectionMembershipExpression)        \
+    (filterLinkCollectionMembershipExpression)
+
+/* Inputs required for UsdSkel skinning. */
+#define HD_SKINNING_INPUT_TOKENS                                        \
+    ((skinningXforms,            "hydra:skinningXforms"))               \
+    ((skinningDualQuats,         "hydra:skinningDualQuats"))            \
+    ((skinningScaleXforms,       "hydra:skinningScaleXforms"))          \
+    ((blendShapeWeights,         "hydra:blendShapeWeights"))            \
+    ((skelLocalToCommonSpace,    "hydra:skelLocalToWorld"))             \
+    ((commonSpaceToPrimLocal,    "hydra:primWorldToLocal"))             \
+    ((blendShapeOffsets,         "hydra:blendShapeOffsets"))            \
+    ((blendShapeOffsetRanges,    "hydra:blendShapeOffsetRanges"))       \
+    ((numBlendShapeOffsetRanges, "hydra:numBlendShapeOffsetRanges"))    \
+                                                                        \
+    ((hasConstantInfluences,     "hydra:hasConstantInfluences"))        \
+    ((numInfluencesPerComponent, "hydra:numInfluencesPerComponent"))    \
+    ((influences,                "hydra:influences"))                   \
+    /* skinningMethod primvar on the skel schema is a token, we provide a
+     * numeric alternative to pass to storm's vertex shader.
+     */                                                                 \
+    ((numSkinningMethod,         "hydra:numSkinningMethod"))            \
+    /* Extra primvars for computing instance/vertex offsets to index into
+     * concatenated skinningXForms/blendShapeWeights constant primvars.
+     */                                                                 \
+    ((numJoints,                 "hydra:numJoints"))                    \
+    ((numBlendShapeWeights,      "hydra:numBlendShapeWeights"))
+
+/* Skinning inputs that already exist on skel binding. */
+#define HD_SKINNING_SKEL_INPUT_TOKENS                                   \
+    /* HYD-3510
+     * these two already exist and they are the source of influences and
+     * numInfluencesPerComponent above. but currently hydra doesn't handle
+     * tensor valued vertex primvar correctly. once that's addressed, we
+     * can access these two in the vertex shader directly and remove the
+     * two above. see imaging/hdSt/mesh.cpp _PopulateVertexPrimvars()#1417
+     * buffer source array size is currently hardcoded to 1.
+     *
+     *((jointIndices,            "skel:jointIndices"))
+     *((jointWeights,            "skel:jointWeights"))
+     */                                                                 \
+    ((geomBindTransform,         "skel:geomBindTransform"))
+
 
 TF_DECLARE_PUBLIC_TOKENS(HdTokens, HD_API, HD_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdInstancerTokens, HD_API, HD_INSTANCER_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdReprTokens, HD_API, HD_REPR_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdCullStyleTokens, HD_API, HD_CULLSTYLE_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdModelDrawModeTokens, HD_API, HD_MODEL_DRAWMODE_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdModelDrawModeTokens, HD_API,
+                         HD_MODEL_DRAWMODE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdPerfTokens, HD_API, HD_PERF_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdShaderTokens, HD_API, HD_SHADER_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdMaterialTagTokens, HD_API, HD_MATERIALTAG_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialTerminalTokens, HD_API, HD_MATERIAL_TERMINAL_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialTerminalTokens, HD_API,
+                         HD_MATERIAL_TERMINAL_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRenderTagTokens, HD_API, HD_RENDERTAG_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRenderContextTokens, HD_API, HD_RENDER_CONTEXT_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdOptionTokens, HD_API, HD_OPTION_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdLightTypeTokens, HD_API, HD_LIGHT_TYPE_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdLightFilterTypeTokens, HD_API, HD_LIGHT_FILTER_TYPE_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdLightFilterTypeTokens, HD_API,
+                         HD_LIGHT_FILTER_TYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRprimTypeTokens, HD_API, HD_RPRIMTYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdSprimTypeTokens, HD_API, HD_SPRIMTYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdBprimTypeTokens, HD_API, HD_BPRIMTYPE_TOKENS);
@@ -331,12 +557,20 @@ TF_DECLARE_PUBLIC_TOKENS(HdPrimTypeTokens, HD_API, HD_PRIMTYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdPrimvarRoleTokens, HD_API, HD_PRIMVAR_ROLE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdAovTokens, HD_API, HD_AOV_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsTokens, HD_API, HD_RENDER_SETTINGS_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens, HD_API, HD_RENDER_SETTINGS_PRIM_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdAspectRatioConformPolicyTokens, HD_API, HD_ASPECT_RATIO_CONFORM_POLICY);
+TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens, HD_API,
+                         HD_RENDER_SETTINGS_PRIM_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdAspectRatioConformPolicyTokens, HD_API,
+                         HD_ASPECT_RATIO_CONFORM_POLICY);
 TF_DECLARE_PUBLIC_TOKENS(HdResourceTypeTokens, HD_API, HD_RESOURCE_TYPE_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, HD_API, HD_SCENE_INDEX_EMULATION_TOKENS);
-TF_DECLARE_PUBLIC_TOKENS(HdCollectionEmulationTokens, HD_API, HD_COLLECTION_EMULATION_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, HD_API,
+                         HD_SCENE_INDEX_EMULATION_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCollectionEmulationTokens, HD_API,
+                         HD_COLLECTION_EMULATION_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSkinningInputTokens, HD_API,
+                         HD_SKINNING_INPUT_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSkinningSkelInputTokens, HD_API,
+                         HD_SKINNING_SKEL_INPUT_TOKENS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_TOKENS_H
+#endif //PXR_IMAGING_HD_TOKENS_H

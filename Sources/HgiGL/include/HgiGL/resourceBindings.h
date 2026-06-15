@@ -7,13 +7,14 @@
 #ifndef PXR_IMAGING_HGIGL_RESOURCEBINDINGS_H
 #define PXR_IMAGING_HGIGL_RESOURCEBINDINGS_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/resourceBindings.h"
 #include "HgiGL/api.h"
-#include "pxr/pxrns.h"
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 ///
 /// \class HgiGLResourceBindings
@@ -21,26 +22,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// OpenGL implementation of HgiResourceBindings.
 ///
 ///
-class HgiGLResourceBindings final : public HgiResourceBindings {
- public:
-  HGIGL_API
-  ~HgiGLResourceBindings() override;
+class HgiGLResourceBindings final : public HgiResourceBindings
+{
+public:
+    HGIGL_API
+    ~HgiGLResourceBindings() override;
 
-  /// Binds the resources to GPU.
-  HGIGL_API
-  void BindResources();
+    /// Binds the resources to GPU.
+    HGIGL_API
+    void BindResources();
 
- protected:
-  friend class HgiGL;
+protected:
+    friend class HgiGL;
 
-  HGIGL_API
-  HgiGLResourceBindings(HgiResourceBindingsDesc const &desc);
+    HGIGL_API
+    HgiGLResourceBindings(HgiResourceBindingsDesc const& desc);
 
- private:
-  HgiGLResourceBindings() = delete;
-  HgiGLResourceBindings &operator=(const HgiGLResourceBindings &) = delete;
-  HgiGLResourceBindings(const HgiGLResourceBindings &) = delete;
+private:
+    HgiGLResourceBindings() = delete;
+    HgiGLResourceBindings & operator=(const HgiGLResourceBindings&) = delete;
+    HgiGLResourceBindings(const HgiGLResourceBindings&) = delete;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

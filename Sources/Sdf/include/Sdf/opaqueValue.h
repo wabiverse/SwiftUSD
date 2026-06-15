@@ -7,11 +7,12 @@
 #ifndef PXR_USD_SDF_OPAQUE_VALUE_H
 #define PXR_USD_SDF_OPAQUE_VALUE_H
 
-#include "Sdf/api.h"
 #include "pxr/pxrns.h"
+#include "Sdf/api.h"
 
 #include <cstddef>
 #include <iosfwd>
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -23,30 +24,32 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// cannot hold any information, cannot be parsed, and cannot be serialized to
 /// a layer.
 ///
-/// SdfOpaqueValue is also the type associated with group attributes. A group
-/// attribute is an opaque attribute that represents a group of other
+/// SdfOpaqueValue is also the type associated with group attributes. A group 
+/// attribute is an opaque attribute that represents a group of other 
 /// properties.
 ///
 class SdfOpaqueValue final {};
 
-inline bool operator==(SdfOpaqueValue const &, SdfOpaqueValue const &)
+inline bool
+operator==(SdfOpaqueValue const &, SdfOpaqueValue const &)
 {
-  return true;
+    return true;
 }
 
-inline bool operator!=(SdfOpaqueValue const &, SdfOpaqueValue const &)
+inline bool
+operator!=(SdfOpaqueValue const &, SdfOpaqueValue const &)
 {
-  return false;
+    return false;
 }
 
 inline size_t hash_value(SdfOpaqueValue const &)
 {
-  // Use a nonzero constant here because some bad hash functions don't deal
-  // with zero well. Chosen by fair dice roll.
-  return 9;
+    // Use a nonzero constant here because some bad hash functions don't deal
+    // with zero well. Chosen by fair dice roll.
+    return 9;
 }
 
-SDF_API std::ostream &operator<<(std::ostream &, SdfOpaqueValue const &);
+SDF_API std::ostream& operator<<(std::ostream &, SdfOpaqueValue const &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

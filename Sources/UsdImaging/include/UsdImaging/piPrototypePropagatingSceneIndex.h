@@ -15,10 +15,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DECLARE_REF_PTRS(UsdImagingPiPrototypePropagatingSceneIndex);
 
-namespace UsdImagingPiPrototypePropagatingSceneIndex_Impl {
+namespace UsdImagingPiPrototypePropagatingSceneIndex_Impl
+{
 using _ContextSharedPtr = std::shared_ptr<struct _Context>;
 using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
-}  // namespace UsdImagingPiPrototypePropagatingSceneIndex_Impl
+}
 
 /// \class UsdImagingPiPrototypePropagatingSceneIndex
 ///
@@ -62,8 +63,7 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 ///       (HdMergingSceneIndex)
 ///         * _Context::instancerSceneIndex
 ///           (HdRetainedSceneIndex, will rewrite prototypes of /MyInstancer to
-///                                  [ /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55
-///                                  ] )
+///                                  [ /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55 ] )
 ///         * UsdImaging_PiPrototypeSceneIndex
 ///           (inserted by PointPropagatingSceneIndex::_instancerOberver
 ///                 which was constructed with
@@ -77,13 +77,11 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 ///                  typically UsdImagingStageSceneIndex, maybe followed by
 ///                  other filtering scene indices)
 ///         * UsdImagingRerootingSceneIndex
-///           (inserted recursively by
-///           PointPropagatingSceneIndex::_instancerObserver::_subinstancerObservers
+///           (inserted recursively by PointPropagatingSceneIndex::_instancerObserver::_subinstancerObservers
 ///                 which was constructed with
 ///                             instancer = /MyInstancer
 ///                             prototypeRoot = /MyInstancer/MyPrototypes/MyPrototype
-///                             rerootedPrototypeRoot =
-///                             /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55)
+///                             rerootedPrototypeRoot = /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55)
 ///           srcPrefix = /MyInstancer/MyPrototypes/MyPrototype
 ///           dstPrefix = /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55
 ///               * UsdImaging_PiPrototypeSceneIndex
@@ -112,16 +110,14 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 ///     dataSource: (from /MyInstancer/MyPrototypes/MyPrototype)
 ///         setting # [4]
 ///             xform:resetXformStack = true
-///             instancedBy:PrototypeRoot =
-///             /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55 instancedBy:paths =
-///             /MyInstancer
+///             instancedBy:PrototypeRoot = /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55
+///             instancedBy:paths = /MyInstancer
 ///
 /// /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55/MySphere
 ///     dataSource: (from /MyInstancer/MyPrototypes/MyPrototype/MySphere)
 ///         setting # [5]
-///             instancedBy:PrototypeRoot =
-///             /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55 instancedBy:paths =
-///             /MyInstancer
+///             instancedBy:PrototypeRoot = /MyInstancer/MyPrototypes/MyPrototype/ForInstancer84e...f55
+///             instancedBy:paths = /MyInstancer
 ///
 /// [1] Set through the retained scene index _Context::instancerSceneIndex to
 /// point to the re-rooted copy of the prototype.
@@ -289,8 +285,7 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 ///     primType: instancer
 ///     dataSource:
 ///         setting # [5]
-///             prototypes =
-///             [/MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f]
+///             prototypes = [/MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f]
 ///             instancedBy:PrototypeRoot = /MyInstancer/MyPrototype/ForInstancer6a3...234
 ///             instancedBy:paths = /MyInstancer
 ///
@@ -304,19 +299,15 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 ///     dataSource: (from /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype)
 ///         settings # [8]
 ///             xform:resetXformStack = true
-///             instancedBy:PrototypeRoot =
-///             /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f
-///             instancedBy:paths =
-///             /MyInstancer/MyPrototype/ForInstancer6a3...234/MyNestedInstancer
+///             instancedBy:PrototypeRoot = /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f
+///             instancedBy:paths = /MyInstancer/MyPrototype/ForInstancer6a3...234/MyNestedInstancer
 ///
 /// /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f/MySphere
 ///     primType: sphere
 ///     dataSource:
 ///         settings # [9]
-///             instancedBy:PrototypeRoot =
-///             /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f
-///             instancedBy:paths =
-///             /MyInstancer/MyPrototype/ForInstancer6a3...234/MyNestedInstancer
+///             instancedBy:PrototypeRoot = /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f
+///             instancedBy:paths = /MyInstancer/MyPrototype/ForInstancer6a3...234/MyNestedInstancer
 ///
 /// [1] As [1] in Example 1.
 ///
@@ -339,8 +330,7 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 /// by the instancer observer (instantiated with
 /// instancer = /MyInstancer/MyPrototype/MyNestedInstancer,
 /// prototypeRoot = /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype,
-/// rerootedPrototypeRoot =
-/// /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f)
+/// rerootedPrototypeRoot = /MyInstancer/MyPrototype/MyNestedInstancer/MyNestedPrototype/ForInstancer8a2...51f)
 ///
 /// Note that this copy is inserted by the instancer observer for
 /// /MyInstancer/MyPrototype.
@@ -356,50 +346,65 @@ using _InstancerObserverUniquePtr = std::unique_ptr<class _InstancerObserver>;
 ///
 /// [9] Similar to [5].
 ///
-class UsdImagingPiPrototypePropagatingSceneIndex final : public HdFilteringSceneIndexBase,
-                                                         public HdEncapsulatingSceneIndexBase {
- public:
-  USDIMAGING_API
-  static UsdImagingPiPrototypePropagatingSceneIndexRefPtr New(
-      HdSceneIndexBaseRefPtr const &inputSceneIndex);
+class UsdImagingPiPrototypePropagatingSceneIndex final
+                                : public HdFilteringSceneIndexBase
+                                , public HdEncapsulatingSceneIndexBase
+{
+public:
+    USDIMAGING_API
+    static UsdImagingPiPrototypePropagatingSceneIndexRefPtr New(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex);
 
-  USDIMAGING_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  USDIMAGING_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
-  USDIMAGING_API
-  std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const override;
+    USDIMAGING_API
+    std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const override;
 
-  USDIMAGING_API
-  std::vector<HdSceneIndexBaseRefPtr> GetEncapsulatedScenes() const override;
+    USDIMAGING_API
+    std::vector<HdSceneIndexBaseRefPtr> GetEncapsulatedScenes() const override;
 
- private:
-  UsdImagingPiPrototypePropagatingSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+private:
+    UsdImagingPiPrototypePropagatingSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  friend class _MergingSceneIndexObserver;
-  class _MergingSceneIndexObserver : public HdSceneIndexObserver {
-   public:
-    _MergingSceneIndexObserver(UsdImagingPiPrototypePropagatingSceneIndex *owner);
+    friend class _MergingSceneIndexObserver;
+    class _MergingSceneIndexObserver : public HdSceneIndexObserver
+    {
+    public:
+        _MergingSceneIndexObserver(
+            UsdImagingPiPrototypePropagatingSceneIndex * owner);
 
-    void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
-    void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
-    void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
-    void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
+        void PrimsAdded(
+            const HdSceneIndexBase &sender,
+            const AddedPrimEntries &entries) override;
+        void PrimsDirtied(
+            const HdSceneIndexBase &sender,
+            const DirtiedPrimEntries &entries) override;
+        void PrimsRemoved(
+            const HdSceneIndexBase &sender,
+            const RemovedPrimEntries &entries) override;
+        void PrimsRenamed(
+            const HdSceneIndexBase &sender,
+            const RenamedPrimEntries &entries) override;
 
-   private:
-    UsdImagingPiPrototypePropagatingSceneIndex *const _owner;
-  };
+    private:
+        UsdImagingPiPrototypePropagatingSceneIndex * const _owner;
+    };
 
-  UsdImagingPiPrototypePropagatingSceneIndex_Impl::_ContextSharedPtr const _context;
+    UsdImagingPiPrototypePropagatingSceneIndex_Impl::
+    _ContextSharedPtr const _context;
 
-  _MergingSceneIndexObserver _mergingSceneIndexObserver;
+    _MergingSceneIndexObserver _mergingSceneIndexObserver;
 
-  UsdImagingPiPrototypePropagatingSceneIndex_Impl::_InstancerObserverUniquePtr const
-      _instancerObserver;
+    UsdImagingPiPrototypePropagatingSceneIndex_Impl::
+    _InstancerObserverUniquePtr const _instancerObserver;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif
+

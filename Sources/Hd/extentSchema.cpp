@@ -19,86 +19,107 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdExtentSchemaTokens, HD_EXTENT_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdExtentSchemaTokens,
+    HD_EXTENT_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdVec3dDataSourceHandle HdExtentSchema::GetMin() const
+HdVec3dDataSourceHandle
+HdExtentSchema::GetMin() const
 {
-  return _GetTypedDataSource<HdVec3dDataSource>(HdExtentSchemaTokens->min);
+    return _GetTypedDataSource<HdVec3dDataSource>(
+        HdExtentSchemaTokens->min);
 }
 
-HdVec3dDataSourceHandle HdExtentSchema::GetMax() const
+HdVec3dDataSourceHandle
+HdExtentSchema::GetMax() const
 {
-  return _GetTypedDataSource<HdVec3dDataSource>(HdExtentSchemaTokens->max);
-}
-
-/*static*/
-HdContainerDataSourceHandle HdExtentSchema::BuildRetained(const HdVec3dDataSourceHandle &min,
-                                                          const HdVec3dDataSourceHandle &max)
-{
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
-
-  size_t _count = 0;
-
-  if (min) {
-    _names[_count] = HdExtentSchemaTokens->min;
-    _values[_count++] = min;
-  }
-
-  if (max) {
-    _names[_count] = HdExtentSchemaTokens->max;
-    _values[_count++] = max;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
-}
-
-HdExtentSchema::Builder &HdExtentSchema::Builder::SetMin(const HdVec3dDataSourceHandle &min)
-{
-  _min = min;
-  return *this;
-}
-
-HdExtentSchema::Builder &HdExtentSchema::Builder::SetMax(const HdVec3dDataSourceHandle &max)
-{
-  _max = max;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdExtentSchema::Builder::Build()
-{
-  return HdExtentSchema::BuildRetained(_min, _max);
+    return _GetTypedDataSource<HdVec3dDataSource>(
+        HdExtentSchemaTokens->max);
 }
 
 /*static*/
-HdExtentSchema HdExtentSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle
+HdExtentSchema::BuildRetained(
+        const HdVec3dDataSourceHandle &min,
+        const HdVec3dDataSourceHandle &max
+)
 {
-  return HdExtentSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                                  HdExtentSchemaTokens->extent)) :
-                                              nullptr);
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
+
+    size_t _count = 0;
+
+    if (min) {
+        _names[_count] = HdExtentSchemaTokens->min;
+        _values[_count++] = min;
+    }
+
+    if (max) {
+        _names[_count] = HdExtentSchemaTokens->max;
+        _values[_count++] = max;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdExtentSchema::Builder &
+HdExtentSchema::Builder::SetMin(
+    const HdVec3dDataSourceHandle &min)
+{
+    _min = min;
+    return *this;
+}
+
+HdExtentSchema::Builder &
+HdExtentSchema::Builder::SetMax(
+    const HdVec3dDataSourceHandle &max)
+{
+    _max = max;
+    return *this;
+}
+
+HdContainerDataSourceHandle
+HdExtentSchema::Builder::Build()
+{
+    return HdExtentSchema::BuildRetained(
+        _min,
+        _max
+    );
 }
 
 /*static*/
-const TfToken &HdExtentSchema::GetSchemaToken()
+HdExtentSchema
+HdExtentSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdExtentSchemaTokens->extent;
+    return HdExtentSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdExtentSchemaTokens->extent))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdExtentSchema::GetDefaultLocator()
+const TfToken &
+HdExtentSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdExtentSchemaTokens->extent;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdExtentSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -8,7 +8,6 @@
 #define PXR_IMAGING_HGI_METAL_PIPELINE_H
 
 #include "pxr/pxrns.h"
-
 #include "Hgi/graphicsCmdsDesc.h"
 #include "Hgi/graphicsPipeline.h"
 
@@ -22,32 +21,34 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiGraphicsPipeline.
 ///
-class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline {
- public:
-  HGIMETAL_API
-  HgiMetalGraphicsPipeline(HgiMetal *hgi, HgiGraphicsPipelineDesc const &desc);
+class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline
+{
+public:
+    HGIMETAL_API
+    HgiMetalGraphicsPipeline(HgiMetal *hgi, HgiGraphicsPipelineDesc const& desc);
 
-  HGIMETAL_API
-  ~HgiMetalGraphicsPipeline() override;
+    HGIMETAL_API
+    ~HgiMetalGraphicsPipeline() override;
 
-  /// Apply pipeline state
-  HGIMETAL_API
-  void BindPipeline(id<MTLRenderCommandEncoder> renderEncoder);
+    /// Apply pipeline state
+    HGIMETAL_API
+    void BindPipeline(id<MTLRenderCommandEncoder> renderEncoder);
 
- private:
-  HgiMetalGraphicsPipeline() = delete;
-  HgiMetalGraphicsPipeline &operator=(const HgiMetalGraphicsPipeline &) = delete;
-  HgiMetalGraphicsPipeline(const HgiMetalGraphicsPipeline &) = delete;
+private:
+    HgiMetalGraphicsPipeline() = delete;
+    HgiMetalGraphicsPipeline& operator=(const HgiMetalGraphicsPipeline&)=delete;
+    HgiMetalGraphicsPipeline(const HgiMetalGraphicsPipeline&) = delete;
+    
+    void _CreateVertexDescriptor();
+    void _CreateDepthStencilState(HgiMetal *hgi);
+    void _CreateRenderPipelineState(HgiMetal *hgi);
 
-  void _CreateVertexDescriptor();
-  void _CreateDepthStencilState(HgiMetal *hgi);
-  void _CreateRenderPipelineState(HgiMetal *hgi);
-
-  MTLVertexDescriptor *_vertexDescriptor;
-  id<MTLDepthStencilState> _depthStencilState;
-  id<MTLRenderPipelineState> _renderPipelineState;
-  id<MTLBuffer> _constantTessFactors;
+    MTLVertexDescriptor *_vertexDescriptor;
+    id<MTLDepthStencilState> _depthStencilState;
+    id<MTLRenderPipelineState> _renderPipelineState;
+    id<MTLBuffer> _constantTessFactors;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

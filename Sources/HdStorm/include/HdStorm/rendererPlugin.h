@@ -14,22 +14,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdStormRendererPlugin final : public HdRendererPlugin
 {
- public:
-  HdStormRendererPlugin() = default;
-  virtual ~HdStormRendererPlugin() = default;
+public:
+    HdStormRendererPlugin()          = default;
+    virtual ~HdStormRendererPlugin() = default;
 
-  virtual HdRenderDelegate *CreateRenderDelegate() override;
-  virtual HdRenderDelegate *CreateRenderDelegate(HdRenderSettingsMap const &settingsMap) override;
+    HdRenderDelegate *CreateRenderDelegate() override;
+    HdRenderDelegate *CreateRenderDelegate(
+        HdRenderSettingsMap const& settingsMap) override;
 
-  virtual void DeleteRenderDelegate(HdRenderDelegate *renderDelegate) override;
+    void DeleteRenderDelegate(HdRenderDelegate *renderDelegate) 
+        override;
 
-  virtual bool IsSupported(bool gpuEnabled = true) const override;
+    bool IsSupported(
+        HdRendererCreateArgs const &rendererCreateArgs,
+        std::string *reasonWhyNot = nullptr) const override;
 
- private:
-  HdStormRendererPlugin(const HdStormRendererPlugin &) = delete;
-  HdStormRendererPlugin &operator=(const HdStormRendererPlugin &) = delete;
+    HdContainerDataSourceHandle GetSceneIndexInputArgs() const override;
+    
+private:
+    HdStormRendererPlugin(const HdStormRendererPlugin &)             = delete;
+    HdStormRendererPlugin &operator =(const HdStormRendererPlugin &) = delete;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_PLUGIN_HD_STORM_RENDERER_PLUGIN_H
+#endif // PXR_IMAGING_PLUGIN_HD_STORM_RENDERER_PLUGIN_H

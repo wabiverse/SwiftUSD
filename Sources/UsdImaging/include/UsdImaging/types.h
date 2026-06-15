@@ -14,7 +14,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Given to an invalidation call to indicate whether the property was
 /// added or removed or whether one of its fields changed.
 ///
-enum class UsdImagingPropertyInvalidationType { Update, Resync };
+enum class UsdImagingPropertyInvalidationType
+{
+    Update,
+    Resync
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -15,11 +15,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<ArPackageResolver>();
+    TfType::Define<ArPackageResolver>();
 }
 
-ArPackageResolver::ArPackageResolver() {}
+ArPackageResolver::ArPackageResolver()
+{
+}
 
-ArPackageResolver::~ArPackageResolver() {}
+ArPackageResolver::~ArPackageResolver()
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

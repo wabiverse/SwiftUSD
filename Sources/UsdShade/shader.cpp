@@ -8,84 +8,96 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdShadeShader, TfType::Bases<UsdTyped>>();
-
-  // Register the usd prim typename as an alias under UsdSchemaBase. This
-  // enables one to call
-  // TfType::Find<UsdSchemaBase>().FindDerivedByName("Shader")
-  // to find TfType<UsdShadeShader>, which is how IsA queries are
-  // answered.
-  TfType::AddAlias<UsdSchemaBase, UsdShadeShader>("Shader");
+    TfType::Define<UsdShadeShader,
+        TfType::Bases< UsdTyped > >();
+    
+    // Register the usd prim typename as an alias under UsdSchemaBase. This
+    // enables one to call
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("Shader")
+    // to find TfType<UsdShadeShader>, which is how IsA queries are
+    // answered.
+    TfType::AddAlias<UsdSchemaBase, UsdShadeShader>("Shader");
 }
 
 /* virtual */
-UsdShadeShader::~UsdShadeShader() {}
-
-/* static */
-UsdShadeShader UsdShadeShader::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdShadeShader::~UsdShadeShader()
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdShadeShader();
-  }
-  return UsdShadeShader(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdShadeShader UsdShadeShader::Define(const UsdStagePtr &stage, const SdfPath &path)
+UsdShadeShader
+UsdShadeShader::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  static TfToken usdPrimTypeName("Shader");
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdShadeShader();
-  }
-  return UsdShadeShader(stage->DefinePrim(path, usdPrimTypeName));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdShadeShader();
+    }
+    return UsdShadeShader(stage->GetPrimAtPath(path));
+}
+
+/* static */
+UsdShadeShader
+UsdShadeShader::Define(
+    const UsdStagePtr &stage, const SdfPath &path)
+{
+    static TfToken usdPrimTypeName("Shader");
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdShadeShader();
+    }
+    return UsdShadeShader(
+        stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdShadeShader::_GetSchemaKind() const
 {
-  return UsdShadeShader::schemaKind;
+    return UsdShadeShader::schemaKind;
 }
 
 /* static */
-const TfType &UsdShadeShader::_GetStaticTfType()
+const TfType &
+UsdShadeShader::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdShadeShader>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdShadeShader>();
+    return tfType;
 }
 
 /* static */
-bool UsdShadeShader::_IsTypedSchema()
+bool 
+UsdShadeShader::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdShadeShader::_GetTfType() const
+const TfType &
+UsdShadeShader::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &UsdShadeShader::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector&
+UsdShadeShader::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames;
-  static TfTokenVector allNames = UsdTyped::GetSchemaAttributeNames(true);
+    static TfTokenVector localNames;
+    static TfTokenVector allNames =
+        UsdTyped::GetSchemaAttributeNames(true);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -106,20 +118,23 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdShadeShader_ConnectableAPIBehavior : public UsdShadeConnectableAPIBehavior {
-  // UsdShadeShader outputs are not connectable!
-  bool CanConnectOutputToSource(const UsdShadeOutput &output,
-                                const UsdAttribute &source,
-                                std::string *reason) const override
-  {
-    return false;
-  }
+class UsdShadeShader_ConnectableAPIBehavior :
+    public UsdShadeConnectableAPIBehavior
+{
+    // UsdShadeShader outputs are not connectable!
+    bool CanConnectOutputToSource(const UsdShadeOutput &output,
+                                  const UsdAttribute &source,
+                                  std::string *reason) const override
+    {
+        return false;
+    }
 };
 
 TF_REGISTRY_FUNCTION(UsdShadeConnectableAPI)
 {
-  // UsdShadeShader prims are connectable, with default behavior rules.
-  UsdShadeRegisterConnectableAPIBehavior<UsdShadeShader, UsdShadeShader_ConnectableAPIBehavior>();
+    // UsdShadeShader prims are connectable, with default behavior rules.
+    UsdShadeRegisterConnectableAPIBehavior<UsdShadeShader, 
+        UsdShadeShader_ConnectableAPIBehavior>();
 }
 
 UsdShadeShader::UsdShadeShader(const UsdShadeConnectableAPI &connectable)
@@ -127,174 +142,221 @@ UsdShadeShader::UsdShadeShader(const UsdShadeConnectableAPI &connectable)
 {
 }
 
-UsdShadeConnectableAPI UsdShadeShader::ConnectableAPI() const
+UsdShadeConnectableAPI 
+UsdShadeShader::ConnectableAPI() const
 {
-  return UsdShadeConnectableAPI(GetPrim());
+    return UsdShadeConnectableAPI(GetPrim());
 }
 
-UsdShadeOutput UsdShadeShader::CreateOutput(const TfToken &name, const SdfValueTypeName &typeName)
+UsdShadeOutput
+UsdShadeShader::CreateOutput(const TfToken& name,
+                             const SdfValueTypeName& typeName)
 {
-  return UsdShadeConnectableAPI(GetPrim()).CreateOutput(name, typeName);
+    return UsdShadeConnectableAPI(GetPrim()).CreateOutput(name, typeName);
 }
 
-UsdShadeOutput UsdShadeShader::GetOutput(const TfToken &name) const
+UsdShadeOutput
+UsdShadeShader::GetOutput(const TfToken &name) const
 {
-  return UsdShadeConnectableAPI(GetPrim()).GetOutput(name);
+    return UsdShadeConnectableAPI(GetPrim()).GetOutput(name);
 }
 
-std::vector<UsdShadeOutput> UsdShadeShader::GetOutputs(bool onlyAuthored) const
+std::vector<UsdShadeOutput>
+UsdShadeShader::GetOutputs(bool onlyAuthored) const
 {
-  return UsdShadeConnectableAPI(GetPrim()).GetOutputs(onlyAuthored);
+    return UsdShadeConnectableAPI(GetPrim()).GetOutputs(onlyAuthored);
 }
 
-UsdShadeInput UsdShadeShader::CreateInput(const TfToken &name, const SdfValueTypeName &typeName)
+UsdShadeInput
+UsdShadeShader::CreateInput(const TfToken& name,
+                            const SdfValueTypeName& typeName)
 {
-  return UsdShadeConnectableAPI(GetPrim()).CreateInput(name, typeName);
+    return UsdShadeConnectableAPI(GetPrim()).CreateInput(name, typeName);
 }
 
-UsdShadeInput UsdShadeShader::GetInput(const TfToken &name) const
+UsdShadeInput
+UsdShadeShader::GetInput(const TfToken &name) const
 {
-  return UsdShadeConnectableAPI(GetPrim()).GetInput(name);
+    return UsdShadeConnectableAPI(GetPrim()).GetInput(name);
 }
 
-std::vector<UsdShadeInput> UsdShadeShader::GetInputs(bool onlyAuthored) const
+std::vector<UsdShadeInput>
+UsdShadeShader::GetInputs(bool onlyAuthored) const
 {
-  return UsdShadeConnectableAPI(GetPrim()).GetInputs(onlyAuthored);
+    return UsdShadeConnectableAPI(GetPrim()).GetInputs(onlyAuthored);
 }
 
-UsdAttribute UsdShadeShader::GetImplementationSourceAttr() const
+UsdAttribute
+UsdShadeShader::GetImplementationSourceAttr() const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetImplementationSourceAttr();
+    return UsdShadeNodeDefAPI(GetPrim()).GetImplementationSourceAttr();
 }
 
-UsdAttribute UsdShadeShader::CreateImplementationSourceAttr(VtValue const &defaultValue,
-                                                            bool writeSparsely) const
+UsdAttribute
+UsdShadeShader::CreateImplementationSourceAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).CreateImplementationSourceAttr(defaultValue, writeSparsely);
+    return UsdShadeNodeDefAPI(GetPrim()).CreateImplementationSourceAttr(defaultValue, writeSparsely);
 }
 
-UsdAttribute UsdShadeShader::GetIdAttr() const
+UsdAttribute
+UsdShadeShader::GetIdAttr() const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetIdAttr();
+    return UsdShadeNodeDefAPI(GetPrim()).GetIdAttr();
 }
 
-UsdAttribute UsdShadeShader::CreateIdAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute
+UsdShadeShader::CreateIdAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).CreateIdAttr(defaultValue, writeSparsely);
+    return UsdShadeNodeDefAPI(GetPrim()).CreateIdAttr(defaultValue, writeSparsely);
 }
 
-TfToken UsdShadeShader::GetImplementationSource() const
+TfToken 
+UsdShadeShader::GetImplementationSource() const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetImplementationSource();
+    return UsdShadeNodeDefAPI(GetPrim()).GetImplementationSource();
+}
+    
+bool 
+UsdShadeShader::SetShaderId(const TfToken &id) const
+{
+    return UsdShadeNodeDefAPI(GetPrim()).SetShaderId(id);
 }
 
-bool UsdShadeShader::SetShaderId(const TfToken &id) const
+bool 
+UsdShadeShader::GetShaderId(TfToken *id) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).SetShaderId(id);
+    return UsdShadeNodeDefAPI(GetPrim()).GetShaderId(id);
 }
 
-bool UsdShadeShader::GetShaderId(TfToken *id) const
+bool 
+UsdShadeShader::SetSourceAsset(
+    const SdfAssetPath &sourceAsset,
+    const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetShaderId(id);
+    return UsdShadeNodeDefAPI(GetPrim()).SetSourceAsset(sourceAsset, sourceType);
 }
 
-bool UsdShadeShader::SetSourceAsset(const SdfAssetPath &sourceAsset,
-                                    const TfToken &sourceType) const
+bool 
+UsdShadeShader::GetSourceAsset(
+    SdfAssetPath *sourceAsset,
+    const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).SetSourceAsset(sourceAsset, sourceType);
+    return UsdShadeNodeDefAPI(GetPrim()).GetSourceAsset(sourceAsset, sourceType);
 }
 
-bool UsdShadeShader::GetSourceAsset(SdfAssetPath *sourceAsset, const TfToken &sourceType) const
+bool
+UsdShadeShader::SetSourceAssetSubIdentifier(
+    const TfToken &subIdentifier,
+    const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetSourceAsset(sourceAsset, sourceType);
+    return UsdShadeNodeDefAPI(GetPrim())
+        .SetSourceAssetSubIdentifier(subIdentifier, sourceType);
 }
 
-bool UsdShadeShader::SetSourceAssetSubIdentifier(const TfToken &subIdentifier,
-                                                 const TfToken &sourceType) const
+bool
+UsdShadeShader::GetSourceAssetSubIdentifier(
+    TfToken *subIdentifier,
+    const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).SetSourceAssetSubIdentifier(subIdentifier, sourceType);
+    return UsdShadeNodeDefAPI(GetPrim())
+        .GetSourceAssetSubIdentifier(subIdentifier, sourceType);
 }
 
-bool UsdShadeShader::GetSourceAssetSubIdentifier(TfToken *subIdentifier,
-                                                 const TfToken &sourceType) const
+bool 
+UsdShadeShader::SetSourceCode(
+    const std::string &sourceCode, 
+    const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetSourceAssetSubIdentifier(subIdentifier, sourceType);
+    return UsdShadeNodeDefAPI(GetPrim())
+        .SetSourceCode(sourceCode, sourceType);
 }
 
-bool UsdShadeShader::SetSourceCode(const std::string &sourceCode, const TfToken &sourceType) const
+bool 
+UsdShadeShader::GetSourceCode(
+    std::string *sourceCode,
+    const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).SetSourceCode(sourceCode, sourceType);
+    return UsdShadeNodeDefAPI(GetPrim())
+        .GetSourceCode(sourceCode, sourceType);
 }
 
-bool UsdShadeShader::GetSourceCode(std::string *sourceCode, const TfToken &sourceType) const
-{
-  return UsdShadeNodeDefAPI(GetPrim()).GetSourceCode(sourceCode, sourceType);
+std::vector<std::string>
+UsdShadeShader::GetSourceTypes() const {
+    return UsdShadeNodeDefAPI(GetPrim())
+        .GetSourceTypes();
 }
 
-std::vector<std::string> UsdShadeShader::GetSourceTypes() const
+SdrShaderNodeConstPtr 
+UsdShadeShader::GetShaderNodeForSourceType(const TfToken &sourceType) const
 {
-  return UsdShadeNodeDefAPI(GetPrim()).GetSourceTypes();
+    // XXX(Performance): This is in the critical path for rendering and may be invoked many times.
+    // We may find that the overhead of creating a new schema object for each call to be
+    // significant, in which case we may want to revisit this.
+    return UsdShadeNodeDefAPI(GetPrim())
+        .GetShaderNodeForSourceType(sourceType);
 }
 
-SdrShaderNodeConstPtr UsdShadeShader::GetShaderNodeForSourceType(const TfToken &sourceType) const
+SdrTokenMap
+UsdShadeShader::GetSdrMetadata() const
 {
-  // XXX(Performance): This is in the critical path for rendering and may be invoked many times.
-  // We may find that the overhead of creating a new schema object for each call to be
-  // significant, in which case we may want to revisit this.
-  return UsdShadeNodeDefAPI(GetPrim()).GetShaderNodeForSourceType(sourceType);
-}
+    SdrTokenMap result;
 
-NdrTokenMap UsdShadeShader::GetSdrMetadata() const
-{
-  NdrTokenMap result;
-
-  VtDictionary sdrMetadata;
-  if (GetPrim().GetMetadata(UsdShadeTokens->sdrMetadata, &sdrMetadata)) {
-    for (const auto &it : sdrMetadata) {
-      result[TfToken(it.first)] = TfStringify(it.second);
+    VtDictionary sdrMetadata;
+    if (GetPrim().GetMetadata(UsdShadeTokens->sdrMetadata, &sdrMetadata)){
+        for (const auto &it : sdrMetadata) {
+            result[TfToken(it.first)] = TfStringify(it.second);
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
-std::string UsdShadeShader::GetSdrMetadataByKey(const TfToken &key) const
+std::string 
+UsdShadeShader::GetSdrMetadataByKey(const TfToken &key) const
 {
-  VtValue val;
-  GetPrim().GetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, &val);
-  return TfStringify(val);
+    VtValue val;
+    GetPrim().GetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, &val);
+    return TfStringify(val);
+}
+    
+void 
+UsdShadeShader::SetSdrMetadata(const SdrTokenMap &sdrMetadata) const
+{
+    for (auto &i: sdrMetadata) {
+        SetSdrMetadataByKey(i.first, i.second);
+    }
 }
 
-void UsdShadeShader::SetSdrMetadata(const NdrTokenMap &sdrMetadata) const
+void 
+UsdShadeShader::SetSdrMetadataByKey(
+    const TfToken &key, 
+    const std::string &value) const
 {
-  for (auto &i : sdrMetadata) {
-    SetSdrMetadataByKey(i.first, i.second);
-  }
+    GetPrim().SetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, value);
 }
 
-void UsdShadeShader::SetSdrMetadataByKey(const TfToken &key, const std::string &value) const
+bool 
+UsdShadeShader::HasSdrMetadata() const
 {
-  GetPrim().SetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, value);
+    return GetPrim().HasMetadata(UsdShadeTokens->sdrMetadata);
 }
 
-bool UsdShadeShader::HasSdrMetadata() const
+bool 
+UsdShadeShader::HasSdrMetadataByKey(const TfToken &key) const
 {
-  return GetPrim().HasMetadata(UsdShadeTokens->sdrMetadata);
+    return GetPrim().HasMetadataDictKey(UsdShadeTokens->sdrMetadata, key);
 }
 
-bool UsdShadeShader::HasSdrMetadataByKey(const TfToken &key) const
+void 
+UsdShadeShader::ClearSdrMetadata() const
 {
-  return GetPrim().HasMetadataDictKey(UsdShadeTokens->sdrMetadata, key);
+    GetPrim().ClearMetadata(UsdShadeTokens->sdrMetadata);
 }
 
-void UsdShadeShader::ClearSdrMetadata() const
+void
+UsdShadeShader::ClearSdrMetadataByKey(const TfToken &key) const
 {
-  GetPrim().ClearMetadata(UsdShadeTokens->sdrMetadata);
-}
-
-void UsdShadeShader::ClearSdrMetadataByKey(const TfToken &key) const
-{
-  GetPrim().ClearMetadataByDictKey(UsdShadeTokens->sdrMetadata, key);
+    GetPrim().ClearMetadataByDictKey(UsdShadeTokens->sdrMetadata, key);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

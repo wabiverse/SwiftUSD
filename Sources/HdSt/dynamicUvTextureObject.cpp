@@ -9,57 +9,76 @@
 
 #include "HdSt/dynamicUvTextureImplementation.h"
 #include "HdSt/resourceRegistry.h"
-#include "HdSt/subtextureIdentifier.h"
 #include "HdSt/textureHandleRegistry.h"
+#include "HdSt/subtextureIdentifier.h"
 
-#include "Hgi/hgiImpl.h"
+#include "Hgi/hgi.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdStDynamicUvTextureObject::HdStDynamicUvTextureObject(
     const HdStTextureIdentifier &textureId,
-    HdSt_TextureObjectRegistry *const textureObjectRegistry)
-    : HdStUvTextureObject(textureId, textureObjectRegistry)
+    HdSt_TextureObjectRegistry * const textureObjectRegistry)
+  : HdStUvTextureObject(textureId, textureObjectRegistry)
 {
 }
 
 HdStDynamicUvTextureObject::~HdStDynamicUvTextureObject()
 {
-  _DestroyTexture();
+    _DestroyTexture();
 }
 
-HdStDynamicUvTextureImplementation *HdStDynamicUvTextureObject::_GetImpl() const
+namespace
 {
-  const HdStDynamicUvSubtextureIdentifier *const subId =
-      dynamic_cast<const HdStDynamicUvSubtextureIdentifier *>(
-          GetTextureIdentifier().GetSubtextureIdentifier());
-  if (!TF_VERIFY(subId)) {
-    return nullptr;
-  }
 
-  return subId->GetTextureImplementation();
+template <typename SubIdType>
+HdStDynamicUvTextureImplementation *
+_GetImplFromSubId(const HdStSubtextureIdentifier * baseSubId) {
+    const auto * const subId = dynamic_cast<const SubIdType *>(baseSubId);
+    if (!TF_VERIFY(subId)) {
+        return nullptr;
+    }
+
+    return subId->GetTextureImplementation();
 }
 
-bool HdStDynamicUvTextureObject::IsValid() const
-{
-  if (HdStDynamicUvTextureImplementation *const impl = _GetImpl()) {
-    return impl->IsValid(this);
-  }
-  return true;
 }
 
-void HdStDynamicUvTextureObject::_Load()
+HdStDynamicUvTextureImplementation *
+HdStDynamicUvTextureObject::_GetImpl() const
 {
-  if (HdStDynamicUvTextureImplementation *const impl = _GetImpl()) {
-    impl->Load(this);
-  }
+    const HdStSubtextureIdentifier * subId =
+        GetTextureIdentifier().GetSubtextureIdentifier();
+    if (GetTextureType() == HdStTextureType::Uv) {
+        return _GetImplFromSubId<HdStDynamicUvSubtextureIdentifier>(subId);
+    } else {
+        return _GetImplFromSubId<HdStDynamicCubemapSubtextureIdentifier>(subId);
+    }
 }
 
-void HdStDynamicUvTextureObject::_Commit()
+bool
+HdStDynamicUvTextureObject::IsValid() const
 {
-  if (HdStDynamicUvTextureImplementation *const impl = _GetImpl()) {
-    impl->Commit(this);
-  }
+    if (HdStDynamicUvTextureImplementation * const impl = _GetImpl()) {
+        return impl->IsValid(this);
+    }
+    return true;
+}
+
+void
+HdStDynamicUvTextureObject::_Load()
+{
+    if (HdStDynamicUvTextureImplementation * const impl = _GetImpl()) {
+        impl->Load(this);
+    }
+}
+
+void
+HdStDynamicUvTextureObject::_Commit()
+{
+    if (HdStDynamicUvTextureImplementation * const impl = _GetImpl()) {
+        impl->Commit(this);
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

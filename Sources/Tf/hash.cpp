@@ -5,37 +5,41 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Tf/hash.h"
-#include "Arch/hash.h"
 #include "Tf/enum.h"
 #include "Tf/stringUtils.h"
 #include "Tf/token.h"
 #include "Tf/type.h"
-#include "pxr/pxrns.h"
+#include "Arch/hash.h"
 
 #include <cstring>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void Tf_HashState::_AppendBytes(char const *bytes, size_t numBytes)
+void
+Tf_HashState::_AppendBytes(char const *bytes, size_t numBytes)
 {
-  _state = ArchHash64(bytes, numBytes, _state);
-  _didOne = true;
+    _state = ArchHash64(bytes, numBytes, _state);
+    _didOne = true;
 }
 
-size_t TfHashCharPtr::operator()(const char *ptr) const
+size_t
+TfHashCharPtr::operator()(const char* ptr) const
 {
-  return TfHash()(static_cast<const void *>(ptr));
+    return TfHash()(static_cast<const void*>(ptr));
 }
 
-size_t TfHashCString::operator()(const char *ptr) const
+size_t
+TfHashCString::operator()(const char* ptr) const
 {
-  return ptr ? ArchHash(ptr, std::strlen(ptr)) : 0;
+    return ptr ? ArchHash(ptr, std::strlen(ptr)) : 0;
 }
 
-bool TfEqualCString::operator()(const char *lhs, const char *rhs) const
+bool
+TfEqualCString::operator()(const char* lhs, const char* rhs) const
 {
-  return std::strcmp(lhs, rhs) == 0;
+    return std::strcmp(lhs, rhs) == 0;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

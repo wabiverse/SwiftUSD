@@ -9,9 +9,9 @@
 
 /// \file hioOpenVDB/vdbTextureData.h
 
+#include "pxr/pxrns.h"
 #include "Hio/api.h"
 #include "Hio/fieldTextureData.h"
-#include "pxr/pxrns.h"
 
 #include "Gf/bbox3d.h"
 
@@ -26,45 +26,47 @@ class HioOpenVDB_TextureData_DenseGridHolderBase;
 /// Implements HioFieldTextureData to read grid with given name from
 /// OpenVDB file at given path.
 ///
-class HioOpenVDB_TextureData final : public HioFieldTextureData {
- public:
-  using Base = HioFieldTextureData;
+class HioOpenVDB_TextureData final : public HioFieldTextureData
+{
+public:
+    using Base = HioFieldTextureData;
 
-  HioOpenVDB_TextureData(std::string const &filePath,
-                         std::string const &gridName,
-                         size_t targetMemory);
-  ~HioOpenVDB_TextureData() override;
+    HioOpenVDB_TextureData(std::string const & filePath,
+                           std::string const & gridName,
+                           size_t targetMemory);
+    ~HioOpenVDB_TextureData() override;
 
-  const GfBBox3d &GetBoundingBox() const override;
+    const GfBBox3d &GetBoundingBox() const override;
 
-  int ResizedWidth() const override;
+    int ResizedWidth() const override;
 
-  int ResizedHeight() const override;
+    int ResizedHeight() const override;
 
-  int ResizedDepth() const override;
+    int ResizedDepth() const override;
 
-  HioFormat GetFormat() const override;
+    HioFormat GetFormat() const override;
+    
+    bool Read() override;
+    
+    bool HasRawBuffer() const override;
 
-  bool Read() override;
+    unsigned char const * GetRawBuffer() const override;
 
-  bool HasRawBuffer() const override;
+private:
+    const std::string _filePath;
+    const std::string _gridName;
 
-  unsigned char const *GetRawBuffer() const override;
+    const size_t _targetMemory;
 
- private:
-  const std::string _filePath;
-  const std::string _gridName;
+    int _resizedWidth, _resizedHeight, _resizedDepth;
 
-  const size_t _targetMemory;
+    HioFormat _format;
 
-  int _resizedWidth, _resizedHeight, _resizedDepth;
+    GfBBox3d _boundingBox;
 
-  HioFormat _format;
-
-  GfBBox3d _boundingBox;
-
-  std::unique_ptr<HioOpenVDB_TextureData_DenseGridHolderBase> _denseGrid;
+    std::unique_ptr<HioOpenVDB_TextureData_DenseGridHolderBase> _denseGrid;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

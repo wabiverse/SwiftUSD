@@ -7,31 +7,35 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/pyFunction.h"
 #include "Tf/pyResultConversions.h"
+#include "Tf/pyFunction.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "UsdUtils/userProcessingFunc.h"
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 void wrapUserProcessingFunc()
 {
-  TfPyFunctionFromPython<UsdUtilsProcessingFunc>();
+    TfPyFunctionFromPython<UsdUtilsProcessingFunc>();
+    
+    typedef UsdUtilsDependencyInfo This;
 
-  typedef UsdUtilsDependencyInfo This;
-
-  class_<This>("DependencyInfo", init<>())
-      .def(init<const This &>())
-      .def(init<const std::string &>())
-      .def(init<const std::string &, const std::vector<std::string>>())
-      .add_property("assetPath",
-                    make_function(&This::GetAssetPath, return_value_policy<return_by_value>()))
-      .add_property(
-          "dependencies",
-          make_function(&This::GetDependencies, return_value_policy<TfPySequenceToList>()));
+    class_<This>("DependencyInfo", init<>())
+        .def(init<const This&>())
+        .def(init<const std::string &>())
+        .def(init<const std::string &, const std::vector<std::string>>())
+        .add_property("assetPath", make_function(&This::GetAssetPath,
+            return_value_policy<return_by_value>()))
+        .add_property("dependencies", make_function(&This::GetDependencies,
+            return_value_policy<TfPySequenceToList>()))
+    ;
 }

@@ -9,10 +9,10 @@
 
 /// \file sdf/layerUtils.h
 
+#include "pxr/pxrns.h"
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/layer.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 
@@ -29,9 +29,19 @@ SDF_DECLARE_HANDLES(SdfLayer);
 ///
 /// Note that if \p anchor is an anonymous layer, we will always return
 /// the untouched \p assetPath.
-SDF_API std::string SdfComputeAssetPathRelativeToLayer(const SdfLayerHandle &anchor,
-                                                       const std::string &assetPath);
+SDF_API std::string
+SdfComputeAssetPathRelativeToLayer(
+    const SdfLayerHandle& anchor,
+    const std::string& assetPath);
+
+/// Wrapper for SdfComputeAssetPathRelativeToLayer that returns the resolved 
+/// \p assetPath. If \p assetPath is empty or \p anchor is anonymous, \p assetPath
+/// returns unchanged.
+SDF_API std::string
+SdfResolveAssetPathRelativeToLayer(
+    const SdfLayerHandle& anchor,
+    const std::string& assetPath);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_SDF_LAYER_UTILS_H
+#endif // PXR_USD_SDF_LAYER_UTILS_H

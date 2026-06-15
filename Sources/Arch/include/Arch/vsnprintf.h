@@ -11,12 +11,12 @@
 /// \ingroup group_arch_Strings
 /// Architecture dependent memory-safe sprintf capability
 
+#include "pxr/pxrns.h"
 #include "Arch/api.h"
 #include "Arch/attributes.h"
-#include "pxr/pxrns.h"
 
-#include <stdarg.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -41,11 +41,11 @@ int ArchVsnprintf(char *str, size_t size, const char *format, va_list ap)
 #ifndef doxygen
     ARCH_PRINTF_FUNCTION(3, 0)
 #endif /* doxygen */
-        ;
+    ;
 
 /// Returns a string formed by a printf()-like specification.
 ///
-/// \c ArchStringPrintf() is a memory-safe architecture-independent way of
+/// \c ArchStringPrintf() is a memory-safe architecture-independent way of 
 /// forming a string using printf()-like formatting.  For example,
 /// \code
 ///  string formatMsg(const string& caller, int i, double val[])
@@ -64,7 +64,7 @@ std::string ArchStringPrintf(const char *fmt, ...)
 #ifndef doxygen
     ARCH_PRINTF_FUNCTION(1, 2)
 #endif /* doxygen */
-        ;
+    ;
 
 /// Returns a string formed by a printf()-like specification.
 ///
@@ -77,11 +77,12 @@ std::string ArchStringPrintf(const char *fmt, ...)
 ARCH_API
 std::string ArchVStringPrintf(const char *fmt, va_list ap)
 #ifndef doxygen
-    ARCH_PRINTF_FUNCTION(1, 0);
-#endif
+    ARCH_PRINTF_FUNCTION(1, 0)
+#endif /* doxygen */
+    ;
 
 /// @}
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif  // PXR_BASE_ARCH_VSNPRINTF_H
+    
+#endif // PXR_BASE_ARCH_VSNPRINTF_H

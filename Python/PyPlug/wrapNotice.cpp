@@ -5,33 +5,40 @@
 // https://openusd.org/license.
 //
 
-#include "Plug/notice.h"
-#include "Tf/pyNoticeWrapper.h"
-#include "Tf/pyResultConversions.h"
 #include "pxr/pxrns.h"
+#include "Plug/notice.h"
+#include "Tf/pyResultConversions.h"
+#include "Tf/pyNoticeWrapper.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/scope.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/scope.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
 TF_INSTANTIATE_NOTICE_WRAPPER(PlugNotice::Base, TfNotice);
 TF_INSTANTIATE_NOTICE_WRAPPER(PlugNotice::DidRegisterPlugins, PlugNotice::Base);
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapNotice()
+void
+wrapNotice()
 {
-  scope noticeScope = class_<PlugNotice>("Notice", no_init);
+    scope noticeScope = class_<PlugNotice>("Notice", no_init);
 
-  TfPyNoticeWrapper<PlugNotice::Base, TfNotice>::Wrap();
+    TfPyNoticeWrapper<PlugNotice::Base, TfNotice>::Wrap()
+        ;
 
-  TfPyNoticeWrapper<PlugNotice::DidRegisterPlugins, PlugNotice::Base>::Wrap().def(
-      "GetNewPlugins",
-      make_function(&PlugNotice::DidRegisterPlugins::GetNewPlugins,
-                    return_value_policy<TfPySequenceToList>()));
+    TfPyNoticeWrapper<PlugNotice::DidRegisterPlugins, PlugNotice::Base>::Wrap()
+        .def("GetNewPlugins", 
+             make_function(&PlugNotice::DidRegisterPlugins::GetNewPlugins,
+                           return_value_policy<TfPySequenceToList>()))
+        ;
 }

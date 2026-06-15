@@ -7,8 +7,8 @@
 #ifndef HD_ST_TEXTURE_HANDLE_H
 #define HD_ST_TEXTURE_HANDLE_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
 #include "Hd/enums.h"
 #include "Hd/types.h"
@@ -17,11 +17,15 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-using HdStShaderCodePtr = std::weak_ptr<class HdStShaderCode>;
-using HdStTextureObjectSharedPtr = std::shared_ptr<class HdStTextureObject>;
-using HdStSamplerObjectSharedPtr = std::shared_ptr<class HdStSamplerObject>;
+using HdStShaderCodePtr =
+    std::weak_ptr<class HdStShaderCode>;
+using HdStTextureObjectSharedPtr =
+    std::shared_ptr<class HdStTextureObject>;
+using HdStSamplerObjectSharedPtr =
+    std::shared_ptr<class HdStSamplerObject>;
 
-using HdStTextureHandleSharedPtr = std::shared_ptr<class HdStTextureHandle>;
+using HdStTextureHandleSharedPtr =
+    std::shared_ptr<class HdStTextureHandle>;
 
 class HdSt_TextureHandleRegistry;
 
@@ -35,73 +39,70 @@ class HdSt_TextureHandleRegistry;
 /// so that the shader code can react to, e.g., changing texture
 /// sampler handle for bindless or changing texture metadata such as a
 /// field bounding box for volumes.
-///
-class HdStTextureHandle {
- public:
-  /// See HdStResourceRegistry::AllocateTextureHandle for details.
-  HDST_API
-  HdStTextureHandle(HdStTextureObjectSharedPtr const &textureObject,
-                    const HdSamplerParameters &samplerParams,
-                    size_t memoryRequest,
-                    HdStShaderCodePtr const &shaderCode,
-                    HdSt_TextureHandleRegistry *textureHandleRegistry);
+/// 
+class HdStTextureHandle
+{
+public:
+    /// See HdStResourceRegistry::AllocateTextureHandle for details.
+    HDST_API
+    HdStTextureHandle(
+        HdStTextureObjectSharedPtr const &textureObject,
+        const HdSamplerParameters &samplerParams,
+        size_t memoryRequest,
+        HdStShaderCodePtr const & shaderCode,
+        HdSt_TextureHandleRegistry *textureHandleRegistry);
 
-  HDST_API
-  ~HdStTextureHandle();
+    HDST_API
+    ~HdStTextureHandle();
 
-  /// Get texture object.
-  ///
-  /// Can be accessed after commit.
-  HdStTextureObjectSharedPtr const &GetTextureObject() const
-  {
-    return _textureObject;
-  }
+    /// Get texture object.
+    ///
+    /// Can be accessed after commit.
+    HdStTextureObjectSharedPtr const &GetTextureObject() const {
+        return _textureObject;
+    }
 
-  /// Get sampler object.
-  ///
-  /// Can be accessed after commit.
-  HdStSamplerObjectSharedPtr const &GetSamplerObject() const
-  {
-    return _samplerObject;
-  }
+    /// Get sampler object.
+    ///
+    /// Can be accessed after commit.
+    HdStSamplerObjectSharedPtr const &GetSamplerObject() const {
+        return _samplerObject;
+    }
+ 
+    /// Get sampler parameters.
+    ///
+    HdSamplerParameters const &GetSamplerParameters() const {
+        return _samplerParams;
+    }
 
-  /// Get sampler parameters.
-  ///
-  HdSamplerParameters const &GetSamplerParameters() const
-  {
-    return _samplerParams;
-  }
+    /// Get how much memory this handle requested for the texture.
+    ///
+    size_t GetMemoryRequest() const {
+        return _memoryRequest;
+    }
 
-  /// Get how much memory this handle requested for the texture.
-  ///
-  size_t GetMemoryRequest() const
-  {
-    return _memoryRequest;
-  }
+    /// Get the shader code associated with this handle.
+    ///
+    HdStShaderCodePtr const &GetShaderCode() const {
+        return _shaderCode;
+    }
 
-  /// Get the shader code associated with this handle.
-  ///
-  HdStShaderCodePtr const &GetShaderCode() const
-  {
-    return _shaderCode;
-  }
+    /// Allocate sampler for this handle (not thread-safe).
+    ///
+    HDST_API
+    void ReallocateSamplerIfNecessary();
 
-  /// Allocate sampler for this handle (not thread-safe).
-  ///
-  HDST_API
-  void ReallocateSamplerIfNecessary();
+    /// Get whether bindless texture handles are enabled.
+    ///
+    bool UseBindlessHandles() const;
 
-  /// Get whether bindless texture handles are enabled.
-  ///
-  bool UseBindlessHandles() const;
-
- private:
-  HdStTextureObjectSharedPtr _textureObject;
-  HdStSamplerObjectSharedPtr _samplerObject;
-  HdSamplerParameters _samplerParams;
-  size_t _memoryRequest;
-  HdStShaderCodePtr _shaderCode;
-  HdSt_TextureHandleRegistry *_textureHandleRegistry;
+private:
+    HdStTextureObjectSharedPtr _textureObject;
+    HdStSamplerObjectSharedPtr _samplerObject;
+    HdSamplerParameters _samplerParams;
+    size_t _memoryRequest;
+    HdStShaderCodePtr _shaderCode;
+    HdSt_TextureHandleRegistry *_textureHandleRegistry;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

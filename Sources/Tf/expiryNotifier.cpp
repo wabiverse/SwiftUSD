@@ -5,9 +5,9 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Tf/expiryNotifier.h"
 #include "Tf/diagnostic.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -16,32 +16,30 @@ void (*Tf_ExpiryNotifier::_func2)(void const *) = 0;
 
 void Tf_ExpiryNotifier::Invoke(void const *p)
 {
-  if (_func)
-    _func(p);
+    if (_func)
+        _func(p);
 }
 
 void Tf_ExpiryNotifier::SetNotifier(void (*func)(void const *))
 {
-  if (func && _func)
-    TF_FATAL_ERROR(
-        "cannot override already installed notification "
-        "function");
-  _func = func;
+    if (func && _func)
+        TF_FATAL_ERROR("cannot override already installed notification "
+                       "function");
+    _func = func;
 }
 
 void Tf_ExpiryNotifier::Invoke2(void const *p)
 {
-  if (_func2)
-    _func2(p);
+    if (_func2)
+        _func2(p);
 }
 
 void Tf_ExpiryNotifier::SetNotifier2(void (*func)(void const *))
 {
-  if (func && _func2)
-    TF_FATAL_ERROR(
-        "cannot override already installed notification(2) "
-        "function");
-  _func2 = func;
+    if (func && _func2)
+        TF_FATAL_ERROR("cannot override already installed notification(2) "
+                       "function");
+    _func2 = func;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

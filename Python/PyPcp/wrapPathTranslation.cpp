@@ -5,43 +5,43 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
+#include "Pcp/pathTranslation.h"
 #include "Pcp/mapFunction.h"
 #include "Pcp/node.h"
-#include "Pcp/pathTranslation.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static SdfPath TranslatePathFromNodeToRoot(const PcpNodeRef &sourceNode,
-                                           const SdfPath &pathInNodeNamespace)
+static SdfPath
+TranslatePathFromNodeToRoot(const PcpNodeRef& sourceNode,
+                            const SdfPath& pathInNodeNamespace)
 {
-  return PcpTranslatePathFromNodeToRoot(sourceNode, pathInNodeNamespace);
+    return PcpTranslatePathFromNodeToRoot(sourceNode, pathInNodeNamespace);
 }
 
-static SdfPath TranslatePathFromRootToNode(const PcpNodeRef &destNode,
-                                           const SdfPath &pathInRootNamespace)
+static SdfPath
+TranslatePathFromRootToNode(const PcpNodeRef& destNode,
+                            const SdfPath& pathInRootNamespace)
 {
-  return PcpTranslatePathFromRootToNode(destNode, pathInRootNamespace);
+    return PcpTranslatePathFromRootToNode(destNode, pathInRootNamespace);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapPathTranslation()
 {
-  def("TranslatePathFromNodeToRoot",
-      TranslatePathFromNodeToRoot,
-      arg("sourceNode"),
-      arg("pathInNodeNamespace"));
+    def("TranslatePathFromNodeToRoot", TranslatePathFromNodeToRoot,
+        arg("sourceNode"), arg("pathInNodeNamespace"));
 
-  def("TranslatePathFromRootToNode",
-      TranslatePathFromRootToNode,
-      arg("destNode"),
-      arg("pathInRootNamespace"));
+    def("TranslatePathFromRootToNode", TranslatePathFromRootToNode,
+        arg("destNode"), arg("pathInRootNamespace"));
 }

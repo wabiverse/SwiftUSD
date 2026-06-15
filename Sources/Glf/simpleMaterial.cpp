@@ -12,77 +12,97 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-GlfSimpleMaterial::GlfSimpleMaterial()
-    : _ambient(0.2, 0.2, 0.2, 1),
-      _diffuse(0.8, 0.8, 0.8, 1),
-      _specular(0.5, 0.5, 0.5, 1),
-      _emission(0, 0, 0, 1),
-      _shininess(32.0)
+
+GlfSimpleMaterial::GlfSimpleMaterial() :
+    _ambient(0.2, 0.2, 0.2, 1),
+    _diffuse(0.8, 0.8, 0.8, 1),
+    _specular(0.5, 0.5, 0.5, 1),
+    _emission(0, 0, 0, 1),
+    _shininess(32.0)
 {
 }
 
-GlfSimpleMaterial::~GlfSimpleMaterial() {}
-
-GfVec4f const &GlfSimpleMaterial::GetAmbient() const
+GlfSimpleMaterial::~GlfSimpleMaterial()
 {
-  return _ambient;
 }
 
-void GlfSimpleMaterial::SetAmbient(GfVec4f const &ambient)
+GfVec4f const &
+GlfSimpleMaterial::GetAmbient() const
 {
-  _ambient = ambient;
+    return _ambient;
 }
 
-GfVec4f const &GlfSimpleMaterial::GetDiffuse() const
+void
+GlfSimpleMaterial::SetAmbient(GfVec4f const & ambient)
 {
-  return _diffuse;
+    _ambient = ambient;
 }
 
-void GlfSimpleMaterial::SetDiffuse(GfVec4f const &diffuse)
+
+GfVec4f const &
+GlfSimpleMaterial::GetDiffuse() const
 {
-  _diffuse = diffuse;
+    return _diffuse;
 }
 
-GfVec4f const &GlfSimpleMaterial::GetSpecular() const
+void
+GlfSimpleMaterial::SetDiffuse(GfVec4f const & diffuse)
 {
-  return _specular;
+    _diffuse = diffuse;
 }
 
-void GlfSimpleMaterial::SetSpecular(GfVec4f const &specular)
+
+GfVec4f const &
+GlfSimpleMaterial::GetSpecular() const
 {
-  _specular = specular;
+    return _specular;
 }
 
-GfVec4f const &GlfSimpleMaterial::GetEmission() const
+void
+GlfSimpleMaterial::SetSpecular(GfVec4f const & specular)
 {
-  return _emission;
+    _specular = specular;
 }
 
-void GlfSimpleMaterial::SetEmission(GfVec4f const &emission)
+GfVec4f const &
+GlfSimpleMaterial::GetEmission() const
 {
-  _emission = emission;
+    return _emission;
 }
 
-double GlfSimpleMaterial::GetShininess() const
+void
+GlfSimpleMaterial::SetEmission(GfVec4f const & emission)
 {
-  return _shininess;
+    _emission = emission;
 }
 
-void GlfSimpleMaterial::SetShininess(double shininess)
+double
+GlfSimpleMaterial::GetShininess() const
 {
-  _shininess = shininess;
+    return _shininess;
 }
 
-bool GlfSimpleMaterial::operator==(GlfSimpleMaterial const &other) const
+void
+GlfSimpleMaterial::SetShininess(double shininess)
 {
-  return (_ambient == other._ambient && _diffuse == other._diffuse &&
-          _specular == other._specular && _emission == other._emission &&
-          _shininess == other._shininess);
+    _shininess = shininess;
 }
 
-bool GlfSimpleMaterial::operator!=(GlfSimpleMaterial const &other) const
+bool
+GlfSimpleMaterial::operator ==(GlfSimpleMaterial const & other) const
 {
-  return !(*this == other);
+    return (_ambient == other._ambient
+        && _diffuse == other._diffuse
+        && _specular == other._specular
+        && _emission == other._emission
+        && _shininess == other._shininess);
+}
+
+bool
+GlfSimpleMaterial::operator !=(GlfSimpleMaterial const & other) const
+{
+    return !(*this == other);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

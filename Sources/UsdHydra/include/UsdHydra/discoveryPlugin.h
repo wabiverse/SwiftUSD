@@ -7,27 +7,28 @@
 #ifndef PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
 #define PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
 
-#include "Tf/token.h"
-#include "UsdHydra/api.h"
 #include "pxr/pxrns.h"
+#include "UsdHydra/api.h"
+#include "Tf/token.h"
 
-#include "Ndr/declare.h"
-#include "Ndr/discoveryPlugin.h"
-#include "Ndr/parserPlugin.h"
+#include "Sdr/declare.h"
+#include "Sdr/discoveryPlugin.h"
+#include "Sdr/parserPlugin.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdHydraDiscoveryPlugin : public NdrDiscoveryPlugin {
- public:
-  UsdHydraDiscoveryPlugin() = default;
+class UsdHydraDiscoveryPlugin : public SdrDiscoveryPlugin {
+public:
+    UsdHydraDiscoveryPlugin() = default;
 
-  ~UsdHydraDiscoveryPlugin() override = default;
+    ~UsdHydraDiscoveryPlugin() override = default;
+    
+    virtual SdrShaderNodeDiscoveryResultVec DiscoverShaderNodes(const Context &context) 
+        override;
 
-  virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context) override;
-
-  virtual const NdrStringVec &GetSearchURIs() const override;
+    virtual const SdrStringVec& GetSearchURIs() const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
+#endif // PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H

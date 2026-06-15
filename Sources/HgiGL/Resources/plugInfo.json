@@ -1,18 +1,18 @@
 {
-  "Plugins": [
-    {
-      "Info": {
-        "Types": {
-          "HgiGL": {
-            "bases": ["Hgi"]
-          }
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "HgiGL" : {
+                        "bases": ["Hgi"]
+                    }
+                }
+            },
+            "LibraryPath": "",
+            "Name": "hgiGL",
+            "ResourcePath": ".",
+            "Root": ".",
+            "Type": "library"
         }
-      },
-      "LibraryPath": "",
-      "Name": "HgiGL",
-      "ResourcePath": ".",
-      "Root": ".",
-      "Type": "library"
-    }
-  ]
+    ]
 }

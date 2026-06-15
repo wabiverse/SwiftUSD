@@ -9,15 +9,17 @@
 #include "pxr/pxrns.h"
 
 #include "Hd/filteringSceneIndex.h"
-#include "HdSi/api.h"
+#include "Hdsi/api.h"
 #include "Sdf/pathTable.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HDSI_PRIM_TYPE_PRUNING_SCENE_INDEX_TOKENS (primTypes)(bindingToken)(doNotPruneNonPrimPaths)
+#define HDSI_PRIM_TYPE_PRUNING_SCENE_INDEX_TOKENS \
+    (primTypes)                                   \
+    (bindingToken)                                \
+    (doNotPruneNonPrimPaths)
 
-TF_DECLARE_PUBLIC_TOKENS(HdsiPrimTypePruningSceneIndexTokens,
-                         HDSI_API,
+TF_DECLARE_PUBLIC_TOKENS(HdsiPrimTypePruningSceneIndexTokens, HDSI_API,
                          HDSI_PRIM_TYPE_PRUNING_SCENE_INDEX_TOKENS);
 
 TF_DECLARE_WEAK_AND_REF_PTRS(HdsiPrimTypePruningSceneIndex);
@@ -40,64 +42,71 @@ TF_DECLARE_WEAK_AND_REF_PTRS(HdsiPrimTypePruningSceneIndex);
 /// If an empty binding token is used, the scene index will not
 /// prune any binding.
 ///
-class HdsiPrimTypePruningSceneIndex final : public HdSingleInputFilteringSceneIndexBase {
- public:
-  HDSI_API
-  static HdsiPrimTypePruningSceneIndexRefPtr New(HdSceneIndexBaseRefPtr const &inputSceneIndex,
-                                                 HdContainerDataSourceHandle const &inputArgs);
+/// \deprecated Use HdsiSceneMaterialPruningSceneIndex or 
+/// HdPrimTypeAndPathPruningSceneIndex with tautological PathPredicate instead.
+///
+class HdsiPrimTypePruningSceneIndex final
+    : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    HDSI_API
+    static HdsiPrimTypePruningSceneIndexRefPtr
+    New(HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        HdContainerDataSourceHandle const &inputArgs);
 
-  /// Is scene index actually prunning?
-  HDSI_API
-  bool GetEnabled() const;
-  /// Enable scene index to prune.
-  HDSI_API
-  void SetEnabled(bool);
+    /// Is scene index actually prunning?
+    HDSI_API
+    bool GetEnabled() const;
+    /// Enable scene index to prune.
+    HDSI_API
+    void SetEnabled(bool);
 
- public:  // HdSceneIndex overrides
-  HDSI_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
-  HDSI_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+public: // HdSceneIndex overrides
+    HDSI_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HDSI_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
-  const TfToken &GetBindingToken() const
-  {
-    return _bindingToken;
-  }
+    const TfToken &GetBindingToken() const { return _bindingToken; }
 
- protected:  // HdSingleInputFilteringSceneIndexBase overrides
-  HDSI_API
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
-  HDSI_API
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
-  HDSI_API
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+protected: // HdSingleInputFilteringSceneIndexBase overrides
+    HDSI_API
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    HDSI_API
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    HDSI_API
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
- protected:
-  HDSI_API
-  HdsiPrimTypePruningSceneIndex(HdSceneIndexBaseRefPtr const &inputSceneIndex,
-                                HdContainerDataSourceHandle const &inputArgs);
-  HDSI_API
-  ~HdsiPrimTypePruningSceneIndex() override;
+protected:
+    HDSI_API
+    HdsiPrimTypePruningSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        HdContainerDataSourceHandle const &inputArgs);
+    HDSI_API
+    ~HdsiPrimTypePruningSceneIndex() override;
 
- private:
-  // Should prim be pruned based on its type?
-  bool _PruneType(const TfToken &primType) const;
-  // Should prim be pruned based on its path?
-  bool _PrunePath(const SdfPath &path) const;
+private:
+    // Should prim be pruned based on its type?
+    bool _PruneType(const TfToken &primType) const;
+    // Should prim be pruned based on its path?
+    bool _PrunePath(const SdfPath &path) const;
 
-  const TfTokenVector _primTypes;
-  const TfToken _bindingToken;
-  const bool _doNotPruneNonPrimPaths;
+    const TfTokenVector _primTypes;
+    const TfToken _bindingToken;
+    const bool _doNotPruneNonPrimPaths;
 
-  // Track pruned prims in a SdfPathTable.  A value of true
-  // indicates a prim was filtered at that path.
-  using _PruneMap = SdfPathTable<bool>;
-  _PruneMap _pruneMap;
+    // Track pruned prims in a SdfPathTable.  A value of true
+    // indicates a prim was filtered at that path.
+    using _PruneMap = SdfPathTable<bool>;
+    _PruneMap _pruneMap;
 
-  bool _enabled;
+    bool _enabled;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

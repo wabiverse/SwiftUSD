@@ -7,371 +7,406 @@
 #ifndef PXR_BASE_VT_WRAP_ARRAY_H
 #define PXR_BASE_VT_WRAP_ARRAY_H
 
+#include "pxr/pxrns.h"
 #include "Vt/api.h"
 #include "Vt/array.h"
-#include "Vt/pyOperators.h"
 #include "Vt/types.h"
 #include "Vt/value.h"
-#include "pxr/pxrns.h"
+#include "Vt/pyOperators.h"
 
-#include "Arch/inttypes.h"
 #include "Arch/math.h"
+#include "Arch/inttypes.h"
 #include "Arch/pragmas.h"
 #include "Gf/half.h"
 #include "Gf/traits.h"
-#include "Tf/iterator.h"
-#include "Tf/meta.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyFunction.h"
 #include "Tf/pyLock.h"
 #include "Tf/pyObjWrapper.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
+#include "Tf/iterator.h"
+#include "Tf/meta.h"
 #include "Tf/span.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tfImpl.h"
+#include "Tf/tf.h"
 #include "Tf/wrapTypeHelpers.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#include <boost/python/class.hpp>
-#include <boost/python/copy_const_reference.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/detail/api_placeholder.hpp>
-#include <boost/python/extract.hpp>
-#include <boost/python/implicit.hpp>
-#include <boost/python/iterator.hpp>
-#include <boost/python/make_constructor.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/overloads.hpp>
-#include <boost/python/return_arg.hpp>
-#include <boost/python/slice.hpp>
-#include <boost/python/type_id.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/copy_const_reference.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/detail/api_placeholder.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/extract.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/implicit.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/iterator.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/make_constructor.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/object.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/return_arg.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/slice.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/type_id.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/overloads.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <algorithm>
-#include <memory>
 #include <numeric>
 #include <ostream>
 #include <string>
+#include <memory>
 #include <vector>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Vt_WrapArray {
 
-using namespace boost::python;
+using namespace pxr_boost::python;
 
-using std::string;
 using std::unique_ptr;
 using std::vector;
+using std::string;
 
-template<typename T> object getitem_ellipsis(VtArray<T> const &self, object idx)
+template <typename T>
+object
+getitem_ellipsis(VtArray<T> const &self, object idx)
 {
-  object ellipsis = object(handle<>(borrowed(Py_Ellipsis)));
-  if (idx != ellipsis) {
-    PyErr_SetString(PyExc_TypeError, "unsupported index type");
-    throw_error_already_set();
-  }
-  return object(self);
-}
-
-template<typename T> object getitem_index(VtArray<T> const &self, int64_t idx)
-{
-  static const bool throwError = true;
-  idx = TfPyNormalizeIndex(idx, self.size(), throwError);
-  return object(self[idx]);
-}
-
-template<typename T> object getitem_slice(VtArray<T> const &self, slice idx)
-{
-  try {
-    slice::range<typename VtArray<T>::const_iterator> range = idx.get_indices(self.begin(),
-                                                                              self.end());
-    const size_t setSize = 1 + (range.stop - range.start) / range.step;
-    VtArray<T> result(setSize);
-    size_t i = 0;
-    for (; range.start != range.stop; range.start += range.step, ++i) {
-      result[i] = *range.start;
+    object ellipsis = object(handle<>(borrowed(Py_Ellipsis)));
+    if (idx != ellipsis) {
+        PyErr_SetString(PyExc_TypeError, "unsupported index type");
+        throw_error_already_set();
     }
-    result[i] = *range.start;
-    return object(result);
-  }
-  catch (std::invalid_argument const &) {
-    return object();
-  }
+    return object(self);
 }
 
-template<typename T, typename S>
-void setArraySlice(
-    VtArray<T> &self, S value, slice::range<T *> &range, size_t setSize, bool tile = false)
+template <typename T>
+object
+getitem_index(VtArray<T> const &self, int64_t idx)
 {
-  // Check size.
-  const size_t length = len(value);
-  if (length == 0)
-    TfPyThrowValueError("No values with which to set array slice.");
-  if (!tile && length < setSize) {
-    string msg = TfStringPrintf(
-        "Not enough values to set slice.  Expected %zu, got %zu.", setSize, length);
-    TfPyThrowValueError(msg);
-  }
-
-  // Extract the values before setting any.  If we can extract the
-  // whole vector at once then do that since it should be faster.
-  std::vector<T> extracted;
-  extract<std::vector<T>> vectorExtraction(value);
-  if (vectorExtraction.check()) {
-    std::vector<T> tmp = vectorExtraction();
-    extracted.swap(tmp);
-  }
-  else {
-    extracted.reserve(length);
-    for (size_t i = 0; i != length; ++i) {
-      extracted.push_back(extract<T>(value[i]));
-    }
-  }
-
-  // We're fine, go through and set them.  Handle common case as a fast
-  // path.
-  if (range.step == 1 && length >= setSize) {
-    std::copy(extracted.begin(), extracted.begin() + setSize, range.start);
-  }
-  else {
-    for (size_t i = 0; i != setSize; range.start += range.step, ++i) {
-      *range.start = extracted[i % length];
-    }
-  }
+    static const bool throwError = true;
+    idx = TfPyNormalizeIndex(idx, self.size(), throwError);
+    return object(self[idx]);
 }
 
-template<typename T>
-void setArraySlice(VtArray<T> &self, slice idx, object value, bool tile = false)
+template <typename T>
+object
+getitem_slice(VtArray<T> const &self, slice idx)
 {
-  // Get the range.
-  slice::range<T *> range;
-  try {
-    T *data = self.data();
-    range = idx.get_indices(data, data + self.size());
-  }
-  catch (std::invalid_argument const &) {
-    // Do nothing
-    return;
-  }
+    try {
+        slice::range<typename VtArray<T>::const_iterator> range =
+            idx.get_indices(self.begin(), self.end());
+        const size_t setSize = 1 + (range.stop - range.start) / range.step;
+        VtArray<T> result(setSize);
+        size_t i = 0;
+        for (; range.start != range.stop; range.start += range.step, ++i) {
+            result[i] = *range.start;
+        }
+        result[i] = *range.start;
+        return object(result);
+    }
+    catch (std::invalid_argument const &) {
+        return object();
+    }
+}
 
-  // Get the number of items to be set.
-  const size_t setSize = 1 + (range.stop - range.start) / range.step;
-
-  // Copy from VtArray.  We only want to take this path if the passed value is
-  // *exactly* a VtArray.  That is, we don't want to take this path if it can
-  // merely *convert* to a VtArray, so we check that we can extract a mutable
-  // lvalue reference from the python object, which requires that there be a
-  // real VtArray there.
-  if (extract<VtArray<T> &>(value).check()) {
-    const VtArray<T> val = extract<VtArray<T>>(value);
-    const size_t length = val.size();
+template <typename T, typename S>
+void
+setArraySlice(VtArray<T> &self, S value,
+              slice::range<T*>& range, size_t setSize, bool tile = false)
+{
+    // Check size.
+    const size_t length = len(value);
     if (length == 0)
-      TfPyThrowValueError("No values with which to set array slice.");
+        TfPyThrowValueError("No values with which to set array slice.");
     if (!tile && length < setSize) {
-      string msg = TfStringPrintf(
-          "Not enough values to set slice.  Expected %zu, got %zu.", setSize, length);
-      TfPyThrowValueError(msg);
+        string msg = TfStringPrintf
+            ("Not enough values to set slice.  Expected %zu, got %zu.",
+             setSize, length);
+        TfPyThrowValueError(msg);
     }
 
-    // We're fine, go through and set them.
-    for (size_t i = 0; i != setSize; range.start += range.step, ++i) {
-      *range.start = val[i % length];
+    // Extract the values before setting any.  If we can extract the
+    // whole vector at once then do that since it should be faster.
+    std::vector<T> extracted;
+    extract<std::vector<T> > vectorExtraction(value);
+    if (vectorExtraction.check()) {
+        std::vector<T> tmp = vectorExtraction();
+        extracted.swap(tmp);
     }
-  }
-
-  // Copy from scalar.
-  else if (extract<T>(value).check()) {
-    if (!tile) {
-      // XXX -- We're allowing implicit tiling;  do we want to?
-      // TfPyThrowValueError("can only assign an iterable.");
+    else {
+        extracted.reserve(length);
+        for (size_t i = 0; i != length; ++i) {
+            extracted.push_back(extract<T>(value[i]));
+        }
     }
 
-    // Use scalar to fill entire slice.
-    const T val = extract<T>(value);
-    for (size_t i = 0; i != setSize; range.start += range.step, ++i) {
-      *range.start = val;
+    // We're fine, go through and set them.  Handle common case as a fast
+    // path.
+    if (range.step == 1 && length >= setSize) {
+        std::copy(extracted.begin(), extracted.begin() + setSize, range.start);
     }
-  }
-
-  // Copy from list.
-  else if (extract<list>(value).check()) {
-    setArraySlice(self, extract<list>(value)(), range, setSize, tile);
-  }
-
-  // Copy from tuple.
-  else if (extract<tuple>(value).check()) {
-    setArraySlice(self, extract<tuple>(value)(), range, setSize, tile);
-  }
-
-  // Copy from iterable.
-  else {
-    setArraySlice(self, list(value), range, setSize, tile);
-  }
+    else {
+        for (size_t i = 0; i != setSize; range.start += range.step, ++i) {
+            *range.start = extracted[i % length];
+        }
+    }
 }
 
-template<typename T> void setitem_ellipsis(VtArray<T> &self, object idx, object value)
+template <typename T>
+void
+setArraySlice(VtArray<T> &self, slice idx, object value, bool tile = false)
 {
-  object ellipsis = object(handle<>(borrowed(Py_Ellipsis)));
-  if (idx != ellipsis) {
-    PyErr_SetString(PyExc_TypeError, "unsupported index type");
-    throw_error_already_set();
-  }
-  setArraySlice(self, slice(0, self.size()), value);
+    // Get the range.
+    slice::range<T*> range;
+    try {
+        T* data = self.data();
+        range = idx.get_indices(data, data + self.size());
+    }
+    catch (std::invalid_argument const &) {
+        // Do nothing
+        return;
+    }
+
+    // Get the number of items to be set.
+    const size_t setSize = 1 + (range.stop - range.start) / range.step;
+
+    // Copy from VtArray.  We only want to take this path if the passed value is
+    // *exactly* a VtArray.  That is, we don't want to take this path if it can
+    // merely *convert* to a VtArray, so we check that we can extract a mutable
+    // lvalue reference from the python object, which requires that there be a
+    // real VtArray there.
+    if (extract< VtArray<T> &>(value).check()) {
+        const VtArray<T> val = extract< VtArray<T> >(value);
+        const size_t length = val.size();
+        if (length == 0)
+            TfPyThrowValueError("No values with which to set array slice.");
+        if (!tile && length < setSize) {
+            string msg = TfStringPrintf
+                ("Not enough values to set slice.  Expected %zu, got %zu.",
+                 setSize, length);
+            TfPyThrowValueError(msg);
+        }
+
+        // We're fine, go through and set them.
+        for (size_t i = 0; i != setSize; range.start += range.step, ++i) {
+            *range.start = val[i % length];
+        }
+    }
+
+    // Copy from scalar.
+    else if (extract<T>(value).check()) {
+        if (!tile) {
+            // XXX -- We're allowing implicit tiling;  do we want to?
+            //TfPyThrowValueError("can only assign an iterable.");
+        }
+
+        // Use scalar to fill entire slice.
+        const T val = extract<T>(value);
+        for (size_t i = 0; i != setSize; range.start += range.step, ++i) {
+            *range.start = val;
+        }
+    }
+
+    // Copy from list.
+    else if (extract<list>(value).check()) {
+        setArraySlice(self, extract<list>(value)(), range, setSize, tile);
+    }
+
+    // Copy from tuple.
+    else if (extract<tuple>(value).check()) {
+        setArraySlice(self, extract<tuple>(value)(), range, setSize, tile);
+    }
+
+    // Copy from iterable.
+    else {
+        setArraySlice(self, list(value), range, setSize, tile);
+    }
 }
 
-template<typename T> void setitem_index(VtArray<T> &self, int64_t idx, object value)
+
+template <typename T>
+void
+setitem_ellipsis(VtArray<T> &self, object idx, object value)
 {
-  idx = TfPyNormalizeIndex(idx, self.size(), /*throwError=*/true);
-  setArraySlice(self, slice(idx, idx + 1), value, /*tile=*/true);
+    object ellipsis = object(handle<>(borrowed(Py_Ellipsis)));
+    if (idx != ellipsis) {
+        PyErr_SetString(PyExc_TypeError, "unsupported index type");
+        throw_error_already_set();
+    }
+    setArraySlice(self, slice(0, self.size()), value);
 }
 
-template<typename T> void setitem_slice(VtArray<T> &self, slice idx, object value)
+template <typename T>
+void
+setitem_index(VtArray<T> &self, int64_t idx, object value)
 {
-  setArraySlice(self, idx, value);
+    idx = TfPyNormalizeIndex(idx, self.size(), /*throwError=*/true);
+    setArraySlice(self, slice(idx, idx+1), value, /*tile=*/true);
 }
 
-template<class T> VT_API string GetVtArrayName();
-
-template<class T, class... Ts> constexpr bool Vt_IsAnySameImpl(TfMetaList<Ts...>)
+template <typename T>
+void
+setitem_slice(VtArray<T> &self, slice idx, object value)
 {
-  return (std::is_same_v<T, Ts> || ...);
+    setArraySlice(self, idx, value);
 }
 
-template<class T, class TypeList> constexpr bool Vt_IsAnySame()
-{
-  return Vt_IsAnySameImpl<T>(TypeList{});
+
+template <class T>
+VT_API string GetVtArrayName();
+
+template <class T, class... Ts>
+constexpr bool Vt_IsAnySameImpl(TfMetaList<Ts...>) {
+     return (std::is_same_v<T, Ts> || ...);
+}
+
+template <class T, class TypeList>
+constexpr bool Vt_IsAnySame() {
+    return Vt_IsAnySameImpl<T>(TypeList{});
 }
 
 // This is the same types as in VT_INTEGRAL_BUILTIN_VALUE_TYPES with char
 // and bool types removed.
-using Vt_OptimizedStreamIntegralTypes = TfMetaList<short,
-                                                   unsigned short,
-                                                   int,
-                                                   unsigned int,
-                                                   long,
-                                                   unsigned long,
-                                                   long long,
-                                                   unsigned long long>;
+using Vt_OptimizedStreamIntegralTypes =
+    TfMetaList<short, unsigned short,
+               int, unsigned int,
+               long, unsigned long,
+               long long, unsigned long long>;
 
 // Explicitly convert half to float here instead of relying on implicit
 // conversion to float to work around the fact that libc++ only provides
-// implementations of std::isfinite for types where std::is_arithmetic
+// implementations of std::isfinite for types where std::is_arithmetic 
 // is true.
-template<typename T> inline bool _IsFinite(T const &value)
-{
-  return std::isfinite(value);
+template <typename T>
+inline bool _IsFinite(T const &value) {
+    return std::isfinite(value);
 }
-inline bool _IsFinite(GfHalf const &value)
-{
-  return std::isfinite(static_cast<float>(value));
+inline bool _IsFinite(GfHalf const &value) {
+    return std::isfinite(static_cast<float>(value));
 }
 
-template<typename T> static void streamValue(std::ostringstream &stream, T const &value)
-{
-  // To avoid overhead we stream out certain builtin types directly
-  // without calling TfPyRepr().
-  if constexpr (Vt_IsAnySame<T, Vt_OptimizedStreamIntegralTypes>()) {
-    stream << value;
-  }
-  // For float types we need to be make sure to represent infs and nans correctly.
-  else if constexpr (GfIsFloatingPoint<T>::value) {
-    if (_IsFinite(value)) {
-      stream << value;
+template <typename T>
+static void streamValue(std::ostringstream &stream, T const &value) {
+    // To avoid overhead we stream out certain builtin types directly
+    // without calling TfPyRepr().
+    if constexpr(Vt_IsAnySame<T, Vt_OptimizedStreamIntegralTypes>()) {
+        stream << value;
+    }
+    // For float types we need to be make sure to represent infs and nans correctly.
+    else if constexpr(GfIsFloatingPoint<T>::value) {
+        if (_IsFinite(value)) {
+            stream << value;
+        }
+        else {
+            stream << TfPyRepr(value);
+        }
     }
     else {
-      stream << TfPyRepr(value);
+        stream << TfPyRepr(value);
     }
-  }
-  else {
-    stream << TfPyRepr(value);
-  }
 }
 
-static unsigned int Vt_ComputeEffectiveRankAndLastDimSize(Vt_ShapeData const *sd,
-                                                          size_t *lastDimSize)
+VT_API
+unsigned int
+Vt_ComputeEffectiveRankAndLastDimSize(
+    Vt_ShapeData const *sd, size_t *lastDimSize);
+
+template <typename T>
+string __repr__(VtArray<T> const &self)
 {
-  unsigned int rank = sd->GetRank();
-  if (rank == 1)
-    return rank;
+    if (self.empty())
+        return TF_PY_REPR_PREFIX +
+            TfStringPrintf("%s()", GetVtArrayName<VtArray<T> >().c_str());
 
-  size_t divisor = std::accumulate(
-      sd->otherDims, sd->otherDims + rank - 1, 1, [](size_t x, size_t y) { return x * y; });
-
-  size_t remainder = divisor ? sd->totalSize % divisor : 0;
-  *lastDimSize = divisor ? sd->totalSize / divisor : 0;
-
-  if (remainder)
-    rank = 1;
-
-  return rank;
-}
-
-template<typename T> string __repr__(VtArray<T> const &self)
-{
-  if (self.empty())
-    return TF_PY_REPR_PREFIX + TfStringPrintf("%s()", GetVtArrayName<VtArray<T>>().c_str());
-
-  std::ostringstream stream;
-  stream.precision(17);
-  stream << "(";
-  for (size_t i = 0; i < self.size(); ++i) {
-    stream << (i ? ", " : "");
-    streamValue(stream, self[i]);
-  }
-  stream << (self.size() == 1 ? ",)" : ")");
-
-  const std::string repr = TF_PY_REPR_PREFIX + TfStringPrintf("%s(%zd, %s)",
-                                                              GetVtArrayName<VtArray<T>>().c_str(),
-                                                              self.size(),
-                                                              stream.str().c_str());
-
-  // XXX: This is to deal with legacy shaped arrays and should be removed
-  // once all shaped arrays have been eliminated.
-  // There is no nice way to make an eval()able __repr__ for shaped arrays
-  // that preserves the shape information, so put it in <> to make it
-  // clearly not eval()able. That has the advantage that, if somebody passes
-  // the repr into eval(), it'll raise a SyntaxError that clearly points to
-  // the beginning of the __repr__.
-  Vt_ShapeData const *shapeData = self._GetShapeData();
-  size_t lastDimSize = 0;
-  unsigned int rank = Vt_ComputeEffectiveRankAndLastDimSize(shapeData, &lastDimSize);
-  if (rank > 1) {
-    std::string shapeStr = "(";
-    for (size_t i = 0; i != rank - 1; ++i) {
-      shapeStr += TfStringPrintf(i ? ", %d" : "%d", shapeData->otherDims[i]);
+    std::ostringstream stream;
+    stream.precision(17);
+    stream << "(";
+    for (size_t i = 0; i < self.size(); ++i) {
+        stream << (i ? ", " : "");
+        streamValue(stream, self[i]);
     }
-    shapeStr += TfStringPrintf(", %zu)", lastDimSize);
-    return TfStringPrintf("<%s with shape %s>", repr.c_str(), shapeStr.c_str());
-  }
+    stream << (self.size() == 1 ? ",)" : ")");
 
-  return repr;
+    const std::string repr = TF_PY_REPR_PREFIX +
+        TfStringPrintf("%s(%zd, %s)",
+                       GetVtArrayName<VtArray<T> >().c_str(),
+                       self.size(), stream.str().c_str());
+
+    // XXX: This is to deal with legacy shaped arrays and should be removed
+    // once all shaped arrays have been eliminated.
+    // There is no nice way to make an eval()able __repr__ for shaped arrays
+    // that preserves the shape information, so put it in <> to make it
+    // clearly not eval()able. That has the advantage that, if somebody passes
+    // the repr into eval(), it'll raise a SyntaxError that clearly points to
+    // the beginning of the __repr__.
+    Vt_ShapeData const *shapeData = self._GetShapeData();
+    size_t lastDimSize = 0;
+    unsigned int rank =
+        Vt_ComputeEffectiveRankAndLastDimSize(shapeData, &lastDimSize);
+    if (rank > 1) {
+        std::string shapeStr = "(";
+        for (size_t i = 0; i != rank-1; ++i) {
+            shapeStr += TfStringPrintf(
+                i ? ", %d" : "%d", shapeData->otherDims[i]);
+        }
+        shapeStr += TfStringPrintf(", %zu)", lastDimSize);
+        return TfStringPrintf("<%s with shape %s>",
+                              repr.c_str(), shapeStr.c_str());
+    }
+
+    return repr;
 }
 
-template<typename T> VtArray<T> *VtArray__init__(object const &values)
+template <typename T>
+VtArray<T> *VtArray__init__(object const &values)
 {
-  // Make an array.
-  unique_ptr<VtArray<T>> ret(new VtArray<T>(len(values)));
+    // Make an array.
+    unique_ptr<VtArray<T> > ret(new VtArray<T>(len(values)));
 
-  // Set the values.  This is equivalent to saying 'ret[...] = values'
-  // in python, except that we allow tiling here.
-  static const bool tile = true;
-  setArraySlice(*ret, slice(0, ret->size()), values, tile);
-  return ret.release();
+    // Set the values.  This is equivalent to saying 'ret[...] = values'
+    // in python, except that we allow tiling here.
+    static const bool tile = true;
+    setArraySlice(*ret, slice(0, ret->size()), values, tile);
+    return ret.release();
 }
-template<typename T> VtArray<T> *VtArray__init__2(size_t size, object const &values)
+template <typename T>
+VtArray<T> *VtArray__init__2(size_t size, object const &values)
 {
-  // Make the array.
-  unique_ptr<VtArray<T>> ret(new VtArray<T>(size));
+    // Make the array.
+    unique_ptr<VtArray<T> > ret(new VtArray<T>(size));
 
-  // Set the values.  This is equivalent to saying 'ret[...] = values'
-  // in python, except that we allow tiling here.
-  static const bool tile = true;
-  setArraySlice(*ret, slice(0, ret->size()), values, tile);
+    // Set the values.  This is equivalent to saying 'ret[...] = values'
+    // in python, except that we allow tiling here.
+    static const bool tile = true;
+    setArraySlice(*ret, slice(0, ret->size()), values, tile);
 
-  return ret.release();
+    return ret.release();
 }
 
 // overloading for operator special methods, to allow tuple / list & array
@@ -380,32 +415,34 @@ ARCH_PRAGMA_PUSH
 ARCH_PRAGMA_UNSAFE_USE_OF_BOOL
 ARCH_PRAGMA_UNARY_MINUS_ON_UNSIGNED
 
-VTOPERATOR_WRAP(__add__, __radd__)
-VTOPERATOR_WRAP_NONCOMM(__sub__, __rsub__)
-VTOPERATOR_WRAP(__mul__, __rmul__)
-VTOPERATOR_WRAP_NONCOMM(__div__, __rdiv__)
-VTOPERATOR_WRAP_NONCOMM(__mod__, __rmod__)
+VTOPERATOR_WRAP(__add__,__radd__)
+VTOPERATOR_WRAP_NONCOMM(__sub__,__rsub__)
+VTOPERATOR_WRAP(__mul__,__rmul__)
+VTOPERATOR_WRAP_NONCOMM(__div__,__rdiv__)
+VTOPERATOR_WRAP_NONCOMM(__mod__,__rmod__)
 
 ARCH_PRAGMA_POP
-}  // namespace Vt_WrapArray
-
-template<typename T> static std::string _VtStr(T const &self)
-{
-  return TfStringify(self);
 }
 
-template<typename T> void VtWrapArray()
+template <typename T>
+static std::string _VtStr(T const &self)
 {
-  using namespace Vt_WrapArray;
+    return TfStringify(self);
+}
 
-  typedef T This;
-  typedef typename This::ElementType Type;
+template <typename T>
+void VtWrapArray()
+{
+    using namespace Vt_WrapArray;
+    
+    typedef T This;
+    typedef typename This::ElementType Type;
 
-  string name = GetVtArrayName<This>();
-  string typeStr = ArchGetDemangled(typeid(Type));
-  string docStr = TfStringPrintf("An array of type %s.", typeStr.c_str());
-
-  auto selfCls = class_<This>(name.c_str(), docStr.c_str(), no_init)
+    string name = GetVtArrayName<This>();
+    string typeStr = ArchGetDemangled(typeid(Type));
+    string docStr = TfStringPrintf("An array of type %s.", typeStr.c_str());
+    
+    auto selfCls = class_<This>(name.c_str(), docStr.c_str(), no_init)
         .setattr("_isVtArray", true)
         .def(TfTypePythonClass())
         .def(init<>())
@@ -436,11 +473,11 @@ template<typename T> void VtWrapArray()
         .def(self != self)
 
 #ifdef NUMERIC_OPERATORS
-#  define ADDITION_OPERATOR
-#  define SUBTRACTION_OPERATOR
-#  define MULTIPLICATION_OPERATOR
-#  define DIVISION_OPERATOR
-#  define UNARY_NEG_OPERATOR
+#define ADDITION_OPERATOR
+#define SUBTRACTION_OPERATOR
+#define MULTIPLICATION_OPERATOR
+#define DIVISION_OPERATOR
+#define UNARY_NEG_OPERATOR
 #endif
 
 #ifdef ADDITION_OPERATOR
@@ -471,97 +508,102 @@ template<typename T> void VtWrapArray()
 
         ;
 
-  // Wrap conversions from python sequences.
-  TfPyContainerConversions::from_python_sequence<
-      This,
-      TfPyContainerConversions::variable_capacity_all_items_convertible_policy>();
+    // Wrap conversions from python sequences.
+    TfPyContainerConversions::from_python_sequence<
+        This,
+        TfPyContainerConversions::
+        variable_capacity_all_items_convertible_policy>();
 
-  // Wrap implicit conversions from VtArray to TfSpan.
-  implicitly_convertible<This, TfSpan<Type>>();
-  implicitly_convertible<This, TfSpan<const Type>>();
+    // Wrap implicit conversions from VtArray to TfSpan.
+    implicitly_convertible<This, TfSpan<Type> >();
+    implicitly_convertible<This, TfSpan<const Type> >();
 }
 
-template<class Array> VtValue Vt_ConvertFromPySequenceOrIter(TfPyObjWrapper const &obj)
+template <class Array>
+VtValue
+Vt_ConvertFromPySequenceOrIter(TfPyObjWrapper const &obj)
 {
-  typedef typename Array::ElementType ElemType;
-  TfPyLock lock;
-  if (PySequence_Check(obj.ptr())) {
-    Py_ssize_t len = PySequence_Length(obj.ptr());
-    Array result(len);
-    ElemType *elem = result.data();
-    for (Py_ssize_t i = 0; i != len; ++i) {
-      boost::python::handle<> h(PySequence_ITEM(obj.ptr(), i));
-      if (!h) {
-        if (PyErr_Occurred())
-          PyErr_Clear();
-        return VtValue();
-      }
-      boost::python::extract<ElemType> e(h.get());
-      if (!e.check())
-        return VtValue();
-      *elem++ = e();
+    typedef typename Array::ElementType ElemType;
+    TfPyLock lock;
+    if (PySequence_Check(obj.ptr())) {
+        Py_ssize_t len = PySequence_Length(obj.ptr());
+        Array result(len);
+        ElemType *elem = result.data();
+        for (Py_ssize_t i = 0; i != len; ++i) {
+            pxr_boost::python::handle<> h(PySequence_ITEM(obj.ptr(), i));
+            if (!h) {
+                if (PyErr_Occurred())
+                    PyErr_Clear();
+                return VtValue();
+            }
+            pxr_boost::python::extract<ElemType> e(h.get());
+            if (!e.check())
+                return VtValue();
+            *elem++ = e();
+        }
+        return VtValue(result);
+    } else if (PyIter_Check(obj.ptr())) {
+        Array result;
+        while (PyObject *item = PyIter_Next(obj.ptr())) {
+            pxr_boost::python::handle<> h(item);
+            if (!h) {
+                if (PyErr_Occurred())
+                    PyErr_Clear();
+                return VtValue();
+            }
+            pxr_boost::python::extract<ElemType> e(h.get());
+            if (!e.check())
+                return VtValue();
+            result.push_back(e());
+        }
+        return VtValue(result);
+    }
+    return VtValue();
+}
+
+template <class Array, class Iter>
+VtValue
+Vt_ConvertFromRange(Iter begin, Iter end)
+{
+    typedef typename Array::ElementType ElemType;
+    Array result(distance(begin, end));
+    for (ElemType *e = result.data(); begin != end; ++begin) {
+        VtValue cast = VtValue::Cast<ElemType>(*begin);
+        if (cast.IsEmpty())
+            return cast;
+        cast.Swap(*e++);
     }
     return VtValue(result);
-  }
-  else if (PyIter_Check(obj.ptr())) {
-    Array result;
-    while (PyObject *item = PyIter_Next(obj.ptr())) {
-      boost::python::handle<> h(item);
-      if (!h) {
-        if (PyErr_Occurred())
-          PyErr_Clear();
-        return VtValue();
-      }
-      boost::python::extract<ElemType> e(h.get());
-      if (!e.check())
-        return VtValue();
-      result.push_back(e());
+}
+
+template <class T>
+VtValue
+Vt_CastToArray(VtValue const &v) {
+    VtValue ret;
+    TfPyObjWrapper obj;
+    // Attempt to convert from either python sequence or vector<VtValue>.
+    if (v.IsHolding<TfPyObjWrapper>()) {
+        ret = Vt_ConvertFromPySequenceOrIter<T>(v.UncheckedGet<TfPyObjWrapper>());
+    } else if (v.IsHolding<std::vector<VtValue> >()) {
+        std::vector<VtValue> const &vec = v.UncheckedGet<std::vector<VtValue> >();
+        ret = Vt_ConvertFromRange<T>(vec.begin(), vec.end());
     }
-    return VtValue(result);
-  }
-  return VtValue();
-}
-
-template<class Array, class Iter> VtValue Vt_ConvertFromRange(Iter begin, Iter end)
-{
-  typedef typename Array::ElementType ElemType;
-  Array result(distance(begin, end));
-  for (ElemType *e = result.data(); begin != end; ++begin) {
-    VtValue cast = VtValue::Cast<ElemType>(*begin);
-    if (cast.IsEmpty())
-      return cast;
-    cast.Swap(*e++);
-  }
-  return VtValue(result);
-}
-
-template<class T> VtValue Vt_CastToArray(VtValue const &v)
-{
-  VtValue ret;
-  TfPyObjWrapper obj;
-  // Attempt to convert from either python sequence or vector<VtValue>.
-  if (v.IsHolding<TfPyObjWrapper>()) {
-    ret = Vt_ConvertFromPySequenceOrIter<T>(v.UncheckedGet<TfPyObjWrapper>());
-  }
-  else if (v.IsHolding<std::vector<VtValue>>()) {
-    std::vector<VtValue> const &vec = v.UncheckedGet<std::vector<VtValue>>();
-    ret = Vt_ConvertFromRange<T>(vec.begin(), vec.end());
-  }
-  return ret;
+    return ret;
 }
 
 /// Register casts with VtValue from python sequences to VtArray types.
-template<class Elem> void VtRegisterValueCastsFromPythonSequencesToArray()
+template <class Elem>
+void VtRegisterValueCastsFromPythonSequencesToArray()
 {
-  typedef VtArray<Elem> Array;
-  VtValue::RegisterCast<TfPyObjWrapper, Array>(Vt_CastToArray<Array>);
-  VtValue::RegisterCast<std::vector<VtValue>, Array>(Vt_CastToArray<Array>);
+    typedef VtArray<Elem> Array;
+    VtValue::RegisterCast<TfPyObjWrapper, Array>(Vt_CastToArray<Array>);
+    VtValue::RegisterCast<std::vector<VtValue>, Array>(Vt_CastToArray<Array>);
 }
 
-#define VT_WRAP_ARRAY(unused, elem) VtWrapArray<VtArray<VT_TYPE(elem)>>();
+#define VT_WRAP_ARRAY(unused, elem)          \
+    VtWrapArray< VtArray< VT_TYPE(elem) > >();
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#endif  // PXR_BASE_VT_WRAP_ARRAY_H
+#endif // PXR_BASE_VT_WRAP_ARRAY_H

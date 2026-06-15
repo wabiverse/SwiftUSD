@@ -7,9 +7,9 @@
 #ifndef PXR_BASE_TF_PATH_UTILS_H
 #define PXR_BASE_TF_PATH_UTILS_H
 
-#include "Arch/fileSystem.h"
-#include "Tf/api.h"
 #include "pxr/pxrns.h"
+#include "Tf/api.h"
+#include "Arch/fileSystem.h"
 #include <string>
 #include <vector>
 
@@ -38,21 +38,23 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// occur while computing the real path. If no error occurs, the string is
 /// cleared.
 TF_API
-std::string TfRealPath(std::string const &path,
+std::string TfRealPath(std::string const& path,
                        bool allowInaccessibleSuffix = false,
-                       std::string *error = 0);
+                       std::string* error = 0);
 
 /// Normalizes the specified path, eliminating double slashes, etc.
 ///
 /// This canonicalizes paths, removing any double slashes, and eliminiating
 /// '.', and '..' components of the path.  This emulates the behavior of
-/// os.path.normpath in Python.
+/// os.path.normpath in Python. A trailing '/' character will be stripped from 
+/// the result if the input contained one.
 ///
 /// On Windows, all backslashes are converted to forward slashes and drive
 /// specifiers (e.g., "C:") are lower-cased. If \p stripDriveSpecifier
 /// is \c true, these drive specifiers are removed from the path.
 TF_API
-std::string TfNormPath(std::string const &path, bool stripDriveSpecifier = false);
+std::string TfNormPath(std::string const& path, 
+                       bool stripDriveSpecifier = false);
 
 /// Return the index delimiting the longest accessible prefix of \a path.
 ///
@@ -60,8 +62,8 @@ std::string TfNormPath(std::string const &path, bool stripDriveSpecifier = false
 /// copy constructor. If the entire path is accessible, return the length of
 /// the input string. If none of the path is accessible, return 0.  Otherwise
 /// the index points to the path separator that delimits the existing prefix
-/// from the non-existing suffix.
-///
+/// from the non-existing suffix. 
+/// 
 /// Examples: suppose the paths /, /usr, and /usr/anim exist, but no other
 /// paths exist.
 ///
@@ -73,8 +75,8 @@ std::string TfNormPath(std::string const &path, bool stripDriveSpecifier = false
 /// reason for the error. If the error string is set, the returned index is
 /// the path separator before the element at which the error occurred.
 TF_API
-std::string::size_type TfFindLongestAccessiblePrefix(std::string const &path,
-                                                     std::string *error = 0);
+std::string::size_type
+TfFindLongestAccessiblePrefix(std::string const &path, std::string* error = 0);
 
 /// Returns the canonical absolute path of the specified filename.
 ///
@@ -84,7 +86,7 @@ std::string::size_type TfFindLongestAccessiblePrefix(std::string const &path,
 /// symlink, or not exist at all, and still result in an absolute path, rather
 /// than an empty string.
 TF_API
-std::string TfAbsPath(std::string const &path);
+std::string TfAbsPath(std::string const& path);
 
 /// Returns the extension for a file path
 ///
@@ -93,7 +95,7 @@ std::string TfAbsPath(std::string const &path);
 /// a string(dot not included).
 ///
 /// Examples:
-///
+/// 
 /// TfGetExtension('/foo/bar')              -> ''
 /// TfGetExtension('/foo/bar/foo.baz')      -> 'baz'
 /// TfGetExtension('/foo.bar/foo.baz')      -> 'baz'
@@ -101,16 +103,16 @@ std::string TfAbsPath(std::string const &path);
 /// TfGetExtension('/foo/bar/.foo.baz')     -> 'baz'
 /// TfGetExtension('/foo/bar/.foo')         -> ''
 TF_API
-std::string TfGetExtension(std::string const &path);
+std::string TfGetExtension(std::string const& path);
 
 /// Returns the value of a symbolic link.  Returns the empty string on
 /// error or if path is not a symbolic link.
 TF_API
-std::string TfReadLink(std::string const &path);
+std::string TfReadLink(std::string const& path);
 
 /// Return true if and only if a path is relative (not absolute).
 TF_API
-bool TfIsRelativePath(std::string const &path);
+bool TfIsRelativePath(std::string const& path);
 
 /// Expands one or more shell glob patterns.
 ///
@@ -120,8 +122,8 @@ bool TfIsRelativePath(std::string const &path);
 /// GLOB_MARK marks directories which match the glob pattern with a trailing
 /// slash. GLOB_NOCHECK returns any unexpanded patterns in the result.
 TF_API
-std::vector<std::string> TfGlob(std::vector<std::string> const &paths,
-                                unsigned int flags = ARCH_GLOB_DEFAULT);
+std::vector<std::string> TfGlob(std::vector<std::string> const& paths,
+                                unsigned int flags=ARCH_GLOB_DEFAULT);
 
 /// Expands a shell glob pattern.
 ///
@@ -130,7 +132,8 @@ std::vector<std::string> TfGlob(std::vector<std::string> const &paths,
 /// if flags is not set, the default glob flags are GLOB_MARK and
 /// GLOB_NOCHECK.
 TF_API
-std::vector<std::string> TfGlob(std::string const &path, unsigned int flags = ARCH_GLOB_DEFAULT);
+std::vector<std::string> TfGlob(std::string const& path,
+                                unsigned int flags=ARCH_GLOB_DEFAULT);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

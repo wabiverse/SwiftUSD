@@ -5,13 +5,14 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Pcp/types.h"
 #include "Tf/pyEnum.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapTypes()
+void
+wrapTypes()
 {
-  TfPyWrapEnum<PcpArcType>();
+    TfPyWrapEnum<PcpArcType>();
 }

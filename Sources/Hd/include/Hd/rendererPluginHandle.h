@@ -7,9 +7,9 @@
 #ifndef PXR_IMAGING_HD_RENDERER_PLUGIN_HANDLE_H
 #define PXR_IMAGING_HD_RENDERER_PLUGIN_HANDLE_H
 
+#include "pxr/pxrns.h"
 #include "Hd/api.h"
 #include "Hd/renderDelegate.h"
-#include "pxr/pxrns.h"
 
 #include "Tf/token.h"
 
@@ -27,51 +27,47 @@ class HdPluginRenderDelegateUniqueHandle;
 /// automatically decreases and increases the plugin's reference
 /// counts with the plugin registry.
 ///
-class HdRendererPluginHandle final {
- public:
-  HdRendererPluginHandle() : _plugin(nullptr) {}
-  HdRendererPluginHandle(const std::nullptr_t &) : _plugin(nullptr) {}
+class HdRendererPluginHandle final
+{
+public:
+    HdRendererPluginHandle() : _plugin(nullptr) { }
+    HdRendererPluginHandle(const std::nullptr_t &) : _plugin(nullptr) { }
 
-  HD_API
-  HdRendererPluginHandle(const HdRendererPluginHandle &);
+    HD_API
+    HdRendererPluginHandle(const HdRendererPluginHandle &);
 
-  HD_API
-  ~HdRendererPluginHandle();
+    HD_API
+    HdRendererPluginHandle(HdRendererPluginHandle &&);
 
-  HD_API
-  HdRendererPluginHandle &operator=(const HdRendererPluginHandle &);
+    HD_API
+    ~HdRendererPluginHandle();
 
-  HD_API
-  HdRendererPluginHandle &operator=(const std::nullptr_t &);
+    HD_API
+    HdRendererPluginHandle &operator=(const HdRendererPluginHandle &);
 
-  /// Get the wrapped HdRendererPlugin
-  HdRendererPlugin *Get() const
-  {
-    return _plugin;
-  }
+    HD_API
+    HdRendererPluginHandle &operator=(HdRendererPluginHandle &&);
 
-  HdRendererPlugin *operator->() const
-  {
-    return _plugin;
-  }
-  HdRendererPlugin &operator*() const
-  {
-    return *_plugin;
-  }
+    HD_API
+    HdRendererPluginHandle &operator=(const std::nullptr_t &);
+    
+    /// Get the wrapped HdRendererPlugin
+    HdRendererPlugin *Get() const { return _plugin; }
 
-  /// Is the wrapped HdRendererPlugin valid?
-  explicit operator bool() const
-  {
-    return _plugin;
-  }
+    HdRendererPlugin *operator->() const { return _plugin; }
+    HdRendererPlugin &operator*() const { return *_plugin; }
 
- private:
-  friend class HdRendererPluginRegistry;
-  friend class HdRendererPlugin;
+    /// Is the wrapped HdRendererPlugin valid?
+    explicit operator bool() const { return _plugin; }
 
-  HdRendererPluginHandle(HdRendererPlugin *const plugin) : _plugin(plugin) {}
+private:
+    friend class HdRendererPluginRegistry;
+    friend class HdRendererPlugin;
+    
+    HdRendererPluginHandle(HdRendererPlugin * const plugin)
+      : _plugin(plugin) { }
 
-  HdRendererPlugin *_plugin;
+    HdRendererPlugin *_plugin;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

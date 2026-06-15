@@ -9,10 +9,10 @@
 
 /// \file sdf/subLayerListEditor.h
 
+#include "pxr/pxrns.h"
+#include "Sdf/vectorListEditor.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/proxyPolicies.h"
-#include "Sdf/vectorListEditor.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -22,20 +22,23 @@ SDF_DECLARE_HANDLES(SdfLayer);
 ///
 /// List editor implementation for sublayer path lists.
 ///
-class Sdf_SubLayerListEditor : public Sdf_VectorListEditor<SdfSubLayerTypePolicy> {
- public:
-  Sdf_SubLayerListEditor(const SdfLayerHandle &owner);
+class Sdf_SubLayerListEditor 
+    : public Sdf_VectorListEditor<SdfSubLayerTypePolicy>
+{
+public:
+    Sdf_SubLayerListEditor(const SdfLayerHandle& owner);
 
-  virtual ~Sdf_SubLayerListEditor();
+    virtual ~Sdf_SubLayerListEditor();
 
- private:
-  typedef Sdf_VectorListEditor<SdfSubLayerTypePolicy> Parent;
+private:
+    typedef Sdf_VectorListEditor<SdfSubLayerTypePolicy> Parent;
 
-  virtual void _OnEdit(SdfListOpType op,
-                       const std::vector<std::string> &oldValues,
-                       const std::vector<std::string> &newValues) const;
+    virtual void _OnEdit(
+        SdfListOpType op,
+        const std::vector<std::string>& oldValues,
+        const std::vector<std::string>& newValues) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_SDF_SUB_LAYER_LIST_EDITOR_H
+#endif // PXR_USD_SDF_SUB_LAYER_LIST_EDITOR_H

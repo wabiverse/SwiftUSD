@@ -13,163 +13,196 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace UsdImagingRootOverridesSceneIndex_Impl {
+namespace UsdImagingRootOverridesSceneIndex_Impl
+{
 
-struct _RootOverlayInfo {
-  GfMatrix4d transform = GfMatrix4d(1.0);
-  bool visibility = true;
+struct _RootOverlayInfo
+{
+    GfMatrix4d transform = GfMatrix4d(1.0);
+    bool visibility = true;
 };
 
 // Data source for locator xform/matrix
-class _MatrixSource : public HdMatrixDataSource {
- public:
-  HD_DECLARE_DATASOURCE(_MatrixSource);
+class _MatrixSource : public HdMatrixDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(_MatrixSource);
 
-  VtValue GetValue(const Time t)
-  {
-    return VtValue(GetTypedValue(t));
-  }
+    VtValue GetValue(const Time t) {
+        return VtValue(GetTypedValue(t));
+    }
 
-  GfMatrix4d GetTypedValue(const Time t)
-  {
-    return _info->transform;
-  }
+    GfMatrix4d GetTypedValue(const Time t) {
+        return _info->transform;
+    }
 
-  bool GetContributingSampleTimesForInterval(Time, Time, std::vector<Time> *)
-  {
-    return false;
-  }
+    bool GetContributingSampleTimesForInterval(Time, Time, std::vector<Time>*)
+    {
+        return false;
+    }
 
- private:
-  _MatrixSource(_RootOverlayInfoSharedPtr const &info) : _info(info) {}
+private:
+    _MatrixSource(_RootOverlayInfoSharedPtr const &info)
+     : _info(info)
+    {
+    }
 
-  _RootOverlayInfoSharedPtr const _info;
+    _RootOverlayInfoSharedPtr const _info;
 };
 
 // Data source for locator visibility/visibility
-class _VisibilitySource : public HdBoolDataSource {
- public:
-  HD_DECLARE_DATASOURCE(_VisibilitySource);
+class _VisibilitySource : public HdBoolDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(_VisibilitySource);
 
-  VtValue GetValue(const Time t)
-  {
-    return VtValue(GetTypedValue(t));
-  }
+    VtValue GetValue(const Time t) {
+        return VtValue(GetTypedValue(t));
+    }
 
-  bool GetTypedValue(const Time t)
-  {
-    return _info->visibility;
-  }
+    bool GetTypedValue(const Time t) {
+        return _info->visibility;
+    }
 
-  bool GetContributingSampleTimesForInterval(Time, Time, std::vector<Time> *)
-  {
-    return false;
-  }
+    bool GetContributingSampleTimesForInterval(Time, Time, std::vector<Time>*)
+    {
+        return false;
+    }
 
- private:
-  _VisibilitySource(_RootOverlayInfoSharedPtr const &info) : _info(info) {}
+private:
+    _VisibilitySource(_RootOverlayInfoSharedPtr const &info)
+     : _info(info)
+    {
+    }
 
-  _RootOverlayInfoSharedPtr const _info;
+    _RootOverlayInfoSharedPtr const _info;
 };
 
-}  // namespace UsdImagingRootOverridesSceneIndex_Impl
+}
 
 using namespace UsdImagingRootOverridesSceneIndex_Impl;
 
-UsdImagingRootOverridesSceneIndexRefPtr UsdImagingRootOverridesSceneIndex::New(
+UsdImagingRootOverridesSceneIndexRefPtr
+UsdImagingRootOverridesSceneIndex::New(
     HdSceneIndexBaseRefPtr const &inputSceneIndex)
 {
-  return TfCreateRefPtr(new UsdImagingRootOverridesSceneIndex(inputSceneIndex));
+    return TfCreateRefPtr(
+        new UsdImagingRootOverridesSceneIndex(
+            inputSceneIndex));
 }
 
-UsdImagingRootOverridesSceneIndex::UsdImagingRootOverridesSceneIndex(
+UsdImagingRootOverridesSceneIndex::
+UsdImagingRootOverridesSceneIndex(
     HdSceneIndexBaseRefPtr const &inputSceneIndex)
-    : HdSingleInputFilteringSceneIndexBase(inputSceneIndex),
-      _rootOverlayInfo(std::make_shared<_RootOverlayInfo>()),
-      _rootOverlayDs(HdRetainedContainerDataSource::New(
+  : HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
+  , _rootOverlayInfo(std::make_shared<_RootOverlayInfo>())
+  , _rootOverlayDs(
+      HdRetainedContainerDataSource::New(
           HdXformSchema::GetSchemaToken(),
-          HdRetainedContainerDataSource::New(HdXformSchemaTokens->matrix,
-                                             _MatrixSource::New(_rootOverlayInfo)),
+          HdRetainedContainerDataSource::New(
+              HdXformSchemaTokens->matrix,
+              _MatrixSource::New(_rootOverlayInfo)),
           HdVisibilitySchema::GetSchemaToken(),
-          HdRetainedContainerDataSource::New(HdVisibilitySchemaTokens->visibility,
-                                             _VisibilitySource::New(_rootOverlayInfo))))
+          HdRetainedContainerDataSource::New(
+              HdVisibilitySchemaTokens->visibility,
+              _VisibilitySource::New(_rootOverlayInfo))))
 {
 }
 
-void UsdImagingRootOverridesSceneIndex::SetRootTransform(const GfMatrix4d &transform)
+void
+UsdImagingRootOverridesSceneIndex::SetRootTransform(
+    const GfMatrix4d &transform)
 {
-  if (_rootOverlayInfo->transform == transform) {
-    return;
-  }
+    if (_rootOverlayInfo->transform == transform) {
+        return;
+    }
 
-  _rootOverlayInfo->transform = transform;
+    _rootOverlayInfo->transform = transform;
 
-  static const HdSceneIndexObserver::DirtiedPrimEntries entries{
-      {SdfPath::AbsoluteRootPath(),
-       HdDataSourceLocatorSet{
-           HdXformSchema::GetDefaultLocator().Append(HdXformSchemaTokens->matrix)}}};
+    static const HdSceneIndexObserver::DirtiedPrimEntries entries{
+        { SdfPath::AbsoluteRootPath(),
+          HdDataSourceLocatorSet{
+                HdXformSchema::GetDefaultLocator()
+                    .Append(HdXformSchemaTokens->matrix)}}};
 
-  _SendPrimsDirtied(entries);
+    _SendPrimsDirtied(entries);
 }
 
-const GfMatrix4d &UsdImagingRootOverridesSceneIndex::GetRootTransform() const
+const GfMatrix4d&
+UsdImagingRootOverridesSceneIndex::GetRootTransform() const
 {
-  return _rootOverlayInfo->transform;
+    return _rootOverlayInfo->transform;
 }
 
-void UsdImagingRootOverridesSceneIndex::SetRootVisibility(const bool visibility)
+void
+UsdImagingRootOverridesSceneIndex::SetRootVisibility(
+    const bool visibility)
 {
-  if (_rootOverlayInfo->visibility == visibility) {
-    return;
-  }
+    if (_rootOverlayInfo->visibility == visibility) {
+        return;
+    }
 
-  _rootOverlayInfo->visibility = visibility;
+    _rootOverlayInfo->visibility = visibility;
 
-  static const HdSceneIndexObserver::DirtiedPrimEntries entries{
-      {SdfPath::AbsoluteRootPath(),
-       HdDataSourceLocatorSet{
-           HdVisibilitySchema::GetDefaultLocator().Append(HdVisibilitySchemaTokens->visibility)}}};
+    static const HdSceneIndexObserver::DirtiedPrimEntries entries{
+        { SdfPath::AbsoluteRootPath(),
+          HdDataSourceLocatorSet{
+                HdVisibilitySchema::GetDefaultLocator()
+                    .Append(HdVisibilitySchemaTokens->visibility)}}};
 
-  _SendPrimsDirtied(entries);
+    _SendPrimsDirtied(entries);
 }
 
-const bool UsdImagingRootOverridesSceneIndex::GetRootVisibility() const
+const bool
+UsdImagingRootOverridesSceneIndex::GetRootVisibility() const
 {
-  return _rootOverlayInfo->visibility;
+    return _rootOverlayInfo->visibility;
 }
 
-HdSceneIndexPrim UsdImagingRootOverridesSceneIndex::GetPrim(const SdfPath &primPath) const
+HdSceneIndexPrim
+UsdImagingRootOverridesSceneIndex::GetPrim(
+    const SdfPath &primPath) const
 {
-  HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
+    HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
 
-  if (primPath == SdfPath::AbsoluteRootPath()) {
-    prim.dataSource = HdOverlayContainerDataSource::New(_rootOverlayDs, prim.dataSource);
-  }
+    if (primPath == SdfPath::AbsoluteRootPath()) {
+        prim.dataSource = HdOverlayContainerDataSource::New(
+            _rootOverlayDs,
+            prim.dataSource);
+    }
 
-  return prim;
+    return prim;
 }
 
-SdfPathVector UsdImagingRootOverridesSceneIndex::GetChildPrimPaths(const SdfPath &primPath) const
+SdfPathVector
+UsdImagingRootOverridesSceneIndex::GetChildPrimPaths(
+    const SdfPath &primPath) const
 {
-  return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+    return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
 }
 
-void UsdImagingRootOverridesSceneIndex::_PrimsAdded(
-    const HdSceneIndexBase &, const HdSceneIndexObserver::AddedPrimEntries &entries)
+void
+UsdImagingRootOverridesSceneIndex::_PrimsAdded(
+    const HdSceneIndexBase&,
+    const HdSceneIndexObserver::AddedPrimEntries &entries)
 {
-  _SendPrimsAdded(entries);
+    _SendPrimsAdded(entries);
 }
 
-void UsdImagingRootOverridesSceneIndex::_PrimsDirtied(
-    const HdSceneIndexBase &, const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+void
+UsdImagingRootOverridesSceneIndex::_PrimsDirtied(
+    const HdSceneIndexBase&,
+    const HdSceneIndexObserver::DirtiedPrimEntries &entries)
 {
-  _SendPrimsDirtied(entries);
+    _SendPrimsDirtied(entries);
 }
 
-void UsdImagingRootOverridesSceneIndex::_PrimsRemoved(
-    const HdSceneIndexBase &, const HdSceneIndexObserver::RemovedPrimEntries &entries)
+void
+UsdImagingRootOverridesSceneIndex::_PrimsRemoved(
+    const HdSceneIndexBase&,
+    const HdSceneIndexObserver::RemovedPrimEntries &entries)
 {
-  _SendPrimsRemoved(entries);
+    _SendPrimsRemoved(entries);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

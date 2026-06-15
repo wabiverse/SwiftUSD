@@ -11,15 +11,15 @@
 /// \ingroup group_tf_DebuggingOutput
 /// Conditional debugging output class and macros.
 
-#include "Arch/attributes.h"
-#include "Arch/hints.h"
+#include "pxr/pxrns.h"
 #include "Tf/api.h"
+#include "Tf/tfImpl.h"
 #include "Tf/enum.h"
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/registryManager.h"
 #include "Tf/stopwatch.h"
-#include "Tf/tfImpl.h"
-#include "pxr/pxrns.h"
+#include "Arch/attributes.h"
+#include "Arch/hints.h"
 
 #include <atomic>
 #include <cstdio>
@@ -96,7 +96,7 @@ class Tf_DebugSymbolRegistry;
 /// Most commonly debug symbols are inactive by default, but can be turned
 /// on either by an environment variable \c TF_DEBUG, or interactively once
 /// a program has started.
-///
+/// 
 /// \code
 ///     TfDebug::DisableAll<MyDebugCodes>();     // disable everything
 ///
@@ -120,231 +120,261 @@ class Tf_DebugSymbolRegistry;
 ///
 ///
 class TfDebug {
-  enum _NodeState { _NodeUninitialized, _NodeDisabled, _NodeEnabled };
+    enum _NodeState { _NodeUninitialized, _NodeDisabled, _NodeEnabled };
 
- public:
-  /// Mark debugging as enabled for enum value \c val.
-  ///
-  /// The default state for all debugging symbols is disabled. Note that the
-  /// template parameter is deduced from \c val:
-  /// \code
-  ///     TfDebug::Enable(MY_E3);
-  /// \endcode
-  template<class T> static void Enable(T val)
-  {
-    _SetNode(_GetNode(val), Tf_DebugGetEnumName(val), true);
-  }
-
-  /// Mark debugging as disabled for enum value \c val.
-  template<class T> static void Disable(T val)
-  {
-    _SetNode(_GetNode(val), Tf_DebugGetEnumName(val), false);
-  }
-
-  /// Mark debugging as enabled for all enum values of type \c T.
-  ///
-  /// Note that the template parameter must be explicitly supplied:
-  /// \code
-  ///     TfDebug::EnableAll<MyDebugCodes>()
-  /// \endcode
-  template<class T> static void EnableAll()
-  {
-    const int n = _Traits<T>::NumCodes;
-    for (int i = 0; i != n; ++i) {
-      T code = static_cast<T>(i);
-      _SetNode(_GetNode(code), Tf_DebugGetEnumName(code), true);
+public:
+    /// Mark debugging as enabled for enum value \c val.
+    ///
+    /// The default state for all debugging symbols is disabled. Note that the
+    /// template parameter is deduced from \c val:
+    /// \code
+    ///     TfDebug::Enable(MY_E3);
+    /// \endcode
+    template <class T>
+    static void Enable(T val) {
+        _SetNode(_GetNode(val), Tf_DebugGetEnumName(val), true);
     }
-  }
 
-  /// Mark debugging as disabled for all enum values of type \c T.
-  template<class T> static void DisableAll()
-  {
-    const int n = _Traits<T>::NumCodes;
-    for (int i = 0; i != n; ++i) {
-      T code = static_cast<T>(i);
-      _SetNode(_GetNode(code), Tf_DebugGetEnumName(code), false);
+    /// Mark debugging as disabled for enum value \c val.
+    template <class T>
+    static void Disable(T val) {
+        _SetNode(_GetNode(val), Tf_DebugGetEnumName(val), false);
     }
-  }
 
-  /// True if debugging is enabled for the enum value \c val.
-  ///
-  /// Note that not only must the specific enum value \c val be marked as
-  /// enabled, but the enum type \c T must be globally enabled; this is
-  /// controlled by the first argument to the
-  /// \c TF_CONDITIONALLY_COMPILE_TIME_ENABLED_DEBUG_CODES() macro.
-  template<class T> static bool IsEnabled(T val)
-  {
-    static_assert(_Traits<T>::IsDeclared, "Must declare debug codes with TF_DEBUG_CODES()");
-    if (_Traits<T>::CompileTimeEnabled) {
-      _Node &node = _GetNode(val);
-      _NodeState curState = node.state.load();
-      if (ARCH_UNLIKELY(curState == _NodeUninitialized)) {
-        _InitializeNode(_GetNode(val), Tf_DebugGetEnumName(val));
-        curState = node.state.load();
-      }
-      return curState == _NodeEnabled;
+    /// Mark debugging as enabled for all enum values of type \c T.
+    ///
+    /// Note that the template parameter must be explicitly supplied:
+    /// \code
+    ///     TfDebug::EnableAll<MyDebugCodes>()
+    /// \endcode
+    template <class T>
+    static void EnableAll() {
+        const int n = _Traits<T>::NumCodes;
+        for (int i = 0; i != n; ++i) {
+            T code = static_cast<T>(i);
+            _SetNode(_GetNode(code), Tf_DebugGetEnumName(code), true);
+        }                              
     }
-    return false;
-  }
 
-  /// True if debugging can be activated at run-time, whether or not it is
-  /// currently enabled.
-  template<class T> static bool IsCompileTimeEnabled()
-  {
-    static_assert(_Traits<T>::IsDeclared, "Must declare debug codes with TF_DEBUG_CODES()");
-    return _Traits<T>::CompileTimeEnabled;
-  }
+    /// Mark debugging as disabled for all enum values of type \c T.
+    template <class T>
+    static void DisableAll() {
+        const int n = _Traits<T>::NumCodes;
+        for (int i = 0; i != n; ++i) {
+            T code = static_cast<T>(i);
+            _SetNode(_GetNode(code), Tf_DebugGetEnumName(code), false);
+        }                              
+    }
 
-  /// Return the number of debugging symbols of this type.
-  ///
-  /// Returns the number of different enums in the range.
-  template<class T> static size_t GetNumDebugCodes()
-  {
-    static_assert(_Traits<T>::IsDeclared, "Must declare debug codes with TF_DEBUG_CODES()");
-    return _Traits<T>::NumCodes;
-  }
+    /// True if debugging is enabled for the enum value \c val.
+    ///
+    /// Note that not only must the specific enum value \c val be marked as
+    /// enabled, but the enum type \c T must be globally enabled; this is
+    /// controlled by the first argument to the
+    /// \c TF_CONDITIONALLY_COMPILE_TIME_ENABLED_DEBUG_CODES() macro.
+    template <class T>
+    static bool IsEnabled(T val) {
+        static_assert(_Traits<T>::IsDeclared,
+                      "Must declare debug codes with TF_DEBUG_CODES()");
+        if (_Traits<T>::CompileTimeEnabled) {
+            _Node &node = _GetNode(val);
+            _NodeState curState = node.state.load();
+            if (ARCH_UNLIKELY(curState == _NodeUninitialized)) {
+                _InitializeNode(_GetNode(val), Tf_DebugGetEnumName(val));
+                curState = node.state.load();
+            }
+            return curState == _NodeEnabled;
+        }
+        return false;
+    }
+
+    /// True if debugging can be activated at run-time, whether or not it is
+    /// currently enabled.
+    template <class T>
+    static bool IsCompileTimeEnabled() {
+        static_assert(_Traits<T>::IsDeclared,
+                      "Must declare debug codes with TF_DEBUG_CODES()");
+        return _Traits<T>::CompileTimeEnabled;
+    }
+    
+    /// Return the number of debugging symbols of this type.
+    ///
+    /// Returns the number of different enums in the range.
+    template <class T>
+    static size_t GetNumDebugCodes() {
+        static_assert(_Traits<T>::IsDeclared,
+                      "Must declare debug codes with TF_DEBUG_CODES()");
+        return _Traits<T>::NumCodes;
+    }
 
 #if !defined(doxygen)
-  struct Helper {
-    static TF_API void Msg(const std::string &msg);
-    static TF_API void Msg(const char *msg, ...) ARCH_PRINTF_FUNCTION(1, 2);
-  };
+    struct _Helper {
+        _Helper() = default;
+        template <class Enum>
+        explicit _Helper(Enum val) : _enumName(Tf_DebugGetEnumName(val)) {}
+        TF_API void Msg(const std::string& msg) const;
+        TF_API void Msg(const char* msg, ...) const ARCH_PRINTF_FUNCTION(2,3);
+    private:
+        char const * const _enumName = "<< no debug code >>";
+    };
+    
+    struct Helper {
+        template <class A1, class ...Args>
+        static void Msg(char const *fmt, A1 &&a1, Args && ...args) {
+            return _Helper().Msg(
+                fmt, std::forward<A1>(a1), std::forward<Args>(args)...);
+        }
+        static void Msg(const std::string &msg) {
+            return _Helper().Msg(msg);
+        }
+    };
 #endif
 
-  template<bool B> struct ScopeHelper {
-    ScopeHelper(bool enabled, const char *name)
-    {
-      if ((active = enabled)) {
-        str = name;
-        TfDebug::_ScopedOutput(true, str);
-      }
-      else
-        str = NULL;
+    template <bool B>
+    struct ScopeHelper {
+        ScopeHelper(bool enabled, const char* name) {
+            if ((active = enabled)) {
+                str = name;
+                TfDebug::_ScopedOutput(true, str);
+            }
+            else
+                str = NULL;
+        }
+
+        ~ScopeHelper() {
+            if (active)
+                TfDebug::_ScopedOutput(false, str);
+        }
+
+        bool active;
+        const char* str;
+    };
+
+    template <bool B>
+    struct TimedScopeHelper {
+        TimedScopeHelper(bool enabled, const char* fmt, ...) 
+            ARCH_PRINTF_FUNCTION(3, 4);
+        ~TimedScopeHelper();
+
+        bool active;
+        std::string str;
+        TfStopwatch stopwatch;
+    };
+
+    /// Set registered debug symbols matching \p pattern to \p value.
+    ///
+    /// All registered debug symbols matching \p pattern are set to \p value.
+    /// The only matching is an exact match with \p pattern, or if \p pattern
+    /// ends with an '*' as is otherwise a prefix of a debug symbols.  The
+    /// names of all debug symbols set by this call are returned as a vector.
+    TF_API
+    static std::vector<std::string> SetDebugSymbolsByName(
+        const std::string& pattern, bool value);
+
+    /// True if the specified debug symbol is set.
+    TF_API
+    static bool IsDebugSymbolNameEnabled(const std::string& name);
+
+    /// Get a description of all debug symbols and their purpose.
+    ///
+    /// A single string describing all registered debug symbols along with
+    /// short descriptions is returned.
+    TF_API
+    static std::string GetDebugSymbolDescriptions();
+
+    /// Get a listing of all debug symbols.
+    TF_API
+    static std::vector<std::string> GetDebugSymbolNames();
+
+    /// Get a description for the specified debug symbol.
+    ///
+    /// A short description of the debug symbol is returned. This is the same
+    /// description string that is embedded in the return value of
+    /// GetDebugSymbolDescriptions.
+    TF_API
+    static std::string GetDebugSymbolDescription(const std::string& name);
+
+    /// Direct debug output to \a either stdout or stderr.
+    ///
+    /// Note that \a file MUST be either stdout or stderr.  If not, issue an
+    /// error and do nothing.  Debug output is issued to stdout by default.
+    /// If the environment variable TF_DEBUG_OUTPUT_FILE is set to 'stderr',
+    /// then output is issued to stderr by default.
+    TF_API
+    static void SetOutputFile(FILE *file);
+    
+    struct _Node;
+
+    // Public, to be used in TF_DEBUG_ENVIRONMENT_SYMBOL() macro,
+    // but not meant to be used otherwise.
+    template <class T>
+    static void _RegisterDebugSymbol(
+        T enumVal, char const *name, char const *descrip) {
+        static_assert(_Traits<T>::IsDeclared,
+                      "Must declare debug codes with TF_DEBUG_CODES()");
+        const int index = static_cast<int>(enumVal);
+        const int numCodes = _Traits<T>::NumCodes;
+        if (ARCH_UNLIKELY(index < 0 || index >= numCodes)) {
+            _ComplainAboutInvalidSymbol(name);
+            return;
+        }
+        _RegisterDebugSymbolImpl(&_GetNode(enumVal), name, descrip);
     }
 
-    ~ScopeHelper()
-    {
-      if (active)
-        TfDebug::_ScopedOutput(false, str);
+    TF_API
+    static void _RegisterDebugSymbolImpl(_Node *addr, char const *enumName,
+                                         char const *descrip);
+
+    // Unfortunately, we need to make both _Traits and _Node, below
+    // public because of their use in macros.
+    // Please treat both as a private data structures!
+
+    template <class T>
+    struct _Traits {
+        static constexpr bool IsDeclared = false;
+    };
+
+    // Note: this structure gets initialized statically zero
+    // (_NodeUninitialized) statically.
+    struct _Node {
+        mutable std::atomic<_NodeState> state;
+    };
+
+private:
+    
+    template <class T>
+    struct _Data {
+        static _Node nodes[_Traits<T>::NumCodes];
+    };
+
+    template <class T>
+    static _Node &_GetNode(T val) {
+        return _Data<T>::nodes[static_cast<int>(val)];
     }
 
-    bool active;
-    const char *str;
-  };
+    friend class Tf_DebugSymbolRegistry;
+    
+    TF_API
+    static void _InitializeNode(_Node &node, char const *name);
 
-  template<bool B> struct TimedScopeHelper {
-    TimedScopeHelper(bool enabled, const char *fmt, ...) ARCH_PRINTF_FUNCTION(3, 4);
-    ~TimedScopeHelper();
+    TF_API
+    static void _ComplainAboutInvalidSymbol(char const *name);
 
-    bool active;
-    std::string str;
-    TfStopwatch stopwatch;
-  };
+    TF_API
+    static void _SetNode(_Node &node, char const *name, bool state);
 
-  /// Set registered debug symbols matching \p pattern to \p value.
-  ///
-  /// All registered debug symbols matching \p pattern are set to \p value.
-  /// The only matching is an exact match with \p pattern, or if \p pattern
-  /// ends with an '*' as is otherwise a prefix of a debug symbols.  The
-  /// names of all debug symbols set by this call are returned as a vector.
-  TF_API
-  static std::vector<std::string> SetDebugSymbolsByName(const std::string &pattern, bool value);
-
-  /// True if the specified debug symbol is set.
-  TF_API
-  static bool IsDebugSymbolNameEnabled(const std::string &name);
-
-  /// Get a description of all debug symbols and their purpose.
-  ///
-  /// A single string describing all registered debug symbols along with
-  /// short descriptions is returned.
-  TF_API
-  static std::string GetDebugSymbolDescriptions();
-
-  /// Get a listing of all debug symbols.
-  TF_API
-  static std::vector<std::string> GetDebugSymbolNames();
-
-  /// Get a description for the specified debug symbol.
-  ///
-  /// A short description of the debug symbol is returned. This is the same
-  /// description string that is embedded in the return value of
-  /// GetDebugSymbolDescriptions.
-  TF_API
-  static std::string GetDebugSymbolDescription(const std::string &name);
-
-  /// Direct debug output to \a either stdout or stderr.
-  ///
-  /// Note that \a file MUST be either stdout or stderr.  If not, issue an
-  /// error and do nothing.  Debug output is issued to stdout by default.
-  /// If the environment variable TF_DEBUG_OUTPUT_FILE is set to 'stderr',
-  /// then output is issued to stderr by default.
-  TF_API
-  static void SetOutputFile(FILE *file);
-
-  struct _Node;
-
-  // Public, to be used in TF_DEBUG_ENVIRONMENT_SYMBOL() macro,
-  // but not meant to be used otherwise.
-  template<class T>
-  static void _RegisterDebugSymbol(T enumVal, char const *name, char const *descrip)
-  {
-    static_assert(_Traits<T>::IsDeclared, "Must declare debug codes with TF_DEBUG_CODES()");
-    const int index = static_cast<int>(enumVal);
-    const int numCodes = _Traits<T>::NumCodes;
-    if (ARCH_UNLIKELY(index < 0 || index >= numCodes)) {
-      _ComplainAboutInvalidSymbol(name);
-      return;
-    }
-    _RegisterDebugSymbolImpl(&_GetNode(enumVal), name, descrip);
-  }
-
-  TF_API
-  static void _RegisterDebugSymbolImpl(_Node *addr, char const *enumName, char const *descrip);
-
-  // Unfortunately, we need to make both _Traits and _Node, below
-  // public because of their use in macros.
-  // Please treat both as a private data structures!
-
-  template<class T> struct _Traits {
-    static constexpr bool IsDeclared = false;
-  };
-
-  // Note: this structure gets initialized statically zero
-  // (_NodeUninitialized) statically.
-  struct _Node {
-    mutable std::atomic<_NodeState> state;
-  };
-
- private:
-  template<class T> struct _Data {
-    static _Node nodes[_Traits<T>::NumCodes];
-  };
-
-  template<class T> static _Node &_GetNode(T val)
-  {
-    return _Data<T>::nodes[static_cast<int>(val)];
-  }
-
-  friend class Tf_DebugSymbolRegistry;
-
-  TF_API
-  static void _InitializeNode(_Node &node, char const *name);
-
-  TF_API
-  static void _ComplainAboutInvalidSymbol(char const *name);
-
-  TF_API
-  static void _SetNode(_Node &node, char const *name, bool state);
-
-  TF_API
-  static void _ScopedOutput(bool start, char const *str);
+    TF_API
+    static void _ScopedOutput(bool start, char const *str);
 };
 
-template<class T> TfDebug::_Node TfDebug::_Data<T>::nodes[];
+template <class T>
+TfDebug::_Node TfDebug::_Data<T>::nodes[];
 
-template<> struct TfDebug::TimedScopeHelper<false> {
-  TimedScopeHelper(bool, const char *, ...) ARCH_PRINTF_FUNCTION(3, 4) {}
+template <>
+struct TfDebug::TimedScopeHelper<false> {
+    TimedScopeHelper(bool, const char*, ...) 
+        ARCH_PRINTF_FUNCTION(3, 4) { 
+    }
 };
 
 /// Define debugging symbols
@@ -359,7 +389,8 @@ template<> struct TfDebug::TimedScopeHelper<false> {
 /// \endcode
 ///
 /// \hideinitializer
-#define TF_DEBUG_CODES(...) TF_CONDITIONALLY_COMPILE_TIME_ENABLED_DEBUG_CODES(true, __VA_ARGS__)
+#define TF_DEBUG_CODES(...)                                                  \
+    TF_CONDITIONALLY_COMPILE_TIME_ENABLED_DEBUG_CODES(true, __VA_ARGS__)
 
 /// Define debugging symbols
 ///
@@ -379,28 +410,33 @@ template<> struct TfDebug::TimedScopeHelper<false> {
 /// and generated code pays no cost for them.
 ///
 /// \hideinitializer
-#define TF_CONDITIONALLY_COMPILE_TIME_ENABLED_DEBUG_CODES(condition, ...) \
-  enum _TF_DEBUG_ENUM_NAME(__VA_ARGS__) { \
-    __VA_ARGS__, \
-    TF_PP_CAT(_TF_DEBUG_ENUM_NAME(__VA_ARGS__), __PAST_END) \
-  }; \
-  template<> struct TfDebug::_Traits<_TF_DEBUG_ENUM_NAME(__VA_ARGS__)> { \
-    static constexpr bool IsDeclared = true; \
-    static constexpr int NumCodes = TF_PP_CAT(_TF_DEBUG_ENUM_NAME(__VA_ARGS__), __PAST_END); \
-    static constexpr bool CompileTimeEnabled = (condition); \
-  }; \
-  inline char const *Tf_DebugGetEnumName(_TF_DEBUG_ENUM_NAME(__VA_ARGS__) val) \
-  { \
-    constexpr char const *CStrings[] = {TF_PP_FOR_EACH(_TF_DEBUG_MAKE_STRING, __VA_ARGS__)}; \
-    return CStrings[static_cast<int>(val)]; \
-  };
+#define TF_CONDITIONALLY_COMPILE_TIME_ENABLED_DEBUG_CODES(condition, ...)      \
+    enum _TF_DEBUG_ENUM_NAME(__VA_ARGS__) {                                    \
+        __VA_ARGS__ ,                                                          \
+        TF_PP_CAT( _TF_DEBUG_ENUM_NAME(__VA_ARGS__), __PAST_END)               \
+    };                                                                         \
+    template <>                                                                \
+    struct TfDebug::_Traits<_TF_DEBUG_ENUM_NAME(__VA_ARGS__)> {                \
+        static constexpr bool IsDeclared = true;                               \
+        static constexpr int NumCodes =                                        \
+            TF_PP_CAT(_TF_DEBUG_ENUM_NAME(__VA_ARGS__), __PAST_END);           \
+        static constexpr bool CompileTimeEnabled = (condition);                \
+    };                                                                         \
+    inline char const *                                                        \
+    Tf_DebugGetEnumName(_TF_DEBUG_ENUM_NAME(__VA_ARGS__) val) {                \
+        constexpr char const *CStrings[] = {                                   \
+            TF_PP_FOR_EACH(_TF_DEBUG_MAKE_STRING, __VA_ARGS__)                 \
+        };                                                                     \
+        return CStrings[static_cast<int>(val)];                                \
+    };
 
 #define _TF_DEBUG_MAKE_STRING(x) #x,
 
 // In the _TF_DEBUG_ENUM_NAME macro below we pass 'dummy' to
 // _TF_DEBUG_FIRST_CODE as the second argument to ensure that we always
 // have more than one argument as expected by _TF_DEBUG_FIRST_CODE.
-#define _TF_DEBUG_ENUM_NAME(...) TF_PP_CAT(_TF_DEBUG_FIRST_CODE(__VA_ARGS__, dummy), __DebugCodes)
+#define _TF_DEBUG_ENUM_NAME(...)                                             \
+    TF_PP_CAT(_TF_DEBUG_FIRST_CODE(__VA_ARGS__, dummy), __DebugCodes)
 
 #define _TF_DEBUG_FIRST_CODE(first, ...) first
 
@@ -426,11 +462,9 @@ template<> struct TfDebug::TimedScopeHelper<false> {
 /// \endcode
 ///
 /// \hideinitializer
-#define TF_DEBUG_MSG(enumVal, ...) \
-  if (!TfDebug::IsEnabled(enumVal)) /* empty */ \
-    ; \
-  else \
-    TfDebug::Helper().Msg(__VA_ARGS__)
+#define TF_DEBUG_MSG(enumVal, ...)                                             \
+    if (!TfDebug::IsEnabled(enumVal)) /* empty */ ;                            \
+    else TfDebug::_Helper(enumVal).Msg(__VA_ARGS__)
 
 /// Evaluate and print debugging message \c msg if \c enumVal is enabled for
 /// debugging.
@@ -464,11 +498,9 @@ template<> struct TfDebug::TimedScopeHelper<false> {
 /// \sa TF_DEBUG_MSG()
 ///
 /// \hideinitializer
-#define TF_DEBUG(enumVal) \
-  if (!TfDebug::IsEnabled(enumVal)) /* empty */ \
-    ; \
-  else \
-    TfDebug::Helper()
+#define TF_DEBUG(enumVal)                                                      \
+    if (!TfDebug::IsEnabled(enumVal)) /* empty */ ;                            \
+    else TfDebug::_Helper(enumVal)
 
 /// Evaluate and print diagnostic messages intended for end-users.
 ///
@@ -506,15 +538,17 @@ template<> struct TfDebug::TimedScopeHelper<false> {
 /// that are called in very tight loops, in final released code.
 ///
 /// \hideinitializer
-#define TF_DEBUG_TIMED_SCOPE(enumVal, ...) \
-  TfDebug::TimedScopeHelper< \
-      TfDebug::_Traits<std::decay<decltype(enumVal)>::type>::CompileTimeEnabled> \
-  TF_PP_CAT(local__TfScopeDebugSwObject, __LINE__)(TfDebug::IsEnabled(enumVal), __VA_ARGS__)
+#define TF_DEBUG_TIMED_SCOPE(enumVal, ...)                              \
+    TfDebug::TimedScopeHelper<                                          \
+        TfDebug::_Traits<                                               \
+            std::decay<decltype(enumVal)>::type>::CompileTimeEnabled>   \
+    TF_PP_CAT(local__TfScopeDebugSwObject, __LINE__)(                   \
+        TfDebug::IsEnabled(enumVal), __VA_ARGS__)
 
 /// Register description strings with enum symbols for debugging.
 ///
 /// This call should be used in source files, not header files, and should
-/// This macro should usually appear within a
+/// This macro should usually appear within a 
 /// \c TF_REGISTRY_FUNCTION(TfDebug,...) call.  The first argument should be
 /// the literal name of the enum symbol, while the second argument should be a
 /// (short) description of what debugging will be enabled if the symbol is
@@ -529,11 +563,12 @@ template<> struct TfDebug::TimedScopeHelper<false> {
 /// \endcode
 ///
 /// \hideinitializer
-#define TF_DEBUG_ENVIRONMENT_SYMBOL(VAL, descrip) \
-  if (TfDebug::_Traits<std::decay<decltype(VAL)>::type>::CompileTimeEnabled) { \
-    TF_ADD_ENUM_NAME(VAL); \
-    TfDebug::_RegisterDebugSymbol(VAL, #VAL, descrip); \
-  }
+#define TF_DEBUG_ENVIRONMENT_SYMBOL(VAL, descrip)                              \
+    if (TfDebug::_Traits<                                                      \
+        std::decay<decltype(VAL)>::type>::CompileTimeEnabled) {                \
+        TF_ADD_ENUM_NAME(VAL);                                                 \
+        TfDebug::_RegisterDebugSymbol(VAL, #VAL, descrip);                     \
+    }
 
 ///@}
 

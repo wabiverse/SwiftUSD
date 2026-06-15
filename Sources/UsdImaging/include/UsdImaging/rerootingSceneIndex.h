@@ -15,7 +15,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DECLARE_REF_PTRS(UsdImagingRerootingSceneIndex);
 
-/// UsdImagingRerootingSceneIndex
+/// \class UsdImagingRerootingSceneIndex
 ///
 /// Drops all prims not under srcPrefix and moves those under srcPrefix to
 /// dstPrefix.
@@ -28,52 +28,61 @@ TF_DECLARE_REF_PTRS(UsdImagingRerootingSceneIndex);
 /// to the root path. It can also use to isolate part of the namespace by
 /// setting the srcPrefix and dstPrefix to be equal.
 ///
-class UsdImagingRerootingSceneIndex final : public HdSingleInputFilteringSceneIndexBase {
- public:
-  static UsdImagingRerootingSceneIndexRefPtr New(HdSceneIndexBaseRefPtr const &inputScene,
-                                                 const SdfPath &srcPrefix,
-                                                 const SdfPath &dstPrefix)
-  {
-    return TfCreateRefPtr(new UsdImagingRerootingSceneIndex(inputScene, srcPrefix, dstPrefix));
-  }
+class UsdImagingRerootingSceneIndex final
+    : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    static UsdImagingRerootingSceneIndexRefPtr New(
+        HdSceneIndexBaseRefPtr const &inputScene,
+        const SdfPath &srcPrefix,
+        const SdfPath &dstPrefix)
+    {
+        return TfCreateRefPtr(
+            new UsdImagingRerootingSceneIndex(
+                inputScene, srcPrefix, dstPrefix));
+    }
 
-  USDIMAGING_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    HdSceneIndexPrim GetPrim(const SdfPath& primPath) const override;
 
-  USDIMAGING_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    SdfPathVector GetChildPrimPaths(const SdfPath& primPath) const override;
 
- protected:
-  USDIMAGING_API
-  UsdImagingRerootingSceneIndex(HdSceneIndexBaseRefPtr const &inputScene,
-                                const SdfPath &srcPrefix,
-                                const SdfPath &dstPrefix);
+protected:
+    USDIMAGING_API
+    UsdImagingRerootingSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputScene,
+        const SdfPath &srcPrefix,
+        const SdfPath &dstPrefix);
 
-  USDIMAGING_API
-  ~UsdImagingRerootingSceneIndex() override;
+    USDIMAGING_API
+    ~UsdImagingRerootingSceneIndex() override;
 
-  // satisfying HdSingleInputFilteringSceneIndexBase
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    // satisfying HdSingleInputFilteringSceneIndexBase
+    void _PrimsAdded(
+        const HdSceneIndexBase& sender,
+        const HdSceneIndexObserver::AddedPrimEntries& entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase& sender,
+        const HdSceneIndexObserver::RemovedPrimEntries& entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase& sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries& entries) override;
 
- private:
-  SdfPath _SrcPathToDstPath(const SdfPath &primPath) const;
-  SdfPath _DstPathToSrcPath(const SdfPath &primPath) const;
+private:
+    SdfPath _SrcPathToDstPath(const SdfPath &primPath) const;
+    SdfPath _DstPathToSrcPath(const SdfPath &primPath) const;
 
-  const SdfPath _srcPrefix;
-  const SdfPath _dstPrefix;
-  // Prefixes of _dstPrefix
-  const SdfPathVector _dstPrefixes;
-  // Is _srcPrefix equal to _dstPrefix?
-  const bool _srcEqualsDst;
-  // Is _srcPrefix == / ?
-  const bool _srcPrefixIsRoot;
+    const SdfPath _srcPrefix;
+    const SdfPath _dstPrefix;
+    // Prefixes of _dstPrefix
+    const SdfPathVector _dstPrefixes;
+    // Is _srcPrefix equal to _dstPrefix?
+    const bool _srcEqualsDst;
+    // Is _srcPrefix == / ?
+    const bool _srcPrefixIsRoot;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

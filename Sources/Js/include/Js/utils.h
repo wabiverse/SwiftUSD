@@ -9,9 +9,9 @@
 
 /// \file js/utils.h
 
+#include "pxr/pxrns.h"
 #include "Js/api.h"
 #include "Js/value.h"
-#include "pxr/pxrns.h"
 
 #include <optional>
 #include <string>
@@ -22,13 +22,14 @@ typedef std::optional<JsValue> JsOptionalValue;
 
 /// Returns the value associated with \p key in the given \p object. If no
 /// such key exists, and the supplied default is not supplied, this method
-/// returns an uninitialized optional JsValue. Otherwise, the \p
+/// returns an uninitialized optional JsValue. Otherwise, the \p 
 /// defaultValue is returned.
 JS_API
-JsOptionalValue JsFindValue(const JsObject &object,
-                            const std::string &key,
-                            const JsOptionalValue &defaultValue = std::nullopt);
+JsOptionalValue JsFindValue(
+    const JsObject& object,
+    const std::string& key,
+    const JsOptionalValue& defaultValue = std::nullopt);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_JS_UTILS_H
+#endif // PXR_BASE_JS_UTILS_H

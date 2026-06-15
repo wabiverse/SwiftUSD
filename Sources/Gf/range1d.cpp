@@ -11,7 +11,7 @@
 #include "Gf/range1d.h"
 #include "Gf/range1f.h"
 
-#include "Gf/gfMath.h"
+#include "Gf/math.h"
 #include "Gf/ostreamHelpers.h"
 #include "Tf/type.h"
 
@@ -20,35 +20,40 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-  TfType::Define<GfRange1d>();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<GfRange1d>();
 }
 
-std::ostream &operator<<(std::ostream &out, GfRange1d const &r)
+std::ostream& 
+operator<<(std::ostream &out, GfRange1d const &r)
 {
-  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << "..." << Gf_OstreamHelperP(r.GetMax())
-             << ']';
+    return out << '[' 
+               << Gf_OstreamHelperP(r.GetMin()) << "..." 
+               << Gf_OstreamHelperP(r.GetMax())
+               << ']';
 }
 
-GfRange1d::GfRange1d(class GfRange1f const &other) : _min((other.GetMin())), _max((other.GetMax()))
+GfRange1d::GfRange1d(class GfRange1f const &other)
+    : _min( (other.GetMin()))
+    , _max( (other.GetMax()))
 {
 }
 
-double GfRange1d::GetDistanceSquared(double p) const
+double
+GfRange1d::GetDistanceSquared(double p) const
 {
-  double dist = 0.0;
+    double dist = 0.0;
 
-  if (p < _min) {
-    // p is left of box
-    dist += GfSqr(_min - p);
-  }
-  else if (p > _max) {
-    // p is right of box
-    dist += GfSqr(p - _max);
-  }
+    if (p < _min) {
+	// p is left of box
+	dist += GfSqr(_min - p);
+    }
+    else if (p > _max) {
+	// p is right of box
+	dist += GfSqr(p - _max);
+    }
 
-  return dist;
+    return dist;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

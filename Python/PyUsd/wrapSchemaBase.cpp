@@ -4,8 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Usd/schemaBase.h"
 #include "pxr/pxrns.h"
+#include "Usd/schemaBase.h"
 
 #include "Sdf/primSpec.h"
 
@@ -13,81 +13,91 @@
 #include "Tf/pyResultConversions.h"
 #include "Tf/wrapTypeHelpers.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/operators.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 using std::string;
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 // We override __getattribute__ for UsdSchemaBase to check object validity
 // and raise an exception instead of crashing from Python.
 
 // Store the original __getattribute__ so we can dispatch to it after verifying
-// validity.
+// validity. Note that this TfPyObjWrapper is intentionally leaked to avoid
+// running Python refcount operations in its d'tor during process shutdown, 
+// which is unsafe if Python has been finalized.
 static TfStaticData<TfPyObjWrapper> _object__getattribute__;
 
 // This function gets wrapped as __getattribute__ on UsdSchemaBase.
-static object __getattribute__(object selfObj, const char *name)
-{
-  // Allow attribute lookups if the attribute name starts with '__', or
-  // if the object's prim is valid. Also add explicit exceptions for every
-  // method on this base class. The real purpose here is to protect against
-  // invalid calls in subclasses which will try to actually manipulate the
-  // underlying (invalid) prim and likely crash.
-  if ((name[0] == '_' && name[1] == '_') ||
-      extract<UsdSchemaBase &>(selfObj)().GetPrim().IsValid() || strcmp(name, "GetPrim") == 0 ||
-      strcmp(name, "GetPath") == 0 || strcmp(name, "GetSchemaClassPrimDefinition") == 0 ||
-      strcmp(name, "GetSchemaAttributeNames") == 0 || strcmp(name, "GetSchemaKind") == 0 ||
-      strcmp(name, "IsAPISchema") == 0 || strcmp(name, "IsConcrete") == 0 ||
-      strcmp(name, "IsTyped") == 0 || strcmp(name, "IsAppliedAPISchema") == 0 ||
-      strcmp(name, "IsMultipleApplyAPISchema") == 0)
-  {
-    // Dispatch to object's __getattribute__.
-    return (*_object__getattribute__)(selfObj, name);
-  }
-  else {
-    // Otherwise raise a runtime error.
-    TfPyThrowRuntimeError(TfStringPrintf("Accessed schema on invalid prim"));
-  }
-  // Unreachable.
-  return object();
+static object
+__getattribute__(object selfObj, const char *name) {
+    // Allow attribute lookups if the attribute name starts with '__', or
+    // if the object's prim is valid. Also add explicit exceptions for every
+    // method on this base class. The real purpose here is to protect against
+    // invalid calls in subclasses which will try to actually manipulate the
+    // underlying (invalid) prim and likely crash.
+    if ((name[0] == '_' && name[1] == '_') ||
+        extract<UsdSchemaBase &>(selfObj)().GetPrim().IsValid() ||
+        strcmp(name, "GetPrim") == 0 ||
+        strcmp(name, "GetPath") == 0 ||
+        strcmp(name, "GetSchemaClassPrimDefinition") == 0 ||
+        strcmp(name, "GetSchemaAttributeNames") == 0 ||
+        strcmp(name, "GetSchemaKind") == 0 ||
+        strcmp(name, "IsAPISchema") == 0 ||
+        strcmp(name, "IsConcrete") == 0 ||
+        strcmp(name, "IsTyped") == 0 ||
+        strcmp(name, "IsAppliedAPISchema") == 0 ||
+        strcmp(name, "IsMultipleApplyAPISchema") == 0) {
+        // Dispatch to object's __getattribute__.
+        return (*_object__getattribute__)(selfObj, name);
+    } else {
+        // Otherwise raise a runtime error.
+        TfPyThrowRuntimeError(
+            TfStringPrintf("Accessed schema on invalid prim"));
+    }
+    // Unreachable.
+    return object();
 }
 
 void wrapUsdSchemaBase()
 {
-  class_<UsdSchemaBase> cls("SchemaBase");
+    class_<UsdSchemaBase> cls("SchemaBase");
 
-  cls.def(init<UsdPrim>(arg("prim")))
-      .def(init<UsdSchemaBase const &>(arg("otherSchema")))
-      .def(TfTypePythonClass())
+    cls
+        .def(init<UsdPrim>(arg("prim")))
+        .def(init<UsdSchemaBase const&>(arg("otherSchema")))
+        .def(TfTypePythonClass())
 
-      .def("GetPrim", &UsdSchemaBase::GetPrim)
-      .def("GetPath", &UsdSchemaBase::GetPath)
-      .def("GetSchemaClassPrimDefinition",
-           &UsdSchemaBase::GetSchemaClassPrimDefinition,
-           return_internal_reference<>())
-      .def("GetSchemaAttributeNames",
-           &UsdSchemaBase::GetSchemaAttributeNames,
-           arg("includeInherited") = true,
-           return_value_policy<TfPySequenceToList>())
-      .staticmethod("GetSchemaAttributeNames")
+        .def("GetPrim", &UsdSchemaBase::GetPrim)
+        .def("GetPath", &UsdSchemaBase::GetPath)
+        .def("GetSchemaClassPrimDefinition",
+             &UsdSchemaBase::GetSchemaClassPrimDefinition,
+             return_internal_reference<>())
+        .def("GetSchemaAttributeNames", &UsdSchemaBase::GetSchemaAttributeNames,
+             arg("includeInherited")=true,
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetSchemaAttributeNames")
 
-      .def("IsAPISchema", &UsdSchemaBase::IsAPISchema)
-      .def("IsConcrete", &UsdSchemaBase::IsConcrete)
-      .def("IsTyped", &UsdSchemaBase::IsTyped)
-      .def("IsAppliedAPISchema", &UsdSchemaBase::IsAppliedAPISchema)
-      .def("IsMultipleApplyAPISchema", &UsdSchemaBase::IsMultipleApplyAPISchema)
+        .def("IsAPISchema", &UsdSchemaBase::IsAPISchema)
+        .def("IsConcrete", &UsdSchemaBase::IsConcrete) 
+        .def("IsTyped", &UsdSchemaBase::IsTyped) 
+        .def("IsAppliedAPISchema", &UsdSchemaBase::IsAppliedAPISchema) 
+        .def("IsMultipleApplyAPISchema", &UsdSchemaBase::IsMultipleApplyAPISchema) 
 
-      .def("GetSchemaKind", &UsdSchemaBase::GetSchemaKind)
+        .def("GetSchemaKind", &UsdSchemaBase::GetSchemaKind)
 
-      .def(!self)
+        .def(!self)
 
-      ;
+        ;
 
-  // Save existing __getattribute__ and replace.
-  *_object__getattribute__ = object(cls.attr("__getattribute__"));
-  cls.def("__getattribute__", __getattribute__);
+    // Save existing __getattribute__ and replace.
+    *_object__getattribute__ = object(cls.attr("__getattribute__"));
+    cls.def("__getattribute__", __getattribute__);
 }

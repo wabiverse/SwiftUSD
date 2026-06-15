@@ -19,49 +19,58 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderCapabilitiesSchemaTokens, HD_RENDER_CAPABILITIES_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderCapabilitiesSchemaTokens,
+    HD_RENDER_CAPABILITIES_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdBoolDataSourceHandle HdRenderCapabilitiesSchema::GetMotionBlur() const
+HdBoolDataSourceHandle
+HdRenderCapabilitiesSchema::GetMotionBlur() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdRenderCapabilitiesSchemaTokens->motionBlur);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdRenderCapabilitiesSchemaTokens->motionBlur);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdRenderCapabilitiesSchema::BuildRetained(
+HdContainerDataSourceHandle
+HdRenderCapabilitiesSchema::BuildRetained(
+        const HdBoolDataSourceHandle &motionBlur
+)
+{
+    TfToken _names[1];
+    HdDataSourceBaseHandle _values[1];
+
+    size_t _count = 0;
+
+    if (motionBlur) {
+        _names[_count] = HdRenderCapabilitiesSchemaTokens->motionBlur;
+        _values[_count++] = motionBlur;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdRenderCapabilitiesSchema::Builder &
+HdRenderCapabilitiesSchema::Builder::SetMotionBlur(
     const HdBoolDataSourceHandle &motionBlur)
 {
-  TfToken _names[1];
-  HdDataSourceBaseHandle _values[1];
-
-  size_t _count = 0;
-
-  if (motionBlur) {
-    _names[_count] = HdRenderCapabilitiesSchemaTokens->motionBlur;
-    _values[_count++] = motionBlur;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    _motionBlur = motionBlur;
+    return *this;
 }
 
-HdRenderCapabilitiesSchema::Builder &HdRenderCapabilitiesSchema::Builder::SetMotionBlur(
-    const HdBoolDataSourceHandle &motionBlur)
+HdContainerDataSourceHandle
+HdRenderCapabilitiesSchema::Builder::Build()
 {
-  _motionBlur = motionBlur;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdRenderCapabilitiesSchema::Builder::Build()
-{
-  return HdRenderCapabilitiesSchema::BuildRetained(_motionBlur);
-}
+    return HdRenderCapabilitiesSchema::BuildRetained(
+        _motionBlur
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

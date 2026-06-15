@@ -16,9 +16,11 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-VtDictionary Hio_GetDictionaryFromInput(const std::string &input,
-                                        const std::string &filename,
-                                        std::string *errorStr);
+VtDictionary
+Hio_GetDictionaryFromInput(
+    const std::string &input,
+    const std::string &filename, 
+    std::string *errorStr);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

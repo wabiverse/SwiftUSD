@@ -7,12 +7,13 @@
 #ifndef PXR_IMAGING_HGI_GL_TEXTURE_H
 #define PXR_IMAGING_HGI_GL_TEXTURE_H
 
-#include "Hgi/texture.h"
-#include "HgiGL/api.h"
 #include "pxr/pxrns.h"
+#include "HgiGL/api.h"
+#include "Hgi/texture.h"
 
 #include "Tf/declarePtrs.h"
 #include "Tf/weakBase.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -26,50 +27,49 @@ TF_DECLARE_WEAK_PTRS(HgiGLTexture);
 /// This is useful to invalidate container objects such as framebuffer objects
 /// that reference a deleted texture resource as an attachment.
 ///
-class HgiGLTexture final : public HgiTexture, public TfWeakBase {
- public:
-  HGIGL_API
-  ~HgiGLTexture() override;
+class HgiGLTexture final : public HgiTexture, public TfWeakBase
+{
+public:
+    HGIGL_API
+    ~HgiGLTexture() override;
 
-  HGIGL_API
-  size_t GetByteSizeOfResource() const override;
+    HGIGL_API
+    size_t GetByteSizeOfResource() const override;
 
-  HGIGL_API
-  uint64_t GetRawResource() const override;
+    HGIGL_API
+    uint64_t GetRawResource() const override;
 
-  /// Returns the OpenGL id / name of the texture.
-  uint32_t GetTextureId() const
-  {
-    return _textureId;
-  }
+    /// Returns the OpenGL id / name of the texture.
+    uint32_t GetTextureId() const {return _textureId;}
 
-  /// Returns the bindless gpu handle (caller must verify extension support)
-  HGIGL_API
-  uint64_t GetBindlessHandle();
+    /// Returns the bindless gpu handle (caller must verify extension support)
+    HGIGL_API
+    uint64_t GetBindlessHandle();
 
-  /// This function does not do anything. There is no support for explicit
-  /// layout transition in non-explicit APIs like OpenGL. Hence this function
-  /// simply returns void.
-  HGIGL_API
-  void SubmitLayoutChange(HgiTextureUsage newLayout) override;
+    /// This function does not do anything. There is no support for explicit 
+    /// layout transition in non-explicit APIs like OpenGL. Hence this function
+    /// simply returns 0 (none).
+    HGIGL_API
+    HgiTextureUsage SubmitLayoutChange(HgiTextureUsage newLayout) override;
 
- protected:
-  friend class HgiGL;
+protected:
+    friend class HgiGL;
 
-  HGIGL_API
-  HgiGLTexture(HgiTextureDesc const &desc);
+    HGIGL_API
+    HgiGLTexture(HgiTextureDesc const & desc);
 
-  HGIGL_API
-  HgiGLTexture(HgiTextureViewDesc const &desc);
+    HGIGL_API
+    HgiGLTexture(HgiTextureViewDesc const & desc);
 
- private:
-  HgiGLTexture() = delete;
-  HgiGLTexture &operator=(const HgiGLTexture &) = delete;
-  HgiGLTexture(const HgiGLTexture &) = delete;
+private:
+    HgiGLTexture() = delete;
+    HgiGLTexture & operator=(const HgiGLTexture&) = delete;
+    HgiGLTexture(const HgiGLTexture&) = delete;
 
-  uint32_t _textureId;
-  uint64_t _bindlessHandle;
+    uint32_t _textureId;
+    uint64_t _bindlessHandle;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

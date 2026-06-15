@@ -11,8 +11,8 @@
 /// \ingroup group_arch_SystemFunctions
 /// Provide architecture-specific system information.
 
-#include "Arch/api.h"
 #include "pxr/pxrns.h"
+#include "Arch/api.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -36,4 +36,4 @@ int ArchGetPageSize();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_SYSTEM_INFO_H
+#endif // PXR_BASE_ARCH_SYSTEM_INFO_H

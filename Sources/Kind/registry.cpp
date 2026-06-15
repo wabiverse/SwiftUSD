@@ -5,216 +5,237 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Kind/registry.h"
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/iterator.h"
 #include "Tf/stringUtils.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_SINGLETON(KindRegistry);
 TF_DEFINE_PUBLIC_TOKENS(KindTokens, KIND_TOKENS);
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens, ((PluginKindsKey, "Kinds")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+    ((PluginKindsKey, "Kinds"))
+    );
+
 
 KindRegistry::KindRegistry()
 {
-  _RegisterDefaults();
+    _RegisterDefaults();
 }
 
 KindRegistry::~KindRegistry()
 {
-  // do nothing
+    // do nothing
 }
 
 /* static */
-KindRegistry &KindRegistry::GetInstance()
+KindRegistry&
+KindRegistry::GetInstance()
 {
-  return TfSingleton<KindRegistry>::GetInstance();
+    return TfSingleton<KindRegistry>::GetInstance();
 }
 
-void KindRegistry::_Register(const TfToken &kind, const TfToken &baseKind)
+void
+KindRegistry::_Register(const TfToken& kind,
+                        const TfToken& baseKind)
 {
-  if (!TfIsValidIdentifier(kind.GetString())) {
-    TF_CODING_ERROR("Invalid kind: '%s'", kind.GetText());
-    return;
-  }
+    if (!TfIsValidIdentifier(kind.GetString())) {
+        TF_CODING_ERROR("Invalid kind: '%s'", kind.GetText());
+        return;
+    }
 
-  _KindMap::const_iterator it = _kindMap.find(kind);
+    _KindMap::const_iterator it = _kindMap.find(kind);
 
-  if (it != _kindMap.end()) {
-    TF_CODING_ERROR("Kind '%s' has already been registered", kind.GetText());
-    return;
-  }
+    if (it != _kindMap.end()) {
+        TF_CODING_ERROR("Kind '%s' has already been registered",
+                        kind.GetText());
+        return;
+    }
 
-  _KindData data;
-  data.baseKind = baseKind;
-  _kindMap[kind] = data;
+    _KindData data;
+    data.baseKind = baseKind;
+    _kindMap[kind] = data;
 }
 
-/* static */
-bool KindRegistry::HasKind(const TfToken &kind)
+/* static */ 
+bool
+KindRegistry::HasKind(const TfToken& kind)
 {
-  return KindRegistry::GetInstance()._HasKind(kind);
+    return KindRegistry::GetInstance()._HasKind(kind);
 }
 
-bool KindRegistry::_HasKind(const TfToken &kind) const
+bool
+KindRegistry::_HasKind(const TfToken& kind) const
 {
-  return _kindMap.count(kind) != 0;
-}
-
-/* static */
-TfToken KindRegistry::GetBaseKind(const TfToken &kind)
-{
-  return KindRegistry::GetInstance()._GetBaseKind(kind);
-}
-
-TfToken KindRegistry::_GetBaseKind(const TfToken &kind) const
-{
-  _KindMap::const_iterator it = _kindMap.find(kind);
-
-  if (it == _kindMap.end()) {
-    TF_CODING_ERROR("Unknown kind: '%s'", kind.GetText());
-    return TfToken();
-  }
-
-  return it->second.baseKind;
+    return _kindMap.count(kind) != 0;
 }
 
 /* static */
-bool KindRegistry::IsA(const TfToken &derivedKind, const TfToken &baseKind)
+TfToken
+KindRegistry::GetBaseKind(const TfToken &kind)
 {
-  return KindRegistry::GetInstance()._IsA(derivedKind, baseKind);
+    return KindRegistry::GetInstance()._GetBaseKind(kind);
+}
+
+TfToken
+KindRegistry::_GetBaseKind(const TfToken &kind) const
+{
+    _KindMap::const_iterator it = _kindMap.find(kind);
+
+    if (it == _kindMap.end()) {
+        TF_CODING_ERROR("Unknown kind: '%s'", kind.GetText());
+        return TfToken();
+    }
+
+    return it->second.baseKind;
 }
 
 /* static */
-bool KindRegistry::IsModel(const TfToken &kind)
+bool
+KindRegistry::IsA(const TfToken& derivedKind, const TfToken &baseKind)
 {
-  return IsA(kind, KindTokens->model);
+    return KindRegistry::GetInstance()._IsA(derivedKind, baseKind);
 }
 
 /* static */
-bool KindRegistry::IsAssembly(const TfToken &kind)
+bool
+KindRegistry::IsModel(const TfToken &kind)
 {
-  return IsA(kind, KindTokens->assembly);
+    return IsA(kind, KindTokens->model);
 }
 
 /* static */
-bool KindRegistry::IsGroup(const TfToken &kind)
+bool
+KindRegistry::IsAssembly(const TfToken &kind)
 {
-  return IsA(kind, KindTokens->group);
+    return IsA(kind, KindTokens->assembly);
 }
 
 /* static */
-bool KindRegistry::IsComponent(const TfToken &kind)
+bool
+KindRegistry::IsGroup(const TfToken &kind)
 {
-  return IsA(kind, KindTokens->component);
+    return IsA(kind, KindTokens->group);
 }
 
 /* static */
-bool KindRegistry::IsSubComponent(const TfToken &kind)
+bool
+KindRegistry::IsComponent(const TfToken &kind)
 {
-  return IsA(kind, KindTokens->subcomponent);
+    return IsA(kind, KindTokens->component);
 }
 
-bool KindRegistry::_IsA(const TfToken &derivedKind, const TfToken &baseKind) const
+/* static */
+bool
+KindRegistry::IsSubComponent(const TfToken &kind)
 {
-  if (derivedKind == baseKind) {
-    return true;
-  }
-
-  _KindMap::const_iterator it = _kindMap.find(derivedKind);
-
-  if (it == _kindMap.end()) {
-    // Don't make this a coding error; it's very convenient to allow
-    // querying about IsA for any random kind without having to e.g.
-    // verify that it's not an empty string first.
-    return false;
-  }
-
-  if (it->second.baseKind.IsEmpty()) {
-    return false;
-  }
-
-  return _IsA(it->second.baseKind, baseKind);
+    return IsA(kind, KindTokens->subcomponent);
 }
 
-std::vector<TfToken> KindRegistry::GetAllKinds()
+bool
+KindRegistry::_IsA(const TfToken& derivedKind, const TfToken &baseKind) const
 {
-  return KindRegistry::GetInstance()._GetAllKinds();
+    if (derivedKind == baseKind) {
+        return true;
+    }
+
+    _KindMap::const_iterator it = _kindMap.find(derivedKind);
+
+    if (it == _kindMap.end()) {
+        // Don't make this a coding error; it's very convenient to allow
+        // querying about IsA for any random kind without having to e.g.
+        // verify that it's not an empty string first.
+        return false;
+    }
+
+    if (it->second.baseKind.IsEmpty()) {
+        return false;
+    }
+
+    return _IsA(it->second.baseKind, baseKind);
 }
 
-std::vector<TfToken> KindRegistry::_GetAllKinds() const
+std::vector<TfToken>
+KindRegistry::GetAllKinds()
 {
-  std::vector<TfToken> r;
-  r.reserve(_kindMap.size());
-  for (const auto &entry : _kindMap) {
-    r.push_back(entry.first);
-  }
-  return r;
+    return KindRegistry::GetInstance()._GetAllKinds();
+}
+
+std::vector<TfToken>
+KindRegistry::_GetAllKinds() const
+{
+    std::vector<TfToken> r;
+    r.reserve(_kindMap.size());
+    for (const auto &entry: _kindMap) {
+        r.push_back(entry.first);
+    }
+    return r;
 }
 
 // Helper function to make reading from dictionaries easier
-static bool _GetKey(const JsObject &dict, const std::string &key, JsObject *value)
+static bool
+_GetKey(const JsObject &dict, const std::string &key, JsObject *value)
 {
-  JsObject::const_iterator i = dict.find(key);
-  if (i != dict.end() && i->second.IsObject()) {
-    *value = i->second.GetJsObject();
-    return true;
-  }
-  return false;
+    JsObject::const_iterator i = dict.find(key);
+    if (i != dict.end() && i->second.IsObject()) {
+        *value = i->second.GetJsObject();
+        return true;
+    }
+    return false;
 }
 
-void KindRegistry::_RegisterDefaults()
+
+void
+KindRegistry::_RegisterDefaults()
 {
-  // Initialize builtin kind hierarchy.
-  _Register(KindTokens->subcomponent);
-  _Register(KindTokens->model);
-  _Register(KindTokens->component, KindTokens->model);
-  _Register(KindTokens->group, KindTokens->model);
-  _Register(KindTokens->assembly, KindTokens->group);
+    // Initialize builtin kind hierarchy.
+    _Register(KindTokens->subcomponent);
+    _Register(KindTokens->model);
+    _Register(KindTokens->component, KindTokens->model);
+    _Register(KindTokens->group, KindTokens->model);
+    _Register(KindTokens->assembly, KindTokens->group);
 
-  // Check plugInfo for extensions to the kind hierarchy.
-  //
-  // XXX We only do this once, and do not re-build the kind hierarchy
-  //     if someone manages to add more plugins while the app is running.
-  //     This allows the KindRegistry to be threadsafe without locking.
-  const PlugPluginPtrVector &plugins = PlugRegistry::GetInstance().GetAllPlugins();
-  TF_FOR_ALL(plug, plugins)
-  {
-    JsObject kinds;
-    const JsObject &metadata = (*plug)->GetMetadata();
-    if (!_GetKey(metadata, _tokens->PluginKindsKey, &kinds))
-      continue;
+    // Check plugInfo for extensions to the kind hierarchy.
+    //
+    // XXX We only do this once, and do not re-build the kind hierarchy
+    //     if someone manages to add more plugins while the app is running.
+    //     This allows the KindRegistry to be threadsafe without locking.
+    const PlugPluginPtrVector& plugins = 
+        PlugRegistry::GetInstance().GetAllPlugins();
+    TF_FOR_ALL(plug, plugins){
+        JsObject kinds;
+        const JsObject &metadata = (*plug)->GetMetadata();
+        if (!_GetKey(metadata, _tokens->PluginKindsKey, &kinds)) continue;
 
-    TF_FOR_ALL(kindEntry, kinds)
-    {
-      // Each entry is a map from kind -> metadata dict.
-      TfToken kind(kindEntry->first);
-      JsObject kindDict;
-      if (!_GetKey(kinds, kind, &kindDict)) {
-        TF_RUNTIME_ERROR("Expected dict for kind '%s'", kind.GetText());
-        continue;
-      }
+        TF_FOR_ALL(kindEntry, kinds){
+            // Each entry is a map from kind -> metadata dict.
+            TfToken  kind(kindEntry->first);
+            JsObject   kindDict;
+            if (!_GetKey(kinds, kind, &kindDict)){
+                TF_RUNTIME_ERROR("Expected dict for kind '%s'",
+                                 kind.GetText());
+                continue;
+            }
 
-      // Check for baseKind.
-      TfToken baseKind;
-      JsObject::const_iterator i = kindDict.find("baseKind");
-      if (i != kindDict.end()) {
-        if (i->second.IsString()) {
-          baseKind = TfToken(i->second.GetString());
+            // Check for baseKind.
+            TfToken baseKind;
+            JsObject::const_iterator i = kindDict.find("baseKind");
+            if (i != kindDict.end()) {
+                if (i->second.IsString())  {
+                    baseKind = TfToken(i->second.GetString());
+                } else {
+                    TF_RUNTIME_ERROR("Expected string for baseKind");
+                    continue;
+                }
+            }
+            _Register(kind, baseKind);
         }
-        else {
-          TF_RUNTIME_ERROR("Expected string for baseKind");
-          continue;
-        }
-      }
-      _Register(kind, baseKind);
     }
-  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -11,10 +11,11 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 // Register the base type with Tf.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<HfPluginBase>();
+    TfType::Define<HfPluginBase>();
 }
 
 //
@@ -31,3 +32,4 @@ TF_REGISTRY_FUNCTION(TfType)
 HfPluginBase::~HfPluginBase() = default;
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

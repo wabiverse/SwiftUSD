@@ -37,7 +37,9 @@
 
 #include <string>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 using namespace boost::python;
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

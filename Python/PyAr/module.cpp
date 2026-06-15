@@ -5,25 +5,26 @@
 // https://openusd.org/license.
 //
 
-#include "Tf/pyModule.h"
 #include "pxr/pxrns.h"
+#include "Tf/pyModule.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 TF_WRAP_MODULE
 {
-  TF_WRAP(AssetInfo);
-  TF_WRAP(ResolvedPath);
-  TF_WRAP(Timestamp);
+    TF_WRAP(Asset);
+    TF_WRAP(AssetInfo);
+    TF_WRAP(ResolvedPath);
+    TF_WRAP(Timestamp);
 
-  TF_WRAP(Resolver);
-  TF_WRAP(ResolverContext);
-  TF_WRAP(ResolverContextBinder);
-  TF_WRAP(ResolverScopedCache);
+    TF_WRAP(Resolver);
+    TF_WRAP(ResolverContext);
+    TF_WRAP(ResolverContextBinder);
+    TF_WRAP(ResolverScopedCache);
 
-  TF_WRAP(DefaultResolver);
-  TF_WRAP(DefaultResolverContext);
+    TF_WRAP(DefaultResolver);
+    TF_WRAP(DefaultResolverContext);
 
-  TF_WRAP(PackageUtils);
-  TF_WRAP(Notice);
+    TF_WRAP(PackageUtils);
+    TF_WRAP(Notice);
 }

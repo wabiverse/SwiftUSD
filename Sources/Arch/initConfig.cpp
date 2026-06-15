@@ -5,10 +5,10 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Arch/attributes.h"
 #include "Arch/stackTrace.h"
 #include "Arch/systemInfo.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -20,33 +20,34 @@ void Arch_InitTickTimer();
 
 namespace {
 
-ARCH_CONSTRUCTOR(Arch_InitConfig, 2, void)
+ARCH_CONSTRUCTOR(Arch_InitConfig, 2)
 {
-  // Initialize the application start time.  First so it's a close as
-  // possible to the real start time.
-  Arch_SetAppLaunchTime();
+    // Initialize the application start time.  First so it's a close as
+    // possible to the real start time.
+    Arch_SetAppLaunchTime();
 
-  // Initialize the temp directory.  Early so other initialization
-  // functions can use it.
-  Arch_InitTmpDir();
+    // Initialize the temp directory.  Early so other initialization
+    // functions can use it.
+    Arch_InitTmpDir();
 
-  // Initialize program name for errors.  Early for initialization
-  // error reporting.
-  ArchSetProgramNameForErrors(ArchGetExecutablePath().c_str());
+    // Initialize program name for errors.  Early for initialization
+    // error reporting.
+    ArchSetProgramNameForErrors(ArchGetExecutablePath().c_str());
 
-  // Perform platform validations: these are very quick, lightweight
-  // checks.  The reason that we call this function here is that pretty
-  // much any program that uses anything from lib/tf will end up here
-  // at some point.  It is not so important that *every* program
-  // perform this check; what is important is that when we bring up a new
-  // architecture/compiler/build, the validation gets performed at some
-  // point, to alert us to any problems.
-  Arch_ValidateAssumptions();
+    // Perform platform validations: these are very quick, lightweight
+    // checks.  The reason that we call this function here is that pretty
+    // much any program that uses anything from lib/tf will end up here
+    // at some point.  It is not so important that *every* program
+    // perform this check; what is important is that when we bring up a new
+    // architecture/compiler/build, the validation gets performed at some
+    // point, to alert us to any problems.
+    Arch_ValidateAssumptions();
 
-  // Initialize the debugger interface.
-  Arch_InitDebuggerAttach();
+    // Initialize the debugger interface.
+    Arch_InitDebuggerAttach();
 }
 
-}  // namespace
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

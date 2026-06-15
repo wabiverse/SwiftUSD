@@ -7,19 +7,21 @@
 #ifndef PXR_IMAGING_HDX_SELECTION_TRACKER_H
 #define PXR_IMAGING_HDX_SELECTION_TRACKER_H
 
-#include "Hd/selection.h"
+#include "pxr/pxrns.h"
 #include "Hdx/api.h"
 #include "Hdx/version.h"
+#include "Hd/selection.h"
 #include "Vt/array.h"
-#include "pxr/pxrns.h"
-#include <memory>
 #include <vector>
+#include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class HdRenderIndex;
 
-using HdxSelectionTrackerSharedPtr = std::shared_ptr<class HdxSelectionTracker>;
+using HdxSelectionTrackerSharedPtr =
+    std::shared_ptr<class HdxSelectionTracker>;
 
 /// ----------------------------------------------------------------------------
 /// Selection highlighting in Hydra:
@@ -31,16 +33,16 @@ using HdxSelectionTrackerSharedPtr = std::shared_ptr<class HdxSelectionTracker>;
 /// Subprimitives support is limited to elements (faces of meshes, or
 /// individual curves of basis curves), edges of meshes/curves,
 ///  and points of meshes.
-///
+/// 
 /// * While the goal is have an architecture that is extensible by rendering
 /// backends, the current implementation is heavily influenced by the Storm
 /// backend.
-///
+/// 
 /// Background:
-/// The current selection implementation is, in a sense, global in nature.
-/// If there are no selected objects, we do not bind any selection-related
+/// The current selection implementation is, in a sense, global in nature. 
+/// If there are no selected objects, we do not bind any selection-related 
 /// resources, nor does the shader execute any selection-related operations.
-///
+/// 
 /// If there are one or more selected objects, we *don't* choose to have them
 /// in a separate 'selection' collection.
 /// Instead, we stick by AZDO principles and avoid command buffer changes as
@@ -73,88 +75,93 @@ using HdxSelectionTrackerSharedPtr = std::shared_ptr<class HdxSelectionTracker>;
 ///
 /// ----------------------------------------------------------------------------
 
+
 /// \class HdxSelectionTracker
 ///
-/// HdxSelectionTracker takes HdSelection and generates a GPU buffer to be used
+/// HdxSelectionTracker takes HdSelection and generates a GPU buffer to be used 
 /// \class HdxSelectionTracker
 ///
 /// HdxSelectionTracker is a base class for observing selection state and
 /// providing selection highlighting details to interested clients.
-///
+/// 
 /// Applications may use HdxSelectionTracker as-is, or extend it as needed.
-///
+/// 
 /// HdxSelectionTask takes HdxSelectionTracker as a task parameter, and uploads
 /// the selection buffer encoding to the GPU.
 ///
-class HdxSelectionTracker {
- public:
-  HDX_API
-  HdxSelectionTracker();
-  virtual ~HdxSelectionTracker();
+class HdxSelectionTracker
+{
+public:
+    HDX_API
+    HdxSelectionTracker();
 
-  /// Optional override to update the selection (either compute HdSelection and
-  /// call SetSelection or update a scene index with selection information using
-  /// the HdSelectionsSchema) during HdxSelectionTask::Prepare.
-  HDX_API
-  virtual void UpdateSelection(HdRenderIndex *index);
+    HDX_API
+    virtual ~HdxSelectionTracker();
 
-  /// Encodes the selection state (HdxSelection) as an integer array. This is
-  /// uploaded to the GPU and decoded in the fragment shader to provide
-  /// selection highlighting behavior. See HdxSelectionTask.
-  /// Returns true if offsets has anything selected.
-  /// \p enableSelectionHighlight will populate selection buffer for any
-  /// active selection highlighting if true.
-  /// \p enableLocateHighlight will populate selection buffer for any active
-  /// locate (rollover) highlighting if true.
-  HDX_API
-  virtual bool GetSelectionOffsetBuffer(const HdRenderIndex *index,
-                                        bool enableSelectionHighlight,
-                                        bool enableLocateHighlight,
-                                        VtIntArray *offsets) const;
+    /// Optional override to update the selection (either compute HdSelection and
+    /// call SetSelection or update a scene index with selection information using
+    /// the HdSelectionsSchema) during HdxSelectionTask::Prepare.
+    HDX_API
+    virtual void UpdateSelection(HdRenderIndex *index);
 
-  HDX_API
-  virtual VtVec4fArray GetSelectedPointColors(const HdRenderIndex *index);
+    /// Encodes the selection state (HdxSelection) as an integer array. This is
+    /// uploaded to the GPU and decoded in the fragment shader to provide
+    /// selection highlighting behavior. See HdxSelectionTask.
+    /// Returns true if offsets has anything selected.
+    /// \p enableSelectionHighlight will populate selection buffer for any
+    /// active selection highlighting if true.
+    /// \p enableLocateHighlight will populate selection buffer for any active 
+    /// locate (rollover) highlighting if true.
+    HDX_API
+    virtual bool GetSelectionOffsetBuffer(const HdRenderIndex *index,
+                                          bool enableSelectionHighlight,
+                                          bool enableLocateHighlight,
+                                          VtIntArray *offsets) const;
 
-  /// Returns a monotonically increasing version number, which increments
-  /// whenever the result of GetBuffers has changed. Note that this number may
-  /// overflow and become negative, thus clients should use a not-equal
-  /// comparison.
-  HDX_API
-  int GetVersion() const;
+    HDX_API
+    virtual VtVec4fArray GetSelectedPointColors(const HdRenderIndex *index);
 
-  /// Set the collection of selected objects. The ultimate selection (used for
-  /// selection highlighting) will be the union of the collection set here and
-  /// the one computed by querying the scene indices (using the
-  /// HdxSelectionSceneIndexObserver).
-  HDX_API
-  void SetSelection(HdSelectionSharedPtr const &selection);
+    /// Returns a monotonically increasing version number, which increments
+    /// whenever the result of GetBuffers has changed. Note that this number may
+    /// overflow and become negative, thus clients should use a not-equal
+    /// comparison.
+    HDX_API
+    int GetVersion() const;
 
-  /// Returns selection set with SetSelection.
-  ///
-  /// XXX: Rename to GetSelection
-  HDX_API
-  HdSelectionSharedPtr const &GetSelectionMap() const;
+    /// Set the collection of selected objects. The ultimate selection (used for
+    /// selection highlighting) will be the union of the collection set here and
+    /// the one computed by querying the scene indices (using the
+    /// HdxSelectionSceneIndexObserver).
+    HDX_API
+    void SetSelection(HdSelectionSharedPtr const &selection);
 
- protected:
-  /// Increments the internal selection state version, used for invalidation
-  /// via GetVersion().
-  HDX_API
-  void _IncrementVersion();
+    /// Returns selection set with SetSelection.
+    ///
+    /// XXX: Rename to GetSelection
+    HDX_API
+    HdSelectionSharedPtr const &GetSelectionMap() const;
 
- private:
-  bool _GetSelectionOffsets(HdSelectionSharedPtr const &selection,
-                            HdSelection::HighlightMode mode,
-                            const HdRenderIndex *index,
-                            size_t modeOffset,
-                            std::vector<int> *offsets) const;
+protected:
+    /// Increments the internal selection state version, used for invalidation
+    /// via GetVersion().
+    HDX_API
+    void _IncrementVersion();
 
-  // A helper class to obtain the union of the selection computed
-  // by querying the scene indices (with the HdxSelectionSceneIndexObserver)
-  // and the selection set with SetSelection.
-  class _MergedSelection;
-  std::unique_ptr<_MergedSelection> _mergedSelection;
+private:
+    bool _GetSelectionOffsets(HdSelectionSharedPtr const &selection,
+                              HdSelection::HighlightMode mode,
+                              const HdRenderIndex *index,
+                              size_t modeOffset,
+                              std::vector<int>* offsets) const;
+
+    // A helper class to obtain the union of the selection computed
+    // by querying the scene indices (with the HdxSelectionSceneIndexObserver)
+    // and the selection set with SetSelection.
+    class _MergedSelection;
+    std::unique_ptr<_MergedSelection> _mergedSelection;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDX_SELECTION_TRACKER_H
+#endif //PXR_IMAGING_HDX_SELECTION_TRACKER_H

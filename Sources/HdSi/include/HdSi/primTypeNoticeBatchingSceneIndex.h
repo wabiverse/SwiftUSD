@@ -17,10 +17,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HDSI_PRIM_TYPE_NOTICE_BATCHING_SCENE_INDEX_TOKENS (primTypePriorityFunctor)
+#define HDSI_PRIM_TYPE_NOTICE_BATCHING_SCENE_INDEX_TOKENS \
+    (primTypePriorityFunctor)
 
-TF_DECLARE_PUBLIC_TOKENS(HdsiPrimTypeNoticeBatchingSceneIndexTokens,
-                         HDSI_API,
+TF_DECLARE_PUBLIC_TOKENS(HdsiPrimTypeNoticeBatchingSceneIndexTokens, HDSI_API,
                          HDSI_PRIM_TYPE_NOTICE_BATCHING_SCENE_INDEX_TOKENS);
 
 TF_DECLARE_REF_PTRS(HdsiPrimTypeNoticeBatchingSceneIndex);
@@ -45,112 +45,132 @@ TF_DECLARE_REF_PTRS(HdsiPrimTypeNoticeBatchingSceneIndex);
 ///
 /// The filtering scene index is empty until the first call to Flush.
 ///
-class HdsiPrimTypeNoticeBatchingSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  /// \class HdsiPrimTypeNoticeBatchingSceneIndex::PrimTypePriorityFunctor
-  ///
-  /// Base class for functor mapping prim types to priorities.
-  ///
-  class PrimTypePriorityFunctor {
-   public:
+class HdsiPrimTypeNoticeBatchingSceneIndex
+    : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    /// \class HdsiPrimTypeNoticeBatchingSceneIndex::PrimTypePriorityFunctor
+    ///
+    /// Base class for functor mapping prim types to priorities.
+    ///
+    class PrimTypePriorityFunctor
+    {
+    public:
+        HDSI_API
+        virtual ~PrimTypePriorityFunctor();
+
+        /// Priority for given prim type. Prims with lower priority number
+        /// are handled before prims with higher priority number.
+        /// Result must be less than GetNumPriorities().
+        ///
+        virtual size_t GetPriorityForPrimType(
+            const TfToken &primType) const = 0;
+        
+        /// Number of priorities - that is 1 + the highest number ever
+        /// returned by GetPriorityForPrimType().
+        ///
+        /// This number should be small as it affects the pre-allocation
+        /// in Flush().
+        ///
+        virtual size_t GetNumPriorities() const = 0;
+    };
+    using PrimTypePriorityFunctorHandle =
+        std::shared_ptr<PrimTypePriorityFunctor>;
+
+    /// Creates a new notice batching scene index. It expects a priority functor
+    /// in a PrimTypePriorityFunctorHandle typed data source at
+    /// HdsiPrimTypeNoticeBatchingSceneIndexTokens->primTypePriorityFunctor in
+    /// the given inputArgs.
+    ///
+    static HdsiPrimTypeNoticeBatchingSceneIndexRefPtr New(
+            HdSceneIndexBaseRefPtr const &inputScene,
+            HdContainerDataSourceHandle const &inputArgs) {
+        return TfCreateRefPtr(
+            new HdsiPrimTypeNoticeBatchingSceneIndex(
+                inputScene,
+                inputArgs));
+    }
+
     HDSI_API
-    virtual ~PrimTypePriorityFunctor();
+    ~HdsiPrimTypeNoticeBatchingSceneIndex() override;
 
-    /// Priority for given prim type. Prims with lower priority number
-    /// are handled before prims with higher priority number.
-    /// Result must be less than GetNumPriorities().
+    /// Forwards to input scene after first call to Flush. Empty before that.
     ///
-    virtual size_t GetPriorityForPrimType(const TfToken &primType) const = 0;
+    HDSI_API 
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-    /// Number of priorities - that is 1 + the highest number ever
-    /// returned by GetPriorityForPrimType().
+    /// Forwards to input scene after first call to Flush. Empty before that.
     ///
-    /// This number should be small as it affects the pre-allocation
-    /// in Flush().
+    HDSI_API 
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+
+    /// Sends out all notices queued and commulated since the last call to
+    /// Flush. The first call to Flush will also send out notices for prims
+    /// that were in the input scene index when it was added to this filtering
+    /// scene index.
     ///
-    virtual size_t GetNumPriorities() const = 0;
-  };
-  using PrimTypePriorityFunctorHandle = std::shared_ptr<PrimTypePriorityFunctor>;
+    HDSI_API
+    void Flush();
 
-  /// Creates a new notice batching scene index. It expects a priority functor
-  /// in a PrimTypePriorityFunctorHandle typed data source at
-  /// HdsiPrimTypeNoticeBatchingSceneIndexTokens->primTypePriorityFunctor in
-  /// the given inputArgs.
-  ///
-  static HdsiPrimTypeNoticeBatchingSceneIndexRefPtr New(
-      HdSceneIndexBaseRefPtr const &inputScene, HdContainerDataSourceHandle const &inputArgs)
-  {
-    return TfCreateRefPtr(new HdsiPrimTypeNoticeBatchingSceneIndex(inputScene, inputArgs));
-  }
+protected:
 
-  HDSI_API
-  ~HdsiPrimTypeNoticeBatchingSceneIndex() override;
+    HDSI_API
+    HdsiPrimTypeNoticeBatchingSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputScene,
+        HdContainerDataSourceHandle const &inputArgs);
 
-  /// Forwards to input scene after first call to Flush. Empty before that.
-  ///
-  HDSI_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    // satisfying HdSingleInputFilteringSceneIndexBase
+    void _PrimsAdded(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  /// Forwards to input scene after first call to Flush. Empty before that.
-  ///
-  HDSI_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    void _PrimsRemoved(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  /// Sends out all notices queued and commulated since the last call to
-  /// Flush. The first call to Flush will also send out notices for prims
-  /// that were in the input scene index when it was added to this filtering
-  /// scene index.
-  ///
-  HDSI_API
-  void Flush();
+    void _PrimsDirtied(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
- protected:
-  HDSI_API
-  HdsiPrimTypeNoticeBatchingSceneIndex(HdSceneIndexBaseRefPtr const &inputScene,
-                                       HdContainerDataSourceHandle const &inputArgs);
+    // Removes items from _addedOrDirtiedPrims prefixed by path.
+    void _RemovePathFromAddedOrDirtiedPrims(const SdfPath &path);
+    // Adds path to _removedPrims and normalizes _removedPrims if necessary.
+    void _AddPathToRemovedPrims(const SdfPath &path);
 
-  // satisfying HdSingleInputFilteringSceneIndexBase
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    size_t _GetPriority(const TfToken &primType) const;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    size_t _GetPriority(const SdfPath &primPath) const;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    PrimTypePriorityFunctorHandle const _primTypePriorityFunctor;
+    const size_t _numPriorities;
 
-  // Removes items from _addedOrDirtiedPrims prefixed by path.
-  void _RemovePathFromAddedOrDirtiedPrims(const SdfPath &path);
-  // Adds path to _removedPrims and normalizes _removedPrims if necessary.
-  void _AddPathToRemovedPrims(const SdfPath &path);
+    struct _PrimAddedEntry
+    {
+        TfToken primType;
+    };
 
-  size_t _GetPriority(const TfToken &primType) const;
+    struct _PrimDirtiedEntry
+    {
+        HdDataSourceLocatorSet dirtyLocators;
+    };
 
-  PrimTypePriorityFunctorHandle const _primTypePriorityFunctor;
-  const size_t _numPriorities;
+    // True after first call to flush.
+    bool _populated;
 
-  struct _PrimAddedEntry {
-    TfToken primType;
-  };
+    // Default constructored _PrimAddedOrDirtiedEntry contains a
+    // _PrimDirtiedEntry. This is used by _addedOrDirtiedPrims.
+    using _PrimAddedOrDirtiedEntry =
+        std::variant<_PrimDirtiedEntry, _PrimAddedEntry>;
 
-  struct _PrimDirtiedEntry {
-    HdDataSourceLocatorSet dirtyLocators;
-  };
+    std::map<SdfPath, _PrimAddedOrDirtiedEntry> _addedOrDirtiedPrims;
 
-  // True after first call to flush.
-  bool _populated;
-
-  // Default constructored _PrimAddedOrDirtiedEntry contains a
-  // _PrimDirtiedEntry. This is used by _addedOrDirtiedPrims.
-  using _PrimAddedOrDirtiedEntry = std::variant<_PrimDirtiedEntry, _PrimAddedEntry>;
-
-  std::map<SdfPath, _PrimAddedOrDirtiedEntry> _addedOrDirtiedPrims;
-
-  // Normalized, so a prefix of an element in _removedPrims will never be in
-  // _removedPrims.
-  std::set<SdfPath> _removedPrims;
+    // Normalized, so a prefix of an element in _removedPrims will never be in
+    // _removedPrims.
+    std::set<SdfPath> _removedPrims;
 };
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
+
 
 #endif

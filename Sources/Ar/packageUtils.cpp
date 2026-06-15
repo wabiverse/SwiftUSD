@@ -5,8 +5,8 @@
 // https://openusd.org/license.
 //
 
-#include "Ar/packageUtils.h"
 #include "pxr/pxrns.h"
+#include "Ar/packageUtils.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/pathUtils.h"
@@ -16,63 +16,70 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace {
-// Returns iterator in \p path pointing to outermost ']' delimiter.
-std::string::const_iterator _FindOutermostClosingDelimiter(const std::string &path)
+namespace
 {
-  if (path.empty() || path.back() != ']') {
-    return path.end();
-  }
-  return path.end() - 1;
+// Returns iterator in \p path pointing to outermost ']' delimiter.
+std::string::const_iterator
+_FindOutermostClosingDelimiter(const std::string& path)
+{
+    if (path.empty() || path.back() != ']') {
+        return path.end();
+    }
+    return path.end() - 1;
 }
 
 // Delete rvalue overload to avoid returning an iterator to a temporary.
-std::string::const_iterator _FindOutermostClosingDelimiter(std::string &&path) = delete;
+std::string::const_iterator
+_FindOutermostClosingDelimiter(std::string&& path) = delete;
 
 // Returns iterator in \p path pointing to the innermost ']' delimiter.
-std::string::const_iterator _FindInnermostClosingDelimiter(const std::string &path)
+std::string::const_iterator
+_FindInnermostClosingDelimiter(const std::string& path)
 {
-  if (path.empty() || path.back() != ']') {
+    if (path.empty() || path.back() != ']') {
+        return path.end();
+    }
+
+    for (auto it = path.rbegin(); it != path.rend(); ++it) {
+        if (*it == '\\') {
+            // The previous ']' character was escaped, so the innermost
+            // delimiter is really the one before that character.
+            return (it - 1).base();
+        }
+        else if (*it != ']') {
+            return it.base();
+        }
+    }
+
     return path.end();
-  }
-
-  for (auto it = path.rbegin(); it != path.rend(); ++it) {
-    if (*it == '\\') {
-      // The previous ']' character was escaped, so the innermost
-      // delimiter is really the one before that character.
-      return (it - 1).base();
-    }
-    else if (*it != ']') {
-      return it.base();
-    }
-  }
-
-  return path.end();
 }
 
 // Delete rvalue overload to avoid returning an iterator to a temporary.
-std::string::const_iterator _FindInnermostClosingDelimiter(std::string &&path) = delete;
+std::string::const_iterator
+_FindInnermostClosingDelimiter(std::string&& path) = delete;
 
 // Given iterator \p closingDelimIt in \p path pointing to a closing
 // ']' character, returns iterator to the corresponding opening '['
 // character, or path.end() if one can't be found.
-std::string::const_iterator _FindMatchingOpeningDelimiter(
-    const std::string &path, std::string::const_iterator closingDelimIt)
+std::string::const_iterator
+_FindMatchingOpeningDelimiter(
+    const std::string& path,
+    std::string::const_iterator closingDelimIt)
 {
-  size_t numOpenNeeded = 1;
-  std::string::const_reverse_iterator revIt(closingDelimIt);
-  for (; revIt != path.rend() && numOpenNeeded != 0; ++revIt) {
-    if (*revIt == '[' || *revIt == ']') {
-      // Ignore this delimiter if it's been escaped.
-      auto prevCharIt = revIt + 1;
-      if (prevCharIt != path.rend() && *prevCharIt == '\\') {
-        continue;
-      }
-      numOpenNeeded += (*revIt == '[') ? -1 : 1;
+    size_t numOpenNeeded = 1;
+    std::string::const_reverse_iterator revIt(closingDelimIt);
+    for (; revIt != path.rend() && numOpenNeeded != 0; ++revIt) {
+        if (*revIt == '[' || *revIt == ']') {
+            // Ignore this delimiter if it's been escaped.
+            auto prevCharIt = revIt + 1;
+            if (prevCharIt != path.rend() && *prevCharIt == '\\') {
+                continue;
+            }
+            numOpenNeeded += (*revIt == '[') ? -1 : 1;
+        }
     }
-  }
 
-  return (numOpenNeeded == 0) ? revIt.base() : path.end();
+    return (numOpenNeeded == 0) ? revIt.base() : path.end();
 }
 
 // Escape delimiters in the given path to preserve them when placing
@@ -80,24 +87,26 @@ std::string::const_iterator _FindMatchingOpeningDelimiter(
 //
 // If path is a package-relative path, we assume the packaged portion of
 // that path has already been escaped and only process the package portion.
-std::string _EscapeDelimiters(const std::string &path)
+std::string
+_EscapeDelimiters(const std::string& path)
 {
-  if (path.empty()) {
-    return path;
-  }
-
-  auto escapeRangeBegin = path.begin(), escapeRangeEnd = path.end();
-  if (path.back() == ']') {
-    auto outermostOpenIt = _FindMatchingOpeningDelimiter(path, path.end() - 1);
-    if (outermostOpenIt != path.end()) {
-      escapeRangeEnd = outermostOpenIt;
+    if (path.empty()) {
+        return path;
     }
-  }
 
-  std::string escapedString(escapeRangeBegin, escapeRangeEnd);
-  escapedString = TfStringReplace(escapedString, "[", "\\[");
-  escapedString = TfStringReplace(escapedString, "]", "\\]");
-  return escapedString + std::string(escapeRangeEnd, path.end());
+    auto escapeRangeBegin = path.begin(), escapeRangeEnd = path.end();
+    if (path.back() == ']') {
+        auto outermostOpenIt = 
+            _FindMatchingOpeningDelimiter(path, path.end() - 1);
+        if (outermostOpenIt != path.end()) {
+            escapeRangeEnd = outermostOpenIt;
+        }
+    }
+
+    std::string escapedString(escapeRangeBegin, escapeRangeEnd);
+    escapedString = TfStringReplace(escapedString, "[", "\\[");
+    escapedString = TfStringReplace(escapedString, "]", "\\]");
+    return escapedString + std::string(escapeRangeEnd, path.end());
 }
 
 // Unescape delimiters in the given path to give clients the 'real' path
@@ -105,157 +114,180 @@ std::string _EscapeDelimiters(const std::string &path)
 //
 // If path is a package-relative path, we assume the packaged portion of
 // that path has already been escaped and only process the package portion.
-std::string _UnescapeDelimiters(const std::string &path)
+std::string
+_UnescapeDelimiters(const std::string& path)
 {
-  if (path.empty()) {
-    return path;
-  }
-
-  auto escapeRangeBegin = path.begin(), escapeRangeEnd = path.end();
-  if (path.back() == ']') {
-    auto outermostOpenIt = _FindMatchingOpeningDelimiter(path, path.end() - 1);
-    if (outermostOpenIt != path.end()) {
-      escapeRangeEnd = outermostOpenIt;
-    }
-  }
-
-  std::string escapedString(escapeRangeBegin, escapeRangeEnd);
-  escapedString = TfStringReplace(escapedString, "\\[", "[");
-  escapedString = TfStringReplace(escapedString, "\\]", "]");
-  return escapedString + std::string(escapeRangeEnd, path.end());
-}
-
-}  // end anonymous namespace
-
-bool ArIsPackageRelativePath(const std::string &path)
-{
-  return !path.empty() && path.back() == ']' &&
-         _FindMatchingOpeningDelimiter(path, path.end() - 1) != path.end();
-}
-
-namespace {
-
-template<class Iter> const std::string &_Get(Iter it)
-{
-  return *it;
-}
-
-const std::string &_Get(const std::string *const *it)
-{
-  return **it;
-}
-
-template<class Iter> std::string _JoinPackageRelativePath(Iter begin, Iter end)
-{
-  Iter pathIt = begin;
-  for (; pathIt != end; ++pathIt) {
-    if (!_Get(pathIt).empty()) {
-      break;
-    }
-  }
-
-  if (pathIt == end) {
-    return std::string();
-  }
-
-  // Start the result packageRelativePath with the first non-empty path
-  // in the range and determine where the next path should be inserted.
-  // If this path is itself a package-relative path, this insert location
-  // should come just before the innermost ']' delimiter.
-  std::string packageRelativePath = _Get(pathIt++);
-  size_t insertIdx = packageRelativePath.length();
-  if (packageRelativePath.back() == ']') {
-    auto innermostCloseRevIt = std::find_if(
-        packageRelativePath.rbegin(), packageRelativePath.rend(), [](char c) { return c != ']'; });
-    insertIdx = std::distance(packageRelativePath.begin(), innermostCloseRevIt.base());
-  }
-
-  // Loop through and insert the rest of the paths.
-  for (; pathIt != end; ++pathIt) {
-    if (_Get(pathIt).empty()) {
-      continue;
+    if (path.empty()) {
+        return path;
     }
 
-    // Since we're enclosing this path in delimiters, we need to escape
-    // any existing delimiters.
-    const std::string pathToInsert = '[' + _EscapeDelimiters(_Get(pathIt)) + ']';
-    packageRelativePath.insert(insertIdx, pathToInsert);
-    insertIdx += pathToInsert.length() - 1;
-  }
+    auto escapeRangeBegin = path.begin(), escapeRangeEnd = path.end();
+    if (path.back() == ']') {
+        auto outermostOpenIt = 
+            _FindMatchingOpeningDelimiter(path, path.end() - 1);
+        if (outermostOpenIt != path.end()) {
+            escapeRangeEnd = outermostOpenIt;
+        }
+    }
 
-  return packageRelativePath;
+    std::string escapedString(escapeRangeBegin, escapeRangeEnd);
+    escapedString = TfStringReplace(escapedString, "\\[", "[");
+    escapedString = TfStringReplace(escapedString, "\\]", "]");
+    return escapedString + std::string(escapeRangeEnd, path.end());
 }
 
-}  // end anonymous namespace
+} // end anonymous namespace
 
-std::string ArJoinPackageRelativePath(const std::vector<std::string> &paths)
+bool
+ArIsPackageRelativePath(
+    const std::string& path)
 {
-  return _JoinPackageRelativePath(paths.begin(), paths.end());
+    return !path.empty() && path.back() == ']' && 
+        _FindMatchingOpeningDelimiter(path, path.end() - 1) != path.end();
 }
 
-std::string ArJoinPackageRelativePath(const std::pair<std::string, std::string> &paths)
+namespace
 {
-  const std::string *const arr[2] = {&paths.first, &paths.second};
-  return _JoinPackageRelativePath(arr, arr + 2);
+
+template <class Iter>
+const std::string&
+_Get(Iter it) 
+{
+    return *it;
 }
 
-std::string ArJoinPackageRelativePath(const std::string &packagePath,
-                                      const std::string &packagedPath)
+const std::string&
+_Get(const std::string* const* it)
 {
-  const std::string *const arr[2] = {&packagePath, &packagedPath};
-  return _JoinPackageRelativePath(arr, arr + 2);
+    return **it;
 }
 
-std::pair<std::string, std::string> ArSplitPackageRelativePathOuter(const std::string &path)
+template <class Iter>
+std::string 
+_JoinPackageRelativePath(Iter begin, Iter end)
 {
-  // For example, given a path like "/dir/foo.package[bar.package[baz.file]]",
-  // find the range [outermostOpenIt, outermostCloseIt] containing
-  // "[bar.package[baz.file]]"
-  auto outermostCloseIt = _FindOutermostClosingDelimiter(path);
-  if (outermostCloseIt == path.end()) {
-    return std::make_pair(path, std::string());
-  }
-  auto outermostOpenIt = _FindMatchingOpeningDelimiter(path, outermostCloseIt);
-  if (outermostOpenIt == path.end()) {
-    return std::make_pair(path, std::string());
-  }
+    Iter pathIt = begin;
+    for (; pathIt != end; ++pathIt) {
+        if (!_Get(pathIt).empty()) {
+            break;
+        }
+    }
 
-  // The package path is everything before the outermost opening delimiter.
-  std::string packagePath(path.begin(), outermostOpenIt);
+    if (pathIt == end) {
+        return std::string();
+    }
 
-  // Drop the opening and closing delimiters to create the packaged path,
-  // making sure to unescape delimiters now that this path has been split.
-  std::string packagedPath(outermostOpenIt + 1, outermostCloseIt);
-  packagedPath = _UnescapeDelimiters(packagedPath);
+    // Start the result packageRelativePath with the first non-empty path
+    // in the range and determine where the next path should be inserted.
+    // If this path is itself a package-relative path, this insert location
+    // should come just before the innermost ']' delimiter.
+    std::string packageRelativePath = _Get(pathIt++);
+    size_t insertIdx = packageRelativePath.length();
+    if (packageRelativePath.back() == ']') {
+        auto innermostCloseRevIt = std::find_if(
+            packageRelativePath.rbegin(), packageRelativePath.rend(),
+            [](char c) { return c != ']'; });
+        insertIdx = std::distance(
+            packageRelativePath.begin(), innermostCloseRevIt.base());
+    }
 
-  return std::make_pair(std::move(packagePath), std::move(packagedPath));
+    // Loop through and insert the rest of the paths.
+    for (; pathIt != end; ++pathIt) {
+        if (_Get(pathIt).empty()) {
+            continue;
+        }
+
+        // Since we're enclosing this path in delimiters, we need to escape
+        // any existing delimiters.
+        const std::string pathToInsert = 
+            '[' + _EscapeDelimiters(_Get(pathIt)) + ']';
+        packageRelativePath.insert(insertIdx, pathToInsert);
+        insertIdx += pathToInsert.length() - 1;
+    }
+
+    return packageRelativePath;
 }
 
-std::pair<std::string, std::string> ArSplitPackageRelativePathInner(const std::string &path)
+} // end anonymous namespace
+
+std::string
+ArJoinPackageRelativePath(
+    const std::vector<std::string>& paths)
 {
-  // For example, given a path like "/dir/foo.package[bar.package[baz.file]]",
-  // find the range [innermostOpenIt, innermostCloseIt] containing
-  // "[baz.file]"
-  auto innermostCloseIt = _FindInnermostClosingDelimiter(path);
-  if (innermostCloseIt == path.end()) {
-    return std::make_pair(path, std::string());
-  }
-  auto innermostOpenIt = _FindMatchingOpeningDelimiter(path, innermostCloseIt);
-  if (innermostOpenIt == path.end()) {
-    return std::make_pair(path, std::string());
-  }
+    return _JoinPackageRelativePath(paths.begin(), paths.end());
+}
 
-  // Erase "[baz.file]" from the given path to generate the package path.
-  std::string packagePath = path;
-  packagePath.erase(std::distance(path.begin(), innermostOpenIt),
-                    std::distance(innermostOpenIt, innermostCloseIt) + 1);
+std::string
+ArJoinPackageRelativePath(
+    const std::pair<std::string, std::string>& paths)
+{
+    const std::string* const arr[2] = { &paths.first, &paths.second };
+    return _JoinPackageRelativePath(arr, arr + 2);
+}
 
-  // Drop the opening and closing delimiters to create the packaged path,
-  // making sure to unescape delimiters now that this path has been split.
-  std::string packagedPath(innermostOpenIt + 1, innermostCloseIt);
-  packagedPath = _UnescapeDelimiters(packagedPath);
+std::string
+ArJoinPackageRelativePath(
+    const std::string& packagePath, const std::string& packagedPath)
+{
+    const std::string* const arr[2] = { &packagePath, &packagedPath };
+    return _JoinPackageRelativePath(arr, arr + 2);
+}
 
-  return std::make_pair(std::move(packagePath), std::move(packagedPath));
+std::pair<std::string, std::string>
+ArSplitPackageRelativePathOuter(
+    const std::string& path)
+{
+    // For example, given a path like "/dir/foo.package[bar.package[baz.file]]",
+    // find the range [outermostOpenIt, outermostCloseIt] containing 
+    // "[bar.package[baz.file]]"
+    auto outermostCloseIt = _FindOutermostClosingDelimiter(path);
+    if (outermostCloseIt == path.end()) {
+        return std::make_pair(path, std::string());
+    }
+    auto outermostOpenIt = _FindMatchingOpeningDelimiter(path, outermostCloseIt);
+    if (outermostOpenIt == path.end()) {
+        return std::make_pair(path, std::string());
+    }
+
+    // The package path is everything before the outermost opening delimiter.
+    std::string packagePath(path.begin(), outermostOpenIt);
+
+    // Drop the opening and closing delimiters to create the packaged path,
+    // making sure to unescape delimiters now that this path has been split.
+    std::string packagedPath(outermostOpenIt + 1, outermostCloseIt);
+    packagedPath = _UnescapeDelimiters(packagedPath);
+
+    return std::make_pair(std::move(packagePath), std::move(packagedPath));
+}
+
+std::pair<std::string, std::string>
+ArSplitPackageRelativePathInner(
+    const std::string& path)
+{
+    // For example, given a path like "/dir/foo.package[bar.package[baz.file]]",
+    // find the range [innermostOpenIt, innermostCloseIt] containing 
+    // "[baz.file]"
+    auto innermostCloseIt = _FindInnermostClosingDelimiter(path);
+    if (innermostCloseIt == path.end()) {
+        return std::make_pair(path, std::string());
+    }
+    auto innermostOpenIt = _FindMatchingOpeningDelimiter(path, innermostCloseIt);
+    if (innermostOpenIt == path.end()) {
+        return std::make_pair(path, std::string());
+    }        
+
+    // Erase "[baz.file]" from the given path to generate the package path.
+    std::string packagePath = path;
+    packagePath.erase(
+        std::distance(path.begin(), innermostOpenIt),
+        std::distance(innermostOpenIt, innermostCloseIt) + 1);
+
+    // Drop the opening and closing delimiters to create the packaged path,
+    // making sure to unescape delimiters now that this path has been split.
+    std::string packagedPath(innermostOpenIt + 1, innermostCloseIt);
+    packagedPath = _UnescapeDelimiters(packagedPath);
+
+    return std::make_pair(std::move(packagePath), std::move(packagedPath));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

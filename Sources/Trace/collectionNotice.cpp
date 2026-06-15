@@ -7,15 +7,16 @@
 
 #include "Trace/collectionNotice.h"
 
+#include "pxr/pxrns.h"
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<TraceCollectionAvailable, TfType::Bases<TfNotice>>();
+    TfType::Define< TraceCollectionAvailable,
+        TfType::Bases<TfNotice> >();
 }
 
 TraceCollectionAvailable::~TraceCollectionAvailable() {}

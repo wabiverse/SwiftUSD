@@ -6,11 +6,13 @@
 //
 // Types.cpp
 
+#include "pxr/pxrns.h"
 #include "Sdf/types.h"
+#include "Sdf/composeTimeSampleSeries.h"
+#include "Sdf/layerOffset.h"
 #include "Sdf/path.h"
 #include "Sdf/schema.h"
 #include "Sdf/valueTypeName.h"
-#include "pxr/pxrns.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/enum.h"
@@ -19,6 +21,8 @@
 #include "Tf/registryManager.h"
 #include "Tf/staticData.h"
 #include "Tf/type.h"
+#include "Ts/spline.h"
+#include "Vt/valueComposeOver.h"
 
 #include <array>
 #include <unordered_map>
@@ -33,22 +37,147 @@ TF_DEFINE_PUBLIC_TOKENS(SdfValueRoleNames, SDF_VALUE_ROLE_NAME_TOKENS);
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  // Enums.
-  TfType::Define<SdfPermission>();
-  TfType::Define<SdfSpecifier>();
-  TfType::Define<SdfVariability>();
-  TfType::Define<SdfSpecType>();
+    // Enums.
+    TfType::Define<SdfPermission>();
+    TfType::Define<SdfSpecifier>();
+    TfType::Define<SdfVariability>();
+    TfType::Define<SdfSpecType>();
 
-  // Other.
-  TfType::Define<SdfTimeSampleMap>().Alias(TfType::GetRoot(), "SdfTimeSampleMap");
-  TfType::Define<SdfVariantSelectionMap>();
-  TfType::Define<SdfRelocates>().Alias(TfType::GetRoot(), "SdfRelocates");
-  TfType::Define<SdfRelocatesMap>()
-      .Alias(TfType::GetRoot(), "SdfRelocatesMap")
-      .Alias(TfType::GetRoot(), "map<SdfPath, SdfPath>");
-  ;
-  TfType::Define<SdfUnregisteredValue>();
-  TfType::Define<SdfValueBlock>();
+    // Other.
+    TfType::Define<SdfTimeSampleMap>()
+        .Alias(TfType::GetRoot(), "SdfTimeSampleMap")
+        ;
+    TfType::Define<SdfVariantSelectionMap>();
+    TfType::Define<SdfRelocates>().
+        Alias(TfType::GetRoot(), "SdfRelocates")
+        ;
+    TfType::Define<SdfRelocatesMap>().
+        Alias(TfType::GetRoot(), "SdfRelocatesMap").
+        Alias(TfType::GetRoot(), "map<SdfPath, SdfPath>");
+        ;
+    TfType::Define<SdfUnregisteredValue>();
+    TfType::Define<SdfValueBlock>(); 
+    TfType::Define<SdfAnimationBlock>();
+}
+
+static std::optional<SdfTimeSampleMap>
+_TimeSampleMapTryTransform(
+    SdfTimeSampleMap const &src,
+    TfFunctionRef<VtValue (VtValueRef)> xform)
+{
+    if (src.empty()) {
+        return std::nullopt;
+    }
+
+    // Just count leading elements that didn't transform in hopes that we never
+    // have to populate dst.  If we discover an element that does transform,
+    // then we transform & copy any remaining elements from there, and tack on
+    // any leading elements after.
+    size_t numLeadingNotXformed = 0;
+    SdfTimeSampleMap dst;
+    for (auto const &[key, val]: src) {
+        VtValue xVal = xform(val);
+        if (!xVal.IsEmpty()) {
+            dst[key] = xVal;
+        }
+        else if (!dst.empty()) {
+            dst[key] = val;
+        }
+        else {
+            ++numLeadingNotXformed;
+        }
+    }
+    if (dst.empty()) {
+        return std::nullopt;
+    }
+    // We actually transformed elements, and the first numLeadingNotXformed from
+    // src that we skipped before we were certain must be copied over.
+    if (numLeadingNotXformed) {
+        for (auto const &[key, val]: src) {
+            dst[key] = val;
+            if (--numLeadingNotXformed == 0) {
+                break;
+            }
+        }
+    }
+    return dst;
+}
+
+static
+SdfTimeSampleMap
+_LayerOffsetTimeSampleMap(SdfTimeSampleMap const &tsm,
+                          SdfLayerOffset const &offset)
+{
+    SdfTimeSampleMap dst;
+    for (auto const &[key, val]: tsm) {
+        VtValue xVal = VtValueTryTransform(val, offset);
+        if (!xVal.IsEmpty()) {
+            dst[offset * key] = std::move(xVal);
+        }
+        else {
+            dst[offset * key] = val;
+        }
+    }
+    return dst;
+}
+
+SdfTimeSampleMap
+SdfComposeTimeSampleMaps(SdfTimeSampleMap const &strong,
+                         SdfTimeSampleMap const &weak)
+{
+    SdfTimeSampleMap result;
+    SdfComposeTimeSampleSeries(
+        strong.begin(), strong.end(),
+        weak.begin(), weak.end(),
+        [](SdfTimeSampleMap::const_iterator iter) { // getTime
+            return iter->first;
+        },
+        [](SdfTimeSampleMap::const_iterator iter) { // getValue
+            return iter->second;
+        },
+        [](VtValue const &strong, VtValue const &weak) { // compose
+            return VtValueTryComposeOver(strong, weak);
+        },
+        [&result](VtValue const &val, double time) { // output
+            result.emplace_hint(result.end(), time, val);
+        });
+    return result;
+}
+
+TF_REGISTRY_FUNCTION(VtValue)
+{
+    VtRegisterErasedTransform(_TimeSampleMapTryTransform);
+    VtRegisterTransform(_LayerOffsetTimeSampleMap);
+
+    VtRegisterTransform(+[](TsSpline const &spline,
+                            SdfLayerOffset const &offset) {
+        if (!offset.IsIdentity()) {
+            TsSpline copy = spline;
+            Ts_SplineOffsetAccess::ApplyOffsetAndScale(
+                &copy, offset.GetOffset(), offset.GetScale());
+            return copy;
+        }
+        return spline;
+    });
+    
+    VtRegisterComposeOver(+[](SdfTimeSampleMap const &strong,
+                              SdfTimeSampleMap const &weak) {
+        return SdfComposeTimeSampleMaps(strong, weak);
+    });
+
+    VtRegisterComposeOver(+[](SdfTimeSampleMap const &map,
+                              VtBackgroundType const &) {
+        SdfTimeSampleMap result;
+        for (auto const &[time, val]: map) {
+            if (auto compVal = VtValueTryComposeOver(val, VtBackground)) {
+                result.emplace_hint(result.end(), time, std::move(*compVal));
+            }
+            else{
+                result.emplace_hint(result.end(), time, val);
+            }
+        }
+        return result;
+    });
 }
 
 // Max units is computed by running `TF_PP_SEQ_SIZE`
@@ -56,721 +185,802 @@ TF_REGISTRY_FUNCTION(TfType)
 // initializer list for `std::max`.
 // A comma is appended to each element.
 #define _SDF_UNIT_MAX_UNITS_IMPL(seq) TF_PP_SEQ_SIZE(seq),
-#define _SDF_UNIT_MAX_UNITS_OP(elem) _SDF_UNIT_MAX_UNITS_IMPL(TF_PP_TUPLE_ELEM(1, elem))
+#define _SDF_UNIT_MAX_UNITS_OP(elem)                     \
+    _SDF_UNIT_MAX_UNITS_IMPL(TF_PP_TUPLE_ELEM(1, elem))
 
-constexpr size_t _Sdf_UnitMaxUnits = (std::max)(
-    {_SDF_FOR_EACH_UNITS(_SDF_UNIT_MAX_UNITS_OP, _SDF_UNITS)});
+constexpr size_t _Sdf_UnitMaxUnits =
+    std::max(
+        {
+            _SDF_FOR_EACH_UNITS(_SDF_UNIT_MAX_UNITS_OP,
+                                _SDF_UNITS)
+        }
+    );
 
 // Compute the number of unit enums
-constexpr size_t _Sdf_UnitNumTypes = TF_PP_VARIADIC_SIZE(TF_PP_EAT_PARENS(_SDF_UNITS));
+constexpr size_t _Sdf_UnitNumTypes =
+    TF_PP_VARIADIC_SIZE(TF_PP_EAT_PARENS(_SDF_UNITS));
 
-static_assert(_Sdf_UnitNumTypes > 0, "There must be at least one define Sdf unit enum.");
-static_assert(_Sdf_UnitMaxUnits > 0, "There must be at least one defined Sdf unit .");
+static_assert(_Sdf_UnitNumTypes > 0,
+              "There must be at least one define Sdf unit enum.");
+static_assert(_Sdf_UnitMaxUnits > 0,
+              "There must be at least one defined Sdf unit .");
 
-template<typename T> static VtValue _GetTfEnumForEnumValue(const VtValue &value)
+template <typename T>
+static VtValue
+_GetTfEnumForEnumValue(const VtValue &value)
 {
-  return VtValue(TfEnum(value.Get<T>()));
+    return VtValue(TfEnum(value.Get<T>()));
 }
 
-template<class T> static void _RegisterEnumWithVtValue()
+template <class T>
+static void _RegisterEnumWithVtValue()
 {
-  VtValue::RegisterCast<T, TfEnum>(_GetTfEnumForEnumValue<T>);
-  VtValue::RegisterSimpleBidirectionalCast<int, T>();
+    VtValue::RegisterCast<T, TfEnum>(_GetTfEnumForEnumValue<T>);
+    VtValue::RegisterSimpleBidirectionalCast<int, T>();
 }
 
 TF_REGISTRY_FUNCTION(VtValue)
 {
-  _RegisterEnumWithVtValue<SdfPermission>();
-  _RegisterEnumWithVtValue<SdfSpecifier>();
-  _RegisterEnumWithVtValue<SdfVariability>();
+    _RegisterEnumWithVtValue<SdfPermission>();
+    _RegisterEnumWithVtValue<SdfSpecifier>();
+    _RegisterEnumWithVtValue<SdfVariability>();
 }
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
-  // SdfSpecType
-  TF_ADD_ENUM_NAME(SdfSpecTypeUnknown);
-  TF_ADD_ENUM_NAME(SdfSpecTypeAttribute);
-  TF_ADD_ENUM_NAME(SdfSpecTypeConnection);
-  TF_ADD_ENUM_NAME(SdfSpecTypeExpression);
-  TF_ADD_ENUM_NAME(SdfSpecTypeMapper);
-  TF_ADD_ENUM_NAME(SdfSpecTypeMapperArg);
-  TF_ADD_ENUM_NAME(SdfSpecTypePrim);
-  TF_ADD_ENUM_NAME(SdfSpecTypePseudoRoot);
-  TF_ADD_ENUM_NAME(SdfSpecTypeRelationship);
-  TF_ADD_ENUM_NAME(SdfSpecTypeRelationshipTarget);
-  TF_ADD_ENUM_NAME(SdfSpecTypeVariant);
-  TF_ADD_ENUM_NAME(SdfSpecTypeVariantSet);
+    // SdfSpecType
+    TF_ADD_ENUM_NAME(SdfSpecTypeUnknown);
+    TF_ADD_ENUM_NAME(SdfSpecTypeAttribute);
+    TF_ADD_ENUM_NAME(SdfSpecTypeConnection);
+    TF_ADD_ENUM_NAME(SdfSpecTypeExpression);
+    TF_ADD_ENUM_NAME(SdfSpecTypeMapper);
+    TF_ADD_ENUM_NAME(SdfSpecTypeMapperArg);
+    TF_ADD_ENUM_NAME(SdfSpecTypePrim);
+    TF_ADD_ENUM_NAME(SdfSpecTypePseudoRoot);
+    TF_ADD_ENUM_NAME(SdfSpecTypeRelationship);
+    TF_ADD_ENUM_NAME(SdfSpecTypeRelationshipTarget);
+    TF_ADD_ENUM_NAME(SdfSpecTypeVariant);
+    TF_ADD_ENUM_NAME(SdfSpecTypeVariantSet);
 
-  // SdfSpecifier
-  TF_ADD_ENUM_NAME(SdfSpecifierDef, "Def");
-  TF_ADD_ENUM_NAME(SdfSpecifierOver, "Over");
-  TF_ADD_ENUM_NAME(SdfSpecifierClass, "Class");
+    // SdfSpecifier
+    TF_ADD_ENUM_NAME(SdfSpecifierDef, "Def");
+    TF_ADD_ENUM_NAME(SdfSpecifierOver, "Over");
+    TF_ADD_ENUM_NAME(SdfSpecifierClass, "Class");
 
-  // SdfPermission
-  TF_ADD_ENUM_NAME(SdfPermissionPublic, "Public");
-  TF_ADD_ENUM_NAME(SdfPermissionPrivate, "Private");
+    // SdfPermission
+    TF_ADD_ENUM_NAME(SdfPermissionPublic, "Public");
+    TF_ADD_ENUM_NAME(SdfPermissionPrivate, "Private");
 
-  // SdfVariability
-  TF_ADD_ENUM_NAME(SdfVariabilityVarying, "Varying");
-  TF_ADD_ENUM_NAME(SdfVariabilityUniform, "Uniform");
+    // SdfVariability
+    TF_ADD_ENUM_NAME(SdfVariabilityVarying, "Varying");
+    TF_ADD_ENUM_NAME(SdfVariabilityUniform, "Uniform");
 
-  // SdfAuthoringError
-  TF_ADD_ENUM_NAME(SdfAuthoringErrorUnrecognizedFields);
-  TF_ADD_ENUM_NAME(SdfAuthoringErrorUnrecognizedSpecType);
+    // SdfAuthoringError
+    TF_ADD_ENUM_NAME(SdfAuthoringErrorUnrecognizedFields);
+    TF_ADD_ENUM_NAME(SdfAuthoringErrorUnrecognizedSpecType);
 }
 
 // Register all units with the TfEnum registry.
 struct _UnitsInfo {
-  map<string, map<int, double> *> _UnitsMap;
-  map<string, TfEnum> _DefaultUnitsMap;
-  map<string, TfEnum> _UnitCategoryToDefaultUnitMap;
-  map<string, string> _UnitTypeNameToUnitCategoryMap;
-  std::array<std::array<std::string, _Sdf_UnitMaxUnits>, _Sdf_UnitNumTypes> _UnitNameTable;
-  map<string, TfEnum> _UnitNameToUnitMap;
-  map<string, uint32_t> _UnitTypeIndicesTable;
+    map<string, map<int, double> *> _UnitsMap;
+    map<string, TfEnum> _DefaultUnitsMap;
+    map<string, TfEnum> _UnitCategoryToDefaultUnitMap;
+    map<string, string> _UnitTypeNameToUnitCategoryMap;
+    std::array<std::array<std::string, _Sdf_UnitMaxUnits>,
+               _Sdf_UnitNumTypes> _UnitNameTable;
+    map<string, TfEnum> _UnitNameToUnitMap;
+    map<string, uint32_t> _UnitTypeIndicesTable;
 };
 
 static void _AddToUnitsMaps(_UnitsInfo &info,
-                            const TfEnum &unit,
+                            const TfEnum &unit, 
                             const string &unitName,
                             double scale,
                             const string &category)
 {
-  const char *enumTypeName = unit.GetType().name();
-  map<int, double> *scalesMap = info._UnitsMap[enumTypeName];
+    const char *enumTypeName = unit.GetType().name();
+    map<int, double> *scalesMap = info._UnitsMap[enumTypeName];
 
-  if (!scalesMap) {
-    scalesMap = info._UnitsMap[enumTypeName] = new map<int, double>;
-  }
-  (*scalesMap)[unit.GetValueAsInt()] = scale;
-  if (scale == 1.0) {
-    info._DefaultUnitsMap[enumTypeName] = unit;
-    info._UnitCategoryToDefaultUnitMap[category] = unit;
-    info._UnitTypeNameToUnitCategoryMap[unit.GetType().name()] = category;
-  }
+    if (!scalesMap) {
+        scalesMap = info._UnitsMap[enumTypeName] = new map<int, double>;
+    }
+    (*scalesMap)[unit.GetValueAsInt()] = scale;
+    if (scale == 1.0) {
+        info._DefaultUnitsMap[enumTypeName] = unit;
+        info._UnitCategoryToDefaultUnitMap[category] = unit;
+        info._UnitTypeNameToUnitCategoryMap[unit.GetType().name()] = category;
+    }
 
-  uint32_t typeIndex;
-  map<string, uint32_t>::iterator i = info._UnitTypeIndicesTable.find(unit.GetType().name());
-  if (i == info._UnitTypeIndicesTable.end()) {
-    typeIndex = (uint32_t)info._UnitTypeIndicesTable.size();
-    info._UnitTypeIndicesTable[unit.GetType().name()] = typeIndex;
-  }
-  else {
-    typeIndex = i->second;
-  }
-  info._UnitNameTable[typeIndex][unit.GetValueAsInt()] = unitName;
-  info._UnitNameToUnitMap[unitName] = unit;
+    uint32_t typeIndex;
+    map<string, uint32_t>::iterator i =
+        info._UnitTypeIndicesTable.find(unit.GetType().name());
+    if (i == info._UnitTypeIndicesTable.end()) {
+        typeIndex = (uint32_t)info._UnitTypeIndicesTable.size();
+        info._UnitTypeIndicesTable[unit.GetType().name()] = typeIndex;
+    }
+    else {
+        typeIndex = i->second;
+    }
+    info._UnitNameTable[typeIndex][unit.GetValueAsInt()] = unitName;
+    info._UnitNameToUnitMap[unitName] = unit;
 }
 
-#define _ADD_UNIT_ENUM(category, elem) \
-  TF_ADD_ENUM_NAME(TF_PP_CAT(Sdf##category##Unit, _SDF_UNIT_TAG(elem)), _SDF_UNIT_NAME(elem));
+#define _ADD_UNIT_ENUM(category, elem)                                  \
+    TF_ADD_ENUM_NAME(                                                   \
+        TF_PP_CAT(Sdf ## category ## Unit, _SDF_UNIT_TAG(elem)),        \
+        _SDF_UNIT_NAME(elem));
 
-#define _REGISTRY_FUNCTION(elem) \
-  TF_REGISTRY_FUNCTION_WITH_TAG(TfEnum, _SDF_UNITSLIST_CATEGORY(elem)) \
-  { \
-    TF_PP_SEQ_FOR_EACH( \
-        _ADD_UNIT_ENUM, _SDF_UNITSLIST_CATEGORY(elem), _SDF_UNITSLIST_TUPLES(elem)); \
-  }
+#define _REGISTRY_FUNCTION(elem)                                     \
+TF_REGISTRY_FUNCTION_WITH_TAG(TfEnum, _SDF_UNITSLIST_CATEGORY(elem)) \
+{                                                                    \
+    TF_PP_SEQ_FOR_EACH(_ADD_UNIT_ENUM,                               \
+                       _SDF_UNITSLIST_CATEGORY(elem),                \
+                       _SDF_UNITSLIST_TUPLES(elem));                 \
+}
 
 _SDF_FOR_EACH_UNITS(_REGISTRY_FUNCTION, _SDF_UNITS)
 
-#define _ADD_UNIT_TO_MAPS(category, elem) \
-  _AddToUnitsMaps(*info, \
-                  TF_PP_CAT(Sdf##category##Unit, _SDF_UNIT_TAG(elem)), \
-                  _SDF_UNIT_NAME(elem), \
-                  _SDF_UNIT_SCALE(elem), \
-                  #category);
+#define _ADD_UNIT_TO_MAPS(category, elem)                               \
+    _AddToUnitsMaps(                                                    \
+        *info,                                                          \
+        TF_PP_CAT(Sdf ## category ## Unit, _SDF_UNIT_TAG(elem)),        \
+        _SDF_UNIT_NAME(elem),                                           \
+        _SDF_UNIT_SCALE(elem), #category);
 
-#define _POPULATE_UNIT_MAPS(elem) \
-  TF_PP_SEQ_FOR_EACH(_ADD_UNIT_TO_MAPS, _SDF_UNITSLIST_CATEGORY(elem), _SDF_UNITSLIST_TUPLES(elem))
+#define _POPULATE_UNIT_MAPS(elem)                                     \
+    TF_PP_SEQ_FOR_EACH(_ADD_UNIT_TO_MAPS,                             \
+                       _SDF_UNITSLIST_CATEGORY(elem),                 \
+                       _SDF_UNITSLIST_TUPLES(elem))                   \
 
-static _UnitsInfo *_MakeUnitsMaps()
-{
-  _UnitsInfo *info = new _UnitsInfo;
-  _SDF_FOR_EACH_UNITS(_POPULATE_UNIT_MAPS, _SDF_UNITS);
-  return info;
+static _UnitsInfo *_MakeUnitsMaps() {
+    _UnitsInfo *info = new _UnitsInfo;
+    _SDF_FOR_EACH_UNITS(_POPULATE_UNIT_MAPS, _SDF_UNITS);
+    return info;
 }
 
-static _UnitsInfo &_GetUnitsInfo()
-{
-  static _UnitsInfo *unitsInfo = _MakeUnitsMaps();
-  return *unitsInfo;
+static _UnitsInfo &_GetUnitsInfo() {
+    static _UnitsInfo *unitsInfo = _MakeUnitsMaps();
+    return *unitsInfo;
 }
 
 #undef _REGISTRY_FUNCTION
 #undef _PROCESS_ENUMERANT
 
-#define _REGISTRY_FUNCTION(elem) \
-  TF_REGISTRY_FUNCTION_WITH_TAG(TfType, TF_PP_CAT(Type, _SDF_UNITSLIST_CATEGORY(elem))) \
-  { \
-    TfType::Define<_SDF_UNITSLIST_ENUM(elem)>(); \
-  } \
-  TF_REGISTRY_FUNCTION_WITH_TAG(VtValue, TF_PP_CAT(Value, _SDF_UNITSLIST_CATEGORY(elem))) \
-  { \
-    _RegisterEnumWithVtValue<_SDF_UNITSLIST_ENUM(elem)>(); \
-  }
+#define _REGISTRY_FUNCTION(elem)                                     \
+TF_REGISTRY_FUNCTION_WITH_TAG(TfType, TF_PP_CAT(Type, _SDF_UNITSLIST_CATEGORY(elem))) \
+{                                                                    \
+    TfType::Define<_SDF_UNITSLIST_ENUM(elem)>();                     \
+}                                                                    \
+TF_REGISTRY_FUNCTION_WITH_TAG(VtValue, TF_PP_CAT(Value, _SDF_UNITSLIST_CATEGORY(elem))) \
+{                                                                    \
+    _RegisterEnumWithVtValue<_SDF_UNITSLIST_ENUM(elem)>();           \
+}
 _SDF_FOR_EACH_UNITS(_REGISTRY_FUNCTION, _SDF_UNITS)
 #undef _REGISTRY_FUNCTION
 
-TfEnum SdfDefaultUnit(const TfToken &typeName)
+TfEnum
+SdfDefaultUnit( const TfToken &typeName )
 {
-  return SdfSchema::GetInstance().FindType(typeName).GetDefaultUnit();
+    return SdfSchema::GetInstance().FindType(typeName).GetDefaultUnit();
 }
 
-const TfEnum &SdfDefaultUnit(const TfEnum &unit)
+const TfEnum &
+SdfDefaultUnit( const TfEnum &unit )
 {
-  static TfEnum empty;
-  _UnitsInfo &info = _GetUnitsInfo();
-  map<string, TfEnum>::const_iterator it = info._DefaultUnitsMap.find(unit.GetType().name());
+    static TfEnum empty;
+    _UnitsInfo &info = _GetUnitsInfo();
+    map<string, TfEnum>::const_iterator it =
+        info._DefaultUnitsMap.find(unit.GetType().name());
 
-  if (it == info._DefaultUnitsMap.end()) {
-    TF_WARN("Unsupported unit '%s'.", ArchGetDemangled(unit.GetType()).c_str());
-    return empty;
-  }
-  return it->second;
+    if ( it == info._DefaultUnitsMap.end() ) {
+        TF_WARN("Unsupported unit '%s'.",
+                ArchGetDemangled(unit.GetType()).c_str());
+        return empty;
+    }
+    return it->second;
 }
 
-const string &SdfUnitCategory(const TfEnum &unit)
+const string &
+SdfUnitCategory( const TfEnum &unit )
 {
-  static string empty;
-  _UnitsInfo &info = _GetUnitsInfo();
-  map<string, string>::const_iterator it = info._UnitTypeNameToUnitCategoryMap.find(
-      unit.GetType().name());
+    static string empty;
+    _UnitsInfo &info = _GetUnitsInfo();
+    map<string, string>::const_iterator it =
+        info._UnitTypeNameToUnitCategoryMap.find(unit.GetType().name());
 
-  if (it == info._UnitTypeNameToUnitCategoryMap.end()) {
-    TF_WARN("Unsupported unit '%s'.", ArchGetDemangled(unit.GetType()).c_str());
-    return empty;
-  }
-  return it->second;
+    if (it == info._UnitTypeNameToUnitCategoryMap.end()) {
+        TF_WARN("Unsupported unit '%s'.",
+                ArchGetDemangled(unit.GetType()).c_str());
+        return empty;
+    }
+    return it->second;
 }
 
 // Gets the type/unit pair for a unit enum.
-static std::pair<uint32_t, uint32_t> Sdf_GetUnitIndices(const TfEnum &unit)
+static std::pair<uint32_t, uint32_t>
+Sdf_GetUnitIndices( const TfEnum &unit )
 {
-  _UnitsInfo &info = _GetUnitsInfo();
-  return std::make_pair(info._UnitTypeIndicesTable[unit.GetType().name()], unit.GetValueAsInt());
+    _UnitsInfo &info = _GetUnitsInfo();
+    return std::make_pair(info._UnitTypeIndicesTable[unit.GetType().name()],
+                          unit.GetValueAsInt());
 }
 
-double SdfConvertUnit(const TfEnum &fromUnit, const TfEnum &toUnit)
+double SdfConvertUnit( const TfEnum &fromUnit, const TfEnum &toUnit )
 {
-  _UnitsInfo &info = _GetUnitsInfo();
-  if (!toUnit.IsA(fromUnit.GetType())) {
-    TF_WARN("Can not convert from '%s' to '%s'.",
-            TfEnum::GetFullName(fromUnit).c_str(),
-            TfEnum::GetFullName(toUnit).c_str());
-    return 0.0;
-  }
-  map<string, map<int, double> *>::const_iterator it = info._UnitsMap.find(
-      fromUnit.GetType().name());
+    _UnitsInfo &info = _GetUnitsInfo();
+    if (!toUnit.IsA(fromUnit.GetType()) ) {
+        TF_WARN("Can not convert from '%s' to '%s'.",
+                TfEnum::GetFullName(fromUnit).c_str(),
+                TfEnum::GetFullName(toUnit).c_str());
+        return 0.0;
+    }
+    map<string, map<int, double> *>::const_iterator it =
+        info._UnitsMap.find(fromUnit.GetType().name());
 
-  if (it == info._UnitsMap.end()) {
-    TF_WARN("Unsupported unit '%s'.", ArchGetDemangled(fromUnit.GetType()).c_str());
-    return 0.0;
-  }
-  return (*it->second)[fromUnit.GetValueAsInt()] / (*it->second)[toUnit.GetValueAsInt()];
+    if ( it == info._UnitsMap.end() ) {
+        TF_WARN("Unsupported unit '%s'.",
+                ArchGetDemangled(fromUnit.GetType()).c_str());
+        return 0.0;
+    }
+    return (*it->second)[fromUnit.GetValueAsInt()] /
+        (*it->second)[toUnit.GetValueAsInt()];
 }
 
-const string &SdfGetNameForUnit(const TfEnum &unit)
+const string &
+SdfGetNameForUnit( const TfEnum &unit )
 {
-  static std::string empty;
-  _UnitsInfo &info = _GetUnitsInfo();
+    static std::string empty;
+    _UnitsInfo &info = _GetUnitsInfo();
 
-  // first check if this is a known type
-  map<string, uint32_t>::const_iterator it = info._UnitTypeIndicesTable.find(
-      unit.GetType().name());
-  if (it == info._UnitTypeIndicesTable.end()) {
-    TF_WARN("Unsupported unit '%s'.", ArchGetDemangled(unit.GetType()).c_str());
-    return empty;
-  }
+    // first check if this is a known type
+    map<string, uint32_t>::const_iterator it =
+        info._UnitTypeIndicesTable.find(unit.GetType().name());
+    if (it == info._UnitTypeIndicesTable.end()) {
+        TF_WARN("Unsupported unit '%s'.",
+                ArchGetDemangled(unit.GetType()).c_str());
+        return empty;
+    }
 
-  // get indices
-  std::pair<uint32_t, uint32_t> indices = Sdf_GetUnitIndices(unit);
-  // look up sdf name in our table
-  return info._UnitNameTable[indices.first][indices.second];
+    // get indices
+    std::pair<uint32_t, uint32_t> indices = Sdf_GetUnitIndices(unit);
+    // look up sdf name in our table
+    return info._UnitNameTable[indices.first][indices.second];
 }
 
-const TfEnum &SdfGetUnitFromName(const std::string &name)
+const TfEnum &
+SdfGetUnitFromName( const std::string &name )
 {
-  static TfEnum empty;
-  _UnitsInfo &info = _GetUnitsInfo();
-  map<string, TfEnum>::const_iterator it = info._UnitNameToUnitMap.find(name);
+    static TfEnum empty;
+    _UnitsInfo &info = _GetUnitsInfo();
+    map<string, TfEnum>::const_iterator it = info._UnitNameToUnitMap.find(name);
 
-  if (it == info._UnitNameToUnitMap.end()) {
-    TF_WARN("Unknown unit name '%s'.", name.c_str());
-    return empty;
-  }
+    if ( it == info._UnitNameToUnitMap.end() ) {
+        TF_WARN("Unknown unit name '%s'.", name.c_str());
+        return empty;
+    }
 
-  return it->second;
+    return it->second;
 }
 
-bool SdfValueHasValidType(const VtValue &value)
+bool
+SdfValueHasValidType(const VtValue& value)
 {
-  return static_cast<bool>(SdfSchema::GetInstance().FindType(value));
+    return static_cast<bool>(SdfSchema::GetInstance().FindType(value));
 }
 
 // Given sdf valueType name, produce TfType.
-TfType SdfGetTypeForValueTypeName(TfToken const &name)
+TfType
+SdfGetTypeForValueTypeName(TfToken const &name)
 {
-  return SdfSchema::GetInstance().FindType(name).GetType();
+    return SdfSchema::GetInstance().FindType(name).GetType();
 }
 
 // Given VtValue, produce corresponding valueType name
-SdfValueTypeName SdfGetValueTypeNameForValue(const VtValue &val)
+SdfValueTypeName
+SdfGetValueTypeNameForValue(const VtValue& val)
 {
-  return SdfSchema::GetInstance().FindType(val);
+    return SdfSchema::GetInstance().FindType(val);
 }
 
-TfToken SdfGetRoleNameForValueTypeName(const TfToken &name)
+TfToken
+SdfGetRoleNameForValueTypeName(const TfToken &name)
 {
-  return SdfSchema::GetInstance().FindType(name).GetRole();
+    return SdfSchema::GetInstance().FindType(name).GetRole();
 }
 
 // Return a human-readable description of the passed value for diagnostic
 // messages.
-static std::string _GetDiagnosticStringForValue(VtValue const &value)
+static std::string
+_GetDiagnosticStringForValue(VtValue const &value)
 {
-  std::string valueStr = TfStringify(value);
-  // Truncate the value after 32 chars so we don't spam huge diagnostic
-  // strings.
-  if (valueStr.size() > 32) {
-    valueStr.erase(valueStr.begin() + 32, valueStr.end());
-    valueStr += "...";
-  }
-  return TfStringPrintf("<%s> '%s'", value.GetTypeName().c_str(), valueStr.c_str());
+    std::string valueStr = TfStringify(value);
+    // Truncate the value after 32 chars so we don't spam huge diagnostic
+    // strings.
+    if (valueStr.size() > 32) {
+        valueStr.erase(valueStr.begin() + 32, valueStr.end());
+        valueStr += "...";
+    }
+    return TfStringPrintf("<%s> '%s'", value.GetTypeName().c_str(),
+                          valueStr.c_str());
 }
 
 // Return either empty string (if keyPath is empty) or a string indicating the
 // path of keys in a nested dictionary, padded by one space on the left.
-static std::string _GetKeyPathText(std::vector<std::string> const &keyPath)
+static std::string
+_GetKeyPathText(std::vector<std::string> const &keyPath)
 {
-  return keyPath.empty() ? std::string() :
-                           TfStringPrintf(" under key '%s'", TfStringJoin(keyPath, ":").c_str());
+    return keyPath.empty() ? std::string() :
+        TfStringPrintf(" under key '%s'", TfStringJoin(keyPath, ":").c_str());
 }
 
 // Add a human-readable error to errMsgs indicating that the passed value does
 // not have a valid scene description datatype.
-static void _AddInvalidTypeError(char const *prefix,
-                                 VtValue const &value,
-                                 std::vector<std::string> *errMsgs,
-                                 std::vector<std::string> const *keyPath)
+static void
+_AddInvalidTypeError(
+    char const *prefix,
+    VtValue const &value,
+    std::vector<std::string> *errMsgs,
+    std::vector<std::string> const *keyPath)
 {
-  errMsgs->push_back(
-      TfStringPrintf("%s%s%s is not a valid scene description "
-                     "datatype",
-                     prefix,
-                     _GetDiagnosticStringForValue(value).c_str(),
-                     _GetKeyPathText(*keyPath).c_str()));
+    errMsgs->push_back(
+        TfStringPrintf(
+            "%s%s%s is not a valid scene description "
+            "datatype", prefix,
+            _GetDiagnosticStringForValue(value).c_str(),
+            _GetKeyPathText(*keyPath).c_str()));
 }
 
 // Function pointer type for converting VtValue holding std::vector<VtValue> to
 // VtArray of a specific type T.
-using _ValueVectorToVtArrayFn = bool (*)(VtValue *,
-                                         std::vector<std::string> *,
-                                         std::vector<std::string> const *);
+using _ValueVectorToVtArrayFn =
+    bool (*)(VtValue *, std::vector<std::string> *,
+             std::vector<std::string> const *);
 
 // This function template converts value (holding vector<VtValue>) to
 // VtArray<T>.  We instantiate this for every type SDF_VALUE_TYPES and dispatch
 // to the correct one based on the type held by the first element in the
 // vector<VtValue>.
-template<class T>
+template <class T>
 bool _ValueVectorToVtArray(VtValue *value,
                            std::vector<std::string> *errMsgs,
                            std::vector<std::string> const *keyPath)
 {
-  // Guarantees: value holds std::vector<VtValue>, and that vector is not
-  // empty.  Also, the first element is a T.  The task here is to attempt to
-  // populate a VtArray<T> with all the elements of the vector cast to T.  If
-  // any fail, add a message to errMsgs indicating the failed element.
-  auto const &valVec = value->UncheckedGet<std::vector<VtValue>>();
-  auto begin = valVec.begin(), end = valVec.end();
-  VtArray<T> result(distance(begin, end));
-
-  bool allValid = true;
-  for (T *e = result.data(); begin != end; ++begin) {
-    VtValue cast = VtValue::Cast<T>(*begin);
-    if (cast.IsEmpty()) {
-      errMsgs->push_back(
-          TfStringPrintf("failed to cast array element "
-                         "%zu: %s%s to <%s>",
-                         std::distance(valVec.begin(), begin),
-                         _GetDiagnosticStringForValue(*begin).c_str(),
-                         _GetKeyPathText(*keyPath).c_str(),
-                         ArchGetDemangled<T>().c_str()));
-      allValid = false;
+    // Guarantees: value holds std::vector<VtValue>, and that vector is not
+    // empty.  Also, the first element is a T.  The task here is to attempt to
+    // populate a VtArray<T> with all the elements of the vector cast to T.  If
+    // any fail, add a message to errMsgs indicating the failed element.
+    auto const &valVec = value->UncheckedGet<std::vector<VtValue>>();
+    auto begin = valVec.begin(), end = valVec.end();
+    VtArray<T> result(distance(begin, end));
+    
+    bool allValid = true;
+    for (T *e = result.data(); begin != end; ++begin) {
+        VtValue cast = VtValue::Cast<T>(*begin);
+        if (cast.IsEmpty()) {
+            errMsgs->push_back(
+                TfStringPrintf("failed to cast array element "
+                               "%zu: %s%s to <%s>",
+                               std::distance(valVec.begin(), begin),
+                               _GetDiagnosticStringForValue(*begin).c_str(),
+                               _GetKeyPathText(*keyPath).c_str(),
+                               ArchGetDemangled<T>().c_str()));
+            allValid = false;
+        }
+        else {
+            cast.Swap(*e++);
+        }
     }
-    else {
-      cast.Swap(*e++);
+    if (!allValid) {
+        *value = VtValue();
+        return false;
     }
-  }
-  if (!allValid) {
-    *value = VtValue();
-    return false;
-  }
-  value->Swap(result);
-  return true;
+    value->Swap(result);
+    return true;
 }
 
 // Look up the function to convert vector<VtValue> to VtArray<T> for type and
 // return it.  The caller guarantees that type is one of SDF_VALUE_TYPES.
-static _ValueVectorToVtArrayFn _GetTypedValueVectorToVtArrayFn(TfType const &type)
+static _ValueVectorToVtArrayFn
+_GetTypedValueVectorToVtArrayFn(TfType const &type)
 {
-  using FnMap = std::unordered_map<TfType, _ValueVectorToVtArrayFn, TfHash>;
-  static FnMap *valueVectorToVtArrayFnMap = []() {
-    FnMap *ret = new FnMap(TF_PP_SEQ_SIZE(SDF_VALUE_TYPES));
+    using FnMap = std::unordered_map<
+        TfType, _ValueVectorToVtArrayFn, TfHash>;
+    static FnMap *valueVectorToVtArrayFnMap = []() {
+        FnMap *ret = new FnMap(TF_PP_SEQ_SIZE(SDF_VALUE_TYPES));
 
 // Add conversion functions for all SDF_VALUE_TYPES.
-#define _ADD_FN(unused, elem) \
-  ret->emplace(TfType::Find<SDF_VALUE_CPP_TYPE(elem)>(), \
-               _ValueVectorToVtArray<SDF_VALUE_CPP_TYPE(elem)>);
+#define _ADD_FN(unused, elem)                                           \
+        ret->emplace(TfType::Find<SDF_VALUE_CPP_TYPE(elem)>(),          \
+                     _ValueVectorToVtArray<SDF_VALUE_CPP_TYPE(elem)>);
 
-    TF_PP_SEQ_FOR_EACH(_ADD_FN, ~, SDF_VALUE_TYPES)
+        TF_PP_SEQ_FOR_EACH(_ADD_FN, ~, SDF_VALUE_TYPES)
 #undef _ADD_FN
-    return ret;
-  }();
+        return ret;
+    }();
 
-  auto iter = valueVectorToVtArrayFnMap->find(type);
-  if (TF_VERIFY(iter != valueVectorToVtArrayFnMap->end(),
-                "Value type '%s' returns true from "
-                "SdfValueHasValidType but does not appear in "
-                "SDF_VALUE_TYPES.",
-                type.GetTypeName().c_str()))
-  {
-    return iter->second;
-  }
-  return nullptr;
+    auto iter = valueVectorToVtArrayFnMap->find(type);
+    if (TF_VERIFY(iter != valueVectorToVtArrayFnMap->end(),
+                  "Value type '%s' returns true from "
+                  "SdfValueHasValidType but does not appear in "
+                  "SDF_VALUE_TYPES.", type.GetTypeName().c_str())) {
+        return iter->second;
+    }
+    return nullptr;
 }
 
 // Try to convert 'value' holding vector<VtValue> to a VtArray, using the type
 // of the first element in the vector.
-static bool _ValueVectorToAnyVtArray(VtValue *value,
-                                     std::vector<std::string> *errMsgs,
-                                     std::vector<std::string> const *keyPath)
+static bool
+_ValueVectorToAnyVtArray(VtValue *value, std::vector<std::string> *errMsgs,
+                         std::vector<std::string> const *keyPath)
 {
-  std::vector<VtValue> const &valVec = value->UncheckedGet<std::vector<VtValue>>();
-  // If this is an empty vector, we cannot sensibly choose any type for the
-  // VtArray.  Error.
-  if (valVec.empty()) {
-    errMsgs->push_back(
-        TfStringPrintf("cannot infer type from empty vector/list%s -- use "
-                       "an empty typed array like VtIntArray/VtStringArray instead",
-                       _GetKeyPathText(*keyPath).c_str()));
-    *value = VtValue();
-    return false;
-  }
-  // Pull the type from the first element, and try to invoke the conversion
-  // function to convert all elements.
-  if (SdfValueHasValidType(valVec.front())) {
-    return _GetTypedValueVectorToVtArrayFn(valVec.front().GetType())(value, errMsgs, keyPath);
-  }
-  else {
-    _AddInvalidTypeError("first vector/list element ", valVec.front(), errMsgs, keyPath);
-    *value = VtValue();
-    return false;
-  }
-  return true;
+    std::vector<VtValue> const &valVec =
+        value->UncheckedGet<std::vector<VtValue>>();
+    // If this is an empty vector, we cannot sensibly choose any type for the
+    // VtArray.  Error.
+    if (valVec.empty()) {
+        errMsgs->push_back(
+            TfStringPrintf(
+                "cannot infer type from empty vector/list%s -- use "
+                "an empty typed array like VtIntArray/VtStringArray instead",
+                _GetKeyPathText(*keyPath).c_str()));
+        *value = VtValue();
+        return false;
+    }
+    // Pull the type from the first element, and try to invoke the conversion
+    // function to convert all elements.
+    if (SdfValueHasValidType(valVec.front())) {
+        return _GetTypedValueVectorToVtArrayFn(
+            valVec.front().GetType())(value, errMsgs, keyPath);
+    }
+    else {
+        _AddInvalidTypeError("first vector/list element ",
+                             valVec.front(), errMsgs, keyPath);
+        *value = VtValue();
+        return false;
+    }
+    return true;
 }
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
 
-using _PySeqToVtArrayFn = bool (*)(VtValue *,
-                                   std::vector<std::string> *,
-                                   std::vector<std::string> const *);
+using _PySeqToVtArrayFn =
+    bool (*)(VtValue *, std::vector<std::string> *,
+             std::vector<std::string> const *);
 
-template<class T>
+template <class T>
 bool _PySeqToVtArray(VtValue *value,
                      std::vector<std::string> *errMsgs,
                      std::vector<std::string> const *keyPath)
 {
-  using ElemType = T;
-  bool allValid = true;
-  TfPyLock lock;
-  TfPyObjWrapper obj = value->UncheckedGet<TfPyObjWrapper>();
-  Py_ssize_t len = PySequence_Length(obj.ptr());
-  VtArray<T> result(len);
-  ElemType *elem = result.data();
-  for (Py_ssize_t i = 0; i != len; ++i) {
-    boost::python::handle<> h(PySequence_ITEM(obj.ptr(), i));
-    if (!h) {
-      if (PyErr_Occurred()) {
-        PyErr_Clear();
-      }
-      errMsgs->push_back(TfStringPrintf("failed to obtain element %s from sequence%s",
-                                        TfStringify(i).c_str(),
-                                        _GetKeyPathText(*keyPath).c_str()));
-      allValid = false;
+    using ElemType = T;
+    bool allValid = true;
+    TfPyLock lock;
+    TfPyObjWrapper obj = value->UncheckedGet<TfPyObjWrapper>();
+    Py_ssize_t len = PySequence_Length(obj.ptr());
+    VtArray<T> result(len);
+    ElemType *elem = result.data();
+    for (Py_ssize_t i = 0; i != len; ++i) {
+        pxr_boost::python::handle<> h(PySequence_ITEM(obj.ptr(), i));
+        if (!h) {
+            if (PyErr_Occurred()) {
+                PyErr_Clear();
+            }
+            errMsgs->push_back(
+                TfStringPrintf("failed to obtain element %s from sequence%s",
+                               TfStringify(i).c_str(),
+                               _GetKeyPathText(*keyPath).c_str()));
+            allValid = false;
+        }
+        pxr_boost::python::extract<ElemType> e(h.get());
+        if (!e.check()) {
+            errMsgs->push_back(
+                TfStringPrintf("failed to cast sequence element "
+                               "%s: %s%s to <%s>",
+                               TfStringify(i).c_str(),
+                               _GetDiagnosticStringForValue(
+                                   pxr_boost::python::extract<VtValue>(
+                                       h.get())).c_str(),
+                               _GetKeyPathText(*keyPath).c_str(),
+                               ArchGetDemangled<ElemType>().c_str()));
+            allValid = false;
+        }
+        else {
+            *elem++ = e();
+        }
     }
-    boost::python::extract<ElemType> e(h.get());
-    if (!e.check()) {
-      errMsgs->push_back(TfStringPrintf(
-          "failed to cast sequence element "
-          "%s: %s%s to <%s>",
-          TfStringify(i).c_str(),
-          _GetDiagnosticStringForValue(boost::python::extract<VtValue>(h.get())).c_str(),
-          _GetKeyPathText(*keyPath).c_str(),
-          ArchGetDemangled<ElemType>().c_str()));
-      allValid = false;
+    if (!allValid) {
+        *value = VtValue();
+        return false;
     }
-    else {
-      *elem++ = e();
-    }
-  }
-  if (!allValid) {
-    *value = VtValue();
-    return false;
-  }
-  value->Swap(result);
-  return true;
+    value->Swap(result);
+    return true;
 }
 
-static _PySeqToVtArrayFn _GetTypedPySeqToVtArrayFn(TfType const &type)
+static _PySeqToVtArrayFn
+_GetTypedPySeqToVtArrayFn(TfType const &type)
 {
-  using FnMap = std::unordered_map<TfType, _PySeqToVtArrayFn, TfHash>;
-  static FnMap *pySeqToVtArrayFnMap = []() {
-    FnMap *ret = new FnMap(TF_PP_SEQ_SIZE(SDF_VALUE_TYPES));
+    using FnMap = std::unordered_map<TfType, _PySeqToVtArrayFn, TfHash>;
+    static FnMap *pySeqToVtArrayFnMap = []() {
+        FnMap *ret = new FnMap(TF_PP_SEQ_SIZE(SDF_VALUE_TYPES));
 
 // Add conversion functions for all SDF_VALUE_TYPES.
-#  define _ADD_FN(unused, elem) \
-    ret->emplace(TfType::Find<SDF_VALUE_CPP_TYPE(elem)>(), \
-                 _PySeqToVtArray<SDF_VALUE_CPP_TYPE(elem)>);
+#define _ADD_FN(unused, elem)                                           \
+        ret->emplace(TfType::Find<SDF_VALUE_CPP_TYPE(elem)>(),          \
+                     _PySeqToVtArray<SDF_VALUE_CPP_TYPE(elem)>);
 
-    TF_PP_SEQ_FOR_EACH(_ADD_FN, ~, SDF_VALUE_TYPES)
-#  undef _ADD_FN
-    return ret;
-  }();
+        TF_PP_SEQ_FOR_EACH(_ADD_FN, ~, SDF_VALUE_TYPES)
+#undef _ADD_FN
+        return ret;
+    }();
 
-  auto iter = pySeqToVtArrayFnMap->find(type);
-  if (TF_VERIFY(iter != pySeqToVtArrayFnMap->end(),
-                "Value type '%s' returns true from "
-                "SdfValueHasValidType but does not appear in "
-                "SDF_VALUE_TYPES.",
-                type.GetTypeName().c_str()))
-  {
-    return iter->second;
-  }
-  return nullptr;
-}
-
-static bool _PyObjToAnyVtArray(VtValue *value,
-                               std::vector<std::string> *errMsgs,
-                               std::vector<std::string> *keyPath)
-{
-  TfPyLock pyLock;
-  TfPyObjWrapper obj = value->UncheckedGet<TfPyObjWrapper>();
-
-  if (!PySequence_Check(obj.ptr())) {
-    errMsgs->push_back(TfStringPrintf("cannot convert python object as sequence%s",
-                                      _GetKeyPathText(*keyPath).c_str()));
-    *value = VtValue();
-    return false;
-  }
-
-  Py_ssize_t len = PySequence_Length(obj.ptr());
-  // If this is an empty sequence, we cannot sensibly choose any type for the
-  // VtArray.  Error.
-  if (len == 0) {
-    errMsgs->push_back(
-        TfStringPrintf("cannot infer type from empty sequence%s -- use"
-                       "an empty typed array like VtIntArray/VtStringArray instead",
-                       _GetKeyPathText(*keyPath).c_str()));
-    *value = VtValue();
-    return false;
-  }
-  // Pull the type from the first element, and try to invoke the conversion
-  // function to convert all elements.
-  boost::python::handle<> h(PySequence_ITEM(obj.ptr(), 0));
-  if (!h) {
-    if (PyErr_Occurred()) {
-      PyErr_Clear();
+    auto iter = pySeqToVtArrayFnMap->find(type);
+    if (TF_VERIFY(iter != pySeqToVtArrayFnMap->end(),
+                  "Value type '%s' returns true from "
+                  "SdfValueHasValidType but does not appear in "
+                  "SDF_VALUE_TYPES.", type.GetTypeName().c_str())) {
+        return iter->second;
     }
-    errMsgs->push_back(TfStringPrintf("failed to obtain first element from sequence%s",
-                                      _GetKeyPathText(*keyPath).c_str()));
-    *value = VtValue();
-    return false;
-  }
-  boost::python::extract<VtValue> e(h.get());
-  if (!e.check()) {
-    errMsgs->push_back(TfStringPrintf("failed to obtain first element from sequence%s",
-                                      _GetKeyPathText(*keyPath).c_str()));
-    *value = VtValue();
-    return false;
-  }
-  VtValue firstVal = e();
-  if (SdfValueHasValidType(firstVal)) {
-    return _GetTypedPySeqToVtArrayFn(firstVal.GetType())(value, errMsgs, keyPath);
-  }
-  else {
-    _AddInvalidTypeError("first sequence element ", firstVal, errMsgs, keyPath);
-    *value = VtValue();
-    return false;
-  }
-  return true;
+    return nullptr;
 }
 
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-static bool _ConvertToValidMetadataDictValueInternal(VtValue *value,
-                                                     std::vector<std::string> *errMsgs,
-                                                     std::vector<std::string> *keyPath)
+static bool
+_PyObjToAnyVtArray(VtValue *value, std::vector<std::string> *errMsgs,
+                   std::vector<std::string> *keyPath)
 {
+    TfPyLock pyLock;
+    TfPyObjWrapper obj = value->UncheckedGet<TfPyObjWrapper>();
 
-  bool allValid = true;
-
-  if (value->IsHolding<VtDictionary>()) {
-    VtDictionary d;
-    value->UncheckedSwap(d);
-    for (auto &kv : d) {
-      keyPath->push_back(kv.first);
-      allValid &= _ConvertToValidMetadataDictValueInternal(&kv.second, errMsgs, keyPath);
-      keyPath->pop_back();
+    if (!PySequence_Check(obj.ptr())) {
+        errMsgs->push_back(
+            TfStringPrintf(
+                "cannot convert python object as sequence%s",
+                _GetKeyPathText(*keyPath).c_str()));
+        *value = VtValue();
+        return false;
     }
-    value->UncheckedSwap(d);
-  }
-  else if (value->IsHolding<std::vector<VtValue>>()) {
-    allValid &= _ValueVectorToAnyVtArray(value, errMsgs, keyPath);
-  }
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-  else if (value->IsHolding<TfPyObjWrapper>()) {
-    allValid &= _PyObjToAnyVtArray(value, errMsgs, keyPath);
-  }
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-  else if (!SdfValueHasValidType(*value)) {
-    allValid = false;
-    *value = VtValue();
-  }
-  return allValid;
+
+    Py_ssize_t len = PySequence_Length(obj.ptr());
+    // If this is an empty sequence, we cannot sensibly choose any type for the
+    // VtArray.  Error.
+    if (len == 0) {
+        errMsgs->push_back(
+            TfStringPrintf(
+                "cannot infer type from empty sequence%s -- use"
+                "an empty typed array like VtIntArray/VtStringArray instead",
+                _GetKeyPathText(*keyPath).c_str()));
+        *value = VtValue();
+        return false;
+    }
+    // Pull the type from the first element, and try to invoke the conversion
+    // function to convert all elements.
+    pxr_boost::python::handle<> h(PySequence_ITEM(obj.ptr(), 0));
+    if (!h) {
+        if (PyErr_Occurred()) {
+            PyErr_Clear();
+        }
+        errMsgs->push_back(
+            TfStringPrintf("failed to obtain first element from sequence%s",
+                           _GetKeyPathText(*keyPath).c_str()));
+        *value = VtValue();
+        return false;
+    }
+    pxr_boost::python::extract<VtValue> e(h.get());
+    if (!e.check()) {
+        errMsgs->push_back(
+            TfStringPrintf("failed to obtain first element from sequence%s",
+                           _GetKeyPathText(*keyPath).c_str()));
+        *value = VtValue();
+        return false;
+    }
+    VtValue firstVal = e();
+    if (SdfValueHasValidType(firstVal)) {
+        return _GetTypedPySeqToVtArrayFn(
+            firstVal.GetType())(value, errMsgs, keyPath);
+    }
+    else {
+        _AddInvalidTypeError("first sequence element ",
+                             firstVal, errMsgs, keyPath);
+        *value = VtValue();
+        return false;
+    }
+    return true;
 }
 
-bool SdfConvertToValidMetadataDictionary(VtDictionary *dict, std::string *errMsg)
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+
+static bool
+_ConvertToValidMetadataDictValueInternal(
+    VtValue *value, std::vector<std::string> *errMsgs,
+    std::vector<std::string> *keyPath) {
+
+    bool allValid = true;
+
+    if (value->IsHolding<VtDictionary>()) {
+        VtDictionary d;
+        value->UncheckedSwap(d);
+        for (auto &kv: d) {
+            keyPath->push_back(kv.first);
+            allValid &= _ConvertToValidMetadataDictValueInternal(
+                &kv.second, errMsgs, keyPath);
+            keyPath->pop_back();
+        }
+        value->UncheckedSwap(d);
+    }
+    else if (value->IsHolding<std::vector<VtValue>>()) {
+        allValid &= _ValueVectorToAnyVtArray(value, errMsgs, keyPath);
+    }
+#if PXR_PYTHON_SUPPORT_ENABLED
+    else if (value->IsHolding<TfPyObjWrapper>()) {
+        allValid &= _PyObjToAnyVtArray(value, errMsgs, keyPath);
+    }
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+    else if (!SdfValueHasValidType(*value)) {
+        allValid = false;
+        *value = VtValue();
+    }
+    return allValid;
+}
+
+bool
+SdfConvertToValidMetadataDictionary(VtDictionary *dict, std::string *errMsg)
 {
-  std::vector<std::string> keyPath;
-  std::vector<std::string> errMsgs;
-  bool allValid = true;
-  for (auto &kv : *dict) {
-    keyPath.push_back(kv.first);
-    allValid &= _ConvertToValidMetadataDictValueInternal(&kv.second, &errMsgs, &keyPath);
-    keyPath.pop_back();
-  }
-  *errMsg = TfStringJoin(errMsgs, "; ");
-  return allValid;
+    std::vector<std::string> keyPath;
+    std::vector<std::string> errMsgs;
+    bool allValid = true;
+    for (auto &kv: *dict) {
+        keyPath.push_back(kv.first);
+        allValid &= _ConvertToValidMetadataDictValueInternal(
+            &kv.second, &errMsgs, &keyPath);
+        keyPath.pop_back();
+    }
+    *errMsg = TfStringJoin(errMsgs, "; ");
+    return allValid;
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfSpecifier &spec)
+std::ostream& operator<<(std::ostream& out, const SdfSpecifier& spec)
 {
-  return out << TfEnum::GetDisplayName(TfEnum(spec)) << "\n";
+    return out << TfEnum::GetDisplayName(TfEnum(spec)) << "\n";
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfRelocatesMap &reloMap)
+std::ostream & operator<<( std::ostream &out,
+                           const SdfRelocatesMap &reloMap )
 {
-  TF_FOR_ALL(it, reloMap)
-  {
-    out << it->first << ": " << it->second << "\n";
-  }
-  return out;
+    TF_FOR_ALL(it, reloMap) {
+        out << it->first << ": " << it->second << "\n";
+    }
+    return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfRelocates &relocates)
+std::ostream & operator<<( std::ostream &out,
+                           const SdfRelocates &relocates )
 {
-  TF_FOR_ALL(it, relocates)
-  {
-    out << it->first << ": " << it->second << "\n";
-  }
-  return out;
+    TF_FOR_ALL(it, relocates) {
+        out << it->first << ": " << it->second << "\n";
+    }
+    return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfTimeSampleMap &sampleMap)
+std::ostream & operator<<( std::ostream &out,
+                           const SdfTimeSampleMap &sampleMap )
 {
-  TF_FOR_ALL(it, sampleMap)
-  {
-    out << it->first << ": " << it->second << "\n";
-  }
-  return out;
+    TF_FOR_ALL(it, sampleMap) {
+        out << it->first << ": " << it->second << "\n";
+    }
+    return out;
 }
 
-std::ostream &VtStreamOut(const SdfVariantSelectionMap &varSelMap, std::ostream &stream)
+std::ostream &
+VtStreamOut(const SdfVariantSelectionMap &varSelMap, std::ostream &stream)
 {
-  return stream << varSelMap;
+    return stream << varSelMap;
 }
 
-SdfUnregisteredValue::SdfUnregisteredValue() {}
+SdfUnregisteredValue::SdfUnregisteredValue()
+{
+}
 
-SdfUnregisteredValue::SdfUnregisteredValue(const std::string &value) : _value(value) {}
+SdfUnregisteredValue::SdfUnregisteredValue(const std::string &value) :
+    _value(value)
+{
+}
 
-SdfUnregisteredValue::SdfUnregisteredValue(const VtDictionary &value) : _value(value) {}
+SdfUnregisteredValue::SdfUnregisteredValue(const VtDictionary &value) :
+    _value(value)
+{
+}
 
-SdfUnregisteredValue::SdfUnregisteredValue(const SdfUnregisteredValueListOp &value) : _value(value)
+SdfUnregisteredValue::SdfUnregisteredValue(
+    const SdfUnregisteredValueListOp& value) :
+    _value(value)
 {
 }
 
 bool SdfUnregisteredValue::operator==(const SdfUnregisteredValue &other) const
 {
-  return _value == other._value;
+    return _value == other._value;
 }
 
 bool SdfUnregisteredValue::operator!=(const SdfUnregisteredValue &other) const
 {
-  return !(*this == other);
+    return !(*this == other);
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfUnregisteredValue &value)
+std::ostream &operator << (std::ostream &out, const SdfUnregisteredValue &value)
 {
-  return out << value.GetValue();
+    return out << value.GetValue();
 }
 
 Sdf_ValueTypeNamesType::Sdf_ValueTypeNamesType()
 {
-  // Do nothing
+    // Do nothing
 }
 
 Sdf_ValueTypeNamesType::~Sdf_ValueTypeNamesType()
 {
-  // Do nothing
+    // Do nothing
 }
 
 // Defined in schema.cpp
-const Sdf_ValueTypeNamesType *Sdf_InitializeValueTypeNames();
+const Sdf_ValueTypeNamesType* Sdf_InitializeValueTypeNames();
 
-const Sdf_ValueTypeNamesType *Sdf_ValueTypeNamesType::_Init::New()
+const Sdf_ValueTypeNamesType*
+Sdf_ValueTypeNamesType::_Init::New()
 {
-  return Sdf_InitializeValueTypeNames();
+    return Sdf_InitializeValueTypeNames();
 }
 
-TfToken Sdf_ValueTypeNamesType::GetSerializationName(const SdfValueTypeName &typeName) const
+TfToken
+Sdf_ValueTypeNamesType::GetSerializationName(
+    const SdfValueTypeName& typeName) const
 {
-  // Return the first registered alias, which is the new type name.
-  const TfToken name = typeName.GetAliasesAsTokens().front();
-  if (!name.IsEmpty()) {
-    return name;
-  }
-
-  return typeName.GetAsToken();
+    // Return the first registered alias, which is the new type name.
+    const TfToken name = typeName.GetAliasesAsTokens().front();
+    if (!name.IsEmpty()) {
+        return name;
+    }
+        
+    return typeName.GetAsToken();
 }
 
-TfToken Sdf_ValueTypeNamesType::GetSerializationName(const VtValue &value) const
+TfToken
+Sdf_ValueTypeNamesType::GetSerializationName(const VtValue& value) const
 {
-  return GetSerializationName(SdfSchema::GetInstance().FindType(value));
+    return GetSerializationName(SdfSchema::GetInstance().FindType(value));
 }
 
-TfToken Sdf_ValueTypeNamesType::GetSerializationName(const TfToken &name) const
+TfToken
+Sdf_ValueTypeNamesType::GetSerializationName(const TfToken& name) const
 {
-  const SdfValueTypeName typeName = SdfSchema::GetInstance().FindType(name);
-  return typeName ? GetSerializationName(typeName) : name;
+    const SdfValueTypeName typeName = SdfSchema::GetInstance().FindType(name);
+    return typeName ? GetSerializationName(typeName) : name;
 }
 
-TfStaticData<const Sdf_ValueTypeNamesType, Sdf_ValueTypeNamesType::_Init> SdfValueTypeNames;
+TfStaticData<const Sdf_ValueTypeNamesType,
+             Sdf_ValueTypeNamesType::_Init> SdfValueTypeNames;
 
-std::ostream &operator<<(std::ostream &ostr, SdfValueBlock const &block)
-{
-  return ostr << "None";
+std::ostream&
+operator<<(std::ostream& ostr, SdfValueBlock const& block)
+{ 
+    return ostr << "None"; 
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfHumanReadableValue &hrval)
+std::ostream&
+operator<<(std::ostream& ostr, SdfAnimationBlock const& /*block*/)
 {
-  return out << "<< " << hrval.GetText() << " >>";
+    return ostr << "AnimationBlock";
 }
 
-size_t hash_value(const SdfHumanReadableValue &hrval)
+std::ostream &
+operator<<(std::ostream &out, const SdfHumanReadableValue &hrval)
 {
-  return TfHash()(hrval.GetText());
+    return out << "<< " << hrval.GetText() << " >>";
+}
+
+size_t
+hash_value(const SdfHumanReadableValue &hrval)
+{
+    return TfHash()(hrval.GetText());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

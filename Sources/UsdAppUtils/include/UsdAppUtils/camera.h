@@ -12,14 +12,16 @@
 /// Collection of module-scoped utilities for applications that operate using
 /// USD cameras.
 
-#include "UsdAppUtils/api.h"
 #include "pxr/pxrns.h"
+#include "UsdAppUtils/api.h"
 
 #include "Sdf/path.h"
 #include "Usd/stage.h"
 #include "UsdGeom/camera.h"
 
+
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// Gets the UsdGeomCamera matching \p cameraPath from the USD stage \p stage.
 ///
@@ -34,8 +36,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// it is just made absolute using the absolute root path before searching. In
 /// the future, this could potentially be changed to use a suffix-based match.
 USDAPPUTILS_API
-UsdGeomCamera UsdAppUtilsGetCameraAtPath(const UsdStagePtr &stage, const SdfPath &cameraPath);
+UsdGeomCamera UsdAppUtilsGetCameraAtPath(
+        const UsdStagePtr& stage,
+        const SdfPath& cameraPath);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
 
 #endif

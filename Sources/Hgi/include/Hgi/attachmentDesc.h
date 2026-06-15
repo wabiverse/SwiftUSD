@@ -7,14 +7,15 @@
 #ifndef PXR_IMAGING_HGI_ATTACHMENT_DESC_H
 #define PXR_IMAGING_HGI_ATTACHMENT_DESC_H
 
-#include "Gf/vec4f.h"
+#include "pxr/pxrns.h"
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
+#include "Gf/vec4f.h"
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \struct HgiAttachmentDesc
 ///
@@ -39,56 +40,64 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   Determines if a blend operation should be applied to the attachment.</li>
 /// <li> ***BlendFactor:
 ///   The blend factors for source and destination.</li>
-/// <li> ***BlendOp:
+/// <li> ***BlendOp: 
 ///   The blending operation.</li>
 /// <li> blendConstantColor:
 ///   The constant color for blend operations.</li>
 ///
-struct HgiAttachmentDesc {
-  HgiAttachmentDesc()
-      : format(HgiFormatInvalid),
-        usage(0),
-        loadOp(HgiAttachmentLoadOpLoad),
-        storeOp(HgiAttachmentStoreOpStore),
-        clearValue(0),
-        colorMask(HgiColorMaskRed | HgiColorMaskGreen | HgiColorMaskBlue | HgiColorMaskAlpha),
-        blendEnabled(false),
-        srcColorBlendFactor(HgiBlendFactorZero),
-        dstColorBlendFactor(HgiBlendFactorZero),
-        colorBlendOp(HgiBlendOpAdd),
-        srcAlphaBlendFactor(HgiBlendFactorZero),
-        dstAlphaBlendFactor(HgiBlendFactorZero),
-        alphaBlendOp(HgiBlendOpAdd),
-        blendConstantColor(0.0f, 0.0f, 0.0f, 0.0f)
-  {
-  }
+struct HgiAttachmentDesc
+{
+    HgiAttachmentDesc() 
+    : format(HgiFormatInvalid)
+    , usage(0)
+    , loadOp(HgiAttachmentLoadOpLoad)
+    , storeOp(HgiAttachmentStoreOpStore)
+    , clearValue(0)
+    , colorMask(HgiColorMaskRed | HgiColorMaskGreen |
+                HgiColorMaskBlue | HgiColorMaskAlpha)
+    , blendEnabled(false)
+    , srcColorBlendFactor(HgiBlendFactorZero)
+    , dstColorBlendFactor(HgiBlendFactorZero)
+    , colorBlendOp(HgiBlendOpAdd)
+    , srcAlphaBlendFactor(HgiBlendFactorZero)
+    , dstAlphaBlendFactor(HgiBlendFactorZero)
+    , alphaBlendOp(HgiBlendOpAdd)
+    , blendConstantColor(0.0f, 0.0f, 0.0f, 0.0f)
+    {}
 
-  HgiFormat format;
-  HgiTextureUsage usage;
-  HgiAttachmentLoadOp loadOp;
-  HgiAttachmentStoreOp storeOp;
-  GfVec4f clearValue;
-  HgiColorMask colorMask;
-  bool blendEnabled;
-  HgiBlendFactor srcColorBlendFactor;
-  HgiBlendFactor dstColorBlendFactor;
-  HgiBlendOp colorBlendOp;
-  HgiBlendFactor srcAlphaBlendFactor;
-  HgiBlendFactor dstAlphaBlendFactor;
-  HgiBlendOp alphaBlendOp;
-  GfVec4f blendConstantColor;
+    HgiFormat format;
+    HgiTextureUsage usage;
+    HgiAttachmentLoadOp loadOp;
+    HgiAttachmentStoreOp storeOp;
+    GfVec4f clearValue;
+    HgiColorMask colorMask;
+    bool blendEnabled;
+    HgiBlendFactor srcColorBlendFactor;
+    HgiBlendFactor dstColorBlendFactor;
+    HgiBlendOp colorBlendOp;
+    HgiBlendFactor srcAlphaBlendFactor;
+    HgiBlendFactor dstAlphaBlendFactor;
+    HgiBlendOp alphaBlendOp;
+    GfVec4f blendConstantColor;
 };
 
 using HgiAttachmentDescVector = std::vector<HgiAttachmentDesc>;
 
 HGI_API
-bool operator==(const HgiAttachmentDesc &lhs, const HgiAttachmentDesc &rhs);
+bool operator==(
+    const HgiAttachmentDesc& lhs,
+    const HgiAttachmentDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiAttachmentDesc &lhs, const HgiAttachmentDesc &rhs);
+bool operator!=(
+    const HgiAttachmentDesc& lhs,
+    const HgiAttachmentDesc& rhs);
 
 HGI_API
-std::ostream &operator<<(std::ostream &out, const HgiAttachmentDesc &attachment);
+std::ostream& operator<<(
+    std::ostream& out,
+    const HgiAttachmentDesc& attachment);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -24,27 +24,30 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// per instance, whether an instance is deactivated.  If it has zero length,
 /// all instances are active.
 ///
-class UsdImagingDataSourcePointInstancerMask : public HdBoolArrayDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointInstancerMask);
+class UsdImagingDataSourcePointInstancerMask : public HdBoolArrayDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointInstancerMask);
 
-  VtValue GetValue(HdSampledDataSource::Time shutterOffset) override;
+    VtValue GetValue(HdSampledDataSource::Time shutterOffset) override;
 
-  VtBoolArray GetTypedValue(HdSampledDataSource::Time shutterOffset) override;
+    VtBoolArray GetTypedValue(
+        HdSampledDataSource::Time shutterOffset) override;
 
-  bool GetContributingSampleTimesForInterval(
-      HdSampledDataSource::Time startTime,
-      HdSampledDataSource::Time endTime,
-      std::vector<HdSampledDataSource::Time> *outSampleTimes) override;
+    bool GetContributingSampleTimesForInterval(
+        HdSampledDataSource::Time startTime,
+        HdSampledDataSource::Time endTime,
+        std::vector<HdSampledDataSource::Time> * outSampleTimes) override;
 
- private:
-  UsdImagingDataSourcePointInstancerMask(const SdfPath &sceneIndexPath,
-                                         const UsdGeomPointInstancer &usdPI,
-                                         const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourcePointInstancerMask(
+        const SdfPath &sceneIndexPath,
+        const UsdGeomPointInstancer &usdPI,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  UsdGeomPointInstancer _usdPI;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    UsdGeomPointInstancer _usdPI;
+    const UsdImagingDataSourceStageGlobals &_stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePointInstancerMask);
@@ -58,23 +61,25 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePointInstancerMask);
 /// to define the right number of instances with the right assigned prototype
 /// and primvar index.
 ///
-class UsdImagingDataSourcePointInstancerTopology : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointInstancerTopology);
+class UsdImagingDataSourcePointInstancerTopology : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointInstancerTopology);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
- private:
-  // Private constructor, use static New() instead.
-  UsdImagingDataSourcePointInstancerTopology(const SdfPath &sceneIndexPath,
-                                             UsdGeomPointInstancer usdPI,
-                                             const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    // Private constructor, use static New() instead.
+    UsdImagingDataSourcePointInstancerTopology(
+        const SdfPath &sceneIndexPath,
+        UsdGeomPointInstancer usdPI,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  const SdfPath _sceneIndexPath;
-  UsdGeomPointInstancer _usdPI;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    const SdfPath _sceneIndexPath;
+    UsdGeomPointInstancer _usdPI;
+    const UsdImagingDataSourceStageGlobals &_stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePointInstancerTopology);
@@ -85,31 +90,36 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePointInstancerTopology);
 ///
 /// A data source representing the UsdGeom PointInstancer prim.
 ///
-class UsdImagingDataSourcePointInstancerPrim : public UsdImagingDataSourcePrim {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointInstancerPrim);
+class UsdImagingDataSourcePointInstancerPrim
+    : public UsdImagingDataSourcePrim
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointInstancerPrim);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
-  /// Returns the hydra attribute set we should invalidate if the value of
-  /// the USD properties in \p properties change.
-  USDIMAGING_API
-  static HdDataSourceLocatorSet Invalidate(UsdPrim const &prim,
-                                           const TfToken &subprim,
-                                           const TfTokenVector &properties,
-                                           UsdImagingPropertyInvalidationType invalidationType);
+    /// Returns the hydra attribute set we should invalidate if the value of
+    /// the USD properties in \p properties change.
+    USDIMAGING_API
+    static HdDataSourceLocatorSet Invalidate(
+        UsdPrim const &prim,
+        const TfToken &subprim,
+        const TfTokenVector &properties,
+        UsdImagingPropertyInvalidationType invalidationType);
 
- private:
-  // Private constructor, use static New() instead.
-  USDIMAGING_API
-  UsdImagingDataSourcePointInstancerPrim(const SdfPath &sceneIndexPath,
-                                         UsdPrim usdPrim,
-                                         const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    // Private constructor, use static New() instead.
+    USDIMAGING_API
+    UsdImagingDataSourcePointInstancerPrim(
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
+
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePointInstancerPrim);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_POINT_INSTANCER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_POINT_INSTANCER_H

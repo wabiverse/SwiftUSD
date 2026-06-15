@@ -8,16 +8,11 @@
 #define PXR_IMAGING_HGI_GL_HGI_H
 
 #include "pxr/pxrns.h"
-
-#include "Arch/swiftInterop.h"
-
-#include "Hgi/hgiImpl.h"
-#include "Hgi/tokens.h"
 #include "HgiGL/api.h"
 #include "HgiGL/capabilities.h"
 #include "HgiGL/garbageCollector.h"
-
-#include "Vt/value.h"
+#include "Hgi/hgi.h"
+#include "Hgi/tokens.h"
 
 #include <functional>
 #include <memory>
@@ -56,164 +51,173 @@ using HgiGLContextArenaHandle = HgiHandle<class HgiGLContextArena>;
 /// is used with the implied expectation that the same GL context is valid
 /// and current for the lifetime of the HgiGL instance.
 ///
-class HgiGL final : public Hgi {
- public:
-  HGIGL_API
-  HgiGL();
+class HgiGL final : public Hgi
+{
+public:
+    HGIGL_API
+    HgiGL();
 
-  HGIGL_API
-  ~HgiGL() override;
+    HGIGL_API
+    ~HgiGL() override;
 
-  HGIGL_API
-  static HgiGL *CreateHgi() SWIFT_RETURNS_RETAINED;
+    /// ------------------------------------------------------------------------
+    /// Virtual API
+    /// ------------------------------------------------------------------------
 
-  /// ------------------------------------------------------------------------
-  /// Virtual API
-  /// ------------------------------------------------------------------------
+    HGIGL_API
+    bool IsBackendSupported() const override;
 
-  HGIGL_API
-  bool IsBackendSupported() const override;
+    HGIGL_API
+    HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(
+        HgiGraphicsCmdsDesc const& desc) override;
 
-  HGIGL_API
-  HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc) override;
+    HGIGL_API
+    HgiBlitCmdsUniquePtr CreateBlitCmds() override;
 
-  HGIGL_API
-  HgiBlitCmdsUniquePtr CreateBlitCmds() override;
+    HGIGL_API
+    HgiComputeCmdsUniquePtr CreateComputeCmds(
+        HgiComputeCmdsDesc const& desc) override;
 
-  HGIGL_API
-  HgiComputeCmdsUniquePtr CreateComputeCmds(HgiComputeCmdsDesc const &desc) override;
+    HGIGL_API
+    void DestroyTexture(HgiTextureHandle* texHandle) override;
 
-  HGIGL_API
-  HgiTextureHandle CreateTexture(HgiTextureDesc const &desc) override;
+    HGIGL_API
+    void DestroyTextureView(HgiTextureViewHandle* viewHandle) override;
 
-  HGIGL_API
-  void DestroyTexture(HgiTextureHandle *texHandle) override;
+    HGIGL_API
+    HgiSamplerHandle CreateSampler(HgiSamplerDesc const & desc) override;
 
-  HGIGL_API
-  HgiTextureViewHandle CreateTextureView(HgiTextureViewDesc const &desc) override;
+    HGIGL_API
+    void DestroySampler(HgiSamplerHandle* smpHandle) override;
 
-  HGIGL_API
-  void DestroyTextureView(HgiTextureViewHandle *viewHandle) override;
+    HGIGL_API
+    void DestroyBuffer(HgiBufferHandle* bufHandle) override;
 
-  HGIGL_API
-  HgiSamplerHandle CreateSampler(HgiSamplerDesc const &desc) override;
+    HGIGL_API
+    HgiShaderFunctionHandle CreateShaderFunction(
+        HgiShaderFunctionDesc const& desc) override;
 
-  HGIGL_API
-  void DestroySampler(HgiSamplerHandle *smpHandle) override;
+    HGIGL_API
+    void DestroyShaderFunction(
+        HgiShaderFunctionHandle* shaderFunctionHandle) override;
 
-  HGIGL_API
-  HgiBufferHandle CreateBuffer(HgiBufferDesc const &desc) override;
+    HGIGL_API
+    HgiShaderProgramHandle CreateShaderProgram(
+        HgiShaderProgramDesc const& desc) override;
 
-  HGIGL_API
-  void DestroyBuffer(HgiBufferHandle *bufHandle) override;
+    HGIGL_API
+    void DestroyShaderProgram(
+        HgiShaderProgramHandle* shaderProgramHandle) override;
 
-  HGIGL_API
-  HgiShaderFunctionHandle CreateShaderFunction(HgiShaderFunctionDesc const &desc) override;
+    HGIGL_API
+    void DestroyResourceBindings(HgiResourceBindingsHandle* resHandle) override;
 
-  HGIGL_API
-  void DestroyShaderFunction(HgiShaderFunctionHandle *shaderFunctionHandle) override;
+    HGIGL_API
+    HgiGraphicsPipelineHandle CreateGraphicsPipeline(
+        HgiGraphicsPipelineDesc const& pipeDesc) override;
 
-  HGIGL_API
-  HgiShaderProgramHandle CreateShaderProgram(HgiShaderProgramDesc const &desc) override;
+    HGIGL_API
+    void DestroyGraphicsPipeline(
+        HgiGraphicsPipelineHandle* pipeHandle) override;
 
-  HGIGL_API
-  void DestroyShaderProgram(HgiShaderProgramHandle *shaderProgramHandle) override;
+    HGIGL_API
+    HgiComputePipelineHandle CreateComputePipeline(
+        HgiComputePipelineDesc const& pipeDesc) override;
 
-  HGIGL_API
-  HgiResourceBindingsHandle CreateResourceBindings(HgiResourceBindingsDesc const &desc) override;
+    HGIGL_API
+    void DestroyComputePipeline(HgiComputePipelineHandle* pipeHandle) override;
 
-  HGIGL_API
-  void DestroyResourceBindings(HgiResourceBindingsHandle *resHandle) override;
+    HGIGL_API
+    TfToken const& GetAPIName() const override;
 
-  HGIGL_API
-  HgiGraphicsPipelineHandle CreateGraphicsPipeline(
-      HgiGraphicsPipelineDesc const &pipeDesc) override;
+    HGIGL_API
+    HgiGLCapabilities const* GetCapabilities() const override;
 
-  HGIGL_API
-  void DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle) override;
+    HGIGL_API
+    HgiIndirectCommandEncoder* GetIndirectCommandEncoder() const override;
 
-  HGIGL_API
-  HgiComputePipelineHandle CreateComputePipeline(HgiComputePipelineDesc const &pipeDesc) override;
+    HGIGL_API
+    void StartFrame() override;
 
-  HGIGL_API
-  void DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle) override;
+    HGIGL_API
+    void EndFrame() override;
 
-  HGIGL_API
-  TfToken const &GetAPIName() const override;
+    HGIGL_API
+    void GarbageCollect() override;
 
-  HGIGL_API
-  HgiGLCapabilities const *GetCapabilities() const override;
+    /// ------------------------------------------------------------------------
+    // HgiGL specific API
+    /// ------------------------------------------------------------------------
 
-  HGIGL_API
-  HgiIndirectCommandEncoder *GetIndirectCommandEncoder() const override;
+    // Returns the opengl device.
+    HGIGL_API
+    HgiGLDevice* GetPrimaryDevice() const;
 
-  HGIGL_API
-  void StartFrame() override;
+    /// ------------------------------------------------------------------------
+    /// Context arena API
+    /// Please refer to \ref "GL Context Management" for usage expectations.
+    ///
+    /// Creates and return a context arena object handle.
+    HGIGL_API
+    HgiGLContextArenaHandle CreateContextArena();
 
-  HGIGL_API
-  void EndFrame() override;
+    /// Destroy a context arena.
+    /// Note: The context arena must be unset (by calling SetContextArena with
+    ///       an empty handle) prior to destruction.
+    HGIGL_API
+    void DestroyContextArena(HgiGLContextArenaHandle* arenaHandle);
+    
+    /// Set the context arena to manage container resources (currently limited to
+    /// framebuffer objects) for graphics commands submitted subsequently.
+    HGIGL_API
+    void SetContextArena(HgiGLContextArenaHandle const& arenaHandle);
+    // -------------------------------------------------------------------------
 
-  /// ------------------------------------------------------------------------
-  // HgiGL specific API
-  /// ------------------------------------------------------------------------
+protected:
+    HGIGL_API
+    HgiTextureHandle _CreateTexture(HgiTextureDesc const & desc) override;
 
-  // Returns the opengl device.
-  HGIGL_API
-  HgiGLDevice *GetPrimaryDevice() const;
+    HGIGL_API
+    HgiTextureViewHandle _CreateTextureView(
+        HgiTextureViewDesc const& desc) override;
 
-  /// ------------------------------------------------------------------------
-  /// Context arena API
-  /// Please refer to \ref "GL Context Management" for usage expectations.
-  ///
-  /// Creates and return a context arena object handle.
-  HGIGL_API
-  HgiGLContextArenaHandle CreateContextArena();
+    HGIGL_API
+    HgiBufferHandle _CreateBuffer(HgiBufferDesc const & desc) override;
 
-  /// Destroy a context arena.
-  /// Note: The context arena must be unset (by calling SetContextArena with
-  ///       an empty handle) prior to destruction.
-  HGIGL_API
-  void DestroyContextArena(HgiGLContextArenaHandle *arenaHandle);
+    HGIGL_API
+    HgiResourceBindingsHandle _CreateResourceBindings(
+        HgiResourceBindingsDesc const& desc) override;
 
-  /// Set the context arena to manage container resources (currently limited to
-  /// framebuffer objects) for graphics commands submitted subsequently.
-  HGIGL_API
-  void SetContextArena(HgiGLContextArenaHandle const &arenaHandle);
-  // -------------------------------------------------------------------------
+    HGIGL_API
+    bool _SubmitCmds(HgiCmds* cmds, HgiSubmitWaitType wait) override;
 
- protected:
-  HGIGL_API
-  bool _SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait) override;
+private:
+    HgiGL & operator=(const HgiGL&) = delete;
+    HgiGL(const HgiGL&) = delete;
 
- private:
-  HgiGL &operator=(const HgiGL &) = delete;
-  HgiGL(const HgiGL &) = delete;
+    /// Invalidates the resource handle and places the object in the garbage
+    /// collector vector for future destruction.
+    /// This is helpful to avoid destroying GPU resources still in-flight.
+    template<class T>
+    void _TrashObject(
+        HgiHandle<T>* handle, std::vector<HgiHandle<T>>* collector) {
+        collector->push_back(HgiHandle<T>(handle->Get(), /*id*/0));
+        *handle = HgiHandle<T>();
+    }
 
-  /// Invalidates the resource handle and places the object in the garbage
-  /// collector vector for future destruction.
-  /// This is helpful to avoid destroying GPU resources still in-flight.
-  template<class T> void _TrashObject(HgiHandle<T> *handle, std::vector<HgiHandle<T>> *collector)
-  {
-    collector->push_back(HgiHandle<T>(handle->Get(), /*id*/ 0));
-    *handle = HgiHandle<T>();
-  }
-
-  HgiGLDevice *_device;
-  std::unique_ptr<HgiGLCapabilities> _capabilities;
-  HgiGLGarbageCollector _garbageCollector;
-  int _frameDepth;
-} SWIFT_SHARED_REFERENCE(HgiGLRetain, HgiGLRelease);
+    HgiGLDevice* _device;
+    std::unique_ptr<HgiGLCapabilities> _capabilities;
+    HgiGLGarbageCollector _garbageCollector;
+    int _frameDepth;
+};
 
 /// ----------------------------------------------------------------------------
-/// API Version & History
+/// API Version & History 
 /// ----------------------------------------------------------------------------
 /// 1 -> 2: Added Context Arena API
 ///
 #define HGIGL_API_VERSION 2
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void HgiGLRetain(PXR_NS::HgiGL *);
-void HgiGLRelease(PXR_NS::HgiGL *);
 
 #endif

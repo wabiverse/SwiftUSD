@@ -18,68 +18,84 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// Base class wrapping a vector data source.
 ///
-class HdVectorSchema {
- public:
-  HdVectorSchema(HdVectorDataSourceHandle const &vector) : _vector(vector) {}
+class HdVectorSchema
+{
+public:
+    HdVectorSchema(HdVectorDataSourceHandle const &vector)
+      : _vector(vector) {}
 
-  HD_API
-  static HdVectorDataSourceHandle BuildRetained(size_t count,
-                                                const HdDataSourceBaseHandle *values);
+    HD_API
+    static HdVectorDataSourceHandle
+    BuildRetained(
+        size_t count,
+        const HdDataSourceBaseHandle *values);
 
-  /// Returns the vector data source that this schema is interpreting.
-  HD_API
-  HdVectorDataSourceHandle GetVector();
-  HD_API
-  bool IsDefined() const;
+    /// Returns the vector data source that this schema is interpreting.
+    HD_API
+    HdVectorDataSourceHandle GetVector();
+    HD_API
+    bool IsDefined() const;
 
-  /// Returns \c true if this schema is applied on top of a non-null
-  /// vector.
-  explicit operator bool() const
-  {
-    return IsDefined();
-  }
+    /// Returns \c true if this schema is applied on top of a non-null
+    /// vector.
+    explicit operator bool() const { return IsDefined(); }
 
-  /// Number of elements in the vector.
-  HD_API
-  size_t GetNumElements() const;
+    /// Number of elements in the vector.
+    HD_API
+    size_t GetNumElements() const;
 
-  using UnderlyingDataSource = HdVectorDataSource;
+    using UnderlyingDataSource = HdVectorDataSource;
 
- protected:
-  template<typename T> typename T::Handle _GetTyped(const size_t element) const
-  {
-    return _vector ? T::Cast(_vector->GetElement(element)) : nullptr;
-  }
+protected:
+    template<typename T>
+    typename T::Handle _GetTyped(const size_t element) const {
+        return
+            _vector
+            ? T::Cast(_vector->GetElement(element))
+            : nullptr;
+    }
 
-  HdVectorDataSourceHandle _vector;
+    HdVectorDataSourceHandle _vector;
 };
 
 /// Template class wrapping a vector data source whose children are
 /// data source of an expected type.
 ///
-template<typename T> class HdTypedVectorSchema : public HdVectorSchema {
- public:
-  HdTypedVectorSchema(HdVectorDataSourceHandle const &vector) : HdVectorSchema(vector) {}
+template<typename T>
+class HdVectorOfTypedSampledDataSourcesSchema : public HdVectorSchema
+{
+public:
+    HdVectorOfTypedSampledDataSourcesSchema(HdVectorDataSourceHandle const &vector)
+      : HdVectorSchema(vector) {}
 
-  typename T::Handle GetElement(const size_t element) const
-  {
-    return _GetTyped<T>(element);
-  }
+    typename T::Handle GetElement(const size_t element) const {
+        return _GetTyped<T>(element);
+    }
 };
+
+/// \deprecated
+template<typename T>
+using HdTypedVectorSchema = HdVectorOfTypedSampledDataSourcesSchema<T>;
 
 /// Template class wrapping a vector data source whose children are
 /// container data source conforming to an expected schema.
 ///
-template<typename Schema> class HdSchemaBasedVectorSchema : public HdVectorSchema {
- public:
-  HdSchemaBasedVectorSchema(HdVectorDataSourceHandle const &vector) : HdVectorSchema(vector) {}
-
-  Schema GetElement(const size_t element) const
-  {
-    using DataSource = typename Schema::UnderlyingDataSource;
-    return Schema(_GetTyped<DataSource>(element));
-  }
+template<typename Schema>
+class HdVectorOfSchemasSchema : public HdVectorSchema
+{
+public:
+    HdVectorOfSchemasSchema(HdVectorDataSourceHandle const &vector)
+      : HdVectorSchema(vector) {}
+    
+    Schema GetElement(const size_t element) const {
+        using DataSource = typename Schema::UnderlyingDataSource;
+        return Schema(_GetTyped<DataSource>(element));
+    }
 };
+
+/// \deprecated
+template<typename T>
+using HdSchemaBasedVectorSchema = HdVectorOfSchemasSchema<T>;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

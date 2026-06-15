@@ -9,30 +9,32 @@
 #include "Hd/retainedDataSource.h"
 #include "Hd/sceneIndexPluginRegistry.h"
 #include "Hd/tokens.h"
-#include "HdSi/tetMeshConversionSceneIndex.h"
+#include "Hdsi/tetMeshConversionSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens,
-                         ((sceneIndexPluginName, "HdSt_TetMeshConversionSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
+    ((sceneIndexPluginName, "HdSt_TetMeshConversionSceneIndexPlugin"))
+);
 
-static const char *const _pluginDisplayName = "GL";
+static const char * const _pluginDisplayName = "GL";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  HdSceneIndexPluginRegistry::Define<HdSt_TetMeshConversionSceneIndexPlugin>();
+    HdSceneIndexPluginRegistry::Define<HdSt_TetMeshConversionSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-  const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 0;
+    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 0;
 
-  HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
-      _pluginDisplayName,
-      _tokens->sceneIndexPluginName,
-      nullptr,  // no argument data necessary
-      insertionPhase,
-      HdSceneIndexPluginRegistry::InsertionOrderAtStart);
+    HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
+        _pluginDisplayName,
+        _tokens->sceneIndexPluginName,
+        nullptr, // no argument data necessary
+        insertionPhase,
+        HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,12 +42,15 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 
 // Implementation of HdSt_TetMeshConversionSceneIndexPlugin
 
-HdSt_TetMeshConversionSceneIndexPlugin::HdSt_TetMeshConversionSceneIndexPlugin() = default;
+HdSt_TetMeshConversionSceneIndexPlugin::
+HdSt_TetMeshConversionSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr HdSt_TetMeshConversionSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr
+HdSt_TetMeshConversionSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene,
+    const HdContainerDataSourceHandle &inputArgs)
 {
-  return HdsiTetMeshConversionSceneIndex::New(inputScene);
+    return HdsiTetMeshConversionSceneIndex::New(inputScene);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

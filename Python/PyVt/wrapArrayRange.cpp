@@ -6,14 +6,15 @@
 //
 #define ADDITION_OPERATOR
 
-#include "Tf/preprocessorUtilsLite.h"
+#include "pxr/pxrns.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/wrapArray.h"
-#include "pxr/pxrns.h"
+#include "Vt/wrapArrayEdit.h"
+#include "Tf/preprocessorUtilsLite.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayRange()
-{
-  TF_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY, ~, VT_RANGE_VALUE_TYPES);
+void wrapArrayRange() {
+    TF_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY, ~, VT_RANGE_VALUE_TYPES);
+    TF_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY_EDIT, ~, VT_RANGE_VALUE_TYPES);
 }

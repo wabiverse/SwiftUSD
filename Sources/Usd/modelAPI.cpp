@@ -8,66 +8,77 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdModelAPI, TfType::Bases<UsdAPISchemaBase>>();
+    TfType::Define<UsdModelAPI,
+        TfType::Bases< UsdAPISchemaBase > >();
+    
 }
 
 /* virtual */
-UsdModelAPI::~UsdModelAPI() {}
+UsdModelAPI::~UsdModelAPI()
+{
+}
 
 /* static */
-UsdModelAPI UsdModelAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdModelAPI
+UsdModelAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdModelAPI();
-  }
-  return UsdModelAPI(stage->GetPrimAtPath(path));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdModelAPI();
+    }
+    return UsdModelAPI(stage->GetPrimAtPath(path));
 }
+
 
 /* virtual */
 UsdSchemaKind UsdModelAPI::_GetSchemaKind() const
 {
-  return UsdModelAPI::schemaKind;
+    return UsdModelAPI::schemaKind;
 }
 
 /* static */
-const TfType &UsdModelAPI::_GetStaticTfType()
+const TfType &
+UsdModelAPI::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdModelAPI>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdModelAPI>();
+    return tfType;
 }
 
 /* static */
-bool UsdModelAPI::_IsTypedSchema()
+bool 
+UsdModelAPI::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdModelAPI::_GetTfType() const
+const TfType &
+UsdModelAPI::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &UsdModelAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector&
+UsdModelAPI::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames;
-  static TfTokenVector allNames = UsdAPISchemaBase::GetSchemaAttributeNames(true);
+    static TfTokenVector localNames;
+    static TfTokenVector allNames =
+        UsdAPISchemaBase::GetSchemaAttributeNames(true);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -80,11 +91,11 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // 'PXR_NAMESPACE_OPEN_SCOPE', 'PXR_NAMESPACE_CLOSE_SCOPE'.
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
-#include "Kind/registry.h"
-#include "Sdf/schema.h"
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"
+#include "Sdf/schema.h"
 #include "Usd/clip.h"
+#include "Kind/registry.h"
 
 #include <string>
 using std::string;
@@ -95,100 +106,121 @@ TF_DEFINE_PUBLIC_TOKENS(UsdModelAPIAssetInfoKeys, USDMODEL_ASSET_INFO_KEYS);
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
-  TF_ADD_ENUM_NAME(UsdModelAPI::KindValidationNone);
-  TF_ADD_ENUM_NAME(UsdModelAPI::KindValidationModelHierarchy);
+    TF_ADD_ENUM_NAME(UsdModelAPI::KindValidationNone);
+    TF_ADD_ENUM_NAME(UsdModelAPI::KindValidationModelHierarchy);
 }
 
-bool UsdModelAPI::GetKind(TfToken *retValue) const
+
+bool
+UsdModelAPI::GetKind(TfToken* retValue) const
 {
-  return GetPrim().GetKind(retValue);
+    return GetPrim().GetKind(retValue);
 }
 
-bool UsdModelAPI::SetKind(const TfToken &value) const
+bool
+UsdModelAPI::SetKind(const TfToken& value) const
 {
-  return GetPrim().SetKind(value);
+    return GetPrim().SetKind(value);
 }
 
-bool UsdModelAPI::IsKind(const TfToken &baseKind, UsdModelAPI::KindValidation validation) const
-{
-  if (validation == UsdModelAPI::KindValidationModelHierarchy) {
-    if (KindRegistry::IsA(baseKind, KindTokens->model) && !IsModel())
-      return false;
-  }
-  TfToken primKind;
-  if (!GetKind(&primKind))
-    return false;
-  return KindRegistry::IsA(primKind, baseKind);
+bool
+UsdModelAPI::IsKind(const TfToken& baseKind,
+                    UsdModelAPI::KindValidation validation) const{
+    if (validation == UsdModelAPI::KindValidationModelHierarchy){
+        if (KindRegistry::IsA(baseKind, KindTokens->model) && !IsModel())
+            return false;
+    }
+    TfToken primKind;
+    if (!GetKind(&primKind))
+        return false;
+    return KindRegistry::IsA(primKind, baseKind);
 }
 
-bool UsdModelAPI::IsModel() const
+bool
+UsdModelAPI::IsModel() const
 {
-  return GetPrim().IsModel();
+    return GetPrim().IsModel();
 }
 
-bool UsdModelAPI::IsGroup() const
+bool 
+UsdModelAPI::IsGroup() const
 {
-  return GetPrim().IsGroup();
+    return GetPrim().IsGroup();
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Asset Info API
 ////////////////////////////////////////////////////////////////////////
 
-bool UsdModelAPI::GetAssetIdentifier(SdfAssetPath *identifier) const
+bool 
+UsdModelAPI::GetAssetIdentifier(SdfAssetPath *identifier) const
 {
-  return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->identifier, identifier);
+    return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->identifier, identifier);
 }
 
-void UsdModelAPI::SetAssetIdentifier(const SdfAssetPath &identifier) const
+void 
+UsdModelAPI::SetAssetIdentifier(const SdfAssetPath &identifier) const
 {
-  GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->identifier, VtValue(identifier));
+    GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->identifier, 
+                                VtValue(identifier));
 }
 
-bool UsdModelAPI::GetAssetName(string *assetName) const
+bool 
+UsdModelAPI::GetAssetName(string *assetName) const
 {
-  return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->name, assetName);
+    return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->name, assetName);
 }
 
-void UsdModelAPI::SetAssetName(const string &assetName) const
+void 
+UsdModelAPI::SetAssetName(const string &assetName) const
 {
-  GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->name, VtValue(assetName));
+    GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->name, 
+                                VtValue(assetName));
 }
 
-bool UsdModelAPI::GetAssetVersion(string *version) const
+bool 
+UsdModelAPI::GetAssetVersion(string *version) const
 {
-  return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->version, version);
+    return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->version, version);
 }
 
-void UsdModelAPI::SetAssetVersion(const string &version) const
+void
+UsdModelAPI::SetAssetVersion(const string &version) const
 {
-  GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->version, VtValue(version));
+    GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->version, 
+                                VtValue(version));
 }
 
-bool UsdModelAPI::GetPayloadAssetDependencies(VtArray<SdfAssetPath> *assetDeps) const
+bool 
+UsdModelAPI::GetPayloadAssetDependencies(VtArray<SdfAssetPath> *assetDeps) const
 {
-  return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->payloadAssetDependencies, assetDeps);
+    return _GetAssetInfoByKey(UsdModelAPIAssetInfoKeys->payloadAssetDependencies, 
+                              assetDeps);
 }
 
-void UsdModelAPI::SetPayloadAssetDependencies(const VtArray<SdfAssetPath> &assetDeps) const
+
+void 
+UsdModelAPI::SetPayloadAssetDependencies(const VtArray<SdfAssetPath> &assetDeps) const
 {
-  GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->payloadAssetDependencies,
-                              VtValue(assetDeps));
+    GetPrim().SetAssetInfoByKey(UsdModelAPIAssetInfoKeys->payloadAssetDependencies, 
+                                VtValue(assetDeps));    
 }
 
-bool UsdModelAPI::GetAssetInfo(VtDictionary *info) const
+bool 
+UsdModelAPI::GetAssetInfo(VtDictionary *info) const
 {
-  if (GetPrim().HasAssetInfo()) {
-    *info = GetPrim().GetAssetInfo();
-    return true;
-  }
+    if (GetPrim().HasAssetInfo()) {
+        *info = GetPrim().GetAssetInfo();
+        return true;
+    }
 
-  return false;
+    return false;
 }
 
-void UsdModelAPI::SetAssetInfo(const VtDictionary &info) const
+void
+UsdModelAPI::SetAssetInfo(const VtDictionary &info) const
 {
-  GetPrim().SetAssetInfo(info);
+    GetPrim().SetAssetInfo(info);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -5,13 +5,14 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/wrapArray.h"
-#include "pxr/pxrns.h"
+#include "Vt/wrapArrayEdit.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayToken()
-{
-  VtWrapArray<VtArray<TfToken>>();
+void wrapArrayToken() {
+    VtWrapArray<VtArray<TfToken> >();
+    VtWrapArrayEdit<VtArrayEdit<TfToken> >();
 }

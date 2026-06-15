@@ -17,37 +17,47 @@
 #include "UsdSkel/cache.h"
 #include "UsdSkel/root.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
+
 namespace {
 
-UsdSkelBinding *_New(const UsdSkelSkeleton &skel, const boost::python::list &skinningQueries)
+
+UsdSkelBinding*
+_New(const UsdSkelSkeleton& skel, const pxr_boost::python::list& skinningQueries)
 {
-  const size_t numQueries = len(skinningQueries);
-  VtArray<UsdSkelSkinningQuery> skinningQueriesArray(numQueries);
-  for (size_t i = 0; i < numQueries; ++i) {
-    skinningQueriesArray[i] = extract<const UsdSkelSkinningQuery &>(skinningQueries[i]);
-  }
-  return new UsdSkelBinding(skel, skinningQueriesArray);
+    const size_t numQueries = len(skinningQueries);
+    VtArray<UsdSkelSkinningQuery> skinningQueriesArray(numQueries);
+    for (size_t i = 0; i < numQueries; ++i) {
+        skinningQueriesArray[i] =
+            extract<const UsdSkelSkinningQuery&>(skinningQueries[i]);
+    }
+    return new UsdSkelBinding(skel, skinningQueriesArray);
 }
 
-}  // namespace
+
+} // namespace
+
 
 void wrapUsdSkelBinding()
 {
-  using This = UsdSkelBinding;
+    using This = UsdSkelBinding;
 
-  class_<This>("Binding", init<>())
+    class_<This>("Binding", init<>())
 
-      .def("__init__", make_constructor(&_New))
+        .def("__init__", make_constructor(&_New))
 
-      .def("GetSkeleton", &This::GetSkeleton, return_value_policy<return_by_value>())
+        .def("GetSkeleton", &This::GetSkeleton,
+             return_value_policy<return_by_value>())
 
-      .def("GetSkinningTargets",
-           &This::GetSkinningTargets,
-           return_value_policy<TfPySequenceToList>());
+        .def("GetSkinningTargets", &This::GetSkinningTargets,
+             return_value_policy<TfPySequenceToList>())
+        ;
 }

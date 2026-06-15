@@ -7,23 +7,25 @@
 #ifndef PXR_IMAGING_HDST_DRAW_ITEMS_CACHE_H
 #define PXR_IMAGING_HDST_DRAW_ITEMS_CACHE_H
 
-#include "Hd/rprimCollection.h"
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
+#include "Hd/rprimCollection.h"
 
-#include "Sdf/path.h"
-#include "Tf/hash.h"
 #include "Tf/token.h"
+#include "Tf/hash.h"
+#include "Sdf/path.h"
 
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdChangeTracker;
 class HdRenderIndex;
-using HdDrawItemConstPtrVector = std::vector<class HdDrawItem const *>;
-using HdDrawItemConstPtrVectorSharedPtr = std::shared_ptr<HdDrawItemConstPtrVector>;
+using HdDrawItemConstPtrVector = std::vector<class HdDrawItem const*>;
+using HdDrawItemConstPtrVectorSharedPtr =
+    std::shared_ptr<HdDrawItemConstPtrVector>;
+
 
 // This class provides a caching mechanism for the filtered draw items returned
 // by the render index given a collection and a list of render tags.
@@ -52,84 +54,86 @@ using HdDrawItemConstPtrVectorSharedPtr = std::shared_ptr<HdDrawItemConstPtrVect
 // where the same set of shadow caster prims may be rendered repeatedly to
 // generate a shadow map for each light.
 //
-class HdSt_DrawItemsCache final {
- public:
-  HdSt_DrawItemsCache() = default;
+class HdSt_DrawItemsCache final
+{
+public:
+    HdSt_DrawItemsCache() = default;
 
-  // See comments above.
-  HDST_API
-  HdDrawItemConstPtrVectorSharedPtr GetDrawItems(
-      HdRprimCollection const &collection,
-      TfTokenVector const &renderTags,
-      HdRenderIndex *renderIndex,
-      HdDrawItemConstPtrVectorSharedPtr const &curDrawItems);
+    // See comments above.
+    HDST_API
+    HdDrawItemConstPtrVectorSharedPtr GetDrawItems(
+        HdRprimCollection const &collection,
+        TfTokenVector const &renderTags,
+        HdRenderIndex *renderIndex,
+        HdDrawItemConstPtrVectorSharedPtr const &curDrawItems);
 
-  // See comments above.
-  HDST_API
-  void GarbageCollect();
+    // See comments above.
+    HDST_API
+    void GarbageCollect();
 
- private:
-  struct _CacheKey {
-    _CacheKey(HdRprimCollection const &collection,
-              TfTokenVector const &renderTags,
-              HdRenderIndex *renderIndex)
-        : _collection(collection), _renderTags(renderTags), _renderIndex(renderIndex)
+private:
+    struct _CacheKey
     {
-    }
+        _CacheKey(HdRprimCollection const &collection,
+                  TfTokenVector const &renderTags,
+                  HdRenderIndex *renderIndex)
+        : _collection(collection)
+        , _renderTags(renderTags)
+        , _renderIndex(renderIndex) {}
 
-    // TfHash support.
-    template<class HashState> friend void TfHashAppend(HashState &h, _CacheKey const &key)
+        // TfHash support.
+        template <class HashState>
+        friend void TfHashAppend(HashState &h, _CacheKey const &key) {
+            h.Append(key._collection, key._renderTags, key._renderIndex);
+        }
+
+        bool operator==(_CacheKey const &other) const {
+            return _collection == other._collection &&
+                   _renderTags == other._renderTags &&
+                   _renderIndex == other._renderIndex;
+        }
+
+    private:
+        HdRprimCollection const _collection;
+        TfTokenVector const _renderTags;
+        HdRenderIndex * const _renderIndex;
+    };
+
+    struct _CacheValue
     {
-      h.Append(key._collection, key._renderTags, key._renderIndex);
-    }
-
-    bool operator==(_CacheKey const &other) const
-    {
-      return _collection == other._collection && _renderTags == other._renderTags &&
-             _renderIndex == other._renderIndex;
-    }
-
-   private:
-    HdRprimCollection const _collection;
-    TfTokenVector const _renderTags;
-    HdRenderIndex *const _renderIndex;
-  };
-
-  struct _CacheValue {
-    _CacheValue()
+        _CacheValue()
         : collectionVersion(0),
           renderTagsVersion(0),
           materialTagsVersion(0),
-          geomSubsetDrawItemsVersion(0)
-    {
-    }
+          geomSubsetDrawItemsVersion(0) {}
+        
+        HdDrawItemConstPtrVectorSharedPtr drawItems;
+        size_t collectionVersion;
+        size_t renderTagsVersion;
+        size_t materialTagsVersion;
+        size_t geomSubsetDrawItemsVersion;
+    };
 
-    HdDrawItemConstPtrVectorSharedPtr drawItems;
-    size_t collectionVersion;
-    size_t renderTagsVersion;
-    size_t materialTagsVersion;
-    size_t geomSubsetDrawItemsVersion;
-  };
+    bool _IsCacheEntryStale(_CacheValue const &val,
+                            TfToken const &collectionName,
+                            HdRenderIndex *renderIndex) const;
 
-  bool _IsCacheEntryStale(_CacheValue const &val,
-                          TfToken const &collectionName,
-                          HdRenderIndex *renderIndex) const;
+    void _UpdateCacheEntry(
+        HdRprimCollection const &collection,
+        TfTokenVector const &renderTags,
+        HdRenderIndex *renderIndex,
+        _CacheValue *val);
 
-  void _UpdateCacheEntry(HdRprimCollection const &collection,
-                         TfTokenVector const &renderTags,
-                         HdRenderIndex *renderIndex,
-                         _CacheValue *val);
+    HdSt_DrawItemsCache(const HdSt_DrawItemsCache &) = delete;
+    HdSt_DrawItemsCache &operator =(const HdSt_DrawItemsCache &) = delete;
 
-  HdSt_DrawItemsCache(const HdSt_DrawItemsCache &) = delete;
-  HdSt_DrawItemsCache &operator=(const HdSt_DrawItemsCache &) = delete;
-
-  //--------------------------------------------------------------------------
-  using _Cache = std::unordered_map<_CacheKey, _CacheValue, TfHash>;
-  _Cache _cache;
+    //--------------------------------------------------------------------------
+    using _Cache = std::unordered_map<_CacheKey, _CacheValue, TfHash>;
+    _Cache _cache;
 };
 
 using HdStDrawItemsCachePtr = HdSt_DrawItemsCache *;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDST_DRAW_ITEMS_CACHE_H
+#endif // PXR_IMAGING_HDST_DRAW_ITEMS_CACHE_H

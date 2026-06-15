@@ -11,7 +11,7 @@
 /// C++ Cast Utilities.
 
 #ifndef __cplusplus
-#  error This include file can only be included in C++ programs.
+#error This include file can only be included in C++ programs.
 #endif
 
 #include "pxr/pxrns.h"
@@ -19,15 +19,18 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template<class Src, class Dst>
-using Tf_CopyConst = typename std::
-    conditional<std::is_const<Src>::value, typename std::add_const<Dst>::type, Dst>::type;
+template <class Src, class Dst>
+using Tf_CopyConst =
+    typename std::conditional<std::is_const<Src>::value,
+                              typename std::add_const<Dst>::type, Dst>::type;
 
-template<class Src, class Dst>
-using Tf_CopyVolatile = typename std::
-    conditional<std::is_volatile<Src>::value, typename std::add_volatile<Dst>::type, Dst>::type;
+template <class Src, class Dst>
+using Tf_CopyVolatile =
+    typename std::conditional<std::is_volatile<Src>::value,
+                              typename std::add_volatile<Dst>::type, Dst>::type;
 
-template<class Src, class Dst> using Tf_CopyCV = Tf_CopyConst<Src, Tf_CopyVolatile<Src, Dst>>;
+template <class Src, class Dst>
+using Tf_CopyCV = Tf_CopyConst<Src, Tf_CopyVolatile<Src, Dst>>;
 
 /// Return a pointer to the most-derived object.
 ///
@@ -41,18 +44,20 @@ template<class Src, class Dst> using Tf_CopyCV = Tf_CopyConst<Src, Tf_CopyVolati
 /// since one cannot prove that that the type is actually different.
 ///
 /// \warning This function is public, but should be used sparingly (or not all).
-template<typename T>
-inline typename std::enable_if<std::is_polymorphic<T>::value, Tf_CopyCV<T, void> *>::type
-TfCastToMostDerivedType(T *ptr)
+template <typename T>
+inline typename std::enable_if<
+    std::is_polymorphic<T>::value, Tf_CopyCV<T, void>*>::type
+TfCastToMostDerivedType(T* ptr)
 {
-  return dynamic_cast<Tf_CopyCV<T, void> *>(ptr);
+    return dynamic_cast<Tf_CopyCV<T, void>*>(ptr);
 }
 
-template<typename T>
-inline typename std::enable_if<!std::is_polymorphic<T>::value, Tf_CopyCV<T, void> *>::type
-TfCastToMostDerivedType(T *ptr)
+template <typename T>
+inline typename std::enable_if<
+    !std::is_polymorphic<T>::value, Tf_CopyCV<T, void>*>::type
+TfCastToMostDerivedType(T* ptr)
 {
-  return static_cast<Tf_CopyCV<T, void> *>(ptr);
+    return static_cast<Tf_CopyCV<T, void>*>(ptr);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

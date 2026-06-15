@@ -7,13 +7,14 @@
 #ifndef PXR_IMAGING_HGI_GRAPHICS_CMDS_DESC_H
 #define PXR_IMAGING_HGI_GRAPHICS_CMDS_DESC_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/api.h"
 #include "Hgi/attachmentDesc.h"
 #include "Hgi/texture.h"
-#include "pxr/pxrns.h"
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \struct HgiGraphicsCmdsDesc
 ///
@@ -40,40 +41,46 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   Render target height (in pixels)</li>
 /// </ul>
 ///
-struct HgiGraphicsCmdsDesc {
-  HgiGraphicsCmdsDesc()
-      : colorAttachmentDescs(),
-        depthAttachmentDesc(),
-        colorTextures(),
-        colorResolveTextures(),
-        depthTexture(),
-        depthResolveTexture()
-  {
-  }
+struct HgiGraphicsCmdsDesc
+{
+    HgiGraphicsCmdsDesc()
+    : colorAttachmentDescs()
+    , depthAttachmentDesc()
+    , colorTextures()
+    , colorResolveTextures()
+    , depthTexture()
+    , depthResolveTexture()
+    {}
 
-  inline bool HasAttachments() const
-  {
-    return !colorAttachmentDescs.empty() || depthTexture;
-  }
+    inline bool HasAttachments() const {
+        return !colorAttachmentDescs.empty() || depthTexture;
+    }
 
-  HgiAttachmentDescVector colorAttachmentDescs;
-  HgiAttachmentDesc depthAttachmentDesc;
+    HgiAttachmentDescVector colorAttachmentDescs;
+    HgiAttachmentDesc depthAttachmentDesc;
 
-  HgiTextureHandleVector colorTextures;
-  HgiTextureHandleVector colorResolveTextures;
+    HgiTextureHandleVector colorTextures;
+    HgiTextureHandleVector colorResolveTextures;
 
-  HgiTextureHandle depthTexture;
-  HgiTextureHandle depthResolveTexture;
+    HgiTextureHandle depthTexture;
+    HgiTextureHandle depthResolveTexture;
 };
 
 HGI_API
-bool operator==(const HgiGraphicsCmdsDesc &lhs, const HgiGraphicsCmdsDesc &rhs);
+bool operator==(
+    const HgiGraphicsCmdsDesc& lhs,
+    const HgiGraphicsCmdsDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiGraphicsCmdsDesc &lhs, const HgiGraphicsCmdsDesc &rhs);
+bool operator!=(
+    const HgiGraphicsCmdsDesc& lhs,
+    const HgiGraphicsCmdsDesc& rhs);
 
 HGI_API
-std::ostream &operator<<(std::ostream &out, const HgiGraphicsCmdsDesc &desc);
+std::ostream& operator<<(
+    std::ostream& out,
+    const HgiGraphicsCmdsDesc& desc);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

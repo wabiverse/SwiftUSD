@@ -9,11 +9,12 @@
 
 /// \file usdImaging/sphereLightAdapter.h
 
+#include "pxr/pxrns.h"
 #include "UsdImaging/api.h"
 #include "UsdImaging/lightAdapter.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 class UsdPrim;
 
@@ -22,38 +23,46 @@ class UsdPrim;
 /// Adapter class for lights of type SphereLight
 ///
 class UsdImagingSphereLightAdapter : public UsdImagingLightAdapter {
- public:
-  typedef UsdImagingLightAdapter BaseAdapter;
+public:
+    typedef UsdImagingLightAdapter BaseAdapter;
 
-  UsdImagingSphereLightAdapter() : UsdImagingLightAdapter() {}
+    UsdImagingSphereLightAdapter()
+        : UsdImagingLightAdapter()
+    {}
 
-  USDIMAGING_API
-  virtual ~UsdImagingSphereLightAdapter();
+    USDIMAGING_API
+    virtual ~UsdImagingSphereLightAdapter();
 
-  // ---------------------------------------------------------------------- //
-  /// \name Scene Index Support
-  // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  TfTokenVector GetImagingSubprims(UsdPrim const &prim) override;
+    // ---------------------------------------------------------------------- //
+    /// \name Scene Index Support
+    // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  TfToken GetImagingSubprimType(UsdPrim const &prim, TfToken const &subprim) override;
+    USDIMAGING_API
+    TfTokenVector GetImagingSubprims(UsdPrim const& prim) override;
 
-  // ---------------------------------------------------------------------- //
+    USDIMAGING_API
+    TfToken GetImagingSubprimType(UsdPrim const& prim, TfToken const& subprim)
+        override;
 
-  USDIMAGING_API
-  SdfPath Populate(UsdPrim const &prim,
-                   UsdImagingIndexProxy *index,
-                   UsdImagingInstancerContext const *instancerContext = NULL) override;
+    // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  bool IsSupported(UsdImagingIndexProxy const *index) const override;
 
- protected:
-  void _RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index) override final;
+    USDIMAGING_API
+    SdfPath Populate(UsdPrim const& prim,
+         UsdImagingIndexProxy* index,
+         UsdImagingInstancerContext const* instancerContext = NULL) override;
+
+    USDIMAGING_API
+    bool IsSupported(UsdImagingIndexProxy const* index) const override;
+
+protected:
+    void _RemovePrim(SdfPath const& cachePath,
+                             UsdImagingIndexProxy* index) override final;
+
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_SPHERE_LIGHT_ADAPTER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_SPHERE_LIGHT_ADAPTER_H

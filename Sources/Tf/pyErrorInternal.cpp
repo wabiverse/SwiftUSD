@@ -11,42 +11,47 @@
 
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"
+#include "Tf/staticData.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/handle.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/object.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include <boost/python/handle.hpp>
-#include <boost/python/object.hpp>
-
-using namespace boost::python;
-
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum)
-{
-  TF_ADD_ENUM_NAME(TF_PYTHON_EXCEPTION);
+using namespace pxr_boost::python;
+
+TF_REGISTRY_FUNCTION(TfEnum) {
+    TF_ADD_ENUM_NAME(TF_PYTHON_EXCEPTION);
 }
 
-// Should probably use a better mechanism.
-
-static handle<> _ExceptionClass;
+// The held handle<> is intentionally leaked to avoid Python refcount ops
+// during shutdown, which is unsafe if Python has been finalized.
+static TfStaticData<handle<>> _ExceptionClass;
 
 handle<> Tf_PyGetErrorExceptionClass()
 {
-  return _ExceptionClass;
+    return *_ExceptionClass;
 }
 
 void Tf_PySetErrorExceptionClass(object const &cls)
 {
-  _ExceptionClass = handle<>(borrowed(cls.ptr()));
+    *_ExceptionClass = handle<>(borrowed(cls.ptr()));
 }
 
-TfPyExceptionStateScope::TfPyExceptionStateScope() : _state(TfPyExceptionState::Fetch()) {}
+TfPyExceptionStateScope::TfPyExceptionStateScope() :
+    _state(TfPyExceptionState::Fetch())
+{
+}
 
 TfPyExceptionStateScope::~TfPyExceptionStateScope()
 {
-  _state.Restore();
+    _state.Restore();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED

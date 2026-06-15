@@ -68,7 +68,8 @@ namespace Overlay
 
   Pixar::UsdAttribute CreateIdAttr(const Pixar::UsdShadeShader &shader, const char *defaultValue, bool writeSparsely);
 
-  Pixar::PlugRegistry::PlugPathsVector PushBackPath(Pixar::PlugRegistry::PlugPathsVector paths, const char *path);
+  std::vector<std::string> MakeStringVector();
+  std::vector<std::string> PushBackPath(std::vector<std::string> paths, const char *path);
 
   /// The reverse direction (`std::string` -> Swift `String`) is just as broken
   /// as the forward direction: `String.init(_ cxxString: std.string)` triggers

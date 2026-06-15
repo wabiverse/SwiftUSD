@@ -33,75 +33,89 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_SELECTION_SCHEMA_TOKENS (fullySelected)(nestedInstanceIndices)
+#define HD_SELECTION_SCHEMA_TOKENS \
+    (fullySelected) \
+    (nestedInstanceIndices) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdSelectionSchemaTokens, HD_API, HD_SELECTION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSelectionSchemaTokens, HD_API,
+    HD_SELECTION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdSelectionSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdSelectionSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdSelectionSchema
+///
+class HdSelectionSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdSelectionSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdBoolDataSourceHandle GetFullySelected() const;
+    /// \name Member accessor
+    /// @{
 
-  /// Starting with the outer most, list for each nesting level of
-  /// instancing what instances are selected.
-  HD_API
-  HdInstanceIndicesVectorSchema GetNestedInstanceIndices() const;
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdBoolDataSourceHandle &fullySelected,
-      const HdVectorDataSourceHandle &nestedInstanceIndices);
-
-  /// \class HdSelectionSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetFullySelected(const HdBoolDataSourceHandle &fullySelected);
+    HdBoolDataSourceHandle GetFullySelected() const;
+
+    /// Starting with the outer most, list for each nesting level of
+    /// instancing what instances are selected.
     HD_API
-    Builder &SetNestedInstanceIndices(const HdVectorDataSourceHandle &nestedInstanceIndices);
+    HdInstanceIndicesVectorSchema GetNestedInstanceIndices() const; 
 
-    /// Returns a container data source containing the members set thus far.
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
     HD_API
-    HdContainerDataSourceHandle Build();
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdBoolDataSourceHandle &fullySelected,
+        const HdVectorDataSourceHandle &nestedInstanceIndices
+    );
 
-   private:
-    HdBoolDataSourceHandle _fullySelected;
-    HdVectorDataSourceHandle _nestedInstanceIndices;
-  };
+    /// \class HdSelectionSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetFullySelected(
+            const HdBoolDataSourceHandle &fullySelected);
+        HD_API
+        Builder &SetNestedInstanceIndices(
+            const HdVectorDataSourceHandle &nestedInstanceIndices);
 
-  /// @}
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdBoolDataSourceHandle _fullySelected;
+        HdVectorDataSourceHandle _nestedInstanceIndices;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

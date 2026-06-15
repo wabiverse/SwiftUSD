@@ -7,36 +7,40 @@
 #ifndef PXR_IMAGING_HGIGL_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGIGL_COMPUTE_PIPELINE_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/computePipeline.h"
 #include "HgiGL/api.h"
-#include "pxr/pxrns.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \class HgiGLComputePipeline
 ///
 /// OpenGL implementation of HgiComputePipeline.
 ///
-class HgiGLComputePipeline final : public HgiComputePipeline {
- public:
-  HGIGL_API
-  ~HgiGLComputePipeline() override;
+class HgiGLComputePipeline final : public HgiComputePipeline
+{
+public:
+    HGIGL_API
+    ~HgiGLComputePipeline() override;
 
-  /// Apply pipeline state
-  HGIGL_API
-  void BindPipeline();
+    /// Apply pipeline state
+    HGIGL_API
+    void BindPipeline();
 
- protected:
-  friend class HgiGL;
+protected:
+    friend class HgiGL;
 
-  HGIGL_API
-  HgiGLComputePipeline(HgiComputePipelineDesc const &desc);
+    HGIGL_API
+    HgiGLComputePipeline(HgiComputePipelineDesc const& desc);
 
- private:
-  HgiGLComputePipeline() = delete;
-  HgiGLComputePipeline &operator=(const HgiGLComputePipeline &) = delete;
-  HgiGLComputePipeline(const HgiGLComputePipeline &) = delete;
+private:
+    HgiGLComputePipeline() = delete;
+    HgiGLComputePipeline & operator=(const HgiGLComputePipeline&) = delete;
+    HgiGLComputePipeline(const HgiGLComputePipeline&) = delete;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

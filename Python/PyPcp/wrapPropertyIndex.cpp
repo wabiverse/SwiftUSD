@@ -5,57 +5,68 @@
 // https://openusd.org/license.
 //
 
-#include "Pcp/cache.h"
-#include "Pcp/primIndex.h"
-#include "Pcp/propertyIndex.h"
 #include "pxr/pxrns.h"
+#include "Pcp/propertyIndex.h"
+#include "Pcp/primIndex.h"
+#include "Pcp/cache.h"
 
 #include "Tf/pyResultConversions.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static SdfPropertySpecHandleVector _WrapPropertyStack(const PcpPropertyIndex &propIndex)
+static SdfPropertySpecHandleVector
+_WrapPropertyStack(const PcpPropertyIndex& propIndex)
 {
-  const PcpPropertyRange range = propIndex.GetPropertyRange();
-  return SdfPropertySpecHandleVector(range.first, range.second);
+    const PcpPropertyRange range = propIndex.GetPropertyRange();
+    return SdfPropertySpecHandleVector(range.first, range.second);
 }
 
-static SdfPropertySpecHandleVector _WrapLocalPropertyStack(const PcpPropertyIndex &propIndex)
+static SdfPropertySpecHandleVector
+_WrapLocalPropertyStack(const PcpPropertyIndex& propIndex)
 {
-  const PcpPropertyRange range = propIndex.GetPropertyRange(/* localOnly= */ true);
-  return SdfPropertySpecHandleVector(range.first, range.second);
+    const PcpPropertyRange range = 
+        propIndex.GetPropertyRange(/* localOnly= */ true);
+    return SdfPropertySpecHandleVector(range.first, range.second);
 }
 
-static boost::python::tuple _WrapBuildPrimPropertyIndex(const SdfPath &path,
-                                                        const PcpCache &cache,
-                                                        const PcpPrimIndex &primIndex)
+static pxr_boost::python::tuple
+_WrapBuildPrimPropertyIndex(
+    const SdfPath &path, const PcpCache &cache, const PcpPrimIndex &primIndex)
 {
-  PcpErrorVector errors;
-  PcpPropertyIndex propIndex;
-  PcpBuildPrimPropertyIndex(path, cache, primIndex, &propIndex, &errors);
+    PcpErrorVector errors;
+    PcpPropertyIndex propIndex;
+    PcpBuildPrimPropertyIndex(path, cache, primIndex, &propIndex, &errors);
 
-  return boost::python::make_tuple(boost::python::object(propIndex), errors);
+    return pxr_boost::python::make_tuple(
+        pxr_boost::python::object(propIndex), errors);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapPropertyIndex()
+void
+wrapPropertyIndex()
 {
-  typedef PcpPropertyIndex This;
+    typedef PcpPropertyIndex This;
 
-  def("BuildPrimPropertyIndex", _WrapBuildPrimPropertyIndex);
+    def("BuildPrimPropertyIndex", _WrapBuildPrimPropertyIndex);
 
-  class_<This>("PropertyIndex", "", no_init)
-      .add_property("propertyStack", _WrapPropertyStack)
-      .add_property("localPropertyStack", _WrapLocalPropertyStack)
-      .add_property(
-          "localErrors",
-          make_function(&This::GetLocalErrors, return_value_policy<TfPySequenceToList>()));
+    class_<This>
+        ("PropertyIndex", "", no_init)
+        .add_property("propertyStack", _WrapPropertyStack)
+        .add_property("localPropertyStack", _WrapLocalPropertyStack)
+        .add_property("localErrors", 
+                      make_function(&This::GetLocalErrors,
+                                    return_value_policy<TfPySequenceToList>()))
+        ;
 }

@@ -10,6 +10,7 @@
 #include <string>
 
 #include "Vt/array.h"
+#include "Vt/arrayEdit.h"
 
 #include "Tf/token.h"
 
@@ -19,17 +20,17 @@
 #include "Gf/frustum.h"
 #include "Gf/half.h"
 #include "Gf/interval.h"
-#include "Gf/matrix2d.h"
-#include "Gf/matrix2f.h"
-#include "Gf/matrix3d.h"
-#include "Gf/matrix3f.h"
-#include "Gf/matrix4d.h"
-#include "Gf/matrix4f.h"
 #include "Gf/multiInterval.h"
+#include "Gf/matrix2f.h"
+#include "Gf/matrix3f.h"
+#include "Gf/matrix4f.h"
+#include "Gf/matrix2d.h"
+#include "Gf/matrix3d.h"
+#include "Gf/matrix4d.h"
 #include "Gf/quatd.h"
-#include "Gf/quaternion.h"
 #include "Gf/quatf.h"
 #include "Gf/quath.h"
+#include "Gf/quaternion.h"
 #include "Gf/range1d.h"
 #include "Gf/range1f.h"
 #include "Gf/range2d.h"
@@ -50,4 +51,4 @@
 #include "Gf/vec4h.h"
 #include "Gf/vec4i.h"
 
-#endif  // PXR_BASE_VT_TYPE_HEADERS_H
+#endif // PXR_BASE_VT_TYPE_HEADERS_H

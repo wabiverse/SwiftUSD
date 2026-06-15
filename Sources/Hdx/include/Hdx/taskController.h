@@ -10,11 +10,11 @@
 #include "pxr/pxrns.h"
 
 #include "Hdx/api.h"
-#include "Hdx/boundingBoxTask.h"
-#include "Hdx/colorCorrectionTask.h"
-#include "Hdx/renderSetupTask.h"
 #include "Hdx/selectionTracker.h"
+#include "Hdx/renderSetupTask.h"
 #include "Hdx/shadowTask.h"
+#include "Hdx/colorCorrectionTask.h"
+#include "Hdx/boundingBoxTask.h"
 
 #include "Hd/aov.h"
 #include "Hd/renderIndex.h"
@@ -35,376 +35,407 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdRenderBuffer;
 
-class HdxTaskController final {
- public:
-  HDX_API
-  HdxTaskController(HdRenderIndex *renderIndex,
-                    SdfPath const &controllerId,
-                    bool gpuEnabled = true);
-  HDX_API
-  ~HdxTaskController();
+class HdxTaskController final
+{
+public:
+    HDX_API
+    HdxTaskController(HdRenderIndex *renderIndex,
+                      SdfPath const& controllerId,
+                      bool gpuEnabled = true);
+    HDX_API
+    ~HdxTaskController();
 
-  /// Return the render index this controller is bound to.
-  HdRenderIndex *GetRenderIndex()
-  {
-    return _index;
-  }
-  HdRenderIndex const *GetRenderIndex() const
-  {
-    return _index;
-  }
+    /// Return the render index this controller is bound to.
+    HdRenderIndex* GetRenderIndex() { return _index; }
+    HdRenderIndex const* GetRenderIndex() const { return _index; }
 
-  /// Return the controller's scene-graph id (prefixed to any
-  /// scene graph objects it creates).
-  SdfPath const &GetControllerId() const
-  {
-    return _controllerId;
-  }
+    /// Return the controller's scene-graph id (prefixed to any
+    /// scene graph objects it creates).
+    SdfPath const& GetControllerId() const { return _controllerId; }
 
-  /// -------------------------------------------------------
-  /// Execution API
+    /// -------------------------------------------------------
+    /// Execution API
 
-  /// Obtain the set of tasks managed by the task controller,
-  /// for image generation. The tasks returned will be different
-  /// based on current renderer state.
-  HDX_API
-  HdTaskSharedPtrVector const GetRenderingTasks() const;
+    /// Obtain paths to the tasks managed by the task controller,
+    /// for image generation. The tasks returned will be different
+    /// based on current renderer state.
+    HDX_API
+    SdfPathVector GetRenderingTaskPaths() const;
 
-  /// Obtain the set of tasks managed by the task controller,
-  /// for picking.
-  HDX_API
-  HdTaskSharedPtrVector const GetPickingTasks() const;
+    /// Obtain paths to tasks managed by the task controller,
+    /// for picking.
+    HDX_API
+    SdfPathVector GetPickingTaskPaths() const;
 
-  /// -------------------------------------------------------
-  /// Rendering API
+    /// \deprecated Use GetRenderingTaskPaths
+    ///
+    /// Deprecated in preparation of changing to an
+    /// HdxTaskControllerSceneIndex.
+    ///
+    HDX_API
+    HdTaskSharedPtrVector GetRenderingTasks() const;
 
-  /// Set the collection to be rendered.
-  HDX_API
-  void SetCollection(HdRprimCollection const &collection);
+    /// \deprecated Use GetPickingTaskPaths
+    ///
+    /// Deprecated in preparation of changing to an
+    /// HdxTaskControllerSceneIndex.
+    ///
+    HDX_API
+    HdTaskSharedPtrVector GetPickingTasks() const;
 
-  /// Set the render params. Note: params.viewport will
-  /// be overwritten, since it comes from SetRenderViewport.
-  /// XXX: For GL renders, HdxTaskController relies on the caller to
-  /// correctly set GL_SAMPLE_ALPHA_TO_COVERAGE.
-  HDX_API
-  void SetRenderParams(HdxRenderTaskParams const &params);
+    /// -------------------------------------------------------
+    /// Rendering API
 
-  /// Set the "view" opinion of the scenes render tags.
-  /// The opinion is the base opinion for the entire scene.
-  /// Individual tasks (such as the shadow task) may
-  /// have a stronger opinion and override this opinion
-  HDX_API
-  void SetRenderTags(TfTokenVector const &renderTags);
+    /// Set the collection to be rendered.
+    HDX_API
+    void SetCollection(HdRprimCollection const& collection);
 
-  /// -------------------------------------------------------
-  /// AOV API
+    /// Set the render params. Note: params.viewport will
+    /// be overwritten, since it comes from SetRenderViewport.
+    /// XXX: For GL renders, HdxTaskController relies on the caller to
+    /// correctly set GL_SAMPLE_ALPHA_TO_COVERAGE.
+    HDX_API
+    void SetRenderParams(HdxRenderTaskParams const& params);
 
-  /// Set the list of outputs to be rendered. If outputs.size() == 1,
-  /// this will send that output to the viewport via a colorizer task.
-  /// Note: names should come from HdAovTokens.
-  HDX_API
-  void SetRenderOutputs(TfTokenVector const &names);
+    /// Set the "view" opinion of the scenes render tags.
+    /// The opinion is the base opinion for the entire scene.
+    /// Individual tasks (such as the shadow task) may
+    /// have a stronger opinion and override this opinion
+    HDX_API
+    void SetRenderTags(TfTokenVector const& renderTags);
 
-  /// Set which output should be rendered to the viewport. The empty token
-  /// disables viewport rendering.
-  HDX_API
-  void SetViewportRenderOutput(TfToken const &name);
+    /// -------------------------------------------------------
+    /// AOV API
 
-  /// Get the buffer for a rendered output. Note: the caller should call
-  /// Resolve(), as HdxTaskController doesn't guarantee the buffer will
-  /// be resolved.
-  HDX_API
-  HdRenderBuffer *GetRenderOutput(TfToken const &name);
+    /// Set the list of outputs to be rendered. If outputs.size() == 1,
+    /// this will send that output to the viewport via a colorizer task.
+    /// Note: names should come from HdAovTokens.
+    HDX_API
+    void SetRenderOutputs(TfTokenVector const& names);
 
-  /// Set custom parameters for an AOV.
-  HDX_API
-  void SetRenderOutputSettings(TfToken const &name, HdAovDescriptor const &desc);
+    /// Set which output should be rendered to the viewport. The empty token
+    /// disables viewport rendering.
+    HDX_API
+    void SetViewportRenderOutput(TfToken const& name);
 
-  /// Get parameters for an AOV.
-  HDX_API
-  HdAovDescriptor GetRenderOutputSettings(TfToken const &name) const;
+    /// Get the buffer for a rendered output. Note: the caller should call
+    /// Resolve(), as HdxTaskController doesn't guarantee the buffer will
+    /// be resolved.
+    HDX_API
+    HdRenderBuffer* GetRenderOutput(TfToken const& name);
 
-  /// The destination API (e.g., OpenGL, see hgiInterop for details) and
-  /// framebuffer that the AOVs are presented into. The framebuffer
-  /// is a VtValue that encoding a framebuffer in a destination API
-  /// specific way.
-  /// E.g., a uint32_t (aka GLuint) for framebuffer object for OpenGL.
-  HDX_API
-  void SetPresentationOutput(TfToken const &api, VtValue const &framebuffer);
+    /// Set custom parameters for an AOV.
+    HDX_API
+    void SetRenderOutputSettings(TfToken const& name,
+                                 HdAovDescriptor const& desc);
 
-  /// -------------------------------------------------------
-  /// Lighting API
+    /// Get parameters for an AOV.
+    HDX_API
+    HdAovDescriptor GetRenderOutputSettings(TfToken const& name) const;
 
-  /// Set the lighting state for the scene.  HdxTaskController maintains
-  /// a set of light sprims with data set from the lights in "src".
-  /// @param src    Lighting state to implement.
-  HDX_API
-  void SetLightingState(GlfSimpleLightingContextPtr const &src);
+    /// The destination API (e.g., OpenGL, see hgiInterop for details) and
+    /// framebuffer that the AOVs are presented into. The framebuffer
+    /// is a VtValue that encoding a framebuffer in a destination API
+    /// specific way.
+    /// E.g., a uint32_t (aka GLuint) for framebuffer object for OpenGL.
+    HDX_API
+    void SetPresentationOutput(TfToken const &api, VtValue const &framebuffer);
 
-  /// -------------------------------------------------------
-  /// Camera and Framing API
+    /// -------------------------------------------------------
+    /// Lighting API
 
-  /// Set the size of the render buffers baking the AOVs.
-  /// GUI applications should set this to the size of the window.
-  ///
-  HDX_API
-  void SetRenderBufferSize(const GfVec2i &size);
+    /// Set the lighting state for the scene.  HdxTaskController maintains
+    /// a set of light sprims with data set from the lights in "src".
+    /// @param src    Lighting state to implement.
+    HDX_API
+    void SetLightingState(GlfSimpleLightingContextPtr const& src);
 
-  /// Determines how the filmback of the camera is mapped into
-  /// the pixels of the render buffer and what pixels of the render
-  /// buffer will be rendered into.
-  HDX_API
-  void SetFraming(const CameraUtilFraming &framing);
+    /// -------------------------------------------------------
+    /// Camera and Framing API
 
-  /// Specifies whether to force a window policy when conforming
-  /// the frustum of the camera to match the display window of
-  /// the camera framing.
-  HDX_API
-  void SetOverrideWindowPolicy(const std::optional<CameraUtilConformWindowPolicy> &policy);
+    /// Set the size of the render buffers backing the AOVs.
+    /// GUI applications should set this to the size of the window.
+    ///
+    HDX_API
+    void SetRenderBufferSize(const GfVec2i &size);
 
-  /// -- Scene camera --
-  /// Set the camera param on tasks to a USD camera path.
-  HDX_API
-  void SetCameraPath(SdfPath const &id);
+    /// Determines how the filmback of the camera is mapped into
+    /// the pixels of the render buffer and what pixels of the render
+    /// buffer will be rendered into.
+    HDX_API
+    void SetFraming(const CameraUtilFraming &framing);
 
-  /// Set the viewport param on tasks.
-  ///
-  /// \deprecated Use SetFraming and SetRenderBufferSize instead.
-  HDX_API
-  void SetRenderViewport(GfVec4d const &viewport);
+    /// Specifies whether to force a window policy when conforming
+    /// the frustum of the camera to match the display window of
+    /// the camera framing.
+    HDX_API
+    void SetOverrideWindowPolicy(
+        const std::optional<CameraUtilConformWindowPolicy> &policy);
 
-  /// -- Free camera --
-  /// Set the view and projection matrices for the free camera.
-  /// Note: The projection matrix must be pre-adjusted for the window policy.
-  HDX_API
-  void SetFreeCameraMatrices(GfMatrix4d const &viewMatrix, GfMatrix4d const &projectionMatrix);
-  /// Set the free camera clip planes.
-  /// (Note: Scene cameras use clipping planes authored on the camera prim)
-  HDX_API
-  void SetFreeCameraClipPlanes(std::vector<GfVec4d> const &clipPlanes);
+    /// -- Scene camera --
+    /// Set the camera param on tasks to a USD camera path.
+    HDX_API
+    void SetCameraPath(SdfPath const& id);
 
-  /// -------------------------------------------------------
-  /// Selection API
+    /// Set the viewport param on tasks.
+    ///
+    /// \deprecated Use SetFraming and SetRenderBufferSize instead.
+    HDX_API
+    void SetRenderViewport(GfVec4d const& viewport);
 
-  /// Turns the selection task on or off.
-  HDX_API
-  void SetEnableSelection(bool enable);
+    /// -- Free camera --
+    /// Set the view and projection matrices for the free camera.
+    /// Note: The projection matrix must be pre-adjusted for the window policy.
+    HDX_API
+    void SetFreeCameraMatrices(GfMatrix4d const& viewMatrix,
+                               GfMatrix4d const& projectionMatrix);
+    /// Set the free camera clip planes.
+    /// (Note: Scene cameras use clipping planes authored on the camera prim)
+    HDX_API
+    void SetFreeCameraClipPlanes(std::vector<GfVec4d> const& clipPlanes);
 
-  /// Set the selection color.
-  HDX_API
-  void SetSelectionColor(GfVec4f const &color);
+    /// Get the free camera's Hydra prim path
+    HDX_API
+    SdfPath GetFreeCameraPath();
 
-  /// Set the selection locate (over) color.
-  HDX_API
-  void SetSelectionLocateColor(GfVec4f const &color);
+    /// -------------------------------------------------------
+    /// Selection API
 
-  /// Set if the selection highlight should be rendered as an outline around
-  /// the selected objects or as a solid color overlaid on top of them.
-  HDX_API
-  void SetSelectionEnableOutline(bool enableOutline);
+    /// Turns the selection task on or off.
+    HDX_API
+    void SetEnableSelection(bool enable);
 
-  /// Set the selection outline radius (thickness) in pixels. This is only
-  /// relevant if the highlight is meant to be rendered as an outline (if
-  /// SetSelectionRenderOutline(true) is called).
-  HDX_API
-  void SetSelectionOutlineRadius(unsigned int radius);
+    /// Set the selection color.
+    HDX_API
+    void SetSelectionColor(GfVec4f const& color);
 
-  /// -------------------------------------------------------
-  /// Shadow API
+    /// Set the selection locate (over) color.
+    HDX_API
+    void SetSelectionLocateColor(GfVec4f const& color);
 
-  /// Turns the shadow task on or off.
-  HDX_API
-  void SetEnableShadows(bool enable);
+    /// Set if the selection highlight should be rendered as an outline around
+    /// the selected objects or as a solid color overlaid on top of them.
+    HDX_API
+    void SetSelectionEnableOutline(bool enableOutline);
 
-  /// Set the shadow params. Note: params.camera will
-  /// be overwritten, since it comes from SetCameraPath/SetCameraState.
-  HDX_API
-  void SetShadowParams(HdxShadowTaskParams const &params);
+    /// Set the selection outline radius (thickness) in pixels. This is only
+    /// relevant if the highlight is meant to be rendered as an outline (if
+    /// SetSelectionRenderOutline(true) is called).
+    HDX_API
+    void SetSelectionOutlineRadius(unsigned int radius);
 
-  /// -------------------------------------------------------
-  /// Progressive Image Generation
+    /// -------------------------------------------------------
+    /// Shadow API
 
-  /// Return whether the image has converged.
-  HDX_API
-  bool IsConverged() const;
+    /// Turns the shadow task on or off.
+    HDX_API
+    void SetEnableShadows(bool enable);
 
-  /// -------------------------------------------------------
-  /// Color Correction API
+    /// Set the shadow params. Note: params.camera will
+    /// be overwritten, since it comes from SetCameraPath/SetCameraState.
+    HDX_API
+    void SetShadowParams(HdxShadowTaskParams const& params);
 
-  /// Configure color correction by settings params.
-  HDX_API
-  void SetColorCorrectionParams(HdxColorCorrectionTaskParams const &params);
+    /// -------------------------------------------------------
+    /// Progressive Image Generation
 
-  /// -------------------------------------------------------
-  /// Bounding Box API
+    /// Return whether the image has converged.
+    ///
+    /// \deprecated
+    ///
+    /// Instead, checks whether HdxTask::IsConverged for a
+    /// task in the render index for each path in GetRenderingTaskPaths().
+    ///
+    /// Deprecated in preparation of changing to an
+    /// HdxTaskControllerSceneIndex.
+    ///
+    HDX_API
+    bool IsConverged() const;
 
-  /// Set the bounding box params.
-  HDX_API
-  void SetBBoxParams(const HdxBoundingBoxTaskParams &params);
+    /// -------------------------------------------------------
+    /// Color Correction API
 
-  /// -------------------------------------------------------
-  /// Present API
+    /// Configure color correction by settings params.
+    HDX_API
+    void SetColorCorrectionParams(HdxColorCorrectionTaskParams const& params);
 
-  /// Enable / disable presenting the render to bound framebuffer.
-  /// An application may choose to manage the AOVs that are rendered into
-  /// itself and skip the task controller's presentation.
-  HDX_API
-  void SetEnablePresentation(bool enabled);
+    /// -------------------------------------------------------
+    /// Bounding Box API
 
- private:
-  ///
-  /// This class is not intended to be copied.
-  ///
-  HdxTaskController(HdxTaskController const &) = delete;
-  HdxTaskController &operator=(HdxTaskController const &) = delete;
+    /// Set the bounding box params.
+    HDX_API
+    void SetBBoxParams(const HdxBoundingBoxTaskParams& params);
 
-  HdRenderIndex *_index;
-  SdfPath const _controllerId;
-  bool _gpuEnabled;
+    /// -------------------------------------------------------
+    /// Present API
 
-  // Create taskController objects. Since the camera is a parameter
-  // to the tasks, _CreateCamera() should be called first.
-  void _CreateRenderGraph();
+    /// Enable / disable presenting the render to bound framebuffer.
+    /// An application may choose to manage the AOVs that are rendered into
+    /// itself and skip the task controller's presentation.
+    HDX_API
+    void SetEnablePresentation(bool enabled);
 
-  void _CreateLightingTask();
-  void _CreateShadowTask();
-  SdfPath _CreateSkydomeTask();
-  SdfPath _CreateRenderTask(TfToken const &materialTag);
-  void _CreateOitResolveTask();
-  void _CreateSelectionTask();
-  void _CreateColorizeSelectionTask();
-  void _CreateColorCorrectionTask();
-  void _CreateVisualizeAovTask();
-  void _CreatePickTask();
-  void _CreatePickFromRenderBufferTask();
-  void _CreateBoundingBoxTask();
-  void _CreateAovInputTask();
-  void _CreatePresentTask();
+private:
+    ///
+    /// This class is not intended to be copied.
+    ///
+    HdxTaskController(HdxTaskController const&) = delete;
+    HdxTaskController &operator=(HdxTaskController const&) = delete;
 
-  void _SetCameraParamForTasks(SdfPath const &id);
-  void _SetCameraFramingForTasks();
-  void _UpdateAovDimensions(GfVec2i const &dimensions);
+    HdRenderIndex *_index;
+    SdfPath const _controllerId;
+    bool _gpuEnabled;
 
-  void _SetBlendStateForMaterialTag(TfToken const &materialTag,
-                                    HdxRenderTaskParams *renderParams) const;
+    // Create taskController objects. Since the camera is a parameter
+    // to the tasks, _CreateCamera() should be called first.
+    void _CreateRenderGraph();
 
-  // Render graph topology control.
-  bool _ShadowsEnabled() const;
-  bool _SelectionEnabled() const;
-  bool _ColorizeSelectionEnabled() const;
-  bool _ColorCorrectionEnabled() const;
-  bool _VisualizeAovEnabled() const;
-  bool _ColorizeQuantizationEnabled() const;
-  bool _AovsSupported() const;
-  bool _UsingAovs() const;
+    void _CreateLightingTask();
+    void _CreateShadowTask();
+    SdfPath _CreateSkydomeTask();
+    SdfPath _CreateRenderTask(TfToken const& materialTag);
+    void _CreateOitResolveTask();
+    void _CreateSelectionTask();
+    void _CreateColorizeSelectionTask();
+    void _CreateColorCorrectionTask();
+    void _CreateVisualizeAovTask();
+    void _CreatePickTask();
+    void _CreatePickFromRenderBufferTask();
+    void _CreateBoundingBoxTask();
+    void _CreateAovInputTask();
+    void _CreatePresentTask();
 
-  // Helper function for renderbuffer management.
-  SdfPath _GetRenderTaskPath(TfToken const &materialTag) const;
-  SdfPath _GetAovPath(TfToken const &aov) const;
-  SdfPathVector _GetAovEnabledTasks() const;
+    void _SetCameraParamForTasks(SdfPath const& id);
+    void _SetCameraFramingForTasks();
+    void _UpdateAovDimensions(GfVec2i const& dimensions);
 
-  // Helper functions to set up the lighting state for the built-in lights
-  bool _SupportBuiltInLightTypes();
-  void _SetBuiltInLightingState(GlfSimpleLightingContextPtr const &src);
+    void _SetBlendStateForMaterialTag(TfToken const& materialTag,
+                                      HdxRenderTaskParams *renderParams) const;
 
-  // Helper function to get the built-in Camera light type SimpleLight for
-  // Storm, and DistantLight otherwise
-  TfToken _GetCameraLightType();
+    // Render graph topology control.
+    bool _ShadowsEnabled() const;
+    bool _SelectionEnabled() const;
+    bool _ColorizeSelectionEnabled() const;
+    bool _ColorCorrectionEnabled() const;
+    bool _VisualizeAovEnabled() const;
+    bool _ColorizeQuantizationEnabled() const;
+    bool _AovsSupported() const;
+    bool _UsingAovs() const;
 
-  // Helper functions to set the parameters of a light, get a particular light
-  // in the scene, replace and remove Sprims from the scene
-  VtValue _GetDomeLightTexture(GlfSimpleLight const &light);
-  void _SetParameters(SdfPath const &pathName, GlfSimpleLight const &light);
-  void _SetMaterialNetwork(SdfPath const &pathName, GlfSimpleLight const &light);
-  GlfSimpleLight _GetLightAtId(size_t const &pathIdx);
-  void _RemoveLightSprim(size_t const &pathIdx);
-  void _ReplaceLightSprim(size_t const &pathIdx,
-                          GlfSimpleLight const &light,
-                          SdfPath const &pathName);
+    // Helper function for renderbuffer management.
+    SdfPath _GetRenderTaskPath(TfToken const& materialTag) const;
+    SdfPath _GetAovPath(TfToken const& aov) const;
+    SdfPathVector _GetAovEnabledTasks() const;
 
-  // A private scene delegate member variable backs the tasks and the free cam
-  // this controller generates. To keep _Delegate simple, the containing class
-  // is responsible for marking things dirty.
-  class _Delegate : public HdSceneDelegate {
-   public:
-    _Delegate(HdRenderIndex *parentIndex, SdfPath const &delegateID)
-        : HdSceneDelegate(parentIndex, delegateID)
+    // Helper functions to set up the lighting state for the built-in lights
+    bool _SupportBuiltInLightTypes();
+    void _SetBuiltInLightingState(GlfSimpleLightingContextPtr const& src);
+
+    // Helper function to get the built-in Camera light type SimpleLight for
+    // Storm, and DistantLight otherwise
+    TfToken _GetCameraLightType();
+
+    // Helper functions to set the parameters of a light, get a particular light
+    // in the scene, replace and remove Sprims from the scene
+    VtValue _GetDomeLightTexture(GlfSimpleLight const& light);
+    void _SetParameters(SdfPath const& pathName, GlfSimpleLight const& light);
+    void _SetMaterialNetwork(SdfPath const& pathName,
+                             GlfSimpleLight const& light);
+    GlfSimpleLight _GetLightAtId(size_t const& pathIdx);
+    void _RemoveLightSprim(size_t const& pathIdx);
+    void _ReplaceLightSprim(size_t const& pathIdx, GlfSimpleLight const& light,
+                        SdfPath const& pathName);
+
+    // A private scene delegate member variable backs the tasks and the free cam
+    // this controller generates. To keep _Delegate simple, the containing class
+    // is responsible for marking things dirty.
+    class _Delegate : public HdSceneDelegate
     {
-    }
-    ~_Delegate() override = default;
+    public:
+        _Delegate(HdRenderIndex *parentIndex,
+                  SdfPath const& delegateID)
+            : HdSceneDelegate(parentIndex, delegateID)
+            {}
+        ~_Delegate() override = default;
 
-    // HdxTaskController set/get interface
-    template<typename T> void SetParameter(SdfPath const &id, TfToken const &key, T const &value)
-    {
-      _valueCacheMap[id][key] = value;
-    }
-    template<typename T> T GetParameter(SdfPath const &id, TfToken const &key) const
-    {
-      VtValue vParams;
-      _ValueCache vCache;
-      TF_VERIFY(TfMapLookup(_valueCacheMap, id, &vCache) && TfMapLookup(vCache, key, &vParams) &&
+        // HdxTaskController set/get interface
+        template <typename T>
+        void SetParameter(SdfPath const& id, TfToken const& key,
+                          T const& value) {
+            _valueCacheMap[id][key] = value;
+        }
+        template <typename T>
+        T GetParameter(SdfPath const& id, TfToken const& key) const {
+            VtValue vParams;
+            _ValueCache vCache;
+            TF_VERIFY(
+                TfMapLookup(_valueCacheMap, id, &vCache) &&
+                TfMapLookup(vCache, key, &vParams) &&
                 vParams.IsHolding<T>());
-      return vParams.Get<T>();
-    }
-    bool HasParameter(SdfPath const &id, TfToken const &key) const
-    {
-      _ValueCache vCache;
-      if (TfMapLookup(_valueCacheMap, id, &vCache) && vCache.count(key) > 0) {
-        return true;
-      }
-      return false;
-    }
+            return vParams.Get<T>();
+        }
+        bool HasParameter(SdfPath const& id, TfToken const& key) const {
+            _ValueCache vCache;
+            if (TfMapLookup(_valueCacheMap, id, &vCache) &&
+                vCache.count(key) > 0) {
+                return true;
+            }
+            return false;
+        }
 
-    // HdSceneDelegate interface
-    VtValue Get(SdfPath const &id, TfToken const &key) override;
-    GfMatrix4d GetTransform(SdfPath const &id) override;
-    VtValue GetLightParamValue(SdfPath const &id, TfToken const &paramName) override;
-    VtValue GetMaterialResource(SdfPath const &id) override;
-    bool IsEnabled(TfToken const &option) const override;
-    HdRenderBufferDescriptor GetRenderBufferDescriptor(SdfPath const &id) override;
-    TfTokenVector GetTaskRenderTags(SdfPath const &taskId) override;
+        // HdSceneDelegate interface
+        VtValue Get(SdfPath const& id, TfToken const& key) override;
+        GfMatrix4d GetTransform(SdfPath const& id) override;
+        VtValue GetLightParamValue(SdfPath const& id,
+                                   TfToken const& paramName) override;
+        VtValue GetMaterialResource(SdfPath const& id) override;
+        bool IsEnabled(TfToken const& option) const override;
+        HdRenderBufferDescriptor
+            GetRenderBufferDescriptor(SdfPath const& id) override;
+        TfTokenVector GetTaskRenderTags(SdfPath const& taskId) override;
 
-   private:
-    using _ValueCache = TfHashMap<TfToken, VtValue, TfToken::HashFunctor>;
-    using _ValueCacheMap = TfHashMap<SdfPath, _ValueCache, SdfPath::Hash>;
-    _ValueCacheMap _valueCacheMap;
-  };
-  _Delegate _delegate;
-  std::unique_ptr<class HdxFreeCameraSceneDelegate> _freeCameraSceneDelegate;
 
-  // Generated tasks.
-  SdfPath _simpleLightTaskId;
-  SdfPath _shadowTaskId;
-  SdfPathVector _renderTaskIds;
-  SdfPath _aovInputTaskId;
-  SdfPath _oitResolveTaskId;
-  SdfPath _selectionTaskId;
-  SdfPath _colorizeSelectionTaskId;
-  SdfPath _colorCorrectionTaskId;
-  SdfPath _visualizeAovTaskId;
-  SdfPath _pickTaskId;
-  SdfPath _pickFromRenderBufferTaskId;
-  SdfPath _boundingBoxTaskId;
-  SdfPath _presentTaskId;
+    private:
+        using _ValueCache = TfHashMap<TfToken, VtValue, TfToken::HashFunctor>;
+        using _ValueCacheMap = TfHashMap<SdfPath, _ValueCache, SdfPath::Hash>;
+        _ValueCacheMap _valueCacheMap;
+    };
+    _Delegate _delegate;
+    std::unique_ptr<class HdxFreeCameraSceneDelegate> _freeCameraSceneDelegate;
 
-  // Current active camera
-  SdfPath _activeCameraId;
+    // Generated tasks.
+    SdfPath _simpleLightTaskId;
+    SdfPath _shadowTaskId;
+    SdfPathVector _renderTaskIds;
+    SdfPath _aovInputTaskId;
+    SdfPath _oitResolveTaskId;
+    SdfPath _selectionTaskId;
+    SdfPath _colorizeSelectionTaskId;
+    SdfPath _colorCorrectionTaskId;
+    SdfPath _visualizeAovTaskId;
+    SdfPath _pickTaskId;
+    SdfPath _pickFromRenderBufferTaskId;
+    SdfPath _boundingBoxTaskId;
+    SdfPath _presentTaskId;
 
-  // Built-in lights
-  SdfPathVector _lightIds;
+    // Current active camera
+    SdfPath _activeCameraId;
 
-  // Generated renderbuffers
-  SdfPathVector _aovBufferIds;
-  TfTokenVector _aovOutputs;
-  TfToken _viewportAov;
+    // Built-in lights
+    SdfPathVector _lightIds;
 
-  GfVec2i _renderBufferSize;
-  CameraUtilFraming _framing;
-  std::optional<CameraUtilConformWindowPolicy> _overrideWindowPolicy;
+    // Generated renderbuffers
+    SdfPathVector _aovBufferIds;
+    TfTokenVector _aovOutputs;
+    TfToken _viewportAov;
 
-  GfVec4d _viewport;
+    GfVec2i _renderBufferSize;
+    CameraUtilFraming _framing;
+    std::optional<CameraUtilConformWindowPolicy> _overrideWindowPolicy;
+
+    GfVec4d _viewport;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDX_TASK_CONTROLLER_H
+#endif // PXR_IMAGING_HDX_TASK_CONTROLLER_H

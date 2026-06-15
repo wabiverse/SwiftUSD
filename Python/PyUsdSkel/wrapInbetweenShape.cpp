@@ -6,91 +6,114 @@
 //
 #include "UsdSkel/inbetweenShape.h"
 
+#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "Usd/pyConversions.h"
 
-#include <boost/python.hpp>
-#include <boost/python/extract.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/extract.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
+
 namespace {
 
-VtVec3fArray _GetOffsets(const UsdSkelInbetweenShape &self)
+
+VtVec3fArray
+_GetOffsets(const UsdSkelInbetweenShape& self)
 {
-  VtVec3fArray points;
-  self.GetOffsets(&points);
-  return points;
+    VtVec3fArray points;
+    self.GetOffsets(&points);
+    return points;
 }
 
-VtVec3fArray _GetNormalOffsets(const UsdSkelInbetweenShape &self)
+
+VtVec3fArray
+_GetNormalOffsets(const UsdSkelInbetweenShape& self)
 {
-  VtVec3fArray points;
-  self.GetNormalOffsets(&points);
-  return points;
+    VtVec3fArray points;
+    self.GetNormalOffsets(&points);
+    return points;
 }
 
-object _GetWeight(const UsdSkelInbetweenShape &self)
+
+object
+_GetWeight(const UsdSkelInbetweenShape& self)
 {
-  float w = 0;
-  return self.GetWeight(&w) ? object(w) : object();
+    float w = 0;
+    return self.GetWeight(&w) ? object(w) : object();
 }
 
-bool _SetOffsets(const UsdSkelInbetweenShape &self, const object &val)
+
+bool
+_SetOffsets(const UsdSkelInbetweenShape& self, const object& val)
 {
-  const VtValue vtVal = UsdPythonToSdfType(val, SdfValueTypeNames->Vector3fArray);
-  return vtVal.IsHolding<VtVec3fArray>() ? self.SetOffsets(vtVal.UncheckedGet<VtVec3fArray>()) :
-                                           false;
+    const VtValue vtVal =
+        UsdPythonToSdfType(val, SdfValueTypeNames->Vector3fArray);
+    return vtVal.IsHolding<VtVec3fArray>() ?
+        self.SetOffsets(vtVal.UncheckedGet<VtVec3fArray>()) : false;
 }
 
-bool _SetNormalOffsets(const UsdSkelInbetweenShape &self, const object &val)
+
+bool
+_SetNormalOffsets(const UsdSkelInbetweenShape& self, const object& val)
 {
-  const VtValue vtVal = UsdPythonToSdfType(val, SdfValueTypeNames->Vector3fArray);
-  return vtVal.IsHolding<VtVec3fArray>() ?
-             self.SetNormalOffsets(vtVal.UncheckedGet<VtVec3fArray>()) :
-             false;
+    const VtValue vtVal =
+        UsdPythonToSdfType(val, SdfValueTypeNames->Vector3fArray);
+    return vtVal.IsHolding<VtVec3fArray>() ?
+        self.SetNormalOffsets(vtVal.UncheckedGet<VtVec3fArray>()) : false;
 }
 
-UsdAttribute _CreateNormalOffsetsAttr(const UsdSkelInbetweenShape &self,
-                                      const object &defaultValue)
-{
-  return self.CreateNormalOffsetsAttr(
-      UsdPythonToSdfType(defaultValue, SdfValueTypeNames->Vector3fArray));
-}
 
-}  // namespace
+UsdAttribute
+_CreateNormalOffsetsAttr(const UsdSkelInbetweenShape& self,
+                         const object& defaultValue)
+{
+    return self.CreateNormalOffsetsAttr(
+        UsdPythonToSdfType(defaultValue, SdfValueTypeNames->Vector3fArray));
+}            
+
+
+} // namespace
+
 
 void wrapUsdSkelInbetweenShape()
 {
-  using This = UsdSkelInbetweenShape;
+    using This = UsdSkelInbetweenShape;
 
-  class_<This>("InbetweenShape")
+    class_<This>("InbetweenShape")
 
-      .def(init<UsdAttribute>(arg("attr")))
-      .def(!self)
-      .def(self == self)
+        .def(init<UsdAttribute>(arg("attr")))
+        .def(!self)
+        .def(self == self)
 
-      .def("GetWeight", &_GetWeight)
-      .def("SetWeight", &This::SetWeight, arg("weight"))
-      .def("HasAuthoredWeight", &This::HasAuthoredWeight)
+        .def("GetWeight", &_GetWeight)
+        .def("SetWeight", &This::SetWeight, arg("weight"))
+        .def("HasAuthoredWeight", &This::HasAuthoredWeight)
 
-      .def("GetOffsets", &_GetOffsets)
-      .def("SetOffsets", &_SetOffsets, arg("offsets"))
+        .def("GetOffsets", &_GetOffsets)
+        .def("SetOffsets", &_SetOffsets, arg("offsets"))
 
-      .def("GetNormalOffsetsAttr", &This::GetNormalOffsetsAttr)
-      .def("CreateNormalOffsetsAttr", &_CreateNormalOffsetsAttr)
+        .def("GetNormalOffsetsAttr", &This::GetNormalOffsetsAttr)
+        .def("CreateNormalOffsetsAttr", &_CreateNormalOffsetsAttr)
 
-      .def("GetNormalOffsets", &_GetNormalOffsets)
-      .def("SetNormalOffsets", &_SetNormalOffsets, arg("offsets"))
+        .def("GetNormalOffsets", &_GetNormalOffsets)
+        .def("SetNormalOffsets", &_SetNormalOffsets, arg("offsets"))
 
-      .def("IsInbetween", &This::IsInbetween, arg("attr"))
-      .staticmethod("IsInbetween")
+        .def("IsInbetween", &This::IsInbetween, arg("attr"))
+        .staticmethod("IsInbetween")
 
-      .def("GetAttr", &This::GetAttr, return_value_policy<return_by_value>())
-      .def("IsDefined", &This::IsDefined);
-}
+        .def("GetAttr", &This::GetAttr,
+             return_value_policy<return_by_value>())
+        .def("IsDefined", &This::IsDefined)
+        ;
+}            

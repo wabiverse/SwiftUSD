@@ -19,108 +19,159 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderBufferSchemaTokens, HD_RENDER_BUFFER_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderBufferSchemaTokens,
+    HD_RENDER_BUFFER_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdVec3iDataSourceHandle HdRenderBufferSchema::GetDimensions() const
+HdVec3iDataSourceHandle
+HdRenderBufferSchema::GetDimensions() const
 {
-  return _GetTypedDataSource<HdVec3iDataSource>(HdRenderBufferSchemaTokens->dimensions);
+    return _GetTypedDataSource<HdVec3iDataSource>(
+        HdRenderBufferSchemaTokens->dimensions);
 }
 
-HdFormatDataSourceHandle HdRenderBufferSchema::GetFormat() const
+HdFormatDataSourceHandle
+HdRenderBufferSchema::GetFormat() const
 {
-  return _GetTypedDataSource<HdFormatDataSource>(HdRenderBufferSchemaTokens->format);
+    return _GetTypedDataSource<HdFormatDataSource>(
+        HdRenderBufferSchemaTokens->format);
 }
 
-HdBoolDataSourceHandle HdRenderBufferSchema::GetMultiSampled() const
+HdBoolDataSourceHandle
+HdRenderBufferSchema::GetMultiSampled() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdRenderBufferSchemaTokens->multiSampled);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdRenderBufferSchemaTokens->multiSampled);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdRenderBufferSchema::BuildRetained(
-    const HdVec3iDataSourceHandle &dimensions,
-    const HdFormatDataSourceHandle &format,
-    const HdBoolDataSourceHandle &multiSampled)
+HdContainerDataSourceHandle
+HdRenderBufferSchema::BuildRetained(
+        const HdVec3iDataSourceHandle &dimensions,
+        const HdFormatDataSourceHandle &format,
+        const HdBoolDataSourceHandle &multiSampled
+)
 {
-  TfToken _names[3];
-  HdDataSourceBaseHandle _values[3];
+    TfToken _names[3];
+    HdDataSourceBaseHandle _values[3];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (dimensions) {
-    _names[_count] = HdRenderBufferSchemaTokens->dimensions;
-    _values[_count++] = dimensions;
-  }
+    if (dimensions) {
+        _names[_count] = HdRenderBufferSchemaTokens->dimensions;
+        _values[_count++] = dimensions;
+    }
 
-  if (format) {
-    _names[_count] = HdRenderBufferSchemaTokens->format;
-    _values[_count++] = format;
-  }
+    if (format) {
+        _names[_count] = HdRenderBufferSchemaTokens->format;
+        _values[_count++] = format;
+    }
 
-  if (multiSampled) {
-    _names[_count] = HdRenderBufferSchemaTokens->multiSampled;
-    _values[_count++] = multiSampled;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (multiSampled) {
+        _names[_count] = HdRenderBufferSchemaTokens->multiSampled;
+        _values[_count++] = multiSampled;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdRenderBufferSchema::Builder &HdRenderBufferSchema::Builder::SetDimensions(
+HdRenderBufferSchema::Builder &
+HdRenderBufferSchema::Builder::SetDimensions(
     const HdVec3iDataSourceHandle &dimensions)
 {
-  _dimensions = dimensions;
-  return *this;
+    _dimensions = dimensions;
+    return *this;
 }
 
-HdRenderBufferSchema::Builder &HdRenderBufferSchema::Builder::SetFormat(
+HdRenderBufferSchema::Builder &
+HdRenderBufferSchema::Builder::SetFormat(
     const HdFormatDataSourceHandle &format)
 {
-  _format = format;
-  return *this;
+    _format = format;
+    return *this;
 }
 
-HdRenderBufferSchema::Builder &HdRenderBufferSchema::Builder::SetMultiSampled(
+HdRenderBufferSchema::Builder &
+HdRenderBufferSchema::Builder::SetMultiSampled(
     const HdBoolDataSourceHandle &multiSampled)
 {
-  _multiSampled = multiSampled;
-  return *this;
+    _multiSampled = multiSampled;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdRenderBufferSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdRenderBufferSchema::Builder::Build()
 {
-  return HdRenderBufferSchema::BuildRetained(_dimensions, _format, _multiSampled);
-}
-
-/*static*/
-HdRenderBufferSchema HdRenderBufferSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdRenderBufferSchema(fromParentContainer ?
-                                  HdContainerDataSource::Cast(fromParentContainer->Get(
-                                      HdRenderBufferSchemaTokens->renderBuffer)) :
-                                  nullptr);
+    return HdRenderBufferSchema::BuildRetained(
+        _dimensions,
+        _format,
+        _multiSampled
+    );
 }
 
 /*static*/
-const TfToken &HdRenderBufferSchema::GetSchemaToken()
+HdRenderBufferSchema
+HdRenderBufferSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdRenderBufferSchemaTokens->renderBuffer;
+    return HdRenderBufferSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdRenderBufferSchemaTokens->renderBuffer))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdRenderBufferSchema::GetDefaultLocator()
+const TfToken &
+HdRenderBufferSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdRenderBufferSchemaTokens->renderBuffer;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdRenderBufferSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdRenderBufferSchema::GetDimensionsLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdRenderBufferSchemaTokens->dimensions);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdRenderBufferSchema::GetFormatLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdRenderBufferSchemaTokens->format);
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdRenderBufferSchema::GetMultiSampledLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdRenderBufferSchemaTokens->multiSampled);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

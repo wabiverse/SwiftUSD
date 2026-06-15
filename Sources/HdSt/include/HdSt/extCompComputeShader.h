@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HD_ST_EXT_COMP_COMPUTE_SHADER_H
 #define PXR_IMAGING_HD_ST_EXT_COMP_COMPUTE_SHADER_H
 
-#include "Hd/version.h"
-#include "HdSt/api.h"
-#include "HdSt/shaderCode.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
+#include "Hd/version.h"
+#include "HdSt/shaderCode.h"
 
 #include "Sdf/path.h"
 
@@ -20,7 +20,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-using HdSt_ExtCompComputeShaderSharedPtr = std::shared_ptr<class HdSt_ExtCompComputeShader>;
+using HdSt_ExtCompComputeShaderSharedPtr =
+    std::shared_ptr<class HdSt_ExtCompComputeShader>;
 
 class HdExtComputation;
 
@@ -31,45 +32,50 @@ class HdExtComputation;
 /// shader program.
 ///
 class HdSt_ExtCompComputeShader final : public HdStShaderCode {
- public:
-  HDST_API
-  HdSt_ExtCompComputeShader(HdExtComputation const *extComp);
+public:
+    HDST_API
+    HdSt_ExtCompComputeShader(HdExtComputation const *extComp);
 
-  HDST_API
-  ~HdSt_ExtCompComputeShader() override;
+    HDST_API
+    ~HdSt_ExtCompComputeShader() override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name HdStShaderCode (pure) virtual interface                         //
-  // ---------------------------------------------------------------------- //
 
-  HDST_API
-  std::string GetSource(TfToken const &shaderStageKey) const override;
+    // ---------------------------------------------------------------------- //
+    /// \name HdStShaderCode (pure) virtual interface                         //
+    // ---------------------------------------------------------------------- //
 
-  HDST_API
-  void BindResources(int program, HdSt_ResourceBinder const &binder) override;
+    HDST_API
+    std::string GetSource(TfToken const &shaderStageKey) const override;
 
-  HDST_API
-  void UnbindResources(int program, HdSt_ResourceBinder const &binder) override;
+    HDST_API
+    void BindResources(int program,
+                       HdSt_ResourceBinder const &binder) override;
 
-  HDST_API
-  void AddBindings(HdStBindingRequestVector *customBindings) override;
+    HDST_API
+    void UnbindResources(int program,
+                         HdSt_ResourceBinder const &binder) override;
 
-  HDST_API
-  ID ComputeHash() const override;
+    HDST_API
+    void AddBindings(HdStBindingRequestVector *customBindings) override;
 
-  // ---------------------------------------------------------------------- //
+    HDST_API
+    ID ComputeHash() const override;
 
-  HDST_API
-  SdfPath const &GetExtComputationId() const;
+    // ---------------------------------------------------------------------- //
 
- private:
-  // No copying
-  HdSt_ExtCompComputeShader(const HdSt_ExtCompComputeShader &) = delete;
-  HdSt_ExtCompComputeShader &operator=(const HdSt_ExtCompComputeShader &) = delete;
+    HDST_API
+    SdfPath const& GetExtComputationId() const;
 
-  HdExtComputation const *const _extComp;
+private:
+    // No copying
+    HdSt_ExtCompComputeShader(const HdSt_ExtCompComputeShader &) = delete;
+    HdSt_ExtCompComputeShader &operator =(const HdSt_ExtCompComputeShader &)
+        = delete;
+    
+    HdExtComputation const * const _extComp;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_EXT_COMP_COMPUTE_SHADER_H
+#endif // PXR_IMAGING_HD_ST_EXT_COMP_COMPUTE_SHADER_H

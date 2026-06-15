@@ -5,74 +5,84 @@
 // https://openusd.org/license.
 //
 #include "HdSt/bufferArrayRange.h"
+#include "HdSt/bufferResource.h"
 #include "Hd/bufferSpec.h"
 #include "Hd/perfLog.h"
 #include "Hd/tokens.h"
-#include "HdSt/bufferResource.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdStBufferArrayRange::HdStBufferArrayRange(HdStResourceRegistry *resourceRegistry)
+HdStBufferArrayRange::HdStBufferArrayRange(
+    HdStResourceRegistry* resourceRegistry)
     : _resourceRegistry(resourceRegistry)
 {
 }
 
-HdStBufferArrayRange::~HdStBufferArrayRange() {}
-
-void HdStBufferArrayRange::GetBufferSpecs(HdBufferSpecVector *specs) const
+HdStBufferArrayRange::~HdStBufferArrayRange() 
 {
-  HD_TRACE_FUNCTION();
-
-  HdStBufferResourceNamedList const &resources = GetResources();
-
-  TF_FOR_ALL(it, resources)
-  {
-    specs->emplace_back(it->first, it->second->GetTupleType());
-  }
 }
 
-HdStResourceRegistry *HdStBufferArrayRange::GetResourceRegistry()
+void
+HdStBufferArrayRange::GetBufferSpecs(HdBufferSpecVector *specs) const
 {
-  return _resourceRegistry;
+    HD_TRACE_FUNCTION();
+
+    HdStBufferResourceNamedList const &resources = GetResources();
+
+    TF_FOR_ALL(it, resources) {
+        specs->emplace_back(it->first, it->second->GetTupleType());
+    }
 }
 
-HdStResourceRegistry *HdStBufferArrayRange::GetResourceRegistry() const
+HdStResourceRegistry*
+HdStBufferArrayRange::GetResourceRegistry()
 {
-  return _resourceRegistry;
+    return _resourceRegistry;
 }
 
-std::ostream &operator<<(std::ostream &out, const HdStBufferArrayRange &self)
+HdStResourceRegistry*
+HdStBufferArrayRange::GetResourceRegistry() const
 {
-  // call virtual
-  self.DebugDump(out);
-  return out;
+    return _resourceRegistry;
 }
 
-void HdStBufferArrayRangeContainer::Set(int index, HdStBufferArrayRangeSharedPtr const &range)
+std::ostream &operator <<(std::ostream &out,
+                          const HdStBufferArrayRange &self)
 {
-  HD_TRACE_FUNCTION();
-
-  if (index < 0) {
-    TF_CODING_ERROR("Index negative in HdStBufferArrayRangeContainer::Set()");
-    return;
-  }
-
-  if (static_cast<size_t>(index) >= _ranges.size()) {
-    HD_PERF_COUNTER_INCR(HdPerfTokens->bufferArrayRangeContainerResized);
-    _ranges.resize(index + 1);
-  }
-  _ranges[index] = range;
+    // call virtual
+    self.DebugDump(out);
+    return out;
 }
 
-HdStBufferArrayRangeSharedPtr const &HdStBufferArrayRangeContainer::Get(int index) const
+void
+HdStBufferArrayRangeContainer::Set(int index,
+                                 HdStBufferArrayRangeSharedPtr const &range)
 {
-  if (index < 0 || static_cast<size_t>(index) >= _ranges.size()) {
-    // out of range access is not an errorneous path.
-    // (i.e. element/instance bars can be null if not exists)
-    static HdStBufferArrayRangeSharedPtr empty;
-    return empty;
-  }
-  return _ranges[index];
+    HD_TRACE_FUNCTION();
+
+    if (index < 0) {
+        TF_CODING_ERROR("Index negative in HdStBufferArrayRangeContainer::Set()");
+        return;
+    }
+
+    if (static_cast<size_t>(index) >= _ranges.size()) {
+        HD_PERF_COUNTER_INCR(HdPerfTokens->bufferArrayRangeContainerResized);
+        _ranges.resize(index + 1);
+    }
+    _ranges[index] = range;
 }
+
+HdStBufferArrayRangeSharedPtr const &
+HdStBufferArrayRangeContainer::Get(int index) const
+{
+    if (index < 0 || static_cast<size_t>(index) >= _ranges.size()) {
+        // out of range access is not an errorneous path.
+        // (i.e. element/instance bars can be null if not exists)
+        static HdStBufferArrayRangeSharedPtr empty;
+        return empty;
+    }
+    return _ranges[index];
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

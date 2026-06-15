@@ -10,297 +10,386 @@
 
 #include "UsdImaging/primvarUtils.h"
 
-#include "Hd/primvarSchema.h"
-#include "Hd/primvarsSchema.h"
 #include "Hd/tokens.h"
+#include "Hd/primvarsSchema.h"
+#include "Hd/primvarSchema.h"
+#include "Hd/retainedDataSource.h"
+
+#include "Usd/colorSpaceAPI.h"
 
 #include "Tf/denseHashMap.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static inline bool _IsIndexed(const UsdAttributeQuery &indicesQuery)
+static inline bool
+_IsIndexed(const UsdAttributeQuery& indicesQuery)
 {
-  return indicesQuery.IsValid() && indicesQuery.HasValue();
+    return indicesQuery.IsValid() && indicesQuery.HasValue();
 }
 
-static TfToken _GetInterpolation(const UsdAttribute &attr)
+static
+TfToken
+_GetInterpolation(const UsdAttribute &attr)
 {
-  // A reimplementation of UsdGeomPrimvar::GetInterpolation(),
-  // but with "vertex" as the default instead of "constant"...
-  TfToken interpolation;
-  if (attr.GetMetadata(UsdGeomTokens->interpolation, &interpolation)) {
-    return UsdImagingUsdToHdInterpolationToken(interpolation);
-  }
+    // A reimplementation of UsdGeomPrimvar::GetInterpolation(),
+    // but with "vertex" as the default instead of "constant"...
+    TfToken interpolation;
+    if (attr.GetMetadata(UsdGeomTokens->interpolation, &interpolation)) {
+        return UsdImagingUsdToHdInterpolationToken(interpolation);
+    }
 
-  return HdPrimvarSchemaTokens->vertex;
+    return HdPrimvarSchemaTokens->vertex;
 }
 
 // Reject primvars:points since we always want to get the value from
 // the points attribute.
 // Similar for velocities and accelerations.
-static bool _RejectPrimvar(const TfToken &name)
+static
+bool
+_RejectPrimvar(const TfToken &name)
 {
-  if (name == UsdGeomTokens->points) {
-    return true;
-  }
-  if (name == UsdGeomTokens->velocities) {
-    return true;
-  }
-  if (name == UsdGeomTokens->accelerations) {
-    return true;
-  }
+    if (name == UsdGeomTokens->points) {
+        return true;
+    }
+    if (name == UsdGeomTokens->velocities) {
+        return true;
+    }
+    if (name == UsdGeomTokens->accelerations) {
+        return true;
+    }
 
-  return false;
+    return false;
 }
 
 UsdImagingDataSourcePrimvars::UsdImagingDataSourcePrimvars(
     const SdfPath &sceneIndexPath,
     UsdPrim const &usdPrim,
-    UsdGeomPrimvarsAPI usdPrimvars,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : _sceneIndexPath(sceneIndexPath), _usdPrim(usdPrim), _stageGlobals(stageGlobals)
+    const UsdImagingDataSourceStageGlobals & stageGlobals)
+: _sceneIndexPath(sceneIndexPath)
+, _usdPrim(usdPrim)
+, _stageGlobals(stageGlobals)
 {
-  const std::vector<UsdGeomPrimvar> primvars = usdPrimvars.GetAuthoredPrimvars();
-  for (const UsdGeomPrimvar &p : primvars) {
-    if (!_RejectPrimvar(p.GetPrimvarName())) {
-      _namespacedPrimvars[p.GetPrimvarName()] = p;
-    }
-  }
 }
+
 
 /*static*/
-TfToken UsdImagingDataSourcePrimvars::_GetPrefixedName(const TfToken &name)
+TfToken
+UsdImagingDataSourcePrimvars::_GetPrefixedName(const TfToken &name)
 {
-  return TfToken(("primvars:" + name.GetString()).c_str());
+    return TfToken(("primvars:" + name.GetString()).c_str());
 }
 
-TfTokenVector UsdImagingDataSourcePrimvars::GetNames()
+TfTokenVector 
+UsdImagingDataSourcePrimvars::GetNames()
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  TfTokenVector result;
-  result.reserve(_namespacedPrimvars.size());
+    TfTokenVector result;
 
-  for (const auto &entry : _namespacedPrimvars) {
-    result.push_back(entry.first);
-  }
-
-  for (UsdProperty prop : _usdPrim.GetAuthoredPropertiesInNamespace("primvars:")) {
-    if (UsdRelationship rel = prop.As<UsdRelationship>()) {
-      // strip only the "primvars:" namespace
-      static const size_t prefixLength = 9;
-      result.push_back(TfToken(rel.GetName().data() + prefixLength));
+    if (!_usdPrim) {
+        return result;
     }
-  }
 
-  return result;
+    // Enumerate primvar names using UsdGeomPrimvarsAPI.
+    // This API filters out supporting attributes such as
+    // "primvars:indexedPrimvar:indices".
+    const std::vector<UsdGeomPrimvar> primvars =
+         UsdGeomPrimvarsAPI(_usdPrim).GetAuthoredPrimvars();
+    result.reserve(primvars.size());
+    for (const UsdGeomPrimvar& primvar : primvars) {
+        const TfToken name = primvar.GetPrimvarName();
+         if (!_RejectPrimvar(name)) {
+            result.push_back(name);
+        }
+    }
+
+    return result;
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourcePrimvars::Get(const TfToken &name)
+HdIntDataSourceHandle
+_ElementSizeToDataSource(const int n)
 {
-  TRACE_FUNCTION();
+    if (n == 1) {
+        // elementSize = 1 is default.
+        // Don't occur the cost of instantiating the data source and
+        // passing it down when most clients ignore elementSize anyway.
+        return nullptr;
+    }
+    return HdRetainedTypedSampledDataSource<int>::New(n);
+}
 
-  const auto nsIt = _namespacedPrimvars.find(name);
-  if (nsIt != _namespacedPrimvars.end()) {
-    const UsdGeomPrimvar &usdPrimvar = nsIt->second;
-    const UsdAttribute &attr = usdPrimvar.GetAttr();
+HdDataSourceBaseHandle
+UsdImagingDataSourcePrimvars::Get(const TfToken & name)
+{
+    TRACE_FUNCTION();
 
-    UsdAttributeQuery valueQuery(attr);
-    if (!valueQuery.HasAuthoredValue()) {
-      return nullptr;
+    if (_RejectPrimvar(name)) {
+        return nullptr;
     }
 
-    return UsdImagingDataSourcePrimvar::New(
-        _sceneIndexPath,
-        name,
-        _stageGlobals,
-        /* value = */ std::move(valueQuery),
-        /* indices = */ UsdAttributeQuery(usdPrimvar.GetIndicesAttr()),
-        HdPrimvarSchema::BuildInterpolationDataSource(
-            UsdImagingUsdToHdInterpolationToken(usdPrimvar.GetInterpolation())),
-        HdPrimvarSchema::BuildRoleDataSource(UsdImagingUsdToHdRole(attr.GetRoleName())));
-  }
+    if (!_usdPrim) {
+        return nullptr;
+    }
+    
+    const TfToken propName = _GetPrefixedName(name);
 
-  if (UsdRelationship rel = _usdPrim.GetRelationship(_GetPrefixedName(name))) {
+    if (UsdAttribute attr = _usdPrim.GetAttribute(propName)) {
+        UsdGeomPrimvar usdPrimvar(attr);
 
-    return HdPrimvarSchema::Builder()
-        .SetPrimvarValue(UsdImagingDataSourceRelationship::New(rel, _stageGlobals))
-        .SetInterpolation(
-            HdPrimvarSchema::BuildInterpolationDataSource(HdPrimvarSchemaTokens->constant))
-        .Build();
-  }
+        UsdAttributeQuery valueQuery(attr);
+        if (!valueQuery.HasAuthoredValue()) {
+            return nullptr;
+        }
 
-  return nullptr;
+        const TfToken primvarRole =  UsdImagingUsdToHdRole(attr.GetRoleName());
+
+        TfToken colorSpace;
+        if (primvarRole == HdPrimvarRoleTokens->color) {
+            colorSpace = UsdColorSpaceAPI::ComputeColorSpaceName(attr);
+        }
+
+        return UsdImagingDataSourcePrimvar::New(
+            _sceneIndexPath, name, _stageGlobals,
+            /* value = */ std::move(valueQuery),
+            /* indices = */ UsdAttributeQuery(usdPrimvar.GetIndicesAttr()),
+            HdPrimvarSchema::BuildInterpolationDataSource(
+                UsdImagingUsdToHdInterpolationToken(
+                    usdPrimvar.GetInterpolation())),
+            primvarRole.IsEmpty()
+                ? nullptr
+                : HdPrimvarSchema::BuildRoleDataSource(primvarRole),
+            colorSpace.IsEmpty() 
+                ? nullptr
+                : HdRetainedTypedSampledDataSource<TfToken>::New(colorSpace),
+            _ElementSizeToDataSource(usdPrimvar.GetElementSize()));
+    }
+
+    if (UsdRelationship rel = _usdPrim.GetRelationship(propName)) {
+        return HdPrimvarSchema::Builder()
+            .SetPrimvarValue(UsdImagingDataSourceRelationship::New(
+                rel, _stageGlobals))
+            .SetInterpolation(HdPrimvarSchema::BuildInterpolationDataSource(
+                HdPrimvarSchemaTokens->constant))
+            .Build();
+    }
+
+    return nullptr;
 }
 
 // ----------------------------------------------------------------------------
 
 UsdImagingDataSourceCustomPrimvars::UsdImagingDataSourceCustomPrimvars(
-    const SdfPath &sceneIndexPath,
-    UsdPrim const &usdPrim,
-    const Mappings &mappings,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : _sceneIndexPath(sceneIndexPath),
-      _usdPrim(usdPrim),
-      _stageGlobals(stageGlobals),
-      _mappings(mappings)
+        const SdfPath &sceneIndexPath,
+        UsdPrim const &usdPrim,
+        const Mappings &mappings,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
+: _sceneIndexPath(sceneIndexPath)
+, _usdPrim(usdPrim)
+, _stageGlobals(stageGlobals)
+, _mappings(mappings)
 {
 }
 
-TfTokenVector UsdImagingDataSourceCustomPrimvars::GetNames()
+TfTokenVector
+UsdImagingDataSourceCustomPrimvars::GetNames()
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
+    
+    TfTokenVector result;
+    result.reserve(_mappings.size());
 
-  TfTokenVector result;
-  result.reserve(_mappings.size());
-
-  for (const auto &mapping : _mappings) {
-    result.push_back(mapping.primvarName);
-  }
-
-  return result;
-}
-
-HdDataSourceBaseHandle UsdImagingDataSourceCustomPrimvars::Get(const TfToken &name)
-{
-  TRACE_FUNCTION();
-
-  for (const Mapping &mapping : _mappings) {
-    if (mapping.primvarName != name) {
-      continue;
+    for (const auto &mapping : _mappings) {
+        result.push_back(mapping.primvarName);
     }
 
-    const UsdAttribute attr = _usdPrim.GetAttribute(mapping.usdAttrName);
-    UsdAttributeQuery valueQuery(attr);
+    return result;
+}
 
-    if (!valueQuery.HasAuthoredValue()) {
-      return nullptr;
+HdDataSourceBaseHandle
+UsdImagingDataSourceCustomPrimvars::Get(const TfToken &name)
+{
+    TRACE_FUNCTION();
+
+    if (!_usdPrim) {
+        return nullptr;
     }
 
-    return UsdImagingDataSourcePrimvar::New(
-        _sceneIndexPath,
-        name,
-        _stageGlobals,
-        /* value = */ std::move(valueQuery),
-        /* indices = */ UsdAttributeQuery(),
-        HdPrimvarSchema::BuildInterpolationDataSource(
-            mapping.interpolation.IsEmpty() ? _GetInterpolation(attr) : mapping.interpolation),
-        HdPrimvarSchema::BuildRoleDataSource(UsdImagingUsdToHdRole(attr.GetRoleName())));
-  }
+    for (const Mapping &mapping : _mappings) {
+        if (mapping.primvarName != name) {
+            continue;
+        }
 
-  return nullptr;
+        const UsdAttribute attr = _usdPrim.GetAttribute(mapping.usdAttrName);
+        UsdAttributeQuery valueQuery(attr);
+
+        if (!valueQuery.HasAuthoredValue()) {
+            return nullptr;
+        }
+
+        const TfToken primvarRole =  UsdImagingUsdToHdRole(attr.GetRoleName());
+
+        TfToken colorSpace;
+        if (primvarRole == HdPrimvarRoleTokens->color) {
+            colorSpace = UsdColorSpaceAPI::ComputeColorSpaceName(attr);
+        }
+
+        return UsdImagingDataSourcePrimvar::New(
+            _sceneIndexPath, name, _stageGlobals,
+            /* value = */ std::move(valueQuery),
+            /* indices = */ UsdAttributeQuery(),
+            HdPrimvarSchema::BuildInterpolationDataSource(
+                mapping.interpolation.IsEmpty()
+                ? _GetInterpolation(attr)
+                : mapping.interpolation),
+            HdPrimvarSchema::BuildRoleDataSource(primvarRole),
+            colorSpace.IsEmpty()
+                ? nullptr
+                : HdRetainedTypedSampledDataSource<TfToken>::New(colorSpace),
+
+            /* elementSize = */ nullptr);
+    }
+
+    return nullptr;
 }
+
+
 
 /*static*/
-HdDataSourceLocatorSet UsdImagingDataSourceCustomPrimvars::Invalidate(
-    const TfTokenVector &properties, const Mappings &mappings)
+HdDataSourceLocatorSet
+UsdImagingDataSourceCustomPrimvars::Invalidate(
+        const TfTokenVector &properties,
+        const Mappings &mappings)
 {
-  HdDataSourceLocatorSet result;
+    HdDataSourceLocatorSet result;
 
-  // TODO, decide how to handle this based on the size?
-  TfDenseHashMap<TfToken, TfToken, TfHash> nameMappings;
-  for (const UsdImagingDataSourceCustomPrimvars::Mapping &m : mappings) {
-    nameMappings[m.usdAttrName] = m.primvarName;
-  }
-
-  for (const TfToken &propertyName : properties) {
-    const auto it = nameMappings.find(propertyName);
-    if (it != nameMappings.end()) {
-      result.insert(HdPrimvarsSchema::GetDefaultLocator().Append(it->second));
+    // TODO, decide how to handle this based on the size?
+    TfDenseHashMap<TfToken, TfToken, TfHash> nameMappings;
+    for (const UsdImagingDataSourceCustomPrimvars::Mapping &m : mappings) {
+        nameMappings[m.usdAttrName] = m.primvarName;
     }
-  }
 
-  return result;
+    for (const TfToken &propertyName : properties) {
+        const auto it = nameMappings.find(propertyName);
+        if (it != nameMappings.end()) {
+            result.insert(HdPrimvarsSchema::GetDefaultLocator().Append(
+                it->second));
+        }
+    }
+
+    return result;
 }
 
 // ----------------------------------------------------------------------------
 
+
 UsdImagingDataSourcePrimvar::UsdImagingDataSourcePrimvar(
-    const SdfPath &sceneIndexPath,
-    const TfToken &name,
-    const UsdImagingDataSourceStageGlobals &stageGlobals,
-    UsdAttributeQuery valueQuery,
-    UsdAttributeQuery indicesQuery,
-    HdTokenDataSourceHandle interpolation,
-    HdTokenDataSourceHandle role)
-    : _stageGlobals(stageGlobals),
-      _valueQuery(valueQuery),
-      _indicesQuery(indicesQuery),
-      _interpolation(interpolation),
-      _role(role)
+        const SdfPath &sceneIndexPath,
+        const TfToken &name,
+        const UsdImagingDataSourceStageGlobals &stageGlobals,
+        UsdAttributeQuery valueQuery,
+        UsdAttributeQuery indicesQuery,
+        HdTokenDataSourceHandle interpolation,
+        HdTokenDataSourceHandle role,
+        HdTokenDataSourceHandle colorSpace,
+        HdIntDataSourceHandle elementSize)
+: _stageGlobals(stageGlobals)
+, _valueQuery(valueQuery)
+, _indicesQuery(indicesQuery)
+, _interpolation(std::move(interpolation))
+, _role(std::move(role))
+, _colorSpace(std::move(colorSpace))
+, _elementSize(std::move(elementSize))
 {
-  const bool indexed = _IsIndexed(_indicesQuery);
-  if (indexed) {
-    if (_valueQuery.ValueMightBeTimeVarying()) {
-      _stageGlobals.FlagAsTimeVarying(
-          sceneIndexPath,
-          HdDataSourceLocator(
-              HdPrimvarsSchemaTokens->primvars, name, HdPrimvarSchemaTokens->indexedPrimvarValue));
+    const bool indexed = _IsIndexed(_indicesQuery);
+    if (indexed) {
+        if (_valueQuery.ValueMightBeTimeVarying()) {
+            _stageGlobals.FlagAsTimeVarying(sceneIndexPath,
+                    HdDataSourceLocator(
+                        HdPrimvarsSchemaTokens->primvars,
+                        name,
+                        HdPrimvarSchemaTokens->indexedPrimvarValue));
+        }
+        if (_indicesQuery.ValueMightBeTimeVarying()) {
+            _stageGlobals.FlagAsTimeVarying(sceneIndexPath,
+                    HdDataSourceLocator(
+                        HdPrimvarsSchemaTokens->primvars,
+                        name,
+                        HdPrimvarSchemaTokens->indices));
+        }
+    } else {
+        if (_valueQuery.ValueMightBeTimeVarying()) {
+            _stageGlobals.FlagAsTimeVarying(sceneIndexPath,
+                    HdDataSourceLocator(
+                        HdPrimvarsSchemaTokens->primvars,
+                        name,
+                        HdPrimvarSchemaTokens->primvarValue));
+        }
     }
-    if (_indicesQuery.ValueMightBeTimeVarying()) {
-      _stageGlobals.FlagAsTimeVarying(sceneIndexPath,
-                                      HdDataSourceLocator(HdPrimvarsSchemaTokens->primvars,
-                                                          name,
-                                                          HdPrimvarSchemaTokens->indices));
-    }
-  }
-  else {
-    if (_valueQuery.ValueMightBeTimeVarying()) {
-      _stageGlobals.FlagAsTimeVarying(sceneIndexPath,
-                                      HdDataSourceLocator(HdPrimvarsSchemaTokens->primvars,
-                                                          name,
-                                                          HdPrimvarSchemaTokens->primvarValue));
-    }
-  }
 }
 
-TfTokenVector UsdImagingDataSourcePrimvar::GetNames()
+TfTokenVector
+UsdImagingDataSourcePrimvar::GetNames()
 {
-  const bool indexed = _IsIndexed(_indicesQuery);
+    const bool indexed = _IsIndexed(_indicesQuery);
 
-  TfTokenVector result = {
-      HdPrimvarSchemaTokens->interpolation,
-      HdPrimvarSchemaTokens->role,
-  };
+    TfTokenVector result = {
+        HdPrimvarSchemaTokens->interpolation,
+        HdPrimvarSchemaTokens->role,
+    };
+    
+    if (_colorSpace) {
+        result.push_back(HdPrimvarSchemaTokens->colorSpace);
+    }
 
-  if (indexed) {
-    result.push_back(HdPrimvarSchemaTokens->indexedPrimvarValue);
-    result.push_back(HdPrimvarSchemaTokens->indices);
-  }
-  else {
-    result.push_back(HdPrimvarSchemaTokens->primvarValue);
-  }
+    if (indexed) {
+        result.push_back(HdPrimvarSchemaTokens->indexedPrimvarValue);
+        result.push_back(HdPrimvarSchemaTokens->indices);
+    } else {
+        result.push_back(HdPrimvarSchemaTokens->primvarValue);
+    }
 
-  return result;
+    if (_elementSize) {
+        result.push_back(HdPrimvarSchemaTokens->elementSize);
+    }
+
+    return result;
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourcePrimvar::Get(const TfToken &name)
+HdDataSourceBaseHandle
+UsdImagingDataSourcePrimvar::Get(const TfToken & name)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  const bool indexed = _IsIndexed(_indicesQuery);
+    const bool indexed = _IsIndexed(_indicesQuery);
 
-  if (indexed) {
-    if (name == HdPrimvarSchemaTokens->indexedPrimvarValue) {
-      return UsdImagingDataSourceAttributeNew(_valueQuery, _stageGlobals);
+    if (indexed) {
+        if (name == HdPrimvarSchemaTokens->indexedPrimvarValue) {
+            return UsdImagingDataSourceAttributeNew(
+                _valueQuery, _stageGlobals);
+        } else if (name == HdPrimvarSchemaTokens->indices) {
+            return UsdImagingDataSourceAttributeNew(
+                    _indicesQuery, _stageGlobals);
+        }
+    } else {
+        if (name == HdPrimvarSchemaTokens->primvarValue) {
+            return UsdImagingDataSourceAttributeNew(
+                _valueQuery, _stageGlobals);
+        }
     }
-    else if (name == HdPrimvarSchemaTokens->indices) {
-      return UsdImagingDataSourceAttributeNew(_indicesQuery, _stageGlobals);
-    }
-  }
-  else {
-    if (name == HdPrimvarSchemaTokens->primvarValue) {
-      return UsdImagingDataSourceAttributeNew(_valueQuery, _stageGlobals);
-    }
-  }
 
-  if (name == HdPrimvarSchemaTokens->interpolation) {
-    return _interpolation;
-  }
-  else if (name == HdPrimvarSchemaTokens->role) {
-    return _role;
-  }
-  return nullptr;
+    if (name == HdPrimvarSchemaTokens->interpolation) {
+        return _interpolation;
+    }
+    if (name == HdPrimvarSchemaTokens->role) {
+        return _role;
+    }
+    if (name == HdPrimvarSchemaTokens->colorSpace) {
+        return _colorSpace;
+    }
+    if (name == HdPrimvarSchemaTokens->elementSize) {
+        return _elementSize;
+    }
+    return nullptr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

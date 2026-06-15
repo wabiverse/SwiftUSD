@@ -9,13 +9,19 @@
 
 #include "Tf/pyUtils.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/raw_function.hpp>
-#include <boost/python/tuple.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/raw_function.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/tuple.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
@@ -23,41 +29,39 @@ namespace {
 // python.
 struct Tf_PySingleton {};
 
-static object _GetSingletonInstance(object const &classObj)
-{
+static object
+_GetSingletonInstance(object const &classObj) {
 
-  // Try to get existing instance from this class.
-  object instance = classObj.attr("__dict__").attr("get")("__instance");
+    // Try to get existing instance from this class.
+    object instance = classObj.attr("__dict__").attr("get")("__instance");
 
-  if (TfPyIsNone(instance)) {
-    // Create instance.  Use our first base class in the method resolution
-    // order (mro) to create it.
-    instance = TfPyGetClassObject<Tf_PySingleton>().attr("__mro__")[1].attr("__new__")(classObj);
+    if (TfPyIsNone(instance)) {
+        // Create instance.  Use our first base class in the method resolution
+        // order (mro) to create it.
+        instance = TfPyGetClassObject
+            <Tf_PySingleton>().attr("__mro__")[1].attr("__new__")(classObj);
 
-    // Store singleton instance in class.
-    setattr(classObj, "__instance", instance);
+        // Store singleton instance in class.
+        setattr(classObj, "__instance", instance);
 
-    // If there's an 'init' method, call it.
-    if (!TfPyIsNone(getattr(instance, "init", object())))
-      instance.attr("init")();
-  }
+        // If there's an 'init' method, call it.
+        if (!TfPyIsNone(getattr(instance, "init", object())))
+            instance.attr("init")();
+    }
 
-  // Return instance.
-  return instance;
+    // Return instance.
+    return instance;
 }
+
 
 // Need an init method that accepts any arguments and does nothing.
-static object _DummyInit(tuple const &, dict const &)
-{
-  return object();
-}
+static object _DummyInit(tuple const &, dict const &) { return object(); }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapSingleton()
-{
-  class_<Tf_PySingleton>("Singleton", no_init)
-      .def("__new__", _GetSingletonInstance)
-      .staticmethod("__new__")
-      .def("__init__", raw_function(_DummyInit));
+void wrapSingleton() {
+    class_<Tf_PySingleton>("Singleton", no_init)
+        .def("__new__", _GetSingletonInstance).staticmethod("__new__")
+        .def("__init__", raw_function(_DummyInit))
+        ;
 }

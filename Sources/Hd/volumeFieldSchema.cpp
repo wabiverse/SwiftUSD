@@ -19,145 +19,173 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdVolumeFieldSchemaTokens, HD_VOLUME_FIELD_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdVolumeFieldSchemaTokens,
+    HD_VOLUME_FIELD_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdAssetPathDataSourceHandle HdVolumeFieldSchema::GetFilePath() const
+HdAssetPathDataSourceHandle
+HdVolumeFieldSchema::GetFilePath() const
 {
-  return _GetTypedDataSource<HdAssetPathDataSource>(HdVolumeFieldSchemaTokens->filePath);
+    return _GetTypedDataSource<HdAssetPathDataSource>(
+        HdVolumeFieldSchemaTokens->filePath);
 }
 
-HdTokenDataSourceHandle HdVolumeFieldSchema::GetFieldName() const
+HdTokenDataSourceHandle
+HdVolumeFieldSchema::GetFieldName() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdVolumeFieldSchemaTokens->fieldName);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdVolumeFieldSchemaTokens->fieldName);
 }
 
-HdIntDataSourceHandle HdVolumeFieldSchema::GetFieldIndex() const
+HdIntDataSourceHandle
+HdVolumeFieldSchema::GetFieldIndex() const
 {
-  return _GetTypedDataSource<HdIntDataSource>(HdVolumeFieldSchemaTokens->fieldIndex);
+    return _GetTypedDataSource<HdIntDataSource>(
+        HdVolumeFieldSchemaTokens->fieldIndex);
 }
 
-HdTokenDataSourceHandle HdVolumeFieldSchema::GetFieldDataType() const
+HdTokenDataSourceHandle
+HdVolumeFieldSchema::GetFieldDataType() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdVolumeFieldSchemaTokens->fieldDataType);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdVolumeFieldSchemaTokens->fieldDataType);
 }
 
-HdTokenDataSourceHandle HdVolumeFieldSchema::GetVectorDataRoleHint() const
+HdTokenDataSourceHandle
+HdVolumeFieldSchema::GetVectorDataRoleHint() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdVolumeFieldSchemaTokens->vectorDataRoleHint);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdVolumeFieldSchemaTokens->vectorDataRoleHint);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdVolumeFieldSchema::BuildRetained(
-    const HdAssetPathDataSourceHandle &filePath,
-    const HdTokenDataSourceHandle &fieldName,
-    const HdIntDataSourceHandle &fieldIndex,
-    const HdTokenDataSourceHandle &fieldDataType,
-    const HdTokenDataSourceHandle &vectorDataRoleHint)
+HdContainerDataSourceHandle
+HdVolumeFieldSchema::BuildRetained(
+        const HdAssetPathDataSourceHandle &filePath,
+        const HdTokenDataSourceHandle &fieldName,
+        const HdIntDataSourceHandle &fieldIndex,
+        const HdTokenDataSourceHandle &fieldDataType,
+        const HdTokenDataSourceHandle &vectorDataRoleHint
+)
 {
-  TfToken _names[5];
-  HdDataSourceBaseHandle _values[5];
+    TfToken _names[5];
+    HdDataSourceBaseHandle _values[5];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (filePath) {
-    _names[_count] = HdVolumeFieldSchemaTokens->filePath;
-    _values[_count++] = filePath;
-  }
+    if (filePath) {
+        _names[_count] = HdVolumeFieldSchemaTokens->filePath;
+        _values[_count++] = filePath;
+    }
 
-  if (fieldName) {
-    _names[_count] = HdVolumeFieldSchemaTokens->fieldName;
-    _values[_count++] = fieldName;
-  }
+    if (fieldName) {
+        _names[_count] = HdVolumeFieldSchemaTokens->fieldName;
+        _values[_count++] = fieldName;
+    }
 
-  if (fieldIndex) {
-    _names[_count] = HdVolumeFieldSchemaTokens->fieldIndex;
-    _values[_count++] = fieldIndex;
-  }
+    if (fieldIndex) {
+        _names[_count] = HdVolumeFieldSchemaTokens->fieldIndex;
+        _values[_count++] = fieldIndex;
+    }
 
-  if (fieldDataType) {
-    _names[_count] = HdVolumeFieldSchemaTokens->fieldDataType;
-    _values[_count++] = fieldDataType;
-  }
+    if (fieldDataType) {
+        _names[_count] = HdVolumeFieldSchemaTokens->fieldDataType;
+        _values[_count++] = fieldDataType;
+    }
 
-  if (vectorDataRoleHint) {
-    _names[_count] = HdVolumeFieldSchemaTokens->vectorDataRoleHint;
-    _values[_count++] = vectorDataRoleHint;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (vectorDataRoleHint) {
+        _names[_count] = HdVolumeFieldSchemaTokens->vectorDataRoleHint;
+        _values[_count++] = vectorDataRoleHint;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdVolumeFieldSchema::Builder &HdVolumeFieldSchema::Builder::SetFilePath(
+HdVolumeFieldSchema::Builder &
+HdVolumeFieldSchema::Builder::SetFilePath(
     const HdAssetPathDataSourceHandle &filePath)
 {
-  _filePath = filePath;
-  return *this;
+    _filePath = filePath;
+    return *this;
 }
 
-HdVolumeFieldSchema::Builder &HdVolumeFieldSchema::Builder::SetFieldName(
+HdVolumeFieldSchema::Builder &
+HdVolumeFieldSchema::Builder::SetFieldName(
     const HdTokenDataSourceHandle &fieldName)
 {
-  _fieldName = fieldName;
-  return *this;
+    _fieldName = fieldName;
+    return *this;
 }
 
-HdVolumeFieldSchema::Builder &HdVolumeFieldSchema::Builder::SetFieldIndex(
+HdVolumeFieldSchema::Builder &
+HdVolumeFieldSchema::Builder::SetFieldIndex(
     const HdIntDataSourceHandle &fieldIndex)
 {
-  _fieldIndex = fieldIndex;
-  return *this;
+    _fieldIndex = fieldIndex;
+    return *this;
 }
 
-HdVolumeFieldSchema::Builder &HdVolumeFieldSchema::Builder::SetFieldDataType(
+HdVolumeFieldSchema::Builder &
+HdVolumeFieldSchema::Builder::SetFieldDataType(
     const HdTokenDataSourceHandle &fieldDataType)
 {
-  _fieldDataType = fieldDataType;
-  return *this;
+    _fieldDataType = fieldDataType;
+    return *this;
 }
 
-HdVolumeFieldSchema::Builder &HdVolumeFieldSchema::Builder::SetVectorDataRoleHint(
+HdVolumeFieldSchema::Builder &
+HdVolumeFieldSchema::Builder::SetVectorDataRoleHint(
     const HdTokenDataSourceHandle &vectorDataRoleHint)
 {
-  _vectorDataRoleHint = vectorDataRoleHint;
-  return *this;
+    _vectorDataRoleHint = vectorDataRoleHint;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdVolumeFieldSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdVolumeFieldSchema::Builder::Build()
 {
-  return HdVolumeFieldSchema::BuildRetained(
-      _filePath, _fieldName, _fieldIndex, _fieldDataType, _vectorDataRoleHint);
-}
-
-/*static*/
-HdVolumeFieldSchema HdVolumeFieldSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdVolumeFieldSchema(fromParentContainer ?
-                                 HdContainerDataSource::Cast(fromParentContainer->Get(
-                                     HdVolumeFieldSchemaTokens->volumeField)) :
-                                 nullptr);
+    return HdVolumeFieldSchema::BuildRetained(
+        _filePath,
+        _fieldName,
+        _fieldIndex,
+        _fieldDataType,
+        _vectorDataRoleHint
+    );
 }
 
 /*static*/
-const TfToken &HdVolumeFieldSchema::GetSchemaToken()
+HdVolumeFieldSchema
+HdVolumeFieldSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdVolumeFieldSchemaTokens->volumeField;
+    return HdVolumeFieldSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdVolumeFieldSchemaTokens->volumeField))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdVolumeFieldSchema::GetDefaultLocator()
+const TfToken &
+HdVolumeFieldSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdVolumeFieldSchemaTokens->volumeField;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdVolumeFieldSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

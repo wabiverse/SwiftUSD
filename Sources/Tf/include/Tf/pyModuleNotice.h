@@ -9,13 +9,12 @@
 
 #include "pxr/pxrns.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
 #include "Tf/api.h"
 #include "Tf/notice.h"
 
 #include <string>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class TfPyModuleWasLoaded
@@ -26,24 +25,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// course, is good practice in general.
 ///
 class TfPyModuleWasLoaded : public TfNotice {
- public:
-  explicit TfPyModuleWasLoaded(std::string const &name) : _name(name) {}
+public:
+    explicit TfPyModuleWasLoaded(std::string const &name) : _name(name) {}
 
-  TF_API
-  virtual ~TfPyModuleWasLoaded();
+    TF_API
+    virtual ~TfPyModuleWasLoaded();
+    
+    /// Return the name of the module that was loaded.
+    std::string const &GetName() { return _name; }
 
-  /// Return the name of the module that was loaded.
-  std::string const &GetName()
-  {
-    return _name;
-  }
-
- private:
-  std::string _name;
+private:
+    std::string _name;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#endif  // PXR_BASE_TF_PY_MODULE_NOTICE_H
+#endif // PXR_BASE_TF_PY_MODULE_NOTICE_H

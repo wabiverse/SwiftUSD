@@ -4,20 +4,21 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "HdSt/renderPassShader.h"
 #include "Hd/aov.h"
+#include "Hd/tokens.h"
 #include "Hd/renderBuffer.h"
 #include "Hd/renderIndex.h"
-#include "Hd/tokens.h"
 #include "HdSt/binding.h"
-#include "HdSt/materialParam.h"
 #include "HdSt/package.h"
+#include "HdSt/materialParam.h"
 #include "HdSt/renderBuffer.h"
+#include "HdSt/renderPassShader.h"
+#include "HdSt/renderPassShaderKey.h"
 #include "HdSt/resourceBinder.h"
 #include "HdSt/textureBinder.h"
 #include "HdSt/textureHandle.h"
-#include "HdSt/textureIdentifier.h"
 #include "HdSt/textureObject.h"
+#include "HdSt/textureIdentifier.h"
 
 #include "Hio/glslfx.h"
 
@@ -30,81 +31,99 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 
 struct _NamedTextureIdentifier {
-  TfToken name;
-  HdStTextureIdentifier id;
+    TfToken name;
+    HdStTextureIdentifier id;
 };
 
 using _NamedTextureIdentifiers = std::vector<_NamedTextureIdentifier>;
 
-TfToken _GetInputName(const TfToken &aovName)
+TfToken
+_GetInputName(const TfToken &aovName)
 {
-  return TfToken(aovName.GetString() + "Readback");
+    return TfToken(aovName.GetString() + "Readback");
 }
 
 // An AOV is backed by a render buffer. And Storm backs a render buffer
 // by a texture. The identifier for this texture can be obtained from
 // the HdStRenderBuffer.
-_NamedTextureIdentifiers _GetNamedTextureIdentifiers(
-    HdRenderPassAovBindingVector const &aovInputBindings, HdRenderIndex *const renderIndex)
+_NamedTextureIdentifiers
+_GetNamedTextureIdentifiers(
+    HdRenderPassAovBindingVector const &aovInputBindings,
+    HdRenderIndex * const renderIndex)
 {
-  _NamedTextureIdentifiers result;
-  result.reserve(aovInputBindings.size());
+    _NamedTextureIdentifiers result;
+    result.reserve(aovInputBindings.size());
 
-  for (const HdRenderPassAovBinding &aovBinding : aovInputBindings) {
-    if (HdStRenderBuffer *const renderBuffer = dynamic_cast<HdStRenderBuffer *>(
-            renderIndex->GetBprim(HdPrimTypeTokens->renderBuffer, aovBinding.renderBufferId)))
-    {
-      result.push_back(_NamedTextureIdentifier{_GetInputName(aovBinding.aovName),
-                                               renderBuffer->GetTextureIdentifier(
-                                                   /* multiSampled = */ false)});
+    for (const HdRenderPassAovBinding &aovBinding : aovInputBindings) {
+        if (HdStRenderBuffer * const renderBuffer =
+                dynamic_cast<HdStRenderBuffer*>(
+                    renderIndex->GetBprim(
+                        HdPrimTypeTokens->renderBuffer,
+                        aovBinding.renderBufferId))) {
+            result.push_back(
+                _NamedTextureIdentifier{
+                    _GetInputName(aovBinding.aovName),
+                    renderBuffer->GetTextureIdentifier(
+                        /* multiSampled = */ false)});
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
 // Check whether the given named texture handles match the given
 // named texture identifiers.
-bool _AreHandlesValid(const HdStShaderCode::NamedTextureHandleVector &namedTextureHandles,
-                      const _NamedTextureIdentifiers &namedTextureIdentifiers)
+bool
+_AreHandlesValid(
+    const HdStShaderCode::NamedTextureHandleVector &namedTextureHandles,
+    const _NamedTextureIdentifiers &namedTextureIdentifiers)
 {
-  if (namedTextureHandles.size() != namedTextureIdentifiers.size()) {
-    return false;
-  }
-
-  for (size_t i = 0; i < namedTextureHandles.size(); i++) {
-    const HdStShaderCode::NamedTextureHandle namedTextureHandle = namedTextureHandles[i];
-    const _NamedTextureIdentifier namedTextureIdentifier = namedTextureIdentifiers[i];
-
-    if (namedTextureHandle.name != namedTextureIdentifier.name) {
-      return false;
+    if (namedTextureHandles.size() != namedTextureIdentifiers.size()) {
+        return false;
     }
-    const HdStTextureObjectSharedPtr &textureObject =
-        namedTextureHandle.handle->GetTextureObject();
-    if (textureObject->GetTextureIdentifier() != namedTextureIdentifier.id) {
-      return false;
-    }
-  }
 
-  return true;
+    for (size_t i = 0; i < namedTextureHandles.size(); i++) {
+        const HdStShaderCode::NamedTextureHandle namedTextureHandle =
+            namedTextureHandles[i];
+        const _NamedTextureIdentifier namedTextureIdentifier =
+            namedTextureIdentifiers[i];
+
+        if (namedTextureHandle.name != namedTextureIdentifier.name) {
+            return false;
+        }
+        if (namedTextureHandle.handles.size() > 1) {
+            TF_CODING_ERROR("Don't support array of textures for AOV textures");
+        }
+        const HdStTextureObjectSharedPtr &textureObject =
+            namedTextureHandle.handles[0]->GetTextureObject();
+        if (textureObject->GetTextureIdentifier() != namedTextureIdentifier.id) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
-}  // namespace
+}
 
-HdStRenderPassShader::HdStRenderPassShader() : HdStRenderPassShader(HdStPackageRenderPassShader())
+HdStRenderPassShader::HdStRenderPassShader()
+    : HdStRenderPassShader(HdStPackageRenderPassShader())
 {
 }
 
 HdStRenderPassShader::HdStRenderPassShader(TfToken const &glslfxFile)
-    : HdStShaderCode(),
-      _glslfx(std::make_shared<HioGlslfx>(glslfxFile)),
-      _hash(0),
-      _hashValid(false)
+    : HdStShaderCode()
+    , _glslfx(std::make_shared<HioGlslfx>(glslfxFile))
+    , _hash(0)
+    , _hashValid(false)
 {
 }
 
 HdStRenderPassShader::HdStRenderPassShader(HioGlslfxSharedPtr const &glslfx)
-    : HdStShaderCode(), _glslfx(glslfx), _hash(0), _hashValid(false)
+    : HdStShaderCode()
+    , _glslfx(glslfx)
+    , _hash(0)
+    , _hashValid(false)
 {
 }
 
@@ -112,186 +131,249 @@ HdStRenderPassShader::HdStRenderPassShader(HioGlslfxSharedPtr const &glslfx)
 HdStRenderPassShader::~HdStRenderPassShader() = default;
 
 /* virtual */
-HioGlslfx const *HdStRenderPassShader::_GetGlslfx() const
+HioGlslfx const *
+HdStRenderPassShader::_GetGlslfx() const
 {
-  return _glslfx.get();
+    return _glslfx.get();
 }
 
 /*virtual*/
-HdStRenderPassShader::ID HdStRenderPassShader::ComputeHash() const
+HdStRenderPassShader::ID
+HdStRenderPassShader::ComputeHash() const
 {
-  // if nothing changed, returns the cached hash value
-  if (_hashValid)
-    return _hash;
+    // if nothing changed, returns the cached hash value
+    if (_hashValid) return _hash;
 
-  _hash = _glslfx->GetHash();
+    _hash = _glslfx->GetHash();
 
-  // cullFaces are dynamic, no need to put in the hash.
+    // cullFaces are dynamic, no need to put in the hash.
 
-  // Custom buffer bindings may vary over time, requiring invalidation
-  // of down stream clients.
-  TF_FOR_ALL(it, _customBuffers)
-  {
-    _hash = TfHash::Combine(_hash, it->second.ComputeHash());
-  }
+    // Custom buffer bindings may vary over time, requiring invalidation
+    // of down stream clients.
+    TF_FOR_ALL(it, _customBuffers) {
+        _hash = TfHash::Combine(_hash, it->second.ComputeHash());
+    }
 
-  for (const HdStShaderCode::NamedTextureHandle &namedHandle : _namedTextureHandles) {
+    for (const HdStShaderCode::NamedTextureHandle &namedHandle :
+             _namedTextureHandles) {
+        
+        // Use name and hash only - not the texture itself as this
+        // does not affect the generated shader source.
+        _hash = TfHash::Combine(_hash, namedHandle.name, namedHandle.hash);
+    }
 
-    // Use name and hash only - not the texture itself as this
-    // does not affect the generated shader source.
-    _hash = TfHash::Combine(_hash, namedHandle.name, namedHandle.hash);
-  }
+    _hashValid = true;
 
-  _hashValid = true;
-
-  return (ID)_hash;
+    return (ID)_hash;
 }
 
 /*virtual*/
-std::string HdStRenderPassShader::GetSource(TfToken const &shaderStageKey) const
+std::string
+HdStRenderPassShader::GetSource(TfToken const &shaderStageKey) const
 {
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  return _glslfx->GetSource(shaderStageKey);
+    return _glslfx->GetSource(shaderStageKey);
 }
 
 /*virtual*/
-void HdStRenderPassShader::BindResources(const int program, HdSt_ResourceBinder const &binder)
+void
+HdStRenderPassShader::BindResources(const int program,
+                                    HdSt_ResourceBinder const &binder)
 {
-  TF_FOR_ALL(it, _customBuffers)
-  {
-    binder.Bind(it->second);
-  }
+    TF_FOR_ALL(it, _customBuffers) {
+        binder.Bind(it->second);
+    }
 
-  HdSt_TextureBinder::BindResources(binder, _namedTextureHandles);
+    HdSt_TextureBinder::BindResources(binder, _namedTextureHandles);
 }
 
 /*virtual*/
-void HdStRenderPassShader::UnbindResources(const int program, HdSt_ResourceBinder const &binder)
+void
+HdStRenderPassShader::UnbindResources(const int program,
+                                      HdSt_ResourceBinder const &binder)
 {
-  TF_FOR_ALL(it, _customBuffers)
-  {
-    binder.Unbind(it->second);
-  }
+    TF_FOR_ALL(it, _customBuffers) {
+        binder.Unbind(it->second);
+    }
 
-  HdSt_TextureBinder::UnbindResources(binder, _namedTextureHandles);
+    HdSt_TextureBinder::UnbindResources(binder, _namedTextureHandles);
 }
 
-void HdStRenderPassShader::AddBufferBinding(HdStBindingRequest const &req)
+void
+HdStRenderPassShader::AddBufferBinding(HdStBindingRequest const& req)
 {
-  _customBuffers[req.GetName()] = req;
-  _hashValid = false;
+    _customBuffers[req.GetName()] = req;
+    _hashValid = false;
 }
 
-void HdStRenderPassShader::RemoveBufferBinding(TfToken const &name)
+void
+HdStRenderPassShader::RemoveBufferBinding(TfToken const &name)
 {
-  _customBuffers.erase(name);
-  _hashValid = false;
+    _customBuffers.erase(name);
+    _hashValid = false;
 }
 
-void HdStRenderPassShader::ClearBufferBindings()
+void
+HdStRenderPassShader::ClearBufferBindings()
 {
-  _customBuffers.clear();
-  _hashValid = false;
+    _customBuffers.clear();
+    _hashValid = false;
 }
 
 /*virtual*/
-void HdStRenderPassShader::AddBindings(HdStBindingRequestVector *customBindings)
+void
+HdStRenderPassShader::AddBindings(HdStBindingRequestVector *customBindings)
 {
-  // note: be careful, the logic behind this function is tricky.
-  //
-  // customBindings will be used for two purpose.
-  //   1. resouceBinder assigned the binding location and use it
-  //      in Bind/UnbindResources. The resourceBinder is held by
-  //      drawingProgram in each batch in the renderPass.
-  //   2. codeGen generates macros to fill the placeholder of binding location
-  //      in glslfx file.
-  //
-  // To make RenderPassShader work on DrawBatch::Execute(), _customBuffers and
-  // other resources should be bound to the right binding locations which were
-  // resolved at the compilation time of the drawingProgram.
-  //
-  // However, if we have 2 or more renderPassStates and if they all share
-  // the same shader hash signature, drawingProgram will only be constructed
-  // at the first renderPassState and then be reused for the subsequent
-  // renderPassStates, because the shaderHash matches in
-  // Hd_DrawBatch::_GetDrawingProgram().
-  //
-  // The shader hash computation must guarantee the consistency such that the
-  // resourceBinder held in the drawingProgram is applicable to all other
-  // renderPassStates as long as the hash matches.
-  //
+    // note: be careful, the logic behind this function is tricky.
+    //
+    // customBindings will be used for two purpose.
+    //   1. resouceBinder assigned the binding location and use it
+    //      in Bind/UnbindResources. The resourceBinder is held by
+    //      drawingProgram in each batch in the renderPass.
+    //   2. codeGen generates macros to fill the placeholder of binding location
+    //      in glslfx file.
+    //
+    // To make RenderPassShader work on DrawBatch::Execute(), _customBuffers and
+    // other resources should be bound to the right binding locations which were
+    // resolved at the compilation time of the drawingProgram.
+    //
+    // However, if we have 2 or more renderPassStates and if they all share
+    // the same shader hash signature, drawingProgram will only be constructed
+    // at the first renderPassState and then be reused for the subsequent
+    // renderPassStates, because the shaderHash matches in
+    // Hd_DrawBatch::_GetDrawingProgram().
+    //
+    // The shader hash computation must guarantee the consistency such that the
+    // resourceBinder held in the drawingProgram is applicable to all other
+    // renderPassStates as long as the hash matches.
+    //
 
-  customBindings->reserve(customBindings->size() + _customBuffers.size() + 1);
-  TF_FOR_ALL(it, _customBuffers)
-  {
-    customBindings->push_back(it->second);
-  }
+    customBindings->reserve(customBindings->size() + _customBuffers.size() + 1);
+    TF_FOR_ALL(it, _customBuffers) {
+        customBindings->push_back(it->second);
+    }
 }
 
-HdSt_MaterialParamVector const &HdStRenderPassShader::GetParams() const
+HdSt_MaterialParamVector const &
+HdStRenderPassShader::GetParams() const
 {
-  return _params;
+    return _params;
 }
 
-HdStShaderCode::NamedTextureHandleVector const &HdStRenderPassShader::GetNamedTextureHandles()
-    const
+HdStShaderCode::NamedTextureHandleVector const &
+HdStRenderPassShader::GetNamedTextureHandles() const
 {
-  return _namedTextureHandles;
+    return _namedTextureHandles;
 }
 
-void HdStRenderPassShader::UpdateAovInputTextures(
-    HdRenderPassAovBindingVector const &aovInputBindings, HdRenderIndex *const renderIndex)
+void
+HdStRenderPassShader::UpdateAovInputTextures(
+    HdRenderPassAovBindingVector const &aovInputBindings,
+    HdRenderIndex * const renderIndex)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  // Compute the identifiers for the textures backing the requested
-  // (resolved) AOVs.
-  const _NamedTextureIdentifiers namedTextureIdentifiers = _GetNamedTextureIdentifiers(
-      aovInputBindings, renderIndex);
-  // If the (named) texture handles are up-to-date, there is nothing to do.
-  if (_AreHandlesValid(_namedTextureHandles, namedTextureIdentifiers)) {
-    return;
-  }
+    // Compute the identifiers for the textures backing the requested
+    // (resolved) AOVs.
+    const _NamedTextureIdentifiers namedTextureIdentifiers =
+        _GetNamedTextureIdentifiers(aovInputBindings, renderIndex);
+    // If the (named) texture handles are up-to-date, there is nothing to do.
+    if (_AreHandlesValid(_namedTextureHandles, namedTextureIdentifiers)) {
+        return;
+    }
 
-  _hashValid = false;
+    _hashValid = false;
 
-  // Otherwise, we need to (re-)allocate texture handles for the
-  // given texture identifiers.
-  _namedTextureHandles.clear();
-  _params.clear();
+    // Otherwise, we need to (re-)allocate texture handles for the
+    // given texture identifiers.
+    _namedTextureHandles.clear();
+    _params.clear();
 
-  HdStResourceRegistry *const resourceRegistry = dynamic_cast<HdStResourceRegistry *>(
-      renderIndex->GetResourceRegistry().get());
-  if (!TF_VERIFY(resourceRegistry)) {
-    return;
-  }
+    HdStResourceRegistry * const resourceRegistry =
+        dynamic_cast<HdStResourceRegistry*>(
+            renderIndex->GetResourceRegistry().get());
+    if (!TF_VERIFY(resourceRegistry)) {
+        return;
+    }
 
-  for (const auto &namedTextureIdentifier : namedTextureIdentifiers) {
-    static const HdSamplerParameters samplerParameters(
-        HdWrapClamp, HdWrapClamp, HdWrapClamp, HdMinFilterNearest, HdMagFilterNearest);
+    for (const auto &namedTextureIdentifier : namedTextureIdentifiers) {
+        static const HdSamplerParameters samplerParameters(
+            HdWrapClamp, HdWrapClamp, HdWrapClamp,
+            HdMinFilterNearest, HdMagFilterNearest,
+            HdBorderColorTransparentBlack, /*enableCompare*/false,
+            HdCmpFuncNever, /*maxAnisotropy*/1);
 
-    // Allocate texture handle for given identifier.
-    HdStTextureHandleSharedPtr textureHandle = resourceRegistry->AllocateTextureHandle(
-        namedTextureIdentifier.id,
-        HdStTextureType::Uv,
-        samplerParameters,
-        /* memoryRequest = */ 0,
-        shared_from_this());
-    // Add to _namedTextureHandles so that the texture will
-    // be bound to the shader in BindResources.
-    _namedTextureHandles.push_back(HdStShaderCode::NamedTextureHandle{namedTextureIdentifier.name,
-                                                                      HdStTextureType::Uv,
-                                                                      std::move(textureHandle),
-                                                                      /* hash = */ 0});
+        // Allocate texture handle for given identifier.
+        HdStTextureHandleSharedPtr textureHandle =
+            resourceRegistry->AllocateTextureHandle(
+                namedTextureIdentifier.id,
+                HdStTextureType::Uv,
+                samplerParameters,
+                /* memoryRequest = */ 0,
+                shared_from_this());
+        // Add to _namedTextureHandles so that the texture will
+        // be bound to the shader in BindResources.
+        _namedTextureHandles.push_back(
+            HdStShaderCode::NamedTextureHandle{
+                namedTextureIdentifier.name,
+                HdStTextureType::Uv,
+                { std::move(textureHandle) },
+                /* hash = */ 0});
+        
+        // Add a corresponding param so that codegen is
+        // generating the accessor HdGet_AOVNAMEReadback().
+        _params.emplace_back(
+            HdSt_MaterialParam::ParamTypeTexture,
+            namedTextureIdentifier.name,
+            VtValue(GfVec4f(0,0,0,0)));
+    }
+}
 
-    // Add a corresponding param so that codegen is
-    // generating the accessor HdGet_AOVNAMEReadback().
-    _params.emplace_back(HdSt_MaterialParam::ParamTypeTexture,
-                         namedTextureIdentifier.name,
-                         VtValue(GfVec4f(0, 0, 0, 0)));
-  }
+namespace {
+size_t
+_GetRenderPassShaderHash(
+    HdRenderPassAovBindingVector const &aovBindings,
+    const HdStRenderPassState * const renderPassState)
+{
+    size_t hash = 0;
+
+    // Aov binding names determine the configuration of the render pass shader
+    // key.
+    for (const auto& aovBinding : aovBindings) {
+        hash = TfHash::Combine(hash, aovBinding.aovName);
+    }
+
+    // We want each renderPassState to have its own renderPassShader, so 
+    // include renderPassState in the hash.
+    hash = TfHash::Combine(hash, renderPassState);
+
+    return hash;
+}
+}
+
+// static
+HdStRenderPassShaderSharedPtr
+HdStRenderPassShader::CreateRenderPassShaderFromAovs(
+    HdStRenderPassState *renderPassState,
+    HdStResourceRegistrySharedPtr const &resourceRegistry,
+    HdRenderPassAovBindingVector const &aovBindings)
+{
+    HdInstance<HdStRenderPassShaderSharedPtr> renderPassShaderInstance =
+        resourceRegistry->RegisterRenderPassShader(
+            _GetRenderPassShaderHash(aovBindings, renderPassState));
+
+    if (renderPassShaderInstance.IsFirstInstance()) {
+        HdSt_RenderPassShaderKey shaderKey(aovBindings);
+        std::istringstream s(shaderKey.GetGlslfxString());
+        HioGlslfxSharedPtr glslfx = std::make_shared<HioGlslfx>(s);
+
+        renderPassShaderInstance.SetValue(
+            std::make_shared<HdStRenderPassShader>(glslfx));
+    }
+
+    return renderPassShaderInstance.GetValue();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

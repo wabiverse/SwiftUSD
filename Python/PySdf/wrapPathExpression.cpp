@@ -7,213 +7,233 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/pySignatureExt.h"  // wrap lvalue-ref-qualified mem fns.
+#include "Tf/pySignatureExt.h" // wrap lvalue-ref-qualified mem fns.
 
+#include "Vt/valueFromPython.h"
 #include "Tf/pyEnum.h"
 #include "Tf/pyFunction.h"
 #include "Tf/pyUtils.h"
-#include "Vt/valueFromPython.h"
+#include "Vt/wrapArray.h"
 
 #include "Sdf/pathExpression.h"
 #include "Sdf/pathExpressionEval.h"
 #include "Sdf/predicateLibrary.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/scope.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/scope.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <mutex>
 #include <string>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 using PathExpr = SdfPathExpression;
 using ExpressionReference = PathExpr::ExpressionReference;
 using PathPattern = PathExpr::PathPattern;
 
-static std::string _Repr(SdfPathExpression const &self)
+TF_REGISTRY_FUNCTION(VtValue)
 {
-  if (!self) {
-    return TF_PY_REPR_PREFIX + "PathExpression()";
-  }
-  else {
-    return std::string(TF_PY_REPR_PREFIX + "PathExpression(") + TfPyRepr(self.GetText()) + ")";
-  }
+    VtRegisterValueCastsFromPythonSequencesToArray<SdfPathExpression>();
+}
+
+static std::string
+_Repr(SdfPathExpression const &self) {
+    if (!self) {
+        return TF_PY_REPR_PREFIX + "PathExpression()";
+    }
+    else {
+        return std::string(TF_PY_REPR_PREFIX + "PathExpression(")
+            + TfPyRepr(self.GetText()) + ")";
+    }
 }
 
 namespace {
 
 struct _PathIdentity {
-  SdfPath operator()(SdfPath const &p) const
-  {
-    return p;
-  }
+    SdfPath operator()(SdfPath const &p) const { return p; }
 };
 
-static SdfPredicateLibrary<SdfPath const &> const &_GetBasicPredicateLib()
-{
-  // Super simple predicate library for paths for testing.
-  static auto theLib = SdfPredicateLibrary<SdfPath const &>()
-                           .Define("isPrimPath", [](SdfPath const &p) { return p.IsPrimPath(); })
-                           .Define("isPropertyPath",
-                                   [](SdfPath const &p) { return p.IsPropertyPath(); });
-  return theLib;
+static SdfPredicateLibrary<SdfPath const &> const &
+_GetBasicPredicateLib() {
+    // Super simple predicate library for paths for testing.
+    static auto theLib = SdfPredicateLibrary<SdfPath const &>()
+        .Define("isPrimPath", [](SdfPath const &p) {
+            return p.IsPrimPath();
+        })
+        .Define("isPropertyPath", [](SdfPath const &p) {
+            return p.IsPropertyPath();
+        })
+        .Define("capital", [](SdfPath const &p) {
+            std::string const &name = p.GetName();
+            auto isCap = [](char l) { return 'A' <= l && l <= 'Z'; };
+            return !name.empty() && isCap(name[0]);
+        })
+        ;
+    return theLib;
 }
 
-struct _BasicMatchEval {
-  explicit _BasicMatchEval(SdfPathExpression const &expr)
-      : _eval(SdfMakePathExpressionEval(expr, _GetBasicPredicateLib()))
-  {
-  }
-  explicit _BasicMatchEval(std::string const &expr) : _BasicMatchEval(SdfPathExpression(expr)) {}
-  SdfPredicateFunctionResult Match(SdfPath const &p)
-  {
-    return _eval.Match(p, _PathIdentity{});
-  }
-  SdfPathExpressionEval<SdfPath const &> _eval;
+struct _BasicMatchEval
+{
+    explicit _BasicMatchEval(SdfPathExpression const &expr)
+        : _eval(SdfMakePathExpressionEval(expr, _GetBasicPredicateLib())) {}
+    explicit _BasicMatchEval(std::string const &expr)
+        : _BasicMatchEval(SdfPathExpression(expr)) {}
+    SdfPredicateFunctionResult
+    Match(SdfPath const &p) {
+        return _eval.Match(p, _PathIdentity {});
+    }
+    SdfPathExpressionEval<SdfPath const &> _eval;
 };
 
 std::once_flag wrapMatchEvalFlag;
-static _BasicMatchEval _MakeBasicMatchEval(std::string const &expr)
+static _BasicMatchEval
+_MakeBasicMatchEval(std::string const &expr)
 {
-  std::call_once(wrapMatchEvalFlag, []() {
-    class_<_BasicMatchEval>("_BasicMatchEval", init<std::string>())
-        .def(init<SdfPathExpression>())
-        .def("Match", &_BasicMatchEval::Match);
-  });
-  return _BasicMatchEval(expr);
+    std::call_once(wrapMatchEvalFlag, []() {
+        class_<_BasicMatchEval>("_BasicMatchEval", init<std::string>())
+            .def(init<SdfPathExpression>())
+            .def("Match", &_BasicMatchEval::Match)
+            ;
+    });
+    return _BasicMatchEval(expr);
 }
 
-}  // namespace
+} // anon
 
 void wrapPathExpression()
 {
-  // For testing.
-  def("_MakeBasicMatchEval", _MakeBasicMatchEval);
+    // For testing.
+    def("_MakeBasicMatchEval", _MakeBasicMatchEval);
+    
+    // For ResolveReferences.
+    TfPyFunctionFromPython<PathExpr (ExpressionReference const &)> {};
+        
+    // For Walk.
+    TfPyFunctionFromPython<void (PathExpr::Op, int)> {};
+    TfPyFunctionFromPython<void (ExpressionReference const &)> {};
+    TfPyFunctionFromPython<void (PathPattern const &)> {};
 
-  // For ResolveReferences.
-  TfPyFunctionFromPython<PathExpr(ExpressionReference const &)>{};
+    scope s = class_<PathExpr>("PathExpression")
+        .def(init<PathExpr const &>())
+        .def(init<std::string, optional<std::string>>(
+                 args("patternString", "parseContext")))
 
-  // For Walk.
-  TfPyFunctionFromPython<void(PathExpr::Op, int)>{};
-  TfPyFunctionFromPython<void(ExpressionReference const &)>{};
-  TfPyFunctionFromPython<void(PathPattern const &)>{};
+        .def("Everything", &PathExpr::Everything,
+             return_value_policy<return_by_value>())
+        .staticmethod("Everything")
 
-  scope s =
-      class_<PathExpr>("PathExpression")
-          .def(init<PathExpr const &>())
-          .def(init<std::string, optional<std::string>>(args("patternString", "parseContext")))
+        .def("Nothing", &PathExpr::Nothing,
+             return_value_policy<return_by_value>())
+        .staticmethod("Nothing")
 
-          .def("Everything", &PathExpr::Everything, return_value_policy<return_by_value>())
-          .staticmethod("Everything")
+        .def("WeakerRef", &PathExpr::WeakerRef,
+             return_value_policy<return_by_value>())
+        .staticmethod("WeakerRef")
 
-          .def("Nothing", &PathExpr::Nothing, return_value_policy<return_by_value>())
-          .staticmethod("Nothing")
+        .def("MakeComplement",
+             +[](PathExpr const &r) {
+                 return PathExpr::MakeComplement(r);
+             }, arg("right"))
+        .staticmethod("MakeComplement")
 
-          .def("WeakerRef", &PathExpr::WeakerRef, return_value_policy<return_by_value>())
-          .staticmethod("WeakerRef")
+        .def("MakeOp",
+             +[](PathExpr::Op op, PathExpr const &l, PathExpr const &r) {
+                 return PathExpr::MakeOp(op, l, r);
+             }, (arg("op"), arg("left"), arg("right")))
+        .staticmethod("MakeOp")
 
-          .def(
-              "MakeComplement",
-              +[](PathExpr const &r) { return PathExpr::MakeComplement(r); },
-              arg("right"))
-          .staticmethod("MakeComplement")
+        .def("MakeAtom",
+             +[](SdfPath const &path) {
+                 return PathExpr::MakeAtom(path);
+             }, arg("path"))
+        .def("MakeAtom",
+             +[](PathExpr::ExpressionReference const &ref) {
+                 return PathExpr::MakeAtom(ref);
+             }, (arg("ref")))
+        .def("MakeAtom",
+             +[](PathExpr::PathPattern const &pat) {
+                 return PathExpr::MakeAtom(pat);
+             }, (arg("pattern")))
+        .staticmethod("MakeAtom")
 
-          .def(
-              "MakeOp",
-              +[](PathExpr::Op op, PathExpr const &l, PathExpr const &r) {
-                return PathExpr::MakeOp(op, l, r);
-              },
-              (arg("op"), arg("left"), arg("right")))
-          .staticmethod("MakeOp")
+        .def("ReplacePrefix",
+             +[](PathExpr const &self,
+                 SdfPath const &oldPrefix, SdfPath const &newPrefix) {
+                 return self.ReplacePrefix(oldPrefix, newPrefix);
+             }, (arg("oldPrefix"), arg("newPrefix")))
 
-          .def(
-              "MakeAtom",
-              +[](SdfPath const &path) { return PathExpr::MakeAtom(path); },
-              arg("path"))
-          .def(
-              "MakeAtom",
-              +[](PathExpr::ExpressionReference const &ref) { return PathExpr::MakeAtom(ref); },
-              (arg("ref")))
-          .def(
-              "MakeAtom",
-              +[](PathExpr::PathPattern const &pat) { return PathExpr::MakeAtom(pat); },
-              (arg("pattern")))
-          .staticmethod("MakeAtom")
+        .def("IsAbsolute", &PathExpr::IsAbsolute)
 
-          .def(
-              "ReplacePrefix",
-              +[](PathExpr const &self, SdfPath const &oldPrefix, SdfPath const &newPrefix) {
-                return self.ReplacePrefix(oldPrefix, newPrefix);
-              },
-              (arg("oldPrefix"), arg("newPrefix")))
+        .def("MakeAbsolute",
+             +[](PathExpr const &self, SdfPath const &anchor) {
+                 return self.MakeAbsolute(anchor);
+             }, (arg("anchor")))
 
-          .def("IsAbsolute", &PathExpr::IsAbsolute)
+        .def("ContainsExpressionReferences",
+             &PathExpr::ContainsExpressionReferences)
 
-          .def(
-              "MakeAbsolute",
-              +[](PathExpr const &self, SdfPath const &anchor) {
-                return self.MakeAbsolute(anchor);
-              },
-              (arg("anchor")))
+        .def("ContainsWeakerExpressionReference",
+             &PathExpr::ContainsWeakerExpressionReference)
 
-          .def("ContainsExpressionReferences", &PathExpr::ContainsExpressionReferences)
+        .def("ResolveReferences",
+             +[](PathExpr const &self,
+                 std::function<
+                 PathExpr (ExpressionReference const &)> resolve) {
+                 return self.ResolveReferences(resolve);
+             }, (arg("resolve")))
 
-          .def("ContainsWeakerExpressionReference", &PathExpr::ContainsWeakerExpressionReference)
+        .def("ComposeOver",
+             +[](PathExpr const &self, SdfPathExpression const &weaker) {
+                 return self.ComposeOver(weaker);
+             }, (arg("weaker")))
 
-          .def(
-              "ResolveReferences",
-              +[](PathExpr const &self,
-                  std::function<PathExpr(ExpressionReference const &)> resolve) {
-                return self.ResolveReferences(resolve);
-              },
-              (arg("resolve")))
+        .def("IsComplete", &PathExpr::IsComplete)
 
-          .def(
-              "ComposeOver",
-              +[](PathExpr const &self, SdfPathExpression const &weaker) {
-                return self.ComposeOver(weaker);
-              },
-              (arg("weaker")))
+        .def("Walk",
+             +[](PathExpr const &self,
+                 std::function<void (PathExpr::Op, int)> logic,
+                 std::function<void (ExpressionReference const &)> ref,
+                 std::function<void (PathPattern const &)> pattern) {
+                 return self.Walk(logic, ref, pattern);
+             }, (arg("logic"), arg("ref"), arg("pattern")))
 
-          .def("IsComplete", &PathExpr::IsComplete)
+        .def("GetText", &PathExpr::GetText)
 
-          .def(
-              "Walk",
-              +[](PathExpr const &self,
-                  std::function<void(PathExpr::Op, int)> logic,
-                  std::function<void(ExpressionReference const &)> ref,
-                  std::function<void(PathPattern const &)> pattern) {
-                return self.Walk(logic, ref, pattern);
-              },
-              (arg("logic"), arg("ref"), arg("pattern")))
+        .def("IsEmpty", &PathExpr::IsEmpty)
 
-          .def("GetText", &PathExpr::GetText)
+        .def("__bool__", &PathExpr::operator bool)
+        .def("__repr__", _Repr)
+        .def("__hash__", +[](PathExpr const &e) { return TfHash{}(e); })
+        .def(self == self)
+        .def(self != self)
+        ;
 
-          .def("IsEmpty", &PathExpr::IsEmpty)
+    VtValueFromPython<SdfPathExpression>();
 
-          .def("__bool__", &PathExpr::operator bool)
-          .def("__repr__", _Repr)
-          .def(
-              "__hash__", +[](PathExpr const &e) { return TfHash{}(e); })
-          .def(self == self)
-          .def(self != self);
-  VtValueFromPython<SdfPathExpression>();
+    TfPyWrapEnum<PathExpr::Op>();
 
-  TfPyWrapEnum<PathExpr::Op>();
+    s.attr("PathPattern") = TfPyGetClassObject<SdfPathPattern>();
+    
+    class_<ExpressionReference>("ExpressionReference")
+        .def_readwrite("path", &ExpressionReference::path)
+        .def_readwrite("name", &ExpressionReference::name)
+        .def("__hash__",
+             +[](ExpressionReference const &r) { return TfHash{}(r); })
+        .def(self == self)
+        .def(self != self)
+        .def("Weaker", &ExpressionReference::Weaker,
+             return_value_policy<return_by_value>())
+        .staticmethod("Weaker")
+        ;        
+    VtValueFromPython<ExpressionReference>();
 
-  s.attr("PathPattern") = TfPyGetClassObject<SdfPathPattern>();
-
-  class_<ExpressionReference>("ExpressionReference")
-      .def_readwrite("path", &ExpressionReference::path)
-      .def_readwrite("name", &ExpressionReference::name)
-      .def(
-          "__hash__", +[](ExpressionReference const &r) { return TfHash{}(r); })
-      .def(self == self)
-      .def(self != self)
-      .def("Weaker", &ExpressionReference::Weaker, return_value_policy<return_by_value>())
-      .staticmethod("Weaker");
-  VtValueFromPython<ExpressionReference>();
 }

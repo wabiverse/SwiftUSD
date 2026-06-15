@@ -7,26 +7,28 @@
 ///
 /// \file js/utils.cpp
 
+#include "pxr/pxrns.h"
 #include "Js/utils.h"
 #include "Tf/diagnostic.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-JsOptionalValue JsFindValue(const JsObject &object,
-                            const std::string &key,
-                            const JsOptionalValue &defaultValue)
+JsOptionalValue
+JsFindValue(
+    const JsObject& object,
+    const std::string& key,
+    const JsOptionalValue& defaultValue)
 {
-  if (key.empty()) {
-    TF_CODING_ERROR("Key is empty");
-    return std::nullopt;
-  }
+    if (key.empty()) {
+        TF_CODING_ERROR("Key is empty");
+        return std::nullopt;
+    }
 
-  JsObject::const_iterator i = object.find(key);
-  if (i != object.end())
-    return i->second;
+    JsObject::const_iterator i = object.find(key);
+    if (i != object.end())
+        return i->second;
 
-  return defaultValue;
+    return defaultValue;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -7,8 +7,8 @@
 #ifndef PXR_BASE_TF_STACK_TRACE_H
 #define PXR_BASE_TF_STACK_TRACE_H
 
-#include "Tf/api.h"
 #include "pxr/pxrns.h"
+#include "Tf/api.h"
 
 #include <cstdio>
 #include <ctime>
@@ -32,11 +32,11 @@ void TfPrintStackTrace(std::ostream &out, std::string const &reason);
 
 /// Logs both the C++ and the python stack to a file in /var/tmp
 /// A message is printed to stderr reporting that a stack trace
-/// has been taken and what file it has been written to. If \c
-/// logtodb is true, then the stack trace will be added to the
+/// has been taken and what file it has been written to. If \c 
+/// logtodb is true, then the stack trace will be added to the 
 /// stack_trace database table.
 TF_API
-void TfLogStackTrace(const std::string &reason, bool logtodb = false);
+void TfLogStackTrace(const std::string &reason, bool logtodb=false);
 
 /// Creates a nicely formatted message describing a crash and writes it to a
 /// temporary file.
@@ -49,10 +49,8 @@ void TfLogStackTrace(const std::string &reason, bool logtodb = false);
 /// \p logToDB controls whether the stack will be added to the stack_trace db table.
 TF_API
 void TfLogCrash(const std::string &reason,
-                const std::string &message,
-                const std::string &additionalInfo,
-                TfCallContext const &context,
-                bool logToDB);
+    const std::string &message, const std::string &additionalInfo,
+    TfCallContext const &context, bool logToDB);
 
 /// Returns the application's launch time.
 TF_API

@@ -12,10 +12,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfDebug)
 {
-  TF_DEBUG_ENVIRONMENT_SYMBOL(HGIGL_DEBUG_FRAMEBUFFER_CACHE,
-                              "Debug framebuffer cache management per context arena.");
+    TF_DEBUG_ENVIRONMENT_SYMBOL(HGIGL_DEBUG_FRAMEBUFFER_CACHE,
+        "Debug framebuffer cache management per context arena.");
 }
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
+

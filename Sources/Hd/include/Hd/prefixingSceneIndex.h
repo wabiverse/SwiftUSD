@@ -18,48 +18,61 @@ TF_DECLARE_REF_PTRS(HdPrefixingSceneIndex);
 ///
 /// \class HdPrefixingSceneIndex
 ///
-/// A prefixing scene index is one in which the input scene contains
+/// A prefixing scene index is one in which the input scene contains 
 /// data sources whose paths are all prefixed with a given prefix.
 ///
-class HdPrefixingSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  /// Creates a new prefixing scene index.
-  ///
-  static HdPrefixingSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputScene,
-                                         const SdfPath &prefix)
-  {
-    return TfCreateRefPtr(new HdPrefixingSceneIndex(inputScene, prefix));
-  }
+class HdPrefixingSceneIndex : public HdSingleInputFilteringSceneIndexBase
+{
+public:
 
-  // satisfying HdSceneIndexBase
-  HD_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    /// Creates a new prefixing scene index.
+    ///
+    static HdPrefixingSceneIndexRefPtr New(
+            const HdSceneIndexBaseRefPtr &inputScene, const SdfPath &prefix) 
+    {
+        return TfCreateRefPtr(new HdPrefixingSceneIndex(inputScene, prefix));
+    }
 
-  HD_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    // satisfying HdSceneIndexBase
+    HD_API 
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
- protected:
-  HD_API
-  HdPrefixingSceneIndex(const HdSceneIndexBaseRefPtr &inputScene, const SdfPath &prefix);
+    HD_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
-  // satisfying HdSingleInputFilteringSceneIndexBase
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    HD_API
+    SdfPath AddPrefix(const SdfPath &primPath) const;
+    HD_API
+    SdfPath RemovePrefix(const SdfPath &primPath) const;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+protected:
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    HD_API
+    HdPrefixingSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+        const SdfPath &prefix);
 
- private:
-  SdfPath _AddPathPrefix(const SdfPath &primPath) const;
+    // satisfying HdSingleInputFilteringSceneIndexBase
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  SdfPath _RemovePathPrefix(const SdfPath &primPath) const;
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  const SdfPath _prefix;
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+
+private:
+
+    const SdfPath _prefix;
+    typedef std::unordered_map<SdfPath, SdfPath, SdfPath::Hash> SdfPathMap;
+    SdfPathMap _addPrefixMap;
+    SdfPathMap _removePrefixMap;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif
+

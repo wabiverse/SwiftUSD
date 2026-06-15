@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HD_ST_EXT_COMP_CPU_COMPUTATION_H
 #define PXR_IMAGING_HD_ST_EXT_COMP_CPU_COMPUTATION_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
 #include "Hd/bufferSource.h"
 
@@ -22,12 +22,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class HdSceneDelegate;
 class HdExtComputation;
 
-using HdStExtCompCpuComputationSharedPtr = std::shared_ptr<class HdStExtCompCpuComputation>;
-using HdSt_ExtCompInputSourceSharedPtr = std::shared_ptr<class HdSt_ExtCompInputSource>;
-using HdSt_ExtCompInputSourceSharedPtrVector = std::vector<HdSt_ExtCompInputSourceSharedPtr>;
+using HdStExtCompCpuComputationSharedPtr =
+    std::shared_ptr<class HdStExtCompCpuComputation>;
+using HdSt_ExtCompInputSourceSharedPtr =
+    std::shared_ptr<class HdSt_ExtCompInputSource>;
+using HdSt_ExtCompInputSourceSharedPtrVector =
+    std::vector<HdSt_ExtCompInputSourceSharedPtr>;
 
 ///
 /// A Buffer Source that represents a CPU implementation of a ExtComputation.
@@ -43,77 +47,83 @@ using HdSt_ExtCompInputSourceSharedPtrVector = std::vector<HdSt_ExtCompInputSour
 ///
 /// Outputs to a computation are in SOA form, so a computation may have
 /// many outputs, but each output has the same number of elements in it.
-class HdStExtCompCpuComputation final : public HdNullBufferSource {
- public:
-  HDST_API
-  static const size_t INVALID_OUTPUT_INDEX;
+class HdStExtCompCpuComputation final : public HdNullBufferSource
+{
+public:
+    HDST_API
+    static const size_t INVALID_OUTPUT_INDEX;
 
-  /// Constructs a new Cpu ExtComputation source.
-  /// inputs provides a list of buffer sources that this computation
-  /// requires.
-  /// outputs is a list of outputs by names that the computation produces.
-  ///
-  /// Num elements specifies the number of elements in the output.
-  ///
-  /// sceneDelegate and id are used to callback to the scene delegate
-  /// in order to invoke computation processing.
-  HdStExtCompCpuComputation(const SdfPath &id,
-                            const HdSt_ExtCompInputSourceSharedPtrVector &inputs,
-                            const TfTokenVector &outputs,
-                            int numElements,
-                            HdSceneDelegate *sceneDelegate);
+    /// Constructs a new Cpu ExtComputation source.
+    /// inputs provides a list of buffer sources that this computation
+    /// requires.
+    /// outputs is a list of outputs by names that the computation produces.
+    ///
+    /// Num elements specifies the number of elements in the output.
+    ///
+    /// sceneDelegate and id are used to callback to the scene delegate
+    /// in order to invoke computation processing.
+    HdStExtCompCpuComputation(
+        const SdfPath &id,
+        const HdSt_ExtCompInputSourceSharedPtrVector &inputs,
+        const TfTokenVector &outputs,
+        int numElements,
+        HdSceneDelegate *sceneDelegate);
 
-  HDST_API
-  ~HdStExtCompCpuComputation() override;
+    HDST_API
+    ~HdStExtCompCpuComputation() override;
 
-  /// Create a CPU computation implementing the given abstract computation.
-  /// The scene delegate identifies which delegate to pull scene inputs from.
-  HDST_API
-  static HdStExtCompCpuComputationSharedPtr CreateComputation(
-      HdSceneDelegate *sceneDelegate,
-      const HdExtComputation &computation,
-      HdBufferSourceSharedPtrVector *computationSources);
+    /// Create a CPU computation implementing the given abstract computation.
+    /// The scene delegate identifies which delegate to pull scene inputs from.
+    HDST_API
+    static HdStExtCompCpuComputationSharedPtr
+    CreateComputation(HdSceneDelegate *sceneDelegate,
+                      const HdExtComputation &computation,
+                      HdBufferSourceSharedPtrVector *computationSources);
 
-  /// Returns the id for this computation as a token.
-  HDST_API
-  TfToken const &GetName() const override;
+    /// Returns the id for this computation as a token.
+    HDST_API
+    TfToken const &GetName() const override;
 
-  /// Ask the scene delegate to run the computation and captures the output
-  /// signals.
-  HDST_API
-  bool Resolve() override;
+    /// Ask the scene delegate to run the computation and captures the output
+    /// signals.
+    HDST_API
+    bool Resolve() override;
 
-  HDST_API
-  size_t GetNumElements() const override;
+    HDST_API
+    size_t GetNumElements() const override;
 
-  /// Converts a output name token into an index.
-  HDST_API
-  size_t GetOutputIndex(const TfToken &outputName) const;
 
-  /// Returns the value of the specified output
-  /// (after the computations been Resolved).
-  HDST_API
-  const VtValue &GetOutputByIndex(size_t index) const;
+    /// Converts a output name token into an index.
+    HDST_API
+    size_t GetOutputIndex(const TfToken &outputName) const;
 
- protected:
-  /// Returns if the computation is specified correctly.
-  HDST_API
-  bool _CheckValid() const override;
+    /// Returns the value of the specified output
+    /// (after the computations been Resolved).
+    HDST_API
+    const VtValue &GetOutputByIndex(size_t index) const;
 
- private:
-  SdfPath _id;
-  HdSt_ExtCompInputSourceSharedPtrVector _inputs;
-  TfTokenVector _outputs;
-  size_t _numElements;
-  HdSceneDelegate *_sceneDelegate;
+protected:
+    /// Returns if the computation is specified correctly.
+    HDST_API
+    bool _CheckValid() const override;
 
-  std::vector<VtValue> _outputValues;
+private:
+    SdfPath                                 _id;
+    HdSt_ExtCompInputSourceSharedPtrVector  _inputs;
+    TfTokenVector                           _outputs;
+    size_t                                  _numElements;
+    HdSceneDelegate                        *_sceneDelegate;
 
-  HdStExtCompCpuComputation() = delete;
-  HdStExtCompCpuComputation(const HdStExtCompCpuComputation &) = delete;
-  HdStExtCompCpuComputation &operator=(const HdStExtCompCpuComputation &) = delete;
+    std::vector<VtValue>                    _outputValues;
+
+    HdStExtCompCpuComputation() = delete;
+    HdStExtCompCpuComputation(
+        const HdStExtCompCpuComputation &) = delete;
+    HdStExtCompCpuComputation &operator = (
+        const HdStExtCompCpuComputation &) = delete;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_EXT_COMP_CPU_COMPUTATION_H
+#endif // PXR_IMAGING_HD_ST_EXT_COMP_CPU_COMPUTATION_H

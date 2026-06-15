@@ -7,11 +7,11 @@
 #ifndef PXR_USD_PCP_TARGET_INDEX_H
 #define PXR_USD_PCP_TARGET_INDEX_H
 
+#include "pxr/pxrns.h"
 #include "Pcp/api.h"
 #include "Pcp/errors.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -27,9 +27,9 @@ class PcpPropertyIndex;
 /// in computing the index, such as the owning property.
 ///
 struct PcpTargetIndex {
-  SdfPathVector paths;
-  PcpErrorVector localErrors;
-  bool hasTargetOpinions = false;
+    SdfPathVector paths;
+    PcpErrorVector localErrors;
+    bool hasTargetOpinions = false;
 };
 
 /// Build a PcpTargetIndex representing the target paths of the given
@@ -44,11 +44,13 @@ struct PcpTargetIndex {
 /// Note that this function will skip the validation checks performed
 /// by PcpBuildFilteredTargetIndex. See documentation below for details.
 PCP_API
-void PcpBuildTargetIndex(const PcpSite &propSite,
-                         const PcpPropertyIndex &propIndex,
-                         const SdfSpecType relOrAttrType,
-                         PcpTargetIndex *targetIndex,
-                         PcpErrorVector *allErrors);
+void
+PcpBuildTargetIndex(
+    const PcpSite& propSite,
+    const PcpPropertyIndex& propIndex,
+    const SdfSpecType relOrAttrType,
+    PcpTargetIndex *targetIndex,
+    PcpErrorVector *allErrors);
 
 /// Like PcpBuildTargetIndex, but optionally filters the result by
 /// enforcing permissions restrictions and a stopProperty.
@@ -71,17 +73,19 @@ void PcpBuildTargetIndex(const PcpSite &propSite,
 /// \p allErrors will contain any errors encountered while
 /// performing this operation.
 PCP_API
-void PcpBuildFilteredTargetIndex(const PcpSite &propSite,
-                                 const PcpPropertyIndex &propIndex,
-                                 const SdfSpecType relOrAttrType,
-                                 const bool localOnly,
-                                 const SdfSpecHandle &stopProperty,
-                                 const bool includeStopProperty,
-                                 PcpCache *cacheForValidation,
-                                 PcpTargetIndex *targetIndex,
-                                 SdfPathVector *deletedPaths,
-                                 PcpErrorVector *allErrors);
+void
+PcpBuildFilteredTargetIndex(
+    const PcpSite& propSite,
+    const PcpPropertyIndex& propIndex,
+    const SdfSpecType relOrAttrType,
+    const bool localOnly,
+    const SdfSpecHandle &stopProperty,
+    const bool includeStopProperty,
+    PcpCache *cacheForValidation,
+    PcpTargetIndex *targetIndex,
+    SdfPathVector *deletedPaths,
+    PcpErrorVector *allErrors);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_PCP_TARGET_INDEX_H
+#endif // PXR_USD_PCP_TARGET_INDEX_H

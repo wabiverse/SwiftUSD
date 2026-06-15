@@ -19,7 +19,7 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
@@ -27,59 +27,94 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdMaterialNodeParameterSchemaTokens,
-                        HD_MATERIAL_NODE_PARAMETER_SCHEMA_TOKENS);
+    HD_MATERIAL_NODE_PARAMETER_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdSampledDataSourceHandle HdMaterialNodeParameterSchema::GetValue() const
+HdSampledDataSourceHandle
+HdMaterialNodeParameterSchema::GetValue() const
 {
-  return _GetTypedDataSource<HdSampledDataSource>(HdMaterialNodeParameterSchemaTokens->value);
+    return _GetTypedDataSource<HdSampledDataSource>(
+        HdMaterialNodeParameterSchemaTokens->value);
 }
 
-HdTokenDataSourceHandle HdMaterialNodeParameterSchema::GetColorSpace() const
+HdTokenDataSourceHandle
+HdMaterialNodeParameterSchema::GetColorSpace() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdMaterialNodeParameterSchemaTokens->colorSpace);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdMaterialNodeParameterSchemaTokens->colorSpace);
+}
+
+HdTokenDataSourceHandle
+HdMaterialNodeParameterSchema::GetTypeName() const
+{
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdMaterialNodeParameterSchemaTokens->typeName);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdMaterialNodeParameterSchema::BuildRetained(
-    const HdSampledDataSourceHandle &value, const HdTokenDataSourceHandle &colorSpace)
+HdContainerDataSourceHandle
+HdMaterialNodeParameterSchema::BuildRetained(
+        const HdSampledDataSourceHandle &value,
+        const HdTokenDataSourceHandle &colorSpace,
+        const HdTokenDataSourceHandle &typeName
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[3];
+    HdDataSourceBaseHandle _values[3];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (value) {
-    _names[_count] = HdMaterialNodeParameterSchemaTokens->value;
-    _values[_count++] = value;
-  }
+    if (value) {
+        _names[_count] = HdMaterialNodeParameterSchemaTokens->value;
+        _values[_count++] = value;
+    }
 
-  if (colorSpace) {
-    _names[_count] = HdMaterialNodeParameterSchemaTokens->colorSpace;
-    _values[_count++] = colorSpace;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (colorSpace) {
+        _names[_count] = HdMaterialNodeParameterSchemaTokens->colorSpace;
+        _values[_count++] = colorSpace;
+    }
+
+    if (typeName) {
+        _names[_count] = HdMaterialNodeParameterSchemaTokens->typeName;
+        _values[_count++] = typeName;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdMaterialNodeParameterSchema::Builder &HdMaterialNodeParameterSchema::Builder::SetValue(
+HdMaterialNodeParameterSchema::Builder &
+HdMaterialNodeParameterSchema::Builder::SetValue(
     const HdSampledDataSourceHandle &value)
 {
-  _value = value;
-  return *this;
+    _value = value;
+    return *this;
 }
 
-HdMaterialNodeParameterSchema::Builder &HdMaterialNodeParameterSchema::Builder::SetColorSpace(
+HdMaterialNodeParameterSchema::Builder &
+HdMaterialNodeParameterSchema::Builder::SetColorSpace(
     const HdTokenDataSourceHandle &colorSpace)
 {
-  _colorSpace = colorSpace;
-  return *this;
+    _colorSpace = colorSpace;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdMaterialNodeParameterSchema::Builder::Build()
+HdMaterialNodeParameterSchema::Builder &
+HdMaterialNodeParameterSchema::Builder::SetTypeName(
+    const HdTokenDataSourceHandle &typeName)
 {
-  return HdMaterialNodeParameterSchema::BuildRetained(_value, _colorSpace);
+    _typeName = typeName;
+    return *this;
 }
+
+HdContainerDataSourceHandle
+HdMaterialNodeParameterSchema::Builder::Build()
+{
+    return HdMaterialNodeParameterSchema::BuildRetained(
+        _value,
+        _colorSpace,
+        _typeName
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

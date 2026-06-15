@@ -66,7 +66,9 @@ HgiMetalBlitCmds::_CreateEncoder()
 }
 
 void
-HgiMetalBlitCmds::PushDebugGroup(const char* label)
+HgiMetalBlitCmds::PushDebugGroup(
+        const char* label,
+        const GfVec4f& color)
 {
     if (!HgiMetalDebugEnabled()) {
         return;
@@ -85,6 +87,20 @@ HgiMetalBlitCmds::PopDebugGroup()
 {
     if (_blitEncoder) {
         HGIMETAL_DEBUG_POP_GROUP(_blitEncoder)
+    }
+}
+
+void
+HgiMetalBlitCmds::InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color)
+{
+    if (!HgiMetalDebugEnabled()) {
+        return;
+    }
+
+    if (_blitEncoder) {
+        HGIMETAL_DEBUG_INSERT_DEBUG_MARKER(_blitEncoder, label)
     }
 }
 
@@ -209,7 +225,7 @@ HgiMetalBlitCmds::CopyTextureCpuToGpu(
     
     mtlDesc.mipmapLevelCount = dstTexDesc.mipLevels;
     mtlDesc.arrayLength = dstTexDesc.layerCount;
-    mtlDesc.resourceOptions = _hgi->GetCapabilities()->preferredStorageMode;
+    mtlDesc.resourceOptions = _hgi->GetCapabilities()->defaultStorageMode;
     mtlDesc.sampleCount = 1;
     if (dstTexDesc.type == HgiTextureType3D) {
         mtlDesc.depth = depth;
@@ -362,7 +378,6 @@ void HgiMetalBlitCmds::CopyBufferCpuToGpu(
     }
 
 #if defined(ARCH_OS_OSX)
-    // didModifyRange is unavailable for iOS and visionOS.
     if (!sharedBuffer &&
         [metalBuffer->GetBufferId()
              respondsToSelector:@selector(didModifyRange:)]) {
@@ -391,13 +406,12 @@ HgiMetalBlitCmds::CopyBufferGpuToCpu(HgiBufferGpuToCpuOp const& copyOp)
         copyOp.gpuSourceBuffer.Get());
 
     _CreateEncoder();
-
 #if defined(ARCH_OS_OSX)
     if ([metalBuffer->GetBufferId() storageMode] == MTLStorageModeManaged) {
         [_blitEncoder performSelector:@selector(synchronizeResource:)
                            withObject:metalBuffer->GetBufferId()];
     }
-#endif // defined(ARCH_OS_OSX)
+#endif
 
     // Offset into the dst buffer
     char* dst = ((char*) copyOp.cpuDestinationBuffer) +
@@ -454,6 +468,12 @@ _HgiTextureCanBeFiltered(HgiTextureDesc const &descriptor)
         return false;
     }
 
+#if defined(ARCH_OS_IPHONE)
+    if (componentFormat == HgiFormatFloat32Vec4) {
+        return false;
+    }
+#endif
+
     GfVec3i const dims = descriptor.dimensions;
     switch (descriptor.type) {
         case HgiTextureType1D:
@@ -462,6 +482,7 @@ _HgiTextureCanBeFiltered(HgiTextureDesc const &descriptor)
 
         case HgiTextureType2D:
         case HgiTextureType2DArray:
+        case HgiTextureTypeCubemap:
             return (dims[0] > 1 || dims[1] > 1);
 
         case HgiTextureType3D:
@@ -475,28 +496,13 @@ _HgiTextureCanBeFiltered(HgiTextureDesc const &descriptor)
     return false;
 }
 
-static const std::set<MTLPixelFormat> unfilterableIosFormats =
-{
-        {MTLPixelFormatRGBA32Float}
-};
-
-bool
-IsFilterable(MTLPixelFormat format)
-{
-#if defined(ARCH_OS_IPHONE)
-    return unfilterableIosFormats.find(format) == unfilterableIosFormats.end();
-#else // !defined(ARCH_OS_IPHONE)
-    return true;
-#endif // defined(ARCH_OS_IPHONE)
-}
-
 void
 HgiMetalBlitCmds::GenerateMipMaps(HgiTextureHandle const& texture)
 {
     HgiMetalTexture* metalTex = static_cast<HgiMetalTexture*>(texture.Get());
 
     if (metalTex) {
-        if (_HgiTextureCanBeFiltered(metalTex->GetDescriptor()) && IsFilterable(metalTex->GetTextureId().pixelFormat)) {
+        if (_HgiTextureCanBeFiltered(metalTex->GetDescriptor())) {
             _CreateEncoder();
             [_blitEncoder generateMipmapsForTexture:metalTex->GetTextureId()];
         }

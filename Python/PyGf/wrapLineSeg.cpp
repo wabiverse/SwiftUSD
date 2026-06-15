@@ -5,112 +5,128 @@
 // https://openusd.org/license.
 //
 
-#include "Gf/lineSeg.h"
 #include "pxr/pxrns.h"
+#include "Gf/lineSeg.h"
 
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/copy_const_reference.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/return_arg.hpp>
-#include <boost/python/tuple.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/copy_const_reference.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/return_arg.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/tuple.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <string>
-
-using namespace boost::python;
 
 using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static string _Repr(GfLineSeg const &self)
-{
-  return TF_PY_REPR_PREFIX + "LineSeg(" + TfPyRepr(self.GetPoint(0.0)) + ", " +
-         TfPyRepr(self.GetPoint(1.0)) + ")";
+static string _Repr(GfLineSeg const &self) {
+    return TF_PY_REPR_PREFIX + "LineSeg(" + TfPyRepr(self.GetPoint(0.0)) + ", " +
+        TfPyRepr(self.GetPoint(1.0)) + ")";
 }
 
-static tuple FindClosestPointsHelper1(const GfLine &l1, const GfLineSeg &l2)
+
+static tuple
+FindClosestPointsHelper1( const GfLine &l1, const GfLineSeg &l2 )
 {
-  GfVec3d p1(0), p2(0);
-  double t1 = 0, t2 = 0;
-  bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
-  return boost::python::make_tuple(result, p1, p2, t1, t2);
+    GfVec3d p1(0), p2(0);
+    double t1 = 0, t2 = 0;
+    bool result = GfFindClosestPoints( l1, l2, &p1, &p2, &t1, &t2 );
+    return pxr_boost::python::make_tuple( result, p1, p2, t1, t2 );
 }
 
-static tuple FindClosestPointsHelper2(const GfLineSeg &l1, const GfLineSeg &l2)
+static tuple
+FindClosestPointsHelper2( const GfLineSeg &l1, const GfLineSeg &l2 )
 {
-  GfVec3d p1(0), p2(0);
-  double t1 = 0, t2 = 0;
-  bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
-  return boost::python::make_tuple(result, p1, p2, t1, t2);
+    GfVec3d p1(0), p2(0);
+    double t1 = 0, t2 = 0;
+    bool result = GfFindClosestPoints( l1, l2, &p1, &p2, &t1, &t2 );
+    return pxr_boost::python::make_tuple( result, p1, p2, t1, t2 );
 }
 
-static tuple FindClosestPointHelper(const GfLineSeg &self, const GfVec3d &point)
+static tuple
+FindClosestPointHelper( const GfLineSeg &self, const GfVec3d &point )
 {
-  double t;
-  GfVec3d p1 = self.FindClosestPoint(point, &t);
-  return boost::python::make_tuple(p1, t);
+    double t;
+    GfVec3d p1 = self.FindClosestPoint( point, &t );
+    return pxr_boost::python::make_tuple( p1, t );
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapLineSeg()
-{
-  typedef GfLineSeg This;
+{    
+    typedef GfLineSeg This;
 
-  def("FindClosestPoints",
-      FindClosestPointsHelper1,
-      "FindClosestPoints( l1, s2 ) -> tuple< intersects = bool, "
-      "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>"
-      "\n\n"
-      "l1 : GfLine\n"
-      "s2 : GfLineSeg"
-      "\n\n"
-      "Computes the closest points between a line and a line "
-      "segment, returning a tuple. The first item in the tuple "
-      "is true if they intersect. The two points are returned in "
-      "p1 and p2.  The parametric distance of each point on the "
-      "line and line segment is returned in t1 and t2.\n"
-      "----------------------------------------------------------------------");
-  def("FindClosestPoints",
-      FindClosestPointsHelper2,
-      "FindClosestPoints( s1, s2 ) -> tuple<result = bool,"
-      "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>"
-      "\n\n"
-      "l1 : GfLineSeg\n"
-      "l2 : GfLineSeg"
-      "\n\n"
-      "Computes the closest points between two line segments, "
-      "returning a tuple.  The first item in the tuple "
-      "is true if they intersect.  The two points are returned in "
-      "p1 and p2.  The parametric distance of each point on the "
-      "line and line segment is returned in t1 and t2.\n"
-      "----------------------------------------------------------------------");
+    def("FindClosestPoints", FindClosestPointsHelper1, 
+        "FindClosestPoints( l1, s2 ) -> tuple< intersects = bool, "
+        "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>"
+        "\n\n"
+        "l1 : GfLine\n"
+        "s2 : GfLineSeg"
+        "\n\n"
+        "Computes the closest points between a line and a line "
+        "segment, returning a tuple. The first item in the tuple "
+        "is true if they intersect. The two points are returned in "
+        "p1 and p2.  The parametric distance of each point on the "
+        "line and line segment is returned in t1 and t2.\n"
+        "----------------------------------------------------------------------");
+    def("FindClosestPoints", FindClosestPointsHelper2, 
+        "FindClosestPoints( s1, s2 ) -> tuple<result = bool,"
+        "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>"
+        "\n\n"
+        "l1 : GfLineSeg\n"
+        "l2 : GfLineSeg"
+        "\n\n"
+        "Computes the closest points between two line segments, "
+        "returning a tuple.  The first item in the tuple "
+        "is true if they intersect.  The two points are returned in "
+        "p1 and p2.  The parametric distance of each point on the "
+        "line and line segment is returned in t1 and t2.\n"
+        "----------------------------------------------------------------------");
+    
+    object getDirection = make_function(&This::GetDirection,
+                                        return_value_policy<return_by_value>());
 
-  object getDirection = make_function(&This::GetDirection, return_value_policy<return_by_value>());
+    class_<This>( "LineSeg", "Line segment class", init<>() )
+        .def(init< const GfVec3d &, const GfVec3d & >())
 
-  class_<This>("LineSeg", "Line segment class", init<>())
-      .def(init<const GfVec3d &, const GfVec3d &>())
+        .def( TfTypePythonClass() )
 
-      .def(TfTypePythonClass())
+        .def("GetDirection", getDirection)
+        .def("GetLength", &This::GetLength)
+        .def("GetPoint", &This::GetPoint)
 
-      .def("GetDirection", getDirection)
-      .def("GetLength", &This::GetLength)
-      .def("GetPoint", &This::GetPoint)
+        .add_property("direction", getDirection)
+        .add_property("length", &This::GetLength)
 
-      .add_property("direction", getDirection)
-      .add_property("length", &This::GetLength)
+        .def( "FindClosestPoint", FindClosestPointHelper )
 
-      .def("FindClosestPoint", FindClosestPointHelper)
+        .def( str(self) )
+        .def( self == self )
+        .def( self != self )
 
-      .def(str(self))
-      .def(self == self)
-      .def(self != self)
-
-      .def("__repr__", _Repr);
+        .def("__repr__", _Repr)
+        ;
+    
 }

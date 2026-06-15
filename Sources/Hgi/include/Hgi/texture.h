@@ -7,12 +7,12 @@
 #ifndef PXR_IMAGING_HGI_TEXTURE_H
 #define PXR_IMAGING_HGI_TEXTURE_H
 
+#include "pxr/pxrns.h"
 #include "Gf/vec3i.h"
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 #include <vector>
@@ -34,18 +34,23 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   What component is used for alpha channel.
 /// </ul>
 ///
-struct HgiComponentMapping {
-  HgiComponentSwizzle r;
-  HgiComponentSwizzle g;
-  HgiComponentSwizzle b;
-  HgiComponentSwizzle a;
+struct HgiComponentMapping
+{
+    HgiComponentSwizzle r;
+    HgiComponentSwizzle g;
+    HgiComponentSwizzle b;
+    HgiComponentSwizzle a;
 };
 
 HGI_API
-bool operator==(const HgiComponentMapping &lhs, const HgiComponentMapping &rhs);
+bool operator==(
+    const HgiComponentMapping& lhs,
+    const HgiComponentMapping& rhs);
 
 HGI_API
-bool operator!=(const HgiComponentMapping &lhs, const HgiComponentMapping &rhs);
+bool operator!=(
+    const HgiComponentMapping& lhs,
+    const HgiComponentMapping& rhs);
 
 /// \struct HgiTextureDesc
 ///
@@ -82,42 +87,48 @@ bool operator!=(const HgiComponentMapping &lhs, const HgiComponentMapping &rhs);
 ///   in more detail how mip dimensions are rounded.</li>
 /// </ul>
 ///
-struct HgiTextureDesc {
-  HgiTextureDesc()
-      : usage(0),
-        format(HgiFormatInvalid),
-        componentMapping{HgiComponentSwizzleR,
-                         HgiComponentSwizzleG,
-                         HgiComponentSwizzleB,
-                         HgiComponentSwizzleA},
-        type(HgiTextureType2D),
-        dimensions(0),
-        layerCount(1),
-        mipLevels(1),
-        sampleCount(HgiSampleCount1),
-        pixelsByteSize(0),
-        initialData(nullptr)
-  {
-  }
+struct HgiTextureDesc
+{
+    HgiTextureDesc()
+    : usage(0)
+    , format(HgiFormatInvalid)
+    , componentMapping{
+        HgiComponentSwizzleR,
+        HgiComponentSwizzleG,
+        HgiComponentSwizzleB,
+        HgiComponentSwizzleA}
+    , type(HgiTextureType2D)
+    , dimensions(0)
+    , layerCount(1)
+    , mipLevels(1)
+    , sampleCount(HgiSampleCount1)
+    , pixelsByteSize(0)
+    , initialData(nullptr)
+    {}
 
-  std::string debugName;
-  HgiTextureUsage usage;
-  HgiFormat format;
-  HgiComponentMapping componentMapping;
-  HgiTextureType type;
-  GfVec3i dimensions;
-  uint16_t layerCount;
-  uint16_t mipLevels;
-  HgiSampleCount sampleCount;
-  size_t pixelsByteSize;
-  void const *initialData;
+    std::string debugName;
+    HgiTextureUsage usage;
+    HgiFormat format;
+    HgiComponentMapping componentMapping;
+    HgiTextureType type;
+    GfVec3i dimensions;
+    uint16_t layerCount;
+    uint16_t mipLevels;
+    HgiSampleCount sampleCount;
+    size_t pixelsByteSize;
+    void const* initialData;
 };
 
 HGI_API
-bool operator==(const HgiTextureDesc &lhs, const HgiTextureDesc &rhs);
+bool operator==(
+    const HgiTextureDesc& lhs,
+    const HgiTextureDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiTextureDesc &lhs, const HgiTextureDesc &rhs);
+bool operator!=(
+    const HgiTextureDesc& lhs,
+    const HgiTextureDesc& rhs);
+
 
 ///
 /// \class HgiTexture
@@ -129,57 +140,62 @@ bool operator!=(const HgiTextureDesc &lhs, const HgiTextureDesc &rhs);
 /// To the client (HdSt) texture resources are referred to via
 /// opaque, stateless handles (HgTextureHandle).
 ///
-class HgiTexture {
- public:
-  HGI_API
-  virtual ~HgiTexture();
+class HgiTexture
+{
+public:
+    HGI_API
+    virtual ~HgiTexture();
 
-  /// The descriptor describes the object.
-  HGI_API
-  HgiTextureDesc const &GetDescriptor() const;
+    /// The descriptor describes the object.
+    HGI_API
+    HgiTextureDesc const& GetDescriptor() const;
 
-  /// Returns the byte size of the GPU texture.
-  /// This can be helpful if the application wishes to tally up memory usage.
-  HGI_API
-  virtual size_t GetByteSizeOfResource() const = 0;
+    /// Returns the byte size of the GPU texture.
+    /// This can be helpful if the application wishes to tally up memory usage.
+    HGI_API
+    virtual size_t GetByteSizeOfResource() const = 0;
 
-  /// This function returns the handle to the Hgi backend's gpu resource, cast
-  /// to a uint64_t. Clients should avoid using this function and instead
-  /// use Hgi base classes so that client code works with any Hgi platform.
-  /// For transitioning code to Hgi, it can however we useful to directly
-  /// access a platform's internal resource handles.
-  /// There is no safety provided in using this. If you by accident pass a
-  /// HgiMetal resource into an OpenGL call, bad things may happen.
-  /// In OpenGL this returns the GLuint resource name.
-  /// In Metal this returns the MTL::Texture* as uint64_t.
-  /// In Vulkan this returns the VkImage as uint64_t.
-  /// In DX12 this returns the ID3D12Resource pointer as uint64_t.
-  HGI_API
-  virtual uint64_t GetRawResource() const = 0;
+    /// This function returns the handle to the Hgi backend's gpu resource, cast
+    /// to a uint64_t. Clients should avoid using this function and instead
+    /// use Hgi base classes so that client code works with any Hgi platform.
+    /// For transitioning code to Hgi, it can however we useful to directly
+    /// access a platform's internal resource handles.
+    /// There is no safety provided in using this. If you by accident pass a
+    /// HgiMetal resource into an OpenGL call, bad things may happen.
+    /// In OpenGL this returns the GLuint resource name.
+    /// In Metal this returns the id<MTLTexture> as uint64_t.
+    /// In Vulkan this returns the VkImage as uint64_t.
+    /// In DX12 this returns the ID3D12Resource pointer as uint64_t.
+    HGI_API
+    virtual uint64_t GetRawResource() const = 0;
 
-  /// This function initiates a layout change process on this texture
-  /// resource. This feature is at the moment required explicitly by explicit
-  /// APIs like Vulkan.
-  HGI_API
-  virtual void SubmitLayoutChange(HgiTextureUsage newLayout) = 0;
+    /// This function initiates a layout change process on this texture 
+    /// resource. This feature is at the moment required explicitly by explicit 
+    /// APIs like Vulkan. Returns the previous layout to make it easier to
+    /// restore it correctly.
+    HGI_API
+    virtual HgiTextureUsage SubmitLayoutChange(HgiTextureUsage newLayout) = 0;
 
- protected:
-  HGI_API
-  static size_t _GetByteSizeOfResource(const HgiTextureDesc &descriptor);
+protected:
+    HGI_API
+    static
+    size_t _GetByteSizeOfResource(const HgiTextureDesc &descriptor);
 
-  HGI_API
-  HgiTexture(HgiTextureDesc const &desc);
+    HGI_API
+    HgiTexture(HgiTextureDesc const& desc);
 
-  HgiTextureDesc _descriptor;
+    HgiTextureDesc _descriptor;
 
- private:
-  HgiTexture() = delete;
-  HgiTexture &operator=(const HgiTexture &) = delete;
-  HgiTexture(const HgiTexture &) = delete;
+private:
+    HgiTexture() = delete;
+    HgiTexture & operator=(const HgiTexture&) = delete;
+    HgiTexture(const HgiTexture&) = delete;
 };
+
 
 using HgiTextureHandle = HgiHandle<class HgiTexture>;
 using HgiTextureHandleVector = std::vector<HgiTextureHandle>;
+
 
 /// \struct HgiTextureViewDesc
 ///
@@ -192,7 +208,7 @@ using HgiTextureHandleVector = std::vector<HgiTextureHandle>;
 /// <li>format:
 ///   The format of the texture view. This format must be compatible with
 ///   the sourceTexture, but does not have to be the identical format.
-///   Generally: All 8-, 16-, 32-, 64-, and 128-bit color formats are
+///   Generally: All 8-, 16-, 32-, 64-, and 128-bit color formats are 
 ///   compatible with other formats with the same bit length.
 ///   For example HgiFormatFloat32Vec4 and HgiFormatInt32Vec4 are compatible.
 /// <li>layerCount:
@@ -209,31 +225,35 @@ using HgiTextureHandleVector = std::vector<HgiTextureHandle>;
 ///   view.</li>
 ///   </ul>
 ///
-struct HgiTextureViewDesc {
-  HgiTextureViewDesc()
-      : format(HgiFormatInvalid),
-        layerCount(1),
-        mipLevels(1),
-        sourceTexture(),
-        sourceFirstLayer(0),
-        sourceFirstMip(0)
-  {
-  }
+struct HgiTextureViewDesc
+{
+    HgiTextureViewDesc()
+    : format(HgiFormatInvalid)
+    , layerCount(1)
+    , mipLevels(1)
+    , sourceTexture()
+    , sourceFirstLayer(0)
+    , sourceFirstMip(0)
+    {}
 
-  std::string debugName;
-  HgiFormat format;
-  uint16_t layerCount;
-  uint16_t mipLevels;
-  HgiTextureHandle sourceTexture;
-  uint16_t sourceFirstLayer;
-  uint16_t sourceFirstMip;
+    std::string debugName;
+    HgiFormat format;
+    uint16_t layerCount;
+    uint16_t mipLevels;
+    HgiTextureHandle sourceTexture;
+    uint16_t sourceFirstLayer;
+    uint16_t sourceFirstMip;
 };
 
 HGI_API
-bool operator==(const HgiTextureViewDesc &lhs, const HgiTextureViewDesc &rhs);
+bool operator==(
+    const HgiTextureViewDesc& lhs,
+    const HgiTextureViewDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiTextureViewDesc &lhs, const HgiTextureViewDesc &rhs);
+bool operator!=(
+    const HgiTextureViewDesc& lhs,
+    const HgiTextureViewDesc& rhs);
 
 ///
 /// \class HgiTextureView
@@ -246,36 +266,37 @@ bool operator!=(const HgiTextureViewDesc &lhs, const HgiTextureViewDesc &rhs);
 /// add the texture to resource bindings for use in shaders.
 ///
 /// For example when using a compute shader to fill the mip levels of a
-/// texture, like a lightDome texture, we can use a texture view to give the
+/// texture, like a lightDome texture, we can use a texture view to give the 
 /// shader access to a specific mip level of a sourceTexture via a TextureView.
 ///
 /// Another example is to conserve resources by reusing a RGBAF32 texture as
 /// a RGBAI32 texture once the F32 texture is no longer needed
 /// (transient resources).
 ///
-class HgiTextureView {
- public:
-  HGI_API
-  HgiTextureView(HgiTextureViewDesc const &desc);
+class HgiTextureView
+{
+public:
+    HGI_API
+    HgiTextureView(HgiTextureViewDesc const& desc);
 
-  HGI_API
-  virtual ~HgiTextureView();
+    HGI_API
+    virtual ~HgiTextureView();
 
-  /// Set the handle to the texture that aliases another texture.
-  HGI_API
-  void SetViewTexture(HgiTextureHandle const &handle);
+    /// Set the handle to the texture that aliases another texture.
+    HGI_API
+    void SetViewTexture(HgiTextureHandle const& handle);
 
-  /// Returns the handle to the texture that aliases another texture.
-  HGI_API
-  HgiTextureHandle const &GetViewTexture() const;
+    /// Returns the handle to the texture that aliases another texture.
+    HGI_API
+    HgiTextureHandle const& GetViewTexture() const;
 
- protected:
-  HgiTextureHandle _viewTexture;
+protected:
+    HgiTextureHandle _viewTexture;
 
- private:
-  HgiTextureView() = delete;
-  HgiTextureView &operator=(const HgiTextureView &) = delete;
-  HgiTextureView(const HgiTextureView &) = delete;
+private:
+    HgiTextureView() = delete;
+    HgiTextureView & operator=(const HgiTextureView&) = delete;
+    HgiTextureView(const HgiTextureView&) = delete;
 };
 
 using HgiTextureViewHandle = HgiHandle<class HgiTextureView>;

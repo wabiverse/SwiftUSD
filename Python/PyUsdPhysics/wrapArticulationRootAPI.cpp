@@ -4,97 +4,108 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Usd/schemaBase.h"
 #include "UsdPhysics/articulationRootAPI.h"
+#include "Usd/schemaBase.h"
 
 #include "Sdf/primSpec.h"
 
+#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "Usd/pyConversions.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <string>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
-#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM                                                     \
+    template <class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-static std::string _Repr(const UsdPhysicsArticulationRootAPI &self)
+
+static std::string
+_Repr(const UsdPhysicsArticulationRootAPI &self)
 {
-  std::string primRepr = TfPyRepr(self.GetPrim());
-  return TfStringPrintf("UsdPhysics.ArticulationRootAPI(%s)", primRepr.c_str());
+    std::string primRepr = TfPyRepr(self.GetPrim());
+    return TfStringPrintf(
+        "UsdPhysics.ArticulationRootAPI(%s)",
+        primRepr.c_str());
 }
 
-struct UsdPhysicsArticulationRootAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
-  UsdPhysicsArticulationRootAPI_CanApplyResult(bool val, std::string const &msg)
-      : TfPyAnnotatedBoolResult<std::string>(val, msg)
-  {
-  }
+struct UsdPhysicsArticulationRootAPI_CanApplyResult : 
+    public TfPyAnnotatedBoolResult<std::string>
+{
+    UsdPhysicsArticulationRootAPI_CanApplyResult(bool val, std::string const &msg) :
+        TfPyAnnotatedBoolResult<std::string>(val, msg) {}
 };
 
-static UsdPhysicsArticulationRootAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+static UsdPhysicsArticulationRootAPI_CanApplyResult
+_WrapCanApply(const UsdPrim& prim)
 {
-  std::string whyNot;
-  bool result = UsdPhysicsArticulationRootAPI::CanApply(prim, &whyNot);
-  return UsdPhysicsArticulationRootAPI_CanApplyResult(result, whyNot);
+    std::string whyNot;
+    bool result = UsdPhysicsArticulationRootAPI::CanApply(prim, &whyNot);
+    return UsdPhysicsArticulationRootAPI_CanApplyResult(result, whyNot);
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
 void wrapUsdPhysicsArticulationRootAPI()
 {
-  typedef UsdPhysicsArticulationRootAPI This;
+    typedef UsdPhysicsArticulationRootAPI This;
 
-  UsdPhysicsArticulationRootAPI_CanApplyResult::Wrap<UsdPhysicsArticulationRootAPI_CanApplyResult>(
-      "_CanApplyResult", "whyNot");
+    UsdPhysicsArticulationRootAPI_CanApplyResult::Wrap<UsdPhysicsArticulationRootAPI_CanApplyResult>(
+        "_CanApplyResult", "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>> cls("ArticulationRootAPI");
+    class_<This, bases<UsdAPISchemaBase> >
+        cls("ArticulationRootAPI");
 
-  cls.def(init<UsdPrim>(arg("prim")))
-      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
-      .def(TfTypePythonClass())
+    cls
+        .def(init<UsdPrim>(arg("prim")))
+        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
+        .def(TfTypePythonClass())
 
-      .def("Get", &This::Get, (arg("stage"), arg("path")))
-      .staticmethod("Get")
+        .def("Get", &This::Get, (arg("stage"), arg("path")))
+        .staticmethod("Get")
 
-      .def("CanApply", &_WrapCanApply, (arg("prim")))
-      .staticmethod("CanApply")
+        .def("CanApply", &_WrapCanApply, (arg("prim")))
+        .staticmethod("CanApply")
 
-      .def("Apply", &This::Apply, (arg("prim")))
-      .staticmethod("Apply")
+        .def("Apply", &This::Apply, (arg("prim")))
+        .staticmethod("Apply")
 
-      .def("GetSchemaAttributeNames",
-           &This::GetSchemaAttributeNames,
-           arg("includeInherited") = true,
-           return_value_policy<TfPySequenceToList>())
-      .staticmethod("GetSchemaAttributeNames")
+        .def("GetSchemaAttributeNames",
+             &This::GetSchemaAttributeNames,
+             arg("includeInherited")=true,
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType",
-           (TfType const &(*)())TfType::Find<This>,
-           return_value_policy<return_by_value>())
-      .staticmethod("_GetStaticTfType")
+        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
+             return_value_policy<return_by_value>())
+        .staticmethod("_GetStaticTfType")
 
-      .def(!self)
+        .def(!self)
 
-      .def("__repr__", ::_Repr);
 
-  _CustomWrapCode(cls);
+        .def("__repr__", ::_Repr)
+    ;
+
+    _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by
+// Feel free to add custom code below this line, it will be preserved by 
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -105,7 +116,7 @@ void wrapUsdPhysicsArticulationRootAPI()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-//
+// 
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
@@ -114,6 +125,7 @@ void wrapUsdPhysicsArticulationRootAPI()
 
 namespace {
 
-WRAP_CUSTOM {}
+WRAP_CUSTOM {
+}
 
-}  // namespace
+}

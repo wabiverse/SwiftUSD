@@ -28,7 +28,7 @@
 #ifndef DOUBLE_CONVERSION_STRTOD_H_
 #define DOUBLE_CONVERSION_STRTOD_H_
 
-#include "Tf/pxrDoubleConversion/utils.h"
+#include "utils.h"
 
 #include "pxr/pxrns.h"
 

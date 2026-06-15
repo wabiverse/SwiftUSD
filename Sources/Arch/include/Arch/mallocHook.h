@@ -11,8 +11,8 @@
 /// \ingroup group_arch_Memory
 /// Routines for controlling malloc behavior.
 
-#include "Arch/api.h"
 #include "pxr/pxrns.h"
+#include "Arch/api.h"
 
 #include <stdlib.h>
 #include <string>
@@ -56,92 +56,88 @@ ARCH_API bool ArchIsStlAllocatorOff();
 /// to use it properly, it should be declared at global scope, ensuring
 /// zero-initialization.
 class ArchMallocHook {
- public:
-  /// Initialize hooks.
-  ///
-  /// Calling \c Initialize() installs the supplied functions as call-back
-  /// in place of the standard system memory allocation routines.  Note
-  /// that the callbacks take an extra \c const \c void* parameter; on
-  /// supported systems, the called function should simply ignore the extra
-  /// parameter.
-  ///
-  /// If initialization fails, \c false is returned and \p *errMsg is set
-  /// accordingly. If \c *this has already been initialized, calling \c
-  /// Initialize() a second time will fail.
-  ARCH_API
-  bool Initialize(void *(*mallocWrapper)(size_t, const void *),
-                  void *(*reallocWrapper)(void *, size_t, const void *),
-                  void *(*memalignWrapper)(size_t, size_t, const void *),
-                  void (*freeWrapper)(void *, const void *),
-                  std::string *errMsg);
+public:
+    /// Initialize hooks.
+    ///
+    /// Calling \c Initialize() installs the supplied functions as call-back
+    /// in place of the standard system memory allocation routines.  Note
+    /// that the callbacks take an extra \c const \c void* parameter; on
+    /// supported systems, the called function should simply ignore the extra
+    /// parameter.
+    ///
+    /// If initialization fails, \c false is returned and \p *errMsg is set
+    /// accordingly. If \c *this has already been initialized, calling \c
+    /// Initialize() a second time will fail.
+    ARCH_API
+    bool Initialize(void* (*mallocWrapper)(size_t, const void*),
+            void* (*reallocWrapper)(void*, size_t, const void*),
+            void* (*memalignWrapper)(size_t, size_t, const void*),
+            void  (*freeWrapper)(void*, const void*),
+            std::string* errMsg);
 
-  /// Return true if \c *this has been (successfully) initialized.
-  ///
-  /// In order for this function to work properly, \c this cannot be a local
-  /// or dynamically initialized variable; rather, \c this must be a global
-  /// variable, to ensure zero-initialization.
-  ARCH_API
-  bool IsInitialized();
+    /// Return true if \c *this has been (successfully) initialized.
+    ///
+    /// In order for this function to work properly, \c this cannot be a local
+    /// or dynamically initialized variable; rather, \c this must be a global
+    /// variable, to ensure zero-initialization.
+    ARCH_API
+    bool IsInitialized();
 
-  /// Call the original system \c malloc() function.
-  ///
-  /// This function allows user-supplied callbacks to access the original
-  /// system-supplied malloc() call.  For speed reasons, no safety checks
-  /// are performed; in particular, calling this function without having
-  /// successfully initialized \p *this will likely crash your program.
-  ARCH_API
-  void *Malloc(size_t nBytes)
-  {
-    return (*_underlyingMallocFunc)(nBytes);
-  }
+    /// Call the original system \c malloc() function.
+    ///
+    /// This function allows user-supplied callbacks to access the original
+    /// system-supplied malloc() call.  For speed reasons, no safety checks
+    /// are performed; in particular, calling this function without having
+    /// successfully initialized \p *this will likely crash your program.
+    ARCH_API
+    void* Malloc(size_t nBytes) {
+        return (*_underlyingMallocFunc)(nBytes);
+    }
 
-  /// Call the original system \c realloc() function.
-  ///
-  /// This function allows user-supplied callbacks to access the original
-  /// system-supplied \c realloc() call.  For speed reasons, no safety checks
-  /// are performed; in particular, calling this function without having
-  /// successfully initialized \p *this will likely crash your program.
-  ARCH_API
-  void *Realloc(void *ptr, size_t nBytes)
-  {
-    return (*_underlyingReallocFunc)(ptr, nBytes);
-  }
+    /// Call the original system \c realloc() function.
+    ///
+    /// This function allows user-supplied callbacks to access the original
+    /// system-supplied \c realloc() call.  For speed reasons, no safety checks
+    /// are performed; in particular, calling this function without having
+    /// successfully initialized \p *this will likely crash your program.
+    ARCH_API
+    void* Realloc(void* ptr, size_t nBytes) {
+        return (*_underlyingReallocFunc)(ptr, nBytes);
+    }
 
-  /// Call the original system \c memalign() function.
-  ///
-  /// This function allows user-supplied callbacks to access the original
-  /// system-supplied \c memalign() call.  For speed reasons, no safety checks
-  /// are performed; in particular, calling this function without having
-  /// successfully initialized \p *this will likely crash your program.
-  ARCH_API
-  void *Memalign(size_t alignment, size_t nBytes)
-  {
-    return (*_underlyingMemalignFunc)(alignment, nBytes);
-  }
+    /// Call the original system \c memalign() function.
+    ///
+    /// This function allows user-supplied callbacks to access the original
+    /// system-supplied \c memalign() call.  For speed reasons, no safety checks
+    /// are performed; in particular, calling this function without having
+    /// successfully initialized \p *this will likely crash your program.
+    ARCH_API
+    void* Memalign(size_t alignment, size_t nBytes) {
+        return (*_underlyingMemalignFunc)(alignment, nBytes);
+    }
 
-  /// Call the original system \c free() function.
-  ///
-  /// This function allows user-supplied callbacks to access the original
-  /// system-supplied \c free() call.  For speed reasons, no safety checks
-  /// are performed; in particular, calling this function without having
-  /// successfully initialized \p *this will likely crash your program.
-  ARCH_API
-  void Free(void *ptr)
-  {
-    (*_underlyingFreeFunc)(ptr);
-  }
+    /// Call the original system \c free() function.
+    ///
+    /// This function allows user-supplied callbacks to access the original
+    /// system-supplied \c free() call.  For speed reasons, no safety checks
+    /// are performed; in particular, calling this function without having
+    /// successfully initialized \p *this will likely crash your program.
+    ARCH_API
+    void Free(void* ptr) {
+        (*_underlyingFreeFunc)(ptr);
+    }
 
- private:
-  // Note: this is a POD (plain 'ol data structure) so we depend on zero
-  // initialization here to null these out.  Do not add a constructor or
-  // destructor to this class.
+private:
+    // Note: this is a POD (plain 'ol data structure) so we depend on zero
+    // initialization here to null these out.  Do not add a constructor or
+    // destructor to this class.
 
-  void *(*_underlyingMallocFunc)(size_t);
-  void *(*_underlyingReallocFunc)(void *, size_t);
-  void *(*_underlyingMemalignFunc)(size_t, size_t);
-  void (*_underlyingFreeFunc)(void *);
+    void* (*_underlyingMallocFunc)(size_t);
+    void* (*_underlyingReallocFunc)(void*, size_t);
+    void* (*_underlyingMemalignFunc)(size_t, size_t);
+    void  (*_underlyingFreeFunc)(void*);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_MALLOC_HOOK_H
+#endif // PXR_BASE_ARCH_MALLOC_HOOK_H

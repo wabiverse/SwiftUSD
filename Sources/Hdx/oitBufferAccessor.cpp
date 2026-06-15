@@ -19,121 +19,142 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(HDX_ENABLE_OIT, true, "Enable order independent translucency");
+TF_DEFINE_ENV_SETTING(HDX_ENABLE_OIT, true, 
+                      "Enable order independent translucency");
 
 /* static */
-bool HdxOitBufferAccessor::IsOitEnabled()
+bool
+HdxOitBufferAccessor::IsOitEnabled()
 {
-  return TfGetEnvSetting(HDX_ENABLE_OIT);
+    return TfGetEnvSetting(HDX_ENABLE_OIT);
 }
 
-HdxOitBufferAccessor::HdxOitBufferAccessor(HdTaskContext *ctx) : _ctx(ctx) {}
-
-void HdxOitBufferAccessor::RequestOitBuffers()
+HdxOitBufferAccessor::HdxOitBufferAccessor(HdTaskContext *ctx)
+    : _ctx(ctx)
 {
-  (*_ctx)[HdxTokens->oitRequestFlag] = VtValue(true);
 }
 
-HdBufferArrayRangeSharedPtr const &HdxOitBufferAccessor::_GetBar(const TfToken &name)
+void
+HdxOitBufferAccessor::RequestOitBuffers()
 {
-  const auto it = _ctx->find(name);
-  if (it == _ctx->end()) {
-    static HdBufferArrayRangeSharedPtr n;
-    return n;
-  }
-
-  const VtValue &v = it->second;
-  return v.Get<HdBufferArrayRangeSharedPtr>();
+    (*_ctx)[HdxTokens->oitRequestFlag] = VtValue(true);
 }
 
-bool HdxOitBufferAccessor::AddOitBufferBindings(const HdStRenderPassShaderSharedPtr &shader)
+HdBufferArrayRangeSharedPtr const &
+HdxOitBufferAccessor::_GetBar(const TfToken &name)
 {
-  HdBufferArrayRangeSharedPtr const &counterBar = _GetBar(HdxTokens->oitCounterBufferBar);
-  HdBufferArrayRangeSharedPtr const &dataBar = _GetBar(HdxTokens->oitDataBufferBar);
-  HdBufferArrayRangeSharedPtr const &depthBar = _GetBar(HdxTokens->oitDepthBufferBar);
-  HdBufferArrayRangeSharedPtr const &indexBar = _GetBar(HdxTokens->oitIndexBufferBar);
-  HdBufferArrayRangeSharedPtr const &uniformBar = _GetBar(HdxTokens->oitUniformBar);
+    const auto it = _ctx->find(name);
+    if (it == _ctx->end()) {
+        static HdBufferArrayRangeSharedPtr n;
+        return n;
+    }
 
-  if (counterBar && dataBar && depthBar && indexBar && uniformBar) {
-    shader->AddBufferBinding(HdStBindingRequest(HdStBinding::SSBO,
-                                                HdxTokens->oitCounterBufferBar,
-                                                counterBar,
-                                                /*interleave = */ false,
-                                                /*writable = */ true));
-
-    shader->AddBufferBinding(HdStBindingRequest(HdStBinding::SSBO,
-                                                HdxTokens->oitDataBufferBar,
-                                                dataBar,
-                                                /*interleave = */ false,
-                                                /*writable = */ true));
-
-    shader->AddBufferBinding(HdStBindingRequest(HdStBinding::SSBO,
-                                                HdxTokens->oitDepthBufferBar,
-                                                depthBar,
-                                                /*interleave = */ false,
-                                                /*writable = */ true));
-
-    shader->AddBufferBinding(HdStBindingRequest(HdStBinding::SSBO,
-                                                HdxTokens->oitIndexBufferBar,
-                                                indexBar,
-                                                /*interleave = */ false,
-                                                /*writable = */ true));
-
-    shader->AddBufferBinding(HdStBindingRequest(HdStBinding::UBO,
-                                                HdxTokens->oitUniformBar,
-                                                uniformBar,
-                                                /*interleave = */ true));
-    return true;
-  }
-  else {
-    shader->RemoveBufferBinding(HdxTokens->oitCounterBufferBar);
-    shader->RemoveBufferBinding(HdxTokens->oitDataBufferBar);
-    shader->RemoveBufferBinding(HdxTokens->oitDepthBufferBar);
-    shader->RemoveBufferBinding(HdxTokens->oitIndexBufferBar);
-    shader->RemoveBufferBinding(HdxTokens->oitUniformBar);
-    return false;
-  }
+    const VtValue &v = it->second;
+    return v.Get<HdBufferArrayRangeSharedPtr>();
 }
 
-void HdxOitBufferAccessor::InitializeOitBuffersIfNecessary(Hgi *hgi)
+bool
+HdxOitBufferAccessor::AddOitBufferBindings(
+    const HdStRenderPassShaderSharedPtr &shader)
 {
-  // If the OIT buffers were already cleared earlier, skip and do not
-  // clear them again.
-  VtValue &clearFlag = (*_ctx)[HdxTokens->oitClearedFlag];
-  if (!clearFlag.IsEmpty()) {
-    return;
-  }
+    HdBufferArrayRangeSharedPtr const & counterBar =
+        _GetBar(HdxTokens->oitCounterBufferBar);
+    HdBufferArrayRangeSharedPtr const & dataBar =
+        _GetBar(HdxTokens->oitDataBufferBar);
+    HdBufferArrayRangeSharedPtr const & depthBar =
+        _GetBar(HdxTokens->oitDepthBufferBar);
+    HdBufferArrayRangeSharedPtr const & indexBar =
+        _GetBar(HdxTokens->oitIndexBufferBar);
+    HdBufferArrayRangeSharedPtr const & uniformBar =
+        _GetBar(HdxTokens->oitUniformBar);
 
-  // Mark OIT buffers as cleared.
-  clearFlag = true;
+    if (counterBar && dataBar && depthBar && indexBar && uniformBar) {
+        shader->AddBufferBinding(
+            HdStBindingRequest(HdStBinding::SSBO,
+                               HdxTokens->oitCounterBufferBar,
+                               counterBar,
+                               /*interleave = */ false,
+                               /*writable = */ true));
 
-  // Clear counter buffer.
+        shader->AddBufferBinding(
+            HdStBindingRequest(HdStBinding::SSBO,
+                               HdxTokens->oitDataBufferBar,
+                               dataBar,
+                               /*interleave = */ false,
+                               /*writable = */ true));
+        
+        shader->AddBufferBinding(
+            HdStBindingRequest(HdStBinding::SSBO,
+                               HdxTokens->oitDepthBufferBar,
+                               depthBar,
+                               /*interleave = */ false,
+                               /*writable = */ true));
+        
+        shader->AddBufferBinding(
+            HdStBindingRequest(HdStBinding::SSBO,
+                               HdxTokens->oitIndexBufferBar,
+                               indexBar,
+                               /*interleave = */ false,
+                               /*writable = */ true));
+        
+        shader->AddBufferBinding(
+            HdStBindingRequest(HdStBinding::UBO, 
+                               HdxTokens->oitUniformBar,
+                               uniformBar,
+                               /*interleave = */ true));
+        return true;
+    } else {
+        shader->RemoveBufferBinding(HdxTokens->oitCounterBufferBar);
+        shader->RemoveBufferBinding(HdxTokens->oitDataBufferBar);
+        shader->RemoveBufferBinding(HdxTokens->oitDepthBufferBar);
+        shader->RemoveBufferBinding(HdxTokens->oitIndexBufferBar);
+        shader->RemoveBufferBinding(HdxTokens->oitUniformBar);
+        return false;
+    }
+}
 
-  // The shader determines what elements in each buffer are used based on
-  // finding -1 in the counter buffer. We can skip clearing the other buffers.
+void
+HdxOitBufferAccessor::InitializeOitBuffersIfNecessary(Hgi *hgi) 
+{
+    // If the OIT buffers were already cleared earlier, skip and do not
+    // clear them again.
+    VtValue &clearFlag = (*_ctx)[HdxTokens->oitClearedFlag];
+    if (!clearFlag.IsEmpty()) {
+        return;
+    }
 
-  HdStBufferArrayRangeSharedPtr stCounterBar = std::dynamic_pointer_cast<HdStBufferArrayRange>(
-      _GetBar(HdxTokens->oitCounterBufferBar));
+    // Mark OIT buffers as cleared.
+    clearFlag = true;
 
-  if (!stCounterBar) {
-    TF_CODING_ERROR("No OIT counter buffer allocateed when trying to clear it");
-    return;
-  }
+    // Clear counter buffer.
+    
+    // The shader determines what elements in each buffer are used based on
+    // finding -1 in the counter buffer. We can skip clearing the other buffers.
 
-  HdStBufferResourceSharedPtr stCounterResource = stCounterBar->GetResource(
-      HdxTokens->hdxOitCounterBuffer);
+    HdStBufferArrayRangeSharedPtr stCounterBar =
+        std::dynamic_pointer_cast<HdStBufferArrayRange>(
+            _GetBar(HdxTokens->oitCounterBufferBar));
 
-  // We want to fill the buffer with int -1 but the FillBuffer interface
-  // supports uint8_t (due to a limitation in the Metal API which we can later
-  // revisit to find a workaround). A buffer filled with uint8_t 0xff is the
-  // same as a buffer filled with int 0xffffffff.
-  const uint8_t clearCounter = -1;
+    if (!stCounterBar) {
+        TF_CODING_ERROR(
+            "No OIT counter buffer allocateed when trying to clear it");
+        return;
+    }
 
-  HgiBlitCmdsUniquePtr blitCmds = hgi->CreateBlitCmds();
-  blitCmds->PushDebugGroup("Clear OIT buffers");
-  blitCmds->FillBuffer(stCounterResource->GetHandle(), clearCounter);
-  blitCmds->PopDebugGroup();
-  hgi->SubmitCmds(blitCmds.get());
+    HdStBufferResourceSharedPtr stCounterResource = 
+        stCounterBar->GetResource(HdxTokens->hdxOitCounterBuffer);
+
+    // We want to fill the buffer with int -1 but the FillBuffer interface 
+    // supports uint8_t (due to a limitation in the Metal API which we can later
+    // revisit to find a workaround). A buffer filled with uint8_t 0xff is the 
+    // same as a buffer filled with int 0xffffffff.
+    const uint8_t clearCounter = -1;
+
+    HgiBlitCmdsUniquePtr blitCmds = hgi->CreateBlitCmds();
+    blitCmds->PushDebugGroup("Clear OIT buffers");
+    blitCmds->FillBuffer(stCounterResource->GetHandle(), clearCounter);
+    blitCmds->PopDebugGroup();
+    hgi->SubmitCmds(blitCmds.get());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -19,7 +19,7 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
@@ -27,48 +27,63 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdExtComputationPrimvarsSchemaTokens,
-                        HD_EXT_COMPUTATION_PRIMVARS_SCHEMA_TOKENS);
+    HD_EXT_COMPUTATION_PRIMVARS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
-
-TfTokenVector HdExtComputationPrimvarsSchema::GetExtComputationPrimvarNames()
-{
-  if (_container) {
-    return _container->GetNames();
-  }
-  else {
-    return {};
-  }
-}
-
-HdExtComputationPrimvarSchema HdExtComputationPrimvarsSchema::GetPrimvar(const TfToken &name)
-{
-  return HdExtComputationPrimvarSchema(_GetTypedDataSource<HdContainerDataSource>(name));
-}
-
 // --(END CUSTOM CODE: Schema Methods)--
 
-/*static*/
-HdExtComputationPrimvarsSchema HdExtComputationPrimvarsSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+TfTokenVector
+HdExtComputationPrimvarsSchema::GetExtComputationPrimvarNames() const
 {
-  return HdExtComputationPrimvarsSchema(
-      fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars)) :
-                            nullptr);
+    if (_container) {
+        return _container->GetNames();
+    } else {
+        return {};
+    }
+}
+
+HdExtComputationPrimvarSchema
+HdExtComputationPrimvarsSchema::GetExtComputationPrimvar(const TfToken &name) const
+{
+    return HdExtComputationPrimvarSchema(
+        _GetTypedDataSource<HdContainerDataSource>(name));
 }
 
 /*static*/
-const TfToken &HdExtComputationPrimvarsSchema::GetSchemaToken()
+HdContainerDataSourceHandle
+HdExtComputationPrimvarsSchema::BuildRetained(
+    const size_t count,
+    const TfToken * const names,
+    const HdDataSourceBaseHandle * const values)
 {
-  return HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars;
+    return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-const HdDataSourceLocator &HdExtComputationPrimvarsSchema::GetDefaultLocator()
+HdExtComputationPrimvarsSchema
+HdExtComputationPrimvarsSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdExtComputationPrimvarsSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars))
+        : nullptr);
 }
+
+/*static*/
+const TfToken &
+HdExtComputationPrimvarsSchema::GetSchemaToken()
+{
+    return HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdExtComputationPrimvarsSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

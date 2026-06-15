@@ -9,8 +9,8 @@
 
 /// \file hioOpenVDB/vdbAssetInterface.h
 
-#include "Ar/asset.h"
 #include "pxr/pxrns.h"
+#include "Ar/asset.h"
 
 #include "openvdb/openvdb.h"
 
@@ -22,16 +22,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Interface for an ArAsset subclass that enables direct access to
 /// OpenVDB grids.
-class HioOpenVDBArAssetInterface : public ArAsset {
- public:
-  /// Return a shared pointer to an OpenVDB grid with \p name,
-  /// or nullptr if no grid matching \p name exists.
-  virtual openvdb::GridBase::Ptr GetGrid(const std::string &name) const = 0;
+class HioOpenVDBArAssetInterface : public ArAsset
+{
+public:
+    /// Return a shared pointer to an OpenVDB grid with \p name,
+    /// or nullptr if no grid matching \p name exists.
+    virtual openvdb::GridBase::Ptr GetGrid(const std::string& name) const = 0;
 
-  /// Return a shared pointer to a vector of OpenVDB grids.
-  virtual openvdb::GridPtrVecPtr GetGrids() const = 0;
+    /// Return a shared pointer to a vector of OpenVDB grids.
+    virtual openvdb::GridPtrVecPtr GetGrids() const = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HIO_OPENVDB_ASSET_INTERFACE_H
+#endif // PXR_IMAGING_HIO_OPENVDB_ASSET_INTERFACE_H

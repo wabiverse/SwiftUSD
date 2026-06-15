@@ -9,11 +9,12 @@
 
 /// \file usdUtils/registeredVariantSet.h
 
-#include "UsdUtils/api.h"
 #include "pxr/pxrns.h"
+#include "UsdUtils/api.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \class UsdUtilsRegisteredVariantSet
 ///
@@ -24,56 +25,61 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// be reasoned about by apps during import/export.
 ///
 /// \sa UsdUtilsGetRegisteredVariantSets
-struct UsdUtilsRegisteredVariantSet {
- public:
-  /// The name of the variantSet.
-  const std::string name;
+struct UsdUtilsRegisteredVariantSet
+{
+public:
+    /// The name of the variantSet.
+    const std::string name;
 
-  /// This specifies how the variantSet should be treated during export.
-  ///
-  /// Note, in the plugInfo.json, the values for these enum's are
-  /// lowerCamelCase.
-  enum class SelectionExportPolicy {
-    /// Never `"never"`
+    /// This specifies how the variantSet should be treated during export.
     ///
-    /// This variantSet selection is meant to remain entirely within an
-    /// application.  This typically represents a "session" variantSelection
-    /// that should not be transmitted down the pipeline.
-    Never,
+    /// Note, in the plugInfo.json, the values for these enum's are
+    /// lowerCamelCase.
+    enum class SelectionExportPolicy {
+        /// Never `"never"`
+        ///
+        /// This variantSet selection is meant to remain entirely within an
+        /// application.  This typically represents a "session" variantSelection
+        /// that should not be transmitted down the pipeline.
+        Never,
 
-    /// IfAuthored `"ifAuthored"`
-    ///
-    /// This variantSet selection should be exported if there is an authored
-    /// opinion in the application.  This is only relevant if the
-    /// application is able to distinguish between "default" and "set"
-    /// opinions.
-    IfAuthored,
+        /// IfAuthored `"ifAuthored"`
+        ///
+        /// This variantSet selection should be exported if there is an authored
+        /// opinion in the application.  This is only relevant if the
+        /// application is able to distinguish between "default" and "set"
+        /// opinions.
+        IfAuthored,
 
-    /// Authored `"authored"`
-    ///
-    /// This variantSet selection should always be exported.
-    Always,
-  };
+        /// Authored `"authored"`
+        ///
+        /// This variantSet selection should always be exported.
+        Always,
+    };
 
-  /// Returns the export policy from the string.
-  static bool GetSelectionExportPolicyFromString(const std::string &selectionExportPolicyStr,
-                                                 SelectionExportPolicy *selectionExportPolicy);
+    /// Returns the export policy from the string.
+    static bool GetSelectionExportPolicyFromString(
+        const std::string& selectionExportPolicyStr,
+        SelectionExportPolicy* selectionExportPolicy);
 
-  /// Specifies how to export a variant selection.
-  const SelectionExportPolicy selectionExportPolicy;
+    /// Specifies how to export a variant selection.
+    const SelectionExportPolicy selectionExportPolicy;
 
-  UsdUtilsRegisteredVariantSet(const std::string &name,
-                               const SelectionExportPolicy &selectionExportPolicy)
-      : name(name), selectionExportPolicy(selectionExportPolicy)
-  {
-  }
+    UsdUtilsRegisteredVariantSet(
+            const std::string& name,
+            const SelectionExportPolicy& selectionExportPolicy) :
+        name(name),
+        selectionExportPolicy(selectionExportPolicy)
+    {
+    }
 
-  // provided so this can be stored in a std::set.
-  bool operator<(const UsdUtilsRegisteredVariantSet &other) const
-  {
-    return this->name < other.name;
-  }
+    // provided so this can be stored in a std::set.
+    bool operator<(const UsdUtilsRegisteredVariantSet&
+            other) const {
+        return this->name < other.name;
+    }
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

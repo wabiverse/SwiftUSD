@@ -5,29 +5,32 @@
 // https://openusd.org/license.
 //
 
-#include "Pcp/dynamicFileFormatInterface.h"
 #include "pxr/pxrns.h"
+#include "Pcp/dynamicFileFormatInterface.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 PcpDynamicFileFormatInterface::~PcpDynamicFileFormatInterface() = default;
 
-bool PcpDynamicFileFormatInterface::CanFieldChangeAffectFileFormatArguments(
+bool 
+PcpDynamicFileFormatInterface::CanFieldChangeAffectFileFormatArguments(
     const TfToken &field,
     const VtValue &oldValue,
     const VtValue &newValue,
     const VtValue &dependencyContextData) const
 {
-  return true;
+    return true;
 }
 
-bool PcpDynamicFileFormatInterface::CanAttributeDefaultValueChangeAffectFileFormatArguments(
+bool 
+PcpDynamicFileFormatInterface::
+CanAttributeDefaultValueChangeAffectFileFormatArguments(
     const TfToken &attributeName,
     const VtValue &oldValue,
     const VtValue &newValue,
     const VtValue &dependencyContextData) const
 {
-  return true;
+    return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

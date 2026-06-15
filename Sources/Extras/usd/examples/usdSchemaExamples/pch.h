@@ -130,7 +130,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
 #  include <boost/python.hpp>
 #  include <boost/python/class.hpp>
 #  include <boost/python/def_visitor.hpp>
@@ -177,6 +177,6 @@
 #include <boost/unordered_map.hpp>
 #include <boost/utility.hpp>
 #include <boost/utility/enable_if.hpp>
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
 #  include "Tf/pySafePython.h"
 #endif  // PXR_PYTHON_SUPPORT_ENABLED

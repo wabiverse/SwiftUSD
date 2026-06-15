@@ -4,31 +4,37 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
 #include "HdSt/volumeShaderKey.h"
 #include "Tf/staticTokens.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens,
-                         ((baseGLSLFX, "volume.glslfx"))
 
-                         // point id mixins (provide functions for picking system)
-                         ((pointIdFS, "PointId.Fragment.Fallback"))
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
+    ((baseGLSLFX,         "volume.glslfx"))
 
-                         // main for all the shader stages
-                         ((mainVS, "Volume.Vertex"))((mainFS, "Volume.Fragment"))
+    // point id mixins (provide functions for picking system)
+    ((pointIdFS,          "PointId.Fragment.Fallback"))
 
-                         // instancing
-                         ((instancing, "Instancing.Transform")));
+    // main for all the shader stages
+    ((mainVS,             "Volume.Vertex"))
+    ((mainFS,             "Volume.Fragment"))
+
+    // instancing       
+    ((instancing,         "Instancing.Transform"))
+);
 
 HdSt_VolumeShaderKey::HdSt_VolumeShaderKey()
     : glslfx(_tokens->baseGLSLFX),
-      VS{_tokens->instancing, _tokens->mainVS, TfToken()},
-      FS{_tokens->pointIdFS, _tokens->instancing, _tokens->mainFS, TfToken()}
+      VS{ _tokens->instancing, _tokens->mainVS, TfToken() },
+      FS{ _tokens->pointIdFS, _tokens->instancing,
+          _tokens->mainFS, TfToken() }
 {
 }
 
 HdSt_VolumeShaderKey::~HdSt_VolumeShaderKey() = default;
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

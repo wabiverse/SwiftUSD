@@ -5,26 +5,32 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/layer.h"
 #include "Sdf/specType.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool Sdf_CanCastToType(const SdfSpec &spec, const std::type_info &destType)
+bool 
+Sdf_CanCastToType(
+    const SdfSpec& spec, const std::type_info& destType)
 {
-  return Sdf_SpecType::CanCast(spec.GetSpecType(), destType);
+    return Sdf_SpecType::CanCast(spec.GetSpecType(), destType);
 }
 
-bool Sdf_CanCastToTypeCheckSchema(const SdfSpec &spec, const std::type_info &destType)
+bool 
+Sdf_CanCastToTypeCheckSchema(
+    const SdfSpec& spec, const std::type_info& destType)
 {
-  return Sdf_SpecType::CanCast(spec, destType);
+    return Sdf_SpecType::CanCast(spec, destType);
 }
 
-template<> SdfHandleTo<SdfLayer>::Handle SdfCreateHandle(SdfLayer *p)
+template <>
+SdfHandleTo<SdfLayer>::Handle
+SdfCreateHandle(SdfLayer *p)
 {
-  return SdfHandleTo<SdfLayer>::Handle(p);
+    return SdfHandleTo<SdfLayer>::Handle(p);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

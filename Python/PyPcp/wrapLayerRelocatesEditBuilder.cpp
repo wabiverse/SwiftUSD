@@ -5,64 +5,70 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Pcp/layerRelocatesEditBuilder.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-struct Pcp_LayerRelocatesEditBuilderRelocateResult : public TfPyAnnotatedBoolResult<std::string> {
-  Pcp_LayerRelocatesEditBuilderRelocateResult(bool val, const std::string &msg)
-      : TfPyAnnotatedBoolResult<std::string>(val, std::move(msg))
-  {
-  }
+struct Pcp_LayerRelocatesEditBuilderRelocateResult :
+    public TfPyAnnotatedBoolResult<std::string>
+{
+    Pcp_LayerRelocatesEditBuilderRelocateResult(bool val, const std::string &msg) :
+        TfPyAnnotatedBoolResult<std::string>(val, std::move(msg)) {}
 };
 
-Pcp_LayerRelocatesEditBuilderRelocateResult _Relocate(PcpLayerRelocatesEditBuilder &self,
-                                                      const SdfPath &source,
-                                                      const SdfPath &target)
+Pcp_LayerRelocatesEditBuilderRelocateResult
+_Relocate(PcpLayerRelocatesEditBuilder &self, 
+    const SdfPath &source, const SdfPath &target)
 {
-  std::string whyNot;
-  bool result = self.Relocate(source, target, &whyNot);
-  return Pcp_LayerRelocatesEditBuilderRelocateResult(result, whyNot);
+    std::string whyNot;
+    bool result = self.Relocate(source, target, &whyNot);
+    return Pcp_LayerRelocatesEditBuilderRelocateResult(result, whyNot);
 }
 
-Pcp_LayerRelocatesEditBuilderRelocateResult _RemoveRelocate(PcpLayerRelocatesEditBuilder &self,
-                                                            const SdfPath &source)
+Pcp_LayerRelocatesEditBuilderRelocateResult
+_RemoveRelocate(PcpLayerRelocatesEditBuilder &self, 
+    const SdfPath &source)
 {
-  std::string whyNot;
-  bool result = self.RemoveRelocate(source, &whyNot);
-  return Pcp_LayerRelocatesEditBuilderRelocateResult(result, whyNot);
+    std::string whyNot;
+    bool result = self.RemoveRelocate(source, &whyNot);
+    return Pcp_LayerRelocatesEditBuilderRelocateResult(result, whyNot);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapLayerRelocatesEditBuilder()
 {
-  Pcp_LayerRelocatesEditBuilderRelocateResult ::Wrap<Pcp_LayerRelocatesEditBuilderRelocateResult>(
-      "_LayerRelocatesEditBuilderRelocateResult", "whyNot");
+    Pcp_LayerRelocatesEditBuilderRelocateResult
+        ::Wrap<Pcp_LayerRelocatesEditBuilderRelocateResult>(
+            "_LayerRelocatesEditBuilderRelocateResult", "whyNot");
 
-  class_<PcpLayerRelocatesEditBuilder, boost::noncopyable>("LayerRelocatesEditBuilder", no_init)
-      .def(init<const PcpLayerStackPtr &>())
-      .def(init<const PcpLayerStackPtr &, const SdfLayerHandle &>())
-      .def("Relocate", &_Relocate)
-      .def("RemoveRelocate", &_RemoveRelocate)
-      .def("GetEditedRelocatesMap",
-           &PcpLayerRelocatesEditBuilder::GetEditedRelocatesMap,
-           return_value_policy<return_by_value>())
-      .def("GetEdits",
-           &PcpLayerRelocatesEditBuilder::GetEdits,
-           return_value_policy<TfPySequenceToList>());
+    class_<PcpLayerRelocatesEditBuilder, noncopyable>(
+        "LayerRelocatesEditBuilder", no_init)
+        .def(init<const PcpLayerStackPtr &>())
+        .def(init<const PcpLayerStackPtr &, const SdfLayerHandle &>())
+        .def("Relocate", &_Relocate)
+        .def("RemoveRelocate", &_RemoveRelocate)
+        .def("GetEditedRelocatesMap",
+             &PcpLayerRelocatesEditBuilder::GetEditedRelocatesMap,
+             return_value_policy<return_by_value>())
+        .def("GetEdits",
+             &PcpLayerRelocatesEditBuilder::GetEdits,
+             return_value_policy<TfPySequenceToList>())
+        ;
 
-  to_python_converter<
-      PcpLayerRelocatesEditBuilder::LayerRelocatesEdit,
-      TfPyContainerConversions::to_tuple<PcpLayerRelocatesEditBuilder::LayerRelocatesEdit>>();
+    to_python_converter<PcpLayerRelocatesEditBuilder::LayerRelocatesEdit, 
+        TfPyContainerConversions::to_tuple<
+            PcpLayerRelocatesEditBuilder::LayerRelocatesEdit>>();
 }

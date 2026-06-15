@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HD_ST_DYNAMIC_UV_TEXTURE_OBJECT_H
 #define PXR_IMAGING_HD_ST_DYNAMIC_UV_TEXTURE_OBJECT_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
 #include "HdSt/textureObject.h"
 
@@ -33,82 +33,79 @@ class HdStDynamicUvTextureImplementation;
 /// a client has created the texture before the texture commit phase
 /// is finished.
 ///
-class HdStDynamicUvTextureObject final : public HdStUvTextureObject {
- public:
-  HDST_API
-  HdStDynamicUvTextureObject(const HdStTextureIdentifier &textureId,
-                             HdSt_TextureObjectRegistry *textureObjectRegistry);
+class HdStDynamicUvTextureObject final : public HdStUvTextureObject
+{
+public:
+    HDST_API
+    HdStDynamicUvTextureObject(
+        const HdStTextureIdentifier &textureId,
+        HdSt_TextureObjectRegistry *textureObjectRegistry);
 
-  HDST_API
-  ~HdStDynamicUvTextureObject() override;
+    HDST_API
+    ~HdStDynamicUvTextureObject() override;
 
-  /// Allocate GPU resource using the texture descriptor. Populate
-  /// if data are given in the descriptor.
-  ///
-  void CreateTexture(const HgiTextureDesc &desc)
-  {
-    _CreateTexture(desc);
-  }
+    /// Allocate GPU resource using the texture descriptor. Populate
+    /// if data are given in the descriptor.
+    /// 
+    void CreateTexture(const HgiTextureDesc &desc) {
+        _CreateTexture(desc);
+    }
 
-  /// Make GPU generate mipmaps.
-  ///
-  void GenerateMipmaps()
-  {
-    _GenerateMipmaps();
-  }
+    /// Make GPU generate mipmaps.
+    ///
+    void GenerateMipmaps()
+    {
+        _GenerateMipmaps();
+    }
 
-  /// Release GPU resource.
-  void DestroyTexture()
-  {
-    _DestroyTexture();
-  }
+    /// Release GPU resource.
+    void DestroyTexture() {
+        _DestroyTexture();
+    }
 
-  /// Set wrap mode hints used when a texture node's wrap mode
-  /// is use metadata.
-  ///
-  /// This is typically called from HdStDynamicUvTextureImplementation::Load
-  /// when the texture file has wrap mode hints.
-  void SetWrapParameters(const std::pair<HdWrap, HdWrap> &wrapParameters)
-  {
-    _SetWrapParameters(wrapParameters);
-  }
+    /// Set wrap mode hints used when a texture node's wrap mode
+    /// is use metadata.
+    ///
+    /// This is typically called from HdStDynamicUvTextureImplementation::Load
+    /// when the texture file has wrap mode hints.
+    void SetWrapParameters(const std::pair<HdWrap, HdWrap> &wrapParameters) {
+        _SetWrapParameters(wrapParameters);
+    }
 
-  /// Save CPU data for this texture (transfering ownership).
-  ///
-  /// This is typically called from HdStDynamicUvTextureImplementation::Load
-  /// so that the CPU data can be uploaded during commit.
-  ///
-  /// To free the CPU data, call with nullptr.
-  ///
-  void SetCpuData(std::unique_ptr<HdStTextureCpuData> &&cpuData)
-  {
-    _SetCpuData(std::move(cpuData));
-  }
+    /// Save CPU data for this texture (transfering ownership).
+    ///
+    /// This is typically called from HdStDynamicUvTextureImplementation::Load
+    /// so that the CPU data can be uploaded during commit.
+    ///
+    /// To free the CPU data, call with nullptr.
+    ///
+    void SetCpuData(std::unique_ptr<HdStTextureCpuData> &&cpuData) {
+        _SetCpuData(std::move(cpuData));
+    }
 
-  /// Get the CPU data stored for this texture.
-  ///
-  /// Typically used in HdStDynamicUvTextureImplementation::Commit to
-  /// commit CPU data to GPU.
-  HdStTextureCpuData *GetCpuData() const
-  {
-    return _GetCpuData();
-  }
+    /// Get the CPU data stored for this texture.
+    ///
+    /// Typically used in HdStDynamicUvTextureImplementation::Commit to
+    /// commit CPU data to GPU.
+    HdStTextureCpuData * GetCpuData() const {
+        return _GetCpuData();
+    }
 
-  /// Always returns true - so that samplers for this texture are
-  /// created.
-  ///
-  HDST_API
-  bool IsValid() const override;
+    /// Always returns true - so that samplers for this texture are
+    /// created.
+    ///
+    HDST_API
+    bool IsValid() const override;
 
- protected:
-  HDST_API
-  void _Load() override;
+protected:
+    HDST_API
+    void _Load() override;
 
-  HDST_API
-  void _Commit() override;
+    HDST_API
+    void _Commit() override;
 
- private:
-  HdStDynamicUvTextureImplementation *_GetImpl() const;
+private:
+    HdStDynamicUvTextureImplementation * _GetImpl() const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -33,86 +33,86 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(END CUSTOM CODE: Declares)--
 
 #define HD_EXT_COMPUTATION_INPUT_COMPUTATION_SCHEMA_TOKENS \
-  (name)(sourceComputation)(sourceComputationOutputName)
+    (sourceComputation) \
+    (sourceComputationOutputName) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationInputComputationSchemaTokens,
-                         HD_API,
-                         HD_EXT_COMPUTATION_INPUT_COMPUTATION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationInputComputationSchemaTokens, HD_API,
+    HD_EXT_COMPUTATION_INPUT_COMPUTATION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationInputComputationSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdExtComputationInputComputationSchema(HdContainerDataSourceHandle container)
-      : HdSchema(container)
-  {
-  }
+/// \class HdExtComputationInputComputationSchema
+///
+class HdExtComputationInputComputationSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdExtComputationInputComputationSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdTokenDataSourceHandle GetName() const;
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  HdPathDataSourceHandle GetSourceComputation() const;
-
-  HD_API
-  HdTokenDataSourceHandle GetSourceComputationOutputName() const;
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdTokenDataSourceHandle &name,
-      const HdPathDataSourceHandle &sourceComputation,
-      const HdTokenDataSourceHandle &sourceComputationOutputName);
-
-  /// \class HdExtComputationInputComputationSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetName(const HdTokenDataSourceHandle &name);
-    HD_API
-    Builder &SetSourceComputation(const HdPathDataSourceHandle &sourceComputation);
-    HD_API
-    Builder &SetSourceComputationOutputName(
-        const HdTokenDataSourceHandle &sourceComputationOutputName);
+    HdPathDataSourceHandle GetSourceComputation() const;
 
-    /// Returns a container data source containing the members set thus far.
     HD_API
-    HdContainerDataSourceHandle Build();
+    HdTokenDataSourceHandle GetSourceComputationOutputName() const; 
 
-   private:
-    HdTokenDataSourceHandle _name;
-    HdPathDataSourceHandle _sourceComputation;
-    HdTokenDataSourceHandle _sourceComputationOutputName;
-  };
+    /// @} 
 
-  /// @}
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdPathDataSourceHandle &sourceComputation,
+        const HdTokenDataSourceHandle &sourceComputationOutputName
+    );
+
+    /// \class HdExtComputationInputComputationSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetSourceComputation(
+            const HdPathDataSourceHandle &sourceComputation);
+        HD_API
+        Builder &SetSourceComputationOutputName(
+            const HdTokenDataSourceHandle &sourceComputationOutputName);
+
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdPathDataSourceHandle _sourceComputation;
+        HdTokenDataSourceHandle _sourceComputationOutputName;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -19,159 +19,191 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMeshSchemaTokens, HD_MESH_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMeshSchemaTokens,
+    HD_MESH_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdMeshTopologySchema HdMeshSchema::GetTopology() const
+HdMeshTopologySchema
+HdMeshSchema::GetTopology() const
 {
-  return HdMeshTopologySchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMeshSchemaTokens->topology));
+    return HdMeshTopologySchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMeshSchemaTokens->topology));
 }
 
-HdTokenDataSourceHandle HdMeshSchema::GetSubdivisionScheme() const
+HdTokenDataSourceHandle
+HdMeshSchema::GetSubdivisionScheme() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdMeshSchemaTokens->subdivisionScheme);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdMeshSchemaTokens->subdivisionScheme);
 }
 
-HdSubdivisionTagsSchema HdMeshSchema::GetSubdivisionTags() const
+HdSubdivisionTagsSchema
+HdMeshSchema::GetSubdivisionTags() const
 {
-  return HdSubdivisionTagsSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMeshSchemaTokens->subdivisionTags));
+    return HdSubdivisionTagsSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMeshSchemaTokens->subdivisionTags));
 }
 
-HdBoolDataSourceHandle HdMeshSchema::GetDoubleSided() const
+HdBoolDataSourceHandle
+HdMeshSchema::GetDoubleSided() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdMeshSchemaTokens->doubleSided);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdMeshSchemaTokens->doubleSided);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdMeshSchema::BuildRetained(
-    const HdContainerDataSourceHandle &topology,
-    const HdTokenDataSourceHandle &subdivisionScheme,
-    const HdContainerDataSourceHandle &subdivisionTags,
-    const HdBoolDataSourceHandle &doubleSided)
+HdContainerDataSourceHandle
+HdMeshSchema::BuildRetained(
+        const HdContainerDataSourceHandle &topology,
+        const HdTokenDataSourceHandle &subdivisionScheme,
+        const HdContainerDataSourceHandle &subdivisionTags,
+        const HdBoolDataSourceHandle &doubleSided
+)
 {
-  TfToken _names[4];
-  HdDataSourceBaseHandle _values[4];
+    TfToken _names[4];
+    HdDataSourceBaseHandle _values[4];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (topology) {
-    _names[_count] = HdMeshSchemaTokens->topology;
-    _values[_count++] = topology;
-  }
+    if (topology) {
+        _names[_count] = HdMeshSchemaTokens->topology;
+        _values[_count++] = topology;
+    }
 
-  if (subdivisionScheme) {
-    _names[_count] = HdMeshSchemaTokens->subdivisionScheme;
-    _values[_count++] = subdivisionScheme;
-  }
+    if (subdivisionScheme) {
+        _names[_count] = HdMeshSchemaTokens->subdivisionScheme;
+        _values[_count++] = subdivisionScheme;
+    }
 
-  if (subdivisionTags) {
-    _names[_count] = HdMeshSchemaTokens->subdivisionTags;
-    _values[_count++] = subdivisionTags;
-  }
+    if (subdivisionTags) {
+        _names[_count] = HdMeshSchemaTokens->subdivisionTags;
+        _values[_count++] = subdivisionTags;
+    }
 
-  if (doubleSided) {
-    _names[_count] = HdMeshSchemaTokens->doubleSided;
-    _values[_count++] = doubleSided;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (doubleSided) {
+        _names[_count] = HdMeshSchemaTokens->doubleSided;
+        _values[_count++] = doubleSided;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdMeshSchema::Builder &HdMeshSchema::Builder::SetTopology(
+HdMeshSchema::Builder &
+HdMeshSchema::Builder::SetTopology(
     const HdContainerDataSourceHandle &topology)
 {
-  _topology = topology;
-  return *this;
+    _topology = topology;
+    return *this;
 }
 
-HdMeshSchema::Builder &HdMeshSchema::Builder::SetSubdivisionScheme(
+HdMeshSchema::Builder &
+HdMeshSchema::Builder::SetSubdivisionScheme(
     const HdTokenDataSourceHandle &subdivisionScheme)
 {
-  _subdivisionScheme = subdivisionScheme;
-  return *this;
+    _subdivisionScheme = subdivisionScheme;
+    return *this;
 }
 
-HdMeshSchema::Builder &HdMeshSchema::Builder::SetSubdivisionTags(
+HdMeshSchema::Builder &
+HdMeshSchema::Builder::SetSubdivisionTags(
     const HdContainerDataSourceHandle &subdivisionTags)
 {
-  _subdivisionTags = subdivisionTags;
-  return *this;
+    _subdivisionTags = subdivisionTags;
+    return *this;
 }
 
-HdMeshSchema::Builder &HdMeshSchema::Builder::SetDoubleSided(
+HdMeshSchema::Builder &
+HdMeshSchema::Builder::SetDoubleSided(
     const HdBoolDataSourceHandle &doubleSided)
 {
-  _doubleSided = doubleSided;
-  return *this;
+    _doubleSided = doubleSided;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdMeshSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdMeshSchema::Builder::Build()
 {
-  return HdMeshSchema::BuildRetained(
-      _topology, _subdivisionScheme, _subdivisionTags, _doubleSided);
-}
-
-/*static*/
-HdMeshSchema HdMeshSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdMeshSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                                HdMeshSchemaTokens->mesh)) :
-                                            nullptr);
+    return HdMeshSchema::BuildRetained(
+        _topology,
+        _subdivisionScheme,
+        _subdivisionTags,
+        _doubleSided
+    );
 }
 
 /*static*/
-const TfToken &HdMeshSchema::GetSchemaToken()
+HdMeshSchema
+HdMeshSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdMeshSchemaTokens->mesh;
+    return HdMeshSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdMeshSchemaTokens->mesh))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdMeshSchema::GetDefaultLocator()
+const TfToken &
+HdMeshSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdMeshSchemaTokens->mesh;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdMeshSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdMeshSchema::GetTopologyLocator()
+const HdDataSourceLocator &
+HdMeshSchema::GetTopologyLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdMeshSchemaTokens->topology);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdMeshSchemaTokens->topology);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdMeshSchema::GetSubdivisionSchemeLocator()
+const HdDataSourceLocator &
+HdMeshSchema::GetSubdivisionSchemeLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdMeshSchemaTokens->subdivisionScheme);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdMeshSchemaTokens->subdivisionScheme);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdMeshSchema::GetSubdivisionTagsLocator()
+const HdDataSourceLocator &
+HdMeshSchema::GetSubdivisionTagsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdMeshSchemaTokens->subdivisionTags);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdMeshSchemaTokens->subdivisionTags);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdMeshSchema::GetDoubleSidedLocator()
+const HdDataSourceLocator &
+HdMeshSchema::GetDoubleSidedLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdMeshSchemaTokens->doubleSided);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdMeshSchemaTokens->doubleSided);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

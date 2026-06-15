@@ -4,56 +4,67 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "UsdGeom/constraintTarget.h"
 #include "pxr/pxrns.h"
+#include "UsdGeom/constraintTarget.h"
 
-#include "Tf/pyResultConversions.h"
 #include "Usd/pyConversions.h"
+#include "Tf/pyResultConversions.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/implicit.hpp>
-#include <boost/python/operators.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/implicit.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
 // The python wrapping of ComputeInWorldSpace does not take an xform cache.
-static GfMatrix4d _ComputeInWorldSpace(const UsdGeomConstraintTarget &self,
-                                       const UsdTimeCode &time = UsdTimeCode::Default())
+static GfMatrix4d
+_ComputeInWorldSpace(
+    const UsdGeomConstraintTarget &self,
+    const UsdTimeCode &time = UsdTimeCode::Default())
 {
-  return self.ComputeInWorldSpace(time);
+    return self.ComputeInWorldSpace(time);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapUsdGeomConstraintTarget()
 {
-  typedef UsdGeomConstraintTarget ConstraintTarget;
+    typedef UsdGeomConstraintTarget ConstraintTarget;
 
-  class_<ConstraintTarget>("ConstraintTarget")
-      .def(init<UsdAttribute>(arg("attr")))
-      .def(!self)
+    class_<ConstraintTarget>("ConstraintTarget")
+        .def(init<UsdAttribute>(arg("attr")))
+        .def(!self)
 
-      .def("GetAttr", &ConstraintTarget::GetAttr, return_value_policy<return_by_value>())
-      .def("IsDefined", &ConstraintTarget::IsDefined)
+        .def("GetAttr", &ConstraintTarget::GetAttr,
+             return_value_policy<return_by_value>())
+        .def("IsDefined", &ConstraintTarget::IsDefined)
 
-      .def("IsValid", &ConstraintTarget::IsValid)
+        .def("IsValid", &ConstraintTarget::IsValid)
 
-      .def("SetIdentifier", &ConstraintTarget::SetIdentifier, arg("identifier"))
-      .def("GetIdentifier",
-           &ConstraintTarget::GetIdentifier,
-           return_value_policy<return_by_value>())
+        .def("SetIdentifier", &ConstraintTarget::SetIdentifier, arg("identifier"))
+        .def("GetIdentifier", &ConstraintTarget::GetIdentifier,
+             return_value_policy<return_by_value>())
 
-      .def("Get", &ConstraintTarget::Get, (arg("time") = UsdTimeCode::Default()))
-      .def("Set", &ConstraintTarget::Set, (arg("value"), arg("time") = UsdTimeCode::Default()))
+        .def("Get", &ConstraintTarget::Get, (arg("time")=UsdTimeCode::Default()))
+        .def("Set", &ConstraintTarget::Set, (arg("value"), 
+            arg("time")=UsdTimeCode::Default()))
 
-      .def("GetConstraintAttrName", &ConstraintTarget::GetConstraintAttrName)
-      .staticmethod("GetConstraintAttrName")
+        .def("GetConstraintAttrName", &ConstraintTarget::GetConstraintAttrName)
+            .staticmethod("GetConstraintAttrName")
 
-      .def("ComputeInWorldSpace", _ComputeInWorldSpace, (arg("time") = UsdTimeCode::Default()));
+        .def("ComputeInWorldSpace", _ComputeInWorldSpace,
+             (arg("time")=UsdTimeCode::Default()))
+        ;
 
-  implicitly_convertible<ConstraintTarget, UsdAttribute>();
+    implicitly_convertible<ConstraintTarget, UsdAttribute>();
 }

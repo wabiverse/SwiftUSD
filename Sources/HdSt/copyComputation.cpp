@@ -5,13 +5,13 @@
 // https://openusd.org/license.
 //
 #include "HdSt/copyComputation.h"
-#include "Hd/perfLog.h"
-#include "Hd/tokens.h"
-#include "Hd/types.h"
 #include "HdSt/bufferArrayRange.h"
 #include "HdSt/bufferResource.h"
 #include "HdSt/resourceRegistry.h"
 #include "HdSt/tokens.h"
+#include "Hd/perfLog.h"
+#include "Hd/tokens.h"
+#include "Hd/types.h"
 
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
@@ -20,94 +20,101 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdStCopyComputationGPU::HdStCopyComputationGPU(HdBufferArrayRangeSharedPtr const &src,
-                                               TfToken const &name)
+
+HdStCopyComputationGPU::HdStCopyComputationGPU(
+    HdBufferArrayRangeSharedPtr const &src, TfToken const &name)
     : _src(src), _name(name)
 {
 }
 
-void HdStCopyComputationGPU::Execute(HdBufferArrayRangeSharedPtr const &range_,
-                                     HdResourceRegistry *resourceRegistry)
+void
+HdStCopyComputationGPU::Execute(HdBufferArrayRangeSharedPtr const &range_,
+                                HdResourceRegistry *resourceRegistry)
 {
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  HdStBufferArrayRangeSharedPtr srcRange = std::static_pointer_cast<HdStBufferArrayRange>(_src);
-  HdStBufferArrayRangeSharedPtr dstRange = std::static_pointer_cast<HdStBufferArrayRange>(range_);
+    HdStBufferArrayRangeSharedPtr srcRange =
+        std::static_pointer_cast<HdStBufferArrayRange> (_src);
+    HdStBufferArrayRangeSharedPtr dstRange =
+        std::static_pointer_cast<HdStBufferArrayRange> (range_);
 
-  HdStBufferResourceSharedPtr srcRes = srcRange->GetResource(_name);
-  HdStBufferResourceSharedPtr dstRes = dstRange->GetResource(_name);
+    HdStBufferResourceSharedPtr srcRes = srcRange->GetResource(_name);
+    HdStBufferResourceSharedPtr dstRes = dstRange->GetResource(_name);
 
-  if (!TF_VERIFY(srcRes)) {
-    return;
-  }
-  if (!TF_VERIFY(dstRes)) {
-    return;
-  }
-
-  int srcResSize = HdDataSizeOfTupleType(srcRes->GetTupleType()) * srcRange->GetNumElements();
-  int dstResSize = HdDataSizeOfTupleType(dstRes->GetTupleType()) * dstRange->GetNumElements();
-
-  if (!TF_VERIFY(srcResSize <= dstResSize)) {
-    // The number of elements in the BAR *can* differ during migration.
-    // One example is during mesh refinement when migration is necessary,
-    // and we copy only the unrefined data over.
-    TF_CODING_ERROR(
-        "Migration error for %s: Source resource (%d) size is "
-        "larger than destination resource size (%d)\n",
-        _name.GetText(),
-        srcResSize,
-        dstResSize);
-    return;
-  }
-
-  size_t readOffset = srcRange->GetByteOffset(_name) + srcRes->GetOffset();
-  size_t writeOffset = dstRange->GetByteOffset(_name) + dstRes->GetOffset();
-  size_t copySize = srcResSize;
-
-  // Unfortunately at the time the copy computation is added, we don't
-  // know if the source buffer has 0 length.  So we can get here with
-  // a zero sized copy.
-  if (srcResSize > 0) {
-
-    // If the buffer's have 0 size, resources for them would not have
-    // be allocated, so the check for resource allocation has been moved
-    // until after the copy size check.
-
-    if (!TF_VERIFY(srcRes->GetHandle())) {
-      return;
+    if (!TF_VERIFY(srcRes)) {
+        return;
     }
-    if (!TF_VERIFY(dstRes->GetHandle())) {
-      return;
+    if (!TF_VERIFY(dstRes)) {
+        return;
     }
 
-    HD_PERF_COUNTER_INCR(HdStPerfTokens->copyBufferGpuToGpu);
+    int srcResSize = HdDataSizeOfTupleType(srcRes->GetTupleType()) *
+                     srcRange->GetNumElements();
+    int dstResSize = HdDataSizeOfTupleType(dstRes->GetTupleType()) *
+                     dstRange->GetNumElements();
 
-    HdStResourceRegistry *hdStResourceRegistry = static_cast<HdStResourceRegistry *>(
-        resourceRegistry);
+    if (!TF_VERIFY(srcResSize <= dstResSize)) {
+        // The number of elements in the BAR *can* differ during migration.
+        // One example is during mesh refinement when migration is necessary,
+        // and we copy only the unrefined data over.
+        TF_CODING_ERROR("Migration error for %s: Source resource (%d) size is "
+            "larger than destination resource size (%d)\n",
+            _name.GetText(), srcResSize, dstResSize);
+        return;
+    }
 
-    HgiBufferGpuToGpuOp blitOp;
-    blitOp.gpuSourceBuffer = srcRes->GetHandle();
-    blitOp.gpuDestinationBuffer = dstRes->GetHandle();
-    blitOp.sourceByteOffset = readOffset;
-    blitOp.byteSize = copySize;
-    blitOp.destinationByteOffset = writeOffset;
+    size_t readOffset = srcRange->GetByteOffset(_name) + srcRes->GetOffset();
+    size_t writeOffset = dstRange->GetByteOffset(_name) + dstRes->GetOffset();
+    size_t copySize = srcResSize;
 
-    HgiBlitCmds *blitCmds = hdStResourceRegistry->GetGlobalBlitCmds();
-    blitCmds->CopyBufferGpuToGpu(blitOp);
-  }
+    // Unfortunately at the time the copy computation is added, we don't
+    // know if the source buffer has 0 length.  So we can get here with
+    // a zero sized copy.
+    if (srcResSize > 0) {
+
+        // If the buffer's have 0 size, resources for them would not have
+        // be allocated, so the check for resource allocation has been moved
+        // until after the copy size check.
+
+        if (!TF_VERIFY(srcRes->GetHandle())) {
+            return;
+        }
+        if (!TF_VERIFY(dstRes->GetHandle())) {
+            return;
+        }
+
+        HD_PERF_COUNTER_INCR(HdStPerfTokens->copyBufferGpuToGpu);
+
+        HdStResourceRegistry* hdStResourceRegistry =
+            static_cast<HdStResourceRegistry*>(resourceRegistry);
+
+        HgiBufferGpuToGpuOp blitOp;
+        blitOp.gpuSourceBuffer = srcRes->GetHandle();
+        blitOp.gpuDestinationBuffer = dstRes->GetHandle();
+        blitOp.sourceByteOffset = readOffset;
+        blitOp.byteSize = copySize;
+        blitOp.destinationByteOffset = writeOffset;
+
+        HgiBlitCmds* blitCmds = hdStResourceRegistry->GetGlobalBlitCmds();
+        blitCmds->CopyBufferGpuToGpu(blitOp);
+    }
 }
 
-int HdStCopyComputationGPU::GetNumOutputElements() const
+int
+HdStCopyComputationGPU::GetNumOutputElements() const
 {
-  return _src->GetNumElements();
+    return _src->GetNumElements();
 }
 
-void HdStCopyComputationGPU::GetBufferSpecs(HdBufferSpecVector *specs) const
+void
+HdStCopyComputationGPU::GetBufferSpecs(HdBufferSpecVector *specs) const
 {
-  HdStBufferArrayRangeSharedPtr srcRange = std::static_pointer_cast<HdStBufferArrayRange>(_src);
+    HdStBufferArrayRangeSharedPtr srcRange =
+        std::static_pointer_cast<HdStBufferArrayRange> (_src);
 
-  specs->emplace_back(_name, srcRange->GetResource(_name)->GetTupleType());
+    specs->emplace_back(_name, srcRange->GetResource(_name)->GetTupleType());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

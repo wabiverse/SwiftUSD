@@ -26,9 +26,10 @@ using HdDataSourceHashType = size_t;
 /// such that is suitable for a hashtable but not for fingerprinting.
 ///
 HD_API
-HdDataSourceHashType HdDataSourceHash(HdDataSourceBaseHandle const &ds,
-                                      const HdSampledDataSource::Time startTime,
-                                      const HdSampledDataSource::Time endTime);
+HdDataSourceHashType
+HdDataSourceHash(HdDataSourceBaseHandle const &ds,
+                 const HdSampledDataSource::Time startTime,
+                 const HdSampledDataSource::Time endTime);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -32,10 +32,10 @@
 /// works in conjunction with a macro in the source file
 /// TF_INSTANTIATE_SINGLETON(), which is itself defined by  including the file
 /// "Tf/instantiateSingleton.h".
-///
+/// 
 /// \anchor TfSingleton_typicalUse
 /// <B> Typical Use </B>
-///
+/// 
 /// The typical use of \c TfSingleton is as follows:
 /// \code
 ///     // file: registry.h
@@ -63,7 +63,7 @@
 ///     #include "Tf/instantiateSingleton.h"
 ///
 ///     TF_INSTANTIATE_SINGLETON(Registry);
-///
+///     
 ///
 ///     // file: RandomCode.cpp
 ///     #include "common/astrology/registry.h"
@@ -87,12 +87,14 @@
 /// the longer \c TfSingleton<Registry>::GetInstance() to obtain a reference
 /// to the sole instance of the registry.
 
-#include "Arch/pragmas.h"
 #include "pxr/pxrns.h"
+#include "Arch/pragmas.h"
 
 #include <atomic>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+struct Tf_SingletonInitState;
 
 /// \class TfSingleton
 /// \ingroup group_tf_ObjectCreation
@@ -101,85 +103,90 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \ref TfSingleton_typicalUse "Typical Use" for a canonical example).
 ///
-template<class T> class TfSingleton {
- public:
-  /// Return a reference to an object of type \c T, creating it if
-  /// necessary.
-  ///
-  /// When \c GetInstance() is called for the first time, it creates an
-  /// object of type \c T, and returns a reference to it.  The type in
-  /// question must have a default constructor (i.e. a constructor taking no
-  /// arguments).
-  ///
-  /// Subsequent calls to \c GetInstance() return a reference to the same
-  /// object.  This call is threadsafe; simultaneous attempts to create an
-  /// object result in only one object being created; locking beyond this
-  /// (for example, letting only one thread at a time call a member
-  /// function) are the responsibility of the class author.
-  inline static T &GetInstance()
-  {
-    // Suppress undefined-var-template warnings from clang; _instance
-    // is expected to be instantiated in another translation unit via
-    // the TF_INSTANTIATE_SINGLETON macro.
-    ARCH_PRAGMA_PUSH
-    ARCH_PRAGMA_UNDEFINED_VAR_TEMPLATE
-    T *p = _instance.load();
-    if (!p) {
-      p = _CreateInstance(_instance);
+template <class T>
+class TfSingleton {
+public:
+    /// Return a reference to an object of type \c T, creating it if
+    /// necessary.
+    ///
+    /// When \c GetInstance() is called for the first time, it creates an
+    /// object of type \c T, and returns a reference to it.  The type in
+    /// question must have a default constructor (i.e. a constructor taking no
+    /// arguments).
+    ///
+    /// Subsequent calls to \c GetInstance() return a reference to the same
+    /// object.  This call is threadsafe; simultaneous attempts to create an
+    /// object result in only one object being created; locking beyond this
+    /// (for example, letting only one thread at a time call a member
+    /// function) are the responsibility of the class author.
+    inline static T& GetInstance() {
+        // Suppress undefined-var-template warnings from clang; _instance
+        // is expected to be instantiated in another translation unit via
+        // the TF_INSTANTIATE_SINGLETON macro.
+        ARCH_PRAGMA_PUSH
+        ARCH_PRAGMA_UNDEFINED_VAR_TEMPLATE
+        T *p = _instance.load();
+        if (!p) {
+            p = _CreateOrWaitForInstance(_instance);
+        }
+        ARCH_PRAGMA_POP
+        return *p;
     }
-    ARCH_PRAGMA_POP
-    return *p;
-  }
 
-  /// Return whether or not the single object of type \c T is currently in
-  /// existence.
-  ///
-  /// This call tests whether or not the singleton currently exists.
-  inline static bool CurrentlyExists()
-  {
-    // Suppress undefined-var-template warnings from clang; _instance
-    // is expected to be instantiated in another translation unit via
-    // the TF_INSTANTIATE_SINGLETON macro.
-    ARCH_PRAGMA_PUSH
-    ARCH_PRAGMA_UNDEFINED_VAR_TEMPLATE
-    return static_cast<bool>(_instance.load());
-    ARCH_PRAGMA_POP
-  }
+    /// Return whether or not the single object of type \c T is currently in
+    /// existence.
+    ///
+    /// This call tests whether or not the singleton currently exists.
+    inline static bool CurrentlyExists() {
+        // Suppress undefined-var-template warnings from clang; _instance
+        // is expected to be instantiated in another translation unit via
+        // the TF_INSTANTIATE_SINGLETON macro.
+        ARCH_PRAGMA_PUSH
+        ARCH_PRAGMA_UNDEFINED_VAR_TEMPLATE
+        return static_cast<bool>(_instance.load());
+        ARCH_PRAGMA_POP
+    }
 
-  /// Indicate that the sole instance object has already been created.
-  ///
-  /// This function is public, but can only be called usefully from within
-  /// the class T itself. This function is used to allow the constructor of
-  /// T to indicate that the sole instance of T has been created, and that
-  /// future calls to \c GetInstance() can immediately return \p instance.
-  ///
-  /// The need for this function occurs when the constructor of \c T
-  /// generates a call chain that leads to calling \c
-  /// TfSingleton<T>::GetInstance(). Until the constructor for \c T has
-  /// finished, however, \c TfSingleton<T>::GetInstance() is unable to
-  /// return a value. Calling \c SetInstanceConstructed() allows future
-  /// calls to \c TfSingleton<T>::GetInstance() to return before \c T's
-  /// constructor has finished.
-  ///
-  /// Be sure that \c T has been constructed (enough) before calling this
-  /// function. Calling this function anyplace but within the call chain of
-  /// \c T's constructor will generate a fatal coding error.
-  inline static void SetInstanceConstructed(T &instance);
+    /// Indicate that the sole instance object has already been created.
+    ///
+    /// This function is public, but should only be called by \c T 's
+    /// constructor. It makes the instance available to the calling thread for
+    /// initialization purposes during the remainder of \c T 's construction.
+    /// In contrast, concurrent threads that call GetInstance() will continue to
+    /// wait until construction is fully complete before returning the instance.
+    ///
+    /// The need for this function occurs when \c T's constructor generates a
+    /// call chain that calls back to \c TfSingleton<T>::GetInstance(). Normally
+    /// calls to \c TfSingleton<T>::GetInstance() during \c T's construction
+    /// will wait for construction to complete.  Calling \c
+    /// SetInstanceConstructed() lets future calls to \c
+    /// TfSingleton<T>::GetInstance() *by the same thread* that called
+    /// SetInstanceConstructed() to access the instance before \c T's
+    /// constructor has finished.  This is useful when the singleton's
+    /// constuctor calls TfRegistryManager::SubscribeTo(), for example.  The
+    /// invoked TF_REGISTRY_FUNCTION()s can successfully call GetInstance() to
+    /// access the singleton.
+    ///
+    /// Be sure that \c T has been constructed (enough) before calling this
+    /// function. Calling this function anywhere but within the call chain of \c
+    /// T's constructor will generate a fatal coding error.
+    inline static void SetInstanceConstructed(T& instance);
 
-  /// Destroy the sole instance object of type \c T, if it exists.
-  ///
-  /// A singleton can be destroyed by a call to \c DeleteInstance. This call
-  /// is threadsafe in the sense that competing simultaneous calls will not
-  /// result in double deletion; however, it is up to the user to ensure
-  /// that the instance is not being used in one thread during an attempt to
-  /// delete the instance from another thread.  After being destroyed, a
-  /// call to \c GetInstance() will create a new instance.
-  inline static void DeleteInstance();
-
- private:
-  static T *_CreateInstance(std::atomic<T *> &instance);
-
-  static std::atomic<T *> _instance;
+    /// Destroy the sole instance object of type \c T, if it exists.
+    ///
+    /// A singleton can be destroyed by a call to \c DeleteInstance. This call
+    /// is threadsafe in the sense that competing simultaneous calls will not
+    /// result in double deletion; however, it is up to the user to ensure
+    /// that the instance is not being used in one thread during an attempt to
+    /// delete the instance from another thread.  After being destroyed, a
+    /// call to \c GetInstance() will create a new instance.
+    inline static void DeleteInstance();
+    
+private:
+    static T *_CreateOrWaitForInstance(std::atomic<T *> &instance);
+    
+    static std::atomic<T *> _instance;
+    static std::atomic<Tf_SingletonInitState *> _initState;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

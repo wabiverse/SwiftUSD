@@ -10,36 +10,42 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 UsdImagingAPISchemaAdapter::~UsdImagingAPISchemaAdapter() = default;
 
-TfTokenVector UsdImagingAPISchemaAdapter::GetImagingSubprims(UsdPrim const &prim,
-                                                             TfToken const &appliedInstanceName)
+TfTokenVector
+UsdImagingAPISchemaAdapter::GetImagingSubprims(
+    UsdPrim const& prim,
+    TfToken const& appliedInstanceName)
 {
-  return TfTokenVector();
+    return TfTokenVector();
 }
 
-TfToken UsdImagingAPISchemaAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                          TfToken const &subprim,
-                                                          TfToken const &appliedInstanceName)
+TfToken
+UsdImagingAPISchemaAdapter::GetImagingSubprimType(
+    UsdPrim const& prim,
+    TfToken const& subprim,
+    TfToken const& appliedInstanceName)
 {
-  return TfToken();
+    return TfToken();
 }
 
-HdContainerDataSourceHandle UsdImagingAPISchemaAdapter::GetImagingSubprimData(
-    UsdPrim const &prim,
-    TfToken const &subprim,
-    TfToken const &appliedInstanceName,
+HdContainerDataSourceHandle
+UsdImagingAPISchemaAdapter::GetImagingSubprimData(
+    UsdPrim const& prim,
+    TfToken const& subprim,
+    TfToken const& appliedInstanceName,
     const UsdImagingDataSourceStageGlobals &stageGlobals)
 {
-  return nullptr;
+    return nullptr;
 }
 
-HdDataSourceLocatorSet UsdImagingAPISchemaAdapter::InvalidateImagingSubprim(
-    UsdPrim const &prim,
-    TfToken const &subprim,
-    TfToken const &appliedInstanceName,
-    TfTokenVector const &properties,
+HdDataSourceLocatorSet
+UsdImagingAPISchemaAdapter::InvalidateImagingSubprim(
+    UsdPrim const& prim,
+    TfToken const& subprim,
+    TfToken const& appliedInstanceName,
+    TfTokenVector const& properties,
     const UsdImagingPropertyInvalidationType invalidationType)
 {
-  return HdDataSourceLocatorSet();
+    return HdDataSourceLocatorSet();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

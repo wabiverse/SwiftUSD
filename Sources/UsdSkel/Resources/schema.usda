@@ -3,14 +3,14 @@
     """ This file contains a schema for supporting skeletal animations in USD.
     """
     subLayers = [
-        @UsdGeom/schema.usda@
+        @usdGeom/schema.usda@
     ]
 ) 
 
 over "GLOBAL" (
     customData = {
-        string libraryName       = "UsdSkel"
-        string libraryPath       = "UsdSkel"
+        string libraryName       = "usdSkel"
+        string libraryPath       = "pxr/usd/usdSkel"
 
         dictionary libraryTokens = {
             dictionary weight = {
@@ -57,7 +57,7 @@ class Skeleton "Skeleton" (
         }
 
         string extraIncludes = """
-#include "UsdSkel/topology.h" """
+#include "pxr/usd/usdSkel/topology.h" """
     }
 ) {
     uniform token[] joints (
@@ -129,7 +129,8 @@ class SkelAnimation "SkelAnimation" (
          doc = """Array of tokens identifying which blend shapes this
          animation's data applies to. The tokens for blendShapes correspond to
          the tokens set in the *skel:blendShapes* binding property of the
-         UsdSkelBindingAPI."""
+         UsdSkelBindingAPI. Note that blendShapes does not accept time-sampled
+         values."""
     )
 
     float[] blendShapeWeights (
@@ -138,14 +139,6 @@ class SkelAnimation "SkelAnimation" (
         *blendShapes* token array, and therefore must have the same length as
         *blendShapes."""
     )
-}
-
-
-class PackedJointAnimation "PackedJointAnimation" (
-    inherits = </SkelAnimation>
-    doc = """Deprecated. Please use SkelAnimation instead."""
-)
-{
 }
 
 class "SkelBindingAPI" (
@@ -160,9 +153,9 @@ class "SkelBindingAPI" (
     customData = {
         string className = "BindingAPI"
         string extraIncludes = """
-#include "Tf/span.h"
-#include "UsdGeom/primvar.h"
-#include "UsdSkel/skeleton.h" """
+#include "pxr/base/tf/span.h"
+#include "pxr/usd/usdGeom/primvar.h"
+#include "pxr/usd/usdSkel/skeleton.h" """
     }
 )
 {
@@ -272,8 +265,8 @@ class BlendShape "BlendShape" (
       """
     customData = {
         string extraIncludes = """
-#include "Tf/span.h"
-#include "UsdSkel/inbetweenShape.h" """
+#include "pxr/base/tf/span.h"
+#include "pxr/usd/usdSkel/inbetweenShape.h" """
     }
 )
 {

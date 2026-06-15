@@ -1,14 +1,14 @@
 #usda 1.0
 (
 	subLayers = [
-        @UsdGeom/schema.usda@
+        @usdGeom/schema.usda@
 	]
 )
 
 over "GLOBAL" (
 	customData = {
-	string libraryName = "UsdPhysics"
-	string libraryPath = "UsdPhysics"
+	string libraryName = "usdPhysics"
+	string libraryPath = "pxr/usd/usdPhysics"
     bool useLiteralIdentifier = 0
     dictionary libraryTokens = {
         dictionary colliders = {
@@ -120,13 +120,15 @@ class "PhysicsRigidBodyAPI"
     customData = {
         string className = "RigidBodyAPI"
         string extraIncludes = """
-#include "Gf/matrix3f.h"
-#include "Gf/quatf.h" """
+#include "pxr/base/gf/matrix3f.h"
+#include "pxr/base/gf/quatf.h" """
     }
     doc = """Applies physics body attributes to any UsdGeomXformable prim and
     marks that prim to be driven by a simulation. If a simulation is running
     it will update this prim's pose. All prims in the hierarchy below this 
-    prim should move accordingly."""
+    prim should move rigidly along with the body, except when the descendant
+    prim has its own UsdPhysicsRigidBodyAPI (marking a separate rigid body
+    subtree which moves independently of the parent rigid body)."""
 
     inherits = </APISchemaBase>
     
@@ -275,9 +277,10 @@ class "PhysicsCollisionAPI"
     }
     doc = """Applies collision attributes to a UsdGeomXformable prim. If a 
     simulation is running, this geometry will collide with other geometries that 
-    have PhysicsCollisionAPI applied. If a prim in the parent hierarchy has the
-    RigidBodyAPI applied, this collider is a part of that body. If there is 
-    no body in the parent hierarchy, this collider is considered to be static."""
+    have PhysicsCollisionAPI applied. If any prim in the parent hierarchy has
+    the RigidBodyAPI applied, the collider is considered a part of the closest
+    ancestor body. If there is no body in the parent hierarchy, this collider
+    is considered to be static."""
 
     inherits = </APISchemaBase>
 )
@@ -391,7 +394,7 @@ class PhysicsCollisionGroup "PhysicsCollisionGroup"
     customData = {
         string className = "CollisionGroup"
         string extraIncludes = """
-#include "Usd/collectionAPI.h" """
+#include "pxr/usd/usd/collectionAPI.h" """
     }    
     doc = """Defines a collision group for coarse filtering. When a collision 
     occurs between two objects that have a PhysicsCollisionGroup assigned,

@@ -7,15 +7,19 @@
 #include "Tf/diagnostic.h"
 #include "Tf/pyEnum.h"
 
-#include <boost/python/def.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 void wrapDiagnostic()
 {
-  TfPyWrapEnum<TfDiagnosticType>();
+    TfPyWrapEnum<TfDiagnosticType>();
 
-  def("InstallTerminateAndCrashHandlers", TfInstallTerminateAndCrashHandlers);
+    def("InstallTerminateAndCrashHandlers",
+        TfInstallTerminateAndCrashHandlers);
+
 }

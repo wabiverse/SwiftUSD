@@ -8,10 +8,6 @@
 
 #include "config.hpp"
 
-#if defined(_WIN32)
-# include <__msvc_string_view.hpp>
-#endif // defined(_WIN32)
-
 // ensure a consistent interface
 namespace PXR_PEGTL_NAMESPACE
 {

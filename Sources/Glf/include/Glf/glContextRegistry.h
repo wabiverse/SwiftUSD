@@ -9,14 +9,15 @@
 
 /// \file glf/glContextRegistry.h
 
+#include "pxr/pxrns.h"
 #include "Glf/glContext.h"
 #include "Tf/singleton.h"
-#include "pxr/pxrns.h"
 
 #include <memory>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 struct GlfGLContextRegistry_Data;
 
@@ -26,48 +27,50 @@ typedef std::shared_ptr<class GlfGLContext> GlfGLContextSharedPtr;
 ///
 /// Registry of GlfGLContexts.
 ///
-class GlfGLContextRegistry {
- public:
-  static GlfGLContextRegistry &GetInstance()
-  {
-    return TfSingleton<GlfGLContextRegistry>::GetInstance();
-  }
+class GlfGLContextRegistry
+{
+public:
+    static GlfGLContextRegistry& GetInstance()
+    {
+        return TfSingleton<GlfGLContextRegistry>::GetInstance();
+    }
 
-  /// Returns whether the registry has any registered interfaces.
-  bool IsInitialized() const;
+    /// Returns whether the registry has any registered interfaces.
+    bool IsInitialized() const;
 
-  /// Add a registration object to the registry.  This takes ownership
-  /// of the object.
-  void Add(GlfGLContextRegistrationInterface *);
+    /// Add a registration object to the registry.  This takes ownership
+    /// of the object.
+    void Add(GlfGLContextRegistrationInterface*);
 
-  /// Returns the shared context, if any.
-  GlfGLContextSharedPtr GetShared();
+    /// Returns the shared context, if any.
+    GlfGLContextSharedPtr GetShared();
 
-  /// Returns the context that matches the raw context, if any.
-  GlfGLContextSharedPtr GetCurrent();
+    /// Returns the context that matches the raw context, if any.
+    GlfGLContextSharedPtr GetCurrent();
 
-  /// Registers this context.  It must be current.
-  void DidMakeCurrent(const GlfGLContextSharedPtr &context);
+    /// Registers this context.  It must be current.
+    void DidMakeCurrent(const GlfGLContextSharedPtr& context);
 
-  /// Removes the context.
-  void Remove(const GlfGLContext *context);
+    /// Removes the context.
+    void Remove(const GlfGLContext* context);
 
- private:
-  GlfGLContextRegistry();
-  ~GlfGLContextRegistry();
+private:
+    GlfGLContextRegistry();
+    ~GlfGLContextRegistry();
 
-  // Non-copyable
-  GlfGLContextRegistry(const GlfGLContextRegistry &) = delete;
-  GlfGLContextRegistry &operator=(const GlfGLContextRegistry &) = delete;
+    // Non-copyable
+    GlfGLContextRegistry(const GlfGLContextRegistry &) = delete;
+    GlfGLContextRegistry &operator=(const GlfGLContextRegistry &) = delete;
 
-  friend class TfSingleton<GlfGLContextRegistry>;
+    friend class TfSingleton<GlfGLContextRegistry>;
 
- private:
-  std::vector<std::unique_ptr<GlfGLContextRegistrationInterface>> _interfaces;
-  bool _sharedContextInitialized;
-  GlfGLContextSharedPtr _shared;
-  std::unique_ptr<GlfGLContextRegistry_Data> _data;
+private:
+    std::vector<std::unique_ptr<GlfGLContextRegistrationInterface>> _interfaces;
+    bool _sharedContextInitialized;
+    GlfGLContextSharedPtr _shared;
+    std::unique_ptr<GlfGLContextRegistry_Data> _data;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

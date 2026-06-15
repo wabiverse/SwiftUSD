@@ -19,166 +19,198 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCapsuleSchemaTokens, HD_CAPSULE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCapsuleSchemaTokens,
+    HD_CAPSULE_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdDoubleDataSourceHandle HdCapsuleSchema::GetHeight() const
+HdDoubleDataSourceHandle
+HdCapsuleSchema::GetHeight() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCapsuleSchemaTokens->height);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCapsuleSchemaTokens->height);
 }
 
-HdDoubleDataSourceHandle HdCapsuleSchema::GetRadius() const
+HdDoubleDataSourceHandle
+HdCapsuleSchema::GetRadius() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCapsuleSchemaTokens->radius);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCapsuleSchemaTokens->radius);
 }
 
-HdDoubleDataSourceHandle HdCapsuleSchema::GetRadiusTop() const
+HdDoubleDataSourceHandle
+HdCapsuleSchema::GetRadiusTop() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCapsuleSchemaTokens->radiusTop);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCapsuleSchemaTokens->radiusTop);
 }
 
-HdDoubleDataSourceHandle HdCapsuleSchema::GetRadiusBottom() const
+HdDoubleDataSourceHandle
+HdCapsuleSchema::GetRadiusBottom() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCapsuleSchemaTokens->radiusBottom);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCapsuleSchemaTokens->radiusBottom);
 }
 
-HdTokenDataSourceHandle HdCapsuleSchema::GetAxis() const
+HdTokenDataSourceHandle
+HdCapsuleSchema::GetAxis() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdCapsuleSchemaTokens->axis);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdCapsuleSchemaTokens->axis);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdCapsuleSchema::BuildRetained(
-    const HdDoubleDataSourceHandle &height,
-    const HdDoubleDataSourceHandle &radius,
-    const HdDoubleDataSourceHandle &radiusTop,
-    const HdDoubleDataSourceHandle &radiusBottom,
-    const HdTokenDataSourceHandle &axis)
+HdContainerDataSourceHandle
+HdCapsuleSchema::BuildRetained(
+        const HdDoubleDataSourceHandle &height,
+        const HdDoubleDataSourceHandle &radius,
+        const HdDoubleDataSourceHandle &radiusTop,
+        const HdDoubleDataSourceHandle &radiusBottom,
+        const HdTokenDataSourceHandle &axis
+)
 {
-  TfToken _names[5];
-  HdDataSourceBaseHandle _values[5];
+    TfToken _names[5];
+    HdDataSourceBaseHandle _values[5];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (height) {
-    _names[_count] = HdCapsuleSchemaTokens->height;
-    _values[_count++] = height;
-  }
+    if (height) {
+        _names[_count] = HdCapsuleSchemaTokens->height;
+        _values[_count++] = height;
+    }
 
-  if (radius) {
-    _names[_count] = HdCapsuleSchemaTokens->radius;
-    _values[_count++] = radius;
-  }
+    if (radius) {
+        _names[_count] = HdCapsuleSchemaTokens->radius;
+        _values[_count++] = radius;
+    }
 
-  if (radiusTop) {
-    _names[_count] = HdCapsuleSchemaTokens->radiusTop;
-    _values[_count++] = radiusTop;
-  }
+    if (radiusTop) {
+        _names[_count] = HdCapsuleSchemaTokens->radiusTop;
+        _values[_count++] = radiusTop;
+    }
 
-  if (radiusBottom) {
-    _names[_count] = HdCapsuleSchemaTokens->radiusBottom;
-    _values[_count++] = radiusBottom;
-  }
+    if (radiusBottom) {
+        _names[_count] = HdCapsuleSchemaTokens->radiusBottom;
+        _values[_count++] = radiusBottom;
+    }
 
-  if (axis) {
-    _names[_count] = HdCapsuleSchemaTokens->axis;
-    _values[_count++] = axis;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (axis) {
+        _names[_count] = HdCapsuleSchemaTokens->axis;
+        _values[_count++] = axis;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetHeight(
+HdCapsuleSchema::Builder &
+HdCapsuleSchema::Builder::SetHeight(
     const HdDoubleDataSourceHandle &height)
 {
-  _height = height;
-  return *this;
+    _height = height;
+    return *this;
 }
 
-HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetRadius(
+HdCapsuleSchema::Builder &
+HdCapsuleSchema::Builder::SetRadius(
     const HdDoubleDataSourceHandle &radius)
 {
-  _radius = radius;
-  return *this;
+    _radius = radius;
+    return *this;
 }
 
-HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetRadiusTop(
+HdCapsuleSchema::Builder &
+HdCapsuleSchema::Builder::SetRadiusTop(
     const HdDoubleDataSourceHandle &radiusTop)
 {
-  _radiusTop = radiusTop;
-  return *this;
+    _radiusTop = radiusTop;
+    return *this;
 }
 
-HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetRadiusBottom(
+HdCapsuleSchema::Builder &
+HdCapsuleSchema::Builder::SetRadiusBottom(
     const HdDoubleDataSourceHandle &radiusBottom)
 {
-  _radiusBottom = radiusBottom;
-  return *this;
+    _radiusBottom = radiusBottom;
+    return *this;
 }
 
-HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetAxis(const HdTokenDataSourceHandle &axis)
+HdCapsuleSchema::Builder &
+HdCapsuleSchema::Builder::SetAxis(
+    const HdTokenDataSourceHandle &axis)
 {
-  _axis = axis;
-  return *this;
+    _axis = axis;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdCapsuleSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdCapsuleSchema::Builder::Build()
 {
-  return HdCapsuleSchema::BuildRetained(_height, _radius, _radiusTop, _radiusBottom, _axis);
+    return HdCapsuleSchema::BuildRetained(
+        _height,
+        _radius,
+        _radiusTop,
+        _radiusBottom,
+        _axis
+    );
 }
 
 /*static*/
-HdCapsuleSchema HdCapsuleSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdCapsuleSchema
+HdCapsuleSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdCapsuleSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(HdCapsuleSchemaTokens->capsule)) :
-          nullptr);
+    return HdCapsuleSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdCapsuleSchemaTokens->capsule))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdCapsuleSchema::GetSchemaToken()
+const TfToken &
+HdCapsuleSchema::GetSchemaToken()
 {
-  return HdCapsuleSchemaTokens->capsule;
+    return HdCapsuleSchemaTokens->capsule;
 }
 
 /*static*/
-const HdDataSourceLocator &HdCapsuleSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdCapsuleSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /*static*/
-HdTokenDataSourceHandle HdCapsuleSchema::BuildAxisDataSource(const TfToken &axis)
+HdTokenDataSourceHandle
+HdCapsuleSchema::BuildAxisDataSource(
+    const TfToken &axis)
 {
 
-  if (axis == HdCapsuleSchemaTokens->X) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  if (axis == HdCapsuleSchemaTokens->Y) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  if (axis == HdCapsuleSchemaTokens->Z) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  // fallback for unknown token
-  return HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-}
+    if (axis == HdCapsuleSchemaTokens->X) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    if (axis == HdCapsuleSchemaTokens->Y) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    if (axis == HdCapsuleSchemaTokens->Z) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    // fallback for unknown token
+    return HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

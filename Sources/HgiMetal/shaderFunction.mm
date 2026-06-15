@@ -46,6 +46,7 @@ HgiMetalShaderFunction::HgiMetalShaderFunction(
             [hgi->GetPrimaryDevice() newLibraryWithSource:@(shaderCode)
                                                         options:options
                                                         error:&error];
+
 #if !__has_feature(objc_arc)
         [options release];
 #endif // !__has_feature(objc_arc)
@@ -84,6 +85,7 @@ HgiMetalShaderFunction::HgiMetalShaderFunction(
         else {
             HGIMETAL_DEBUG_LABEL(_shaderId, _descriptor.debugName.c_str());
         }
+        
 #if !__has_feature(objc_arc)
         [library release];
 #endif // !__has_feature(objc_arc)

@@ -4,8 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Tf/mallocTag.h"
 #include "pxr/pxrns.h"
+#include "Tf/mallocTag.h"
 
 #include "Tf/diagnosticLite.h"
 #include "Tf/fileUtils.h"
@@ -16,11 +16,15 @@
 #include "Arch/fileSystem.h"
 #include "Arch/symbols.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/scope.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/scope.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include <fstream>
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <string>
 #include <vector>
@@ -28,173 +32,211 @@
 using std::string;
 using std::vector;
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
-static bool _Initialize()
+static bool
+_Initialize()
 {
-  string reason;
-  return TfMallocTag::Initialize(&reason);
+    string reason;
+    return TfMallocTag::Initialize(&reason);
 }
 
-static bool _Initialize2(const std::string &captureTag)
+static bool
+_Initialize2(const std::string& captureTag)
 {
-  string reason;
-  bool result = TfMallocTag::Initialize(&reason);
-  if (result) {
-    TfMallocTag::SetCapturedMallocStacksMatchList(captureTag);
-  }
-  return result;
+    string reason;
+    bool result = TfMallocTag::Initialize(&reason);
+    if (result) {
+        TfMallocTag::SetCapturedMallocStacksMatchList(captureTag);
+    }
+    return result;
 }
 
-static TfMallocTag::CallTree _GetCallTree()
+static TfMallocTag::CallTree
+_GetCallTree(const bool skipRepeated)
 {
-  TfMallocTag::CallTree ret;
-  TfMallocTag::GetCallTree(&ret);
-  return ret;
+    TfMallocTag::CallTree ret;
+    TfMallocTag::GetCallTree(&ret, skipRepeated);
+    return ret;
 }
 
-static std::vector<std::string> _GetCallStacks()
+static
+std::vector<std::string>
+_GetCallStacks()
 {
-  std::vector<std::vector<uintptr_t>> stacks = TfMallocTag::GetCapturedMallocStacks();
+    std::vector<std::vector<uintptr_t> > stacks =
+        TfMallocTag::GetCapturedMallocStacks();
 
-  // Cache address to function name map, one lookup per address.
-  std::map<uintptr_t, std::string> functionNames;
-  TF_FOR_ALL(stack, stacks)
-  {
-    TF_FOR_ALL(func, *stack)
-    {
-      std::string &name = functionNames[*func];
-      if (name.empty()) {
-        ArchGetAddressInfo(reinterpret_cast<void *>(*func), NULL, NULL, &name, NULL);
-        if (name.empty()) {
-          name = "<unknown>";
+    // Cache address to function name map, one lookup per address.
+    std::map<uintptr_t, std::string> functionNames;
+    TF_FOR_ALL(stack, stacks) {
+        TF_FOR_ALL(func, *stack) {
+            std::string& name = functionNames[*func];
+            if (name.empty()) {
+                ArchGetAddressInfo(reinterpret_cast<void*>(*func),
+                                   NULL, NULL, &name, NULL);
+                if (name.empty()) {
+                    name = "<unknown>";
+                }
+            }
         }
-      }
     }
-  }
 
-  std::vector<std::string> result;
-  TF_FOR_ALL(stack, stacks)
-  {
-    result.push_back(std::string());
-    std::string &trace = result.back();
-    TF_FOR_ALL(func, *stack)
-    {
-      trace += TfStringPrintf(
-          "  0x%016lx: %s\n", (unsigned long)*func, functionNames[*func].c_str());
+    std::vector<std::string> result;
+    TF_FOR_ALL(stack, stacks) {
+        result.push_back(std::string());
+        std::string& trace = result.back();
+        TF_FOR_ALL(func, *stack) {
+            trace += TfStringPrintf("  0x%016lx: %s\n",
+                                    (unsigned long)*func,
+                                    functionNames[*func].c_str());
+        }
+        trace += '\n';
     }
-    trace += '\n';
-  }
-  return result;
+    return result;
 }
 
-static string _GetPrettyPrintString(TfMallocTag::CallTree const &self)
+static string
+_GetPrettyPrintString(TfMallocTag::CallTree const &self)
 {
-  return self.GetPrettyPrintString();
+    return self.GetPrettyPrintString();
 }
 
-static vector<TfMallocTag::CallTree::CallSite> _GetCallSites(TfMallocTag::CallTree const &self)
+static vector<TfMallocTag::CallTree::CallSite>
+_GetCallSites(TfMallocTag::CallTree const &self)
 {
-  return self.callSites;
+    return self.callSites;
 }
 
-static TfMallocTag::CallTree::PathNode _GetRoot(TfMallocTag::CallTree const &self)
+static TfMallocTag::CallTree::PathNode
+_GetRoot(TfMallocTag::CallTree const &self)
 {
-  return self.root;
+    return self.root;
 }
 
-static vector<TfMallocTag::CallTree::PathNode> _GetChildren(
-    TfMallocTag::CallTree::PathNode const &self)
+static vector<TfMallocTag::CallTree::PathNode>
+_GetChildren(TfMallocTag::CallTree::PathNode const &self)
 {
-  return self.children;
+    return self.children;
 }
 
-static void _Report(TfMallocTag::CallTree const &self, std::string const &rootName)
+static void
+_Report(
+    TfMallocTag::CallTree const &self,
+    std::string const &rootName)
 {
-  self.Report(std::cout, rootName);
+    self.Report(std::cout, rootName);
 }
 
-static void _ReportToFile(TfMallocTag::CallTree const &self,
-                          std::string const &fileName,
-                          std::string const &rootName)
+static void
+_ReportToFile(
+    TfMallocTag::CallTree const &self,
+    std::string const &fileName,
+    std::string const &rootName)
 {
-  std::ofstream os(fileName.c_str());
-  self.Report(os, rootName);
+    std::ofstream os(fileName.c_str());
+    self.Report(os, rootName);
 }
 
-static bool _LoadReport(TfMallocTag::CallTree &self, std::string const &fileName)
+static bool
+_LoadReport(
+    TfMallocTag::CallTree  &self,
+    std::string const &fileName)
 {
-  std::ifstream in(fileName.c_str());
-  if (!in.good()) {
-    TF_RUNTIME_ERROR("Failed to open file '%s'.", fileName.c_str());
-    return false;
-  }
+    std::ifstream in(fileName.c_str());
+    if (!in.good()) {
+        TF_RUNTIME_ERROR(
+            "Failed to open file '%s'.", fileName.c_str());
+        return false;
+    }
 
-  return self.LoadReport(in);
+    return self.LoadReport(in);
 }
 
-static std::string _LogReport(TfMallocTag::CallTree const &self, std::string const &rootName)
+static std::string
+_LogReport(
+    TfMallocTag::CallTree const &self,
+    std::string const &rootName)
 {
-  string tmpFile;
-  ArchMakeTmpFile(std::string("callSiteReport") + (rootName.empty() ? "" : "_") + rootName,
-                  &tmpFile);
+    string tmpFile;
+    int fd = ArchMakeTmpFile(std::string("callSiteReport") +
+        (rootName.empty() ? "" : "_") + rootName, &tmpFile);
+    if (fd == -1) {
+        TF_RUNTIME_ERROR(
+            "Failed to make temporary file '%s'.", tmpFile.c_str());
+        return std::string();
+    }
 
-  _ReportToFile(self, tmpFile, rootName);
-  return tmpFile;
+    ArchCloseFile(fd);
+    _ReportToFile(self, tmpFile, rootName);
+    return tmpFile;
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapMallocTag()
 {
-  typedef TfMallocTag This;
+    typedef TfMallocTag This;
+    
+    scope mallocTag = class_<This>("MallocTag", no_init)
+        .def("Initialize", _Initialize)
+        .def("Initialize", _Initialize2)
+            // Note: Both Initialize overloads are made static by this single
+            // registration.
+            .staticmethod("Initialize")
+        .def("IsInitialized", This::IsInitialized)
+            .staticmethod("IsInitialized")
+        .def("GetTotalBytes", This::GetTotalBytes)
+            .staticmethod("GetTotalBytes")
+        .def("GetMaxTotalBytes", This::GetMaxTotalBytes)
+            .staticmethod("GetMaxTotalBytes")
+        .def("GetCallTree", _GetCallTree, (arg("skipRepeated")=true))
+            .staticmethod("GetCallTree")
 
-  scope mallocTag =
-      class_<This>("MallocTag", no_init)
-          .def("Initialize", _Initialize2)
-          .def("Initialize", _Initialize)
-          .staticmethod("Initialize")
-          .def("IsInitialized", This::IsInitialized)
-          .staticmethod("IsInitialized")
-          .def("GetTotalBytes", This::GetTotalBytes)
-          .staticmethod("GetTotalBytes")
-          .def("GetMaxTotalBytes", This::GetMaxTotalBytes)
-          .staticmethod("GetMaxTotalBytes")
-          .def("GetCallTree", _GetCallTree)
-          .staticmethod("GetCallTree")
+        .def("SetCapturedMallocStacksMatchList",
+             This::SetCapturedMallocStacksMatchList)
+            .staticmethod("SetCapturedMallocStacksMatchList")
+        .def("GetCallStacks", _GetCallStacks,
+             return_value_policy<TfPySequenceToList>())
+            .staticmethod("GetCallStacks")
 
-          .def("SetCapturedMallocStacksMatchList", This::SetCapturedMallocStacksMatchList)
-          .staticmethod("SetCapturedMallocStacksMatchList")
-          .def("GetCallStacks", _GetCallStacks, return_value_policy<TfPySequenceToList>())
-          .staticmethod("GetCallStacks")
+        .def("SetDebugMatchList", This::SetDebugMatchList)
+            .staticmethod("SetDebugMatchList")
+        ;
 
-          .def("SetDebugMatchList", This::SetDebugMatchList)
-          .staticmethod("SetDebugMatchList");
-
-  {
-    scope callTree =
-        class_<This::CallTree>("CallTree", no_init)
-            .def("GetPrettyPrintString", _GetPrettyPrintString)
-            .def("GetCallSites", _GetCallSites, return_value_policy<TfPySequenceToList>())
-            .def("GetRoot", _GetRoot)
-            .def("Report", _Report, (arg("rootName") = std::string()))
-            .def("Report", _ReportToFile, (arg("fileName"), arg("rootName") = std::string()))
-            .def("LoadReport", _LoadReport, (arg("fileName")))
-            .def("LogReport", _LogReport, (arg("rootName") = std::string()));
+    {
+    scope callTree = class_<This::CallTree>("CallTree")
+        .def("GetPrettyPrintString", _GetPrettyPrintString)
+        .def("GetCallSites", _GetCallSites,
+             return_value_policy<TfPySequenceToList>())
+        .def("GetRoot", _GetRoot)
+        .def("Report", _Report,
+            (arg("rootName")=std::string()))
+        .def("Report", _ReportToFile,
+             (arg("fileName"), arg("rootName")=std::string()))
+        .def("LoadReport", _LoadReport,
+             (arg("fileName")))
+        .def("LogReport", _LogReport,
+             (arg("rootName")=std::string()))
+        ;
 
     class_<This::CallTree::PathNode>("PathNode", no_init)
         .def_readonly("nBytes", &This::CallTree::PathNode::nBytes)
         .def_readonly("nBytesDirect", &This::CallTree::PathNode::nBytesDirect)
         .def_readonly("nAllocations", &This::CallTree::PathNode::nAllocations)
         .def_readonly("siteName", &This::CallTree::PathNode::siteName)
-        .def("GetChildren", _GetChildren, return_value_policy<TfPySequenceToList>());
+        .def("GetChildren", _GetChildren,
+             return_value_policy<TfPySequenceToList>())
+        ;
 
     class_<This::CallTree::CallSite>("CallSite", no_init)
         .def_readonly("name", &This::CallTree::CallSite::name)
-        .def_readonly("nBytes", &This::CallTree::CallSite::nBytes);
-  }
+        .def_readonly("nBytes", &This::CallTree::CallSite::nBytes)
+        ;
+    }
+
 }

@@ -9,11 +9,11 @@
 
 #include "pxr/pxrns.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
 
-#  include "Tf/pySafePython.h"
+#include "Tf/pySafePython.h"
 
-#  include "Tf/api.h"
+#include "Tf/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -103,54 +103,54 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// that could be shared across multiple threads.
 ///
 class TfPyLock {
- public:
-  /// Acquires the Python GIL and swaps in callers thread state.
-  TF_API TfPyLock();
+public:
+    /// Acquires the Python GIL and swaps in callers thread state.
+    TF_API TfPyLock();
 
-  /// Releases Python GIL and restores prior threads state.
-  TF_API ~TfPyLock();
+    /// Releases Python GIL and restores prior threads state.
+    TF_API ~TfPyLock();
 
-  /// (Re)acquires GIL and thread state, if previously released.
-  TF_API void Acquire();
+    /// (Re)acquires GIL and thread state, if previously released.
+    TF_API void Acquire();
 
-  /// Explicitly releases GIL and thread state.
-  TF_API void Release();
+    /// Explicitly releases GIL and thread state.
+    TF_API void Release();
 
-  /// Unlock the GIL temporarily to allow other threads to use python.
-  /// Typically this is used to unblock threads during operations like
-  /// blocking I/O.  The lock must be acquired when called.
-  TF_API void BeginAllowThreads();
+    /// Unlock the GIL temporarily to allow other threads to use python.
+    /// Typically this is used to unblock threads during operations like
+    /// blocking I/O.  The lock must be acquired when called.
+    TF_API void BeginAllowThreads();
 
-  /// End allowing other threads, reacquiring the lock state.
-  /// \a BeginAllowThreads must have been successfully called first.
-  TF_API void EndAllowThreads();
+    /// End allowing other threads, reacquiring the lock state.
+    /// \a BeginAllowThreads must have been successfully called first.
+    TF_API void EndAllowThreads();
 
- private:
-  // Non-acquiring constructor for TfPyEnsureGILUnlockedObj's use.
-  friend struct TfPyEnsureGILUnlockedObj;
-  enum _UnlockedTag { _ConstructUnlocked };
-  explicit TfPyLock(_UnlockedTag);
+private:
+    // Non-acquiring constructor for TfPyEnsureGILUnlockedObj's use.
+    friend struct TfPyEnsureGILUnlockedObj;
+    enum _UnlockedTag { _ConstructUnlocked };
+    explicit TfPyLock(_UnlockedTag);
 
-  PyGILState_STATE _gilState;
-  PyThreadState *_savedState;
-  bool _acquired : 1;
-  bool _allowingThreads : 1;
+    PyGILState_STATE _gilState;
+    PyThreadState *_savedState;
+    bool _acquired:1;
+    bool _allowingThreads:1;
 };
 
 // Helper class for TF_PY_ALLOW_THREADS_IN_SCOPE()
-struct TfPyEnsureGILUnlockedObj {
-  // Do nothing if the current thread does not have the GIL, otherwise unlock
-  // the GIL, and relock upon destruction.
-  TF_API TfPyEnsureGILUnlockedObj();
-
- private:
-  TfPyLock _lock;
+struct TfPyEnsureGILUnlockedObj
+{
+    // Do nothing if the current thread does not have the GIL, otherwise unlock
+    // the GIL, and relock upon destruction.
+    TF_API TfPyEnsureGILUnlockedObj();
+private:
+    TfPyLock _lock;
 };
 
 /// If the current thread of execution has the python GIL, release it,
 /// allowing python threads to run, then upon leaving the current scope
 /// reacquire the python GIL. Otherwise, do nothing.
-///
+/// 
 /// For example:
 /// \code
 /// {
@@ -170,15 +170,16 @@ struct TfPyEnsureGILUnlockedObj {
 /// \endcode
 ///
 /// \hideinitializer
-#  define TF_PY_ALLOW_THREADS_IN_SCOPE() TfPyEnsureGILUnlockedObj __py_lock_allow_threads__
+#define TF_PY_ALLOW_THREADS_IN_SCOPE()                  \
+    TfPyEnsureGILUnlockedObj __py_lock_allow_threads__
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#else
+#else 
 
 // When python is disabled, we stub this macro out to nothing.
-#  define TF_PY_ALLOW_THREADS_IN_SCOPE()
+#define TF_PY_ALLOW_THREADS_IN_SCOPE()
 
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif  // PXR_BASE_TF_PY_LOCK_H
+#endif // PXR_BASE_TF_PY_LOCK_H

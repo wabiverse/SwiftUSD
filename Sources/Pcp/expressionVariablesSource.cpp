@@ -4,8 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Pcp/expressionVariablesSource.h"
 #include "pxr/pxrns.h"
+#include "Pcp/expressionVariablesSource.h"
 
 #include "Pcp/cache.h"
 #include "Pcp/layerStackIdentifier.h"
@@ -15,65 +15,74 @@ PXR_NAMESPACE_OPEN_SCOPE
 PcpExpressionVariablesSource::PcpExpressionVariablesSource() = default;
 
 PcpExpressionVariablesSource::PcpExpressionVariablesSource(
-    const PcpLayerStackIdentifier &layerStackIdentifier,
-    const PcpLayerStackIdentifier &rootLayerStackIdentifier)
-    : _identifier(layerStackIdentifier == rootLayerStackIdentifier ?
-                      nullptr :
-                      new PcpLayerStackIdentifier(layerStackIdentifier))
+    const PcpLayerStackIdentifier& layerStackIdentifier,
+    const PcpLayerStackIdentifier& rootLayerStackIdentifier)
+    : _identifier(
+        layerStackIdentifier == rootLayerStackIdentifier ?
+        nullptr : new PcpLayerStackIdentifier(layerStackIdentifier))
 {
 }
 
 PcpExpressionVariablesSource::~PcpExpressionVariablesSource() = default;
 
-size_t PcpExpressionVariablesSource::GetHash() const
+size_t
+PcpExpressionVariablesSource::GetHash() const
 {
-  return _identifier ? TfHash()(*_identifier) : TfHash()(0);
+    return _identifier ? TfHash()(*_identifier) : TfHash()(0);
 }
 
-bool PcpExpressionVariablesSource::operator==(const PcpExpressionVariablesSource &rhs) const
+bool 
+PcpExpressionVariablesSource::operator==(
+    const PcpExpressionVariablesSource& rhs) const
 {
-  if (this == &rhs) {
-    return true;
-  }
+    if (this == &rhs) {
+        return true;
+    }
 
-  const bool hasId = static_cast<bool>(_identifier);
-  const bool rhsHasId = static_cast<bool>(rhs._identifier);
+    const bool hasId = static_cast<bool>(_identifier);
+    const bool rhsHasId = static_cast<bool>(rhs._identifier);
 
-  if (hasId && rhsHasId) {
-    return *_identifier == *rhs._identifier;
-  }
-  return hasId == rhsHasId;
+    if (hasId && rhsHasId) {
+        return *_identifier == *rhs._identifier;
+    }
+    return hasId == rhsHasId;
 }
 
-bool PcpExpressionVariablesSource::operator!=(const PcpExpressionVariablesSource &rhs) const
+bool
+PcpExpressionVariablesSource::operator!=(
+    const PcpExpressionVariablesSource& rhs) const
 {
-  return !(*this == rhs);
+    return !(*this == rhs);
 }
 
-bool PcpExpressionVariablesSource::operator<(const PcpExpressionVariablesSource &rhs) const
+bool
+PcpExpressionVariablesSource::operator<(
+    const PcpExpressionVariablesSource& rhs) const
 {
-  const bool hasId = static_cast<bool>(_identifier);
-  const bool rhsHasId = static_cast<bool>(rhs._identifier);
-
-  if (hasId && rhsHasId) {
-    return *_identifier < *rhs._identifier;
-  }
-  return hasId < rhsHasId;
+    const bool hasId = static_cast<bool>(_identifier);
+    const bool rhsHasId = static_cast<bool>(rhs._identifier);
+    
+    if (hasId && rhsHasId) {
+        return *_identifier < *rhs._identifier;
+    }
+    return hasId < rhsHasId;
 }
 
-const PcpLayerStackIdentifier &PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
-    const PcpLayerStackIdentifier &rootLayerStackIdentifier) const
+const PcpLayerStackIdentifier&
+PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
+    const PcpLayerStackIdentifier& rootLayerStackIdentifier) const
 {
-  if (IsRootLayerStack()) {
-    return rootLayerStackIdentifier;
-  }
-  return *_identifier;
+    if (IsRootLayerStack()) {
+        return rootLayerStackIdentifier;
+    }
+    return *_identifier;
 }
 
-const PcpLayerStackIdentifier &PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
-    const PcpCache &cache) const
+const PcpLayerStackIdentifier&
+PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
+    const PcpCache& cache) const
 {
-  return ResolveLayerStackIdentifier(cache.GetLayerStackIdentifier());
+    return ResolveLayerStackIdentifier(cache.GetLayerStackIdentifier());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

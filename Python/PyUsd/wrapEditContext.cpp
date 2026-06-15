@@ -4,30 +4,30 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
 #include "Usd/editContext.h"
 #include "Usd/pyEditContext.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <memory>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-struct Usd_PyEditContextAccess {
-  static void __enter__(UsdPyEditContext &self)
-  {
-    self._editContext = self._editTarget.IsValid() ?
-                            std::make_shared<UsdEditContext>(self._stage, self._editTarget) :
-                            std::make_shared<UsdEditContext>(self._stage);
-  }
+using namespace pxr_boost::python;
 
-  static void __exit__(UsdPyEditContext &self, object, object, object)
-  {
-    self._editContext.reset();
-  }
+struct Usd_PyEditContextAccess {
+    static void __enter__(UsdPyEditContext &self) {
+        self._editContext = self._editTarget.IsValid() ?
+            std::make_shared<UsdEditContext>(self._stage, self._editTarget) :
+            std::make_shared<UsdEditContext>(self._stage);
+    }
+
+    static void __exit__(UsdPyEditContext &self, object, object, object) {
+        self._editContext.reset();
+    }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -36,9 +36,10 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapUsdEditContext()
 {
-  class_<UsdPyEditContext>("EditContext",
-                           init<UsdStagePtr, optional<UsdEditTarget>>(
-                               (arg("stage"), arg("editTarget") = UsdEditTarget())))
-      .def("__enter__", &Usd_PyEditContextAccess::__enter__, return_self<>())
-      .def("__exit__", &Usd_PyEditContextAccess::__exit__);
+    class_<UsdPyEditContext>(
+        "EditContext", init<UsdStagePtr, optional<UsdEditTarget> >(
+            (arg("stage"), arg("editTarget")=UsdEditTarget())))
+        .def("__enter__", &Usd_PyEditContextAccess::__enter__, return_self<>())
+        .def("__exit__", &Usd_PyEditContextAccess::__exit__)
+        ;
 }

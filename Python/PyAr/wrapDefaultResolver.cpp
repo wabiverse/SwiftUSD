@@ -5,21 +5,27 @@
 // https://openusd.org/license.
 //
 
-#include <boost/python/class.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Ar/defaultResolver.h"
 #include "pxr/pxrns.h"
-
-using namespace boost::python;
+#include "Ar/defaultResolver.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapDefaultResolver()
+using namespace pxr_boost::python;
+
+void
+wrapDefaultResolver()
 {
-  using This = ArDefaultResolver;
+    using This = ArDefaultResolver;
 
-  class_<This, bases<ArResolver>, boost::noncopyable>("DefaultResolver", no_init)
+    class_<This, bases<ArResolver>, noncopyable>
+        ("DefaultResolver", no_init)
 
-      .def("SetDefaultSearchPath", &This::SetDefaultSearchPath, args("searchPath"))
-      .staticmethod("SetDefaultSearchPath");
+        .def("SetDefaultSearchPath", &This::SetDefaultSearchPath,
+             args("searchPath"))
+        .staticmethod("SetDefaultSearchPath")
+        ;
 }

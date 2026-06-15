@@ -4,345 +4,413 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
 #include "Usd/object.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
-#include "pxr/pxrns.h"
+#include "Sdf/propertySpec.h"
 
 #include "Tf/ostreamMethods.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdStageWeakPtr UsdObject::GetStage() const
+
+UsdStageWeakPtr
+UsdObject::GetStage() const
 {
-  return TfCreateWeakPtr(_GetStage());
+    return TfCreateWeakPtr(_GetStage());
 }
 
 // ------------------------------------------------------------------------- //
 // Metadata IO
 // ------------------------------------------------------------------------- //
 
-bool UsdObject::GetMetadata(const TfToken &key, VtValue *value) const
+bool
+UsdObject::GetMetadata(const TfToken& key, VtValue* value) const
 {
-  return _GetMetadataImpl(key, value);
+    return _GetMetadataImpl(key, value);
 }
 
-bool UsdObject::GetMetadataByDictKey(const TfToken &key,
-                                     const TfToken &keyPath,
-                                     VtValue *value) const
+bool
+UsdObject::GetMetadataByDictKey(
+    const TfToken& key, const TfToken &keyPath, VtValue* value) const
 {
-  return _GetMetadataImpl(key, value, keyPath);
+    return _GetMetadataImpl(key, value, keyPath);
 }
 
-bool UsdObject::_GetMetadataImpl(const TfToken &key, VtValue *value, const TfToken &keyPath) const
+bool
+UsdObject::_GetMetadataImpl(
+    const TfToken& key, VtValue* value, const TfToken &keyPath) const
 {
-  return _GetStage()->_GetMetadata(*this, key, keyPath, /*useFallbacks=*/true, value);
+    return _GetStage()->_GetMetadata(
+        *this, key, keyPath, /*useFallbacks=*/true, value);
 }
 
-bool UsdObject::SetMetadata(const TfToken &key, const VtValue &value) const
+bool 
+UsdObject::SetMetadata(const TfToken& key, VtValueRef value) const
 {
-  return _SetMetadataImpl(key, value);
+    return _SetMetadataImpl(key, value);
 }
 
-bool UsdObject::SetMetadataByDictKey(const TfToken &key,
-                                     const TfToken &keyPath,
-                                     const VtValue &value) const
+bool
+UsdObject::SetMetadataByDictKey(
+        const TfToken& key, const TfToken &keyPath, VtValueRef value) const
 {
-  return _SetMetadataImpl(key, value, keyPath);
+    return _SetMetadataImpl(key, value, keyPath);
 }
 
-bool UsdObject::_SetMetadataImpl(const TfToken &key,
-                                 const VtValue &value,
-                                 const TfToken &keyPath) const
+bool 
+UsdObject::_SetMetadataImpl(const TfToken& key, VtValueRef value,
+                            const TfToken &keyPath) const
 {
-  return _GetStage()->_SetMetadata(*this, key, keyPath, value);
+    return _GetStage()->_SetMetadata(*this, key, keyPath, value);
 }
 
-bool UsdObject::ClearMetadata(const TfToken &key) const
+bool
+UsdObject::ClearMetadata(const TfToken& key) const
 {
-  return _GetStage()->_ClearMetadata(*this, key);
+    return _GetStage()->_ClearMetadata(*this, key);
 }
 
-bool UsdObject::ClearMetadataByDictKey(const TfToken &key, const TfToken &keyPath) const
+bool
+UsdObject::ClearMetadataByDictKey(
+    const TfToken& key, const TfToken &keyPath) const
 {
-  return _GetStage()->_ClearMetadata(*this, key, keyPath);
+    return _GetStage()->_ClearMetadata(*this, key, keyPath);
 }
 
-bool UsdObject::HasMetadata(const TfToken &key) const
+bool
+UsdObject::HasMetadata(const TfToken& key) const
 {
-  return _GetStage()->_HasMetadata(*this,
-                                   key,
-                                   TfToken(),
-                                   /*useFallbacks*/ true);
+    return _GetStage()->_HasMetadata(*this, key, TfToken(),
+                                     /*useFallbacks*/ true);
 }
 
-bool UsdObject::HasAuthoredMetadata(const TfToken &key) const
+bool
+UsdObject::HasAuthoredMetadata(const TfToken& key) const
 {
-  return _GetStage()->_HasMetadata(*this,
-                                   key,
-                                   TfToken(),
-                                   /*useFallbacks*/ false);
+    return _GetStage()->_HasMetadata(*this, key, TfToken(),
+                                     /*useFallbacks*/ false);
 }
 
-bool UsdObject::HasMetadataDictKey(const TfToken &key, const TfToken &keyPath) const
+bool
+UsdObject::HasMetadataDictKey(const TfToken& key, const TfToken &keyPath) const
 {
-  return _GetStage()->_HasMetadata(*this,
-                                   key,
-                                   keyPath,
-                                   /*useFallbacks*/ true);
+    return _GetStage()->_HasMetadata(*this, key, keyPath,
+                                     /*useFallbacks*/ true);
 }
 
-bool UsdObject::HasAuthoredMetadataDictKey(const TfToken &key, const TfToken &keyPath) const
+bool
+UsdObject::HasAuthoredMetadataDictKey(
+    const TfToken& key, const TfToken &keyPath) const
 {
-  return _GetStage()->_HasMetadata(*this,
-                                   key,
-                                   keyPath,
-                                   /*useFallbacks*/ false);
+    return _GetStage()->_HasMetadata(*this, key, keyPath,
+                                     /*useFallbacks*/ false);
 }
 
-UsdMetadataValueMap UsdObject::GetAllMetadata() const
+UsdMetadataValueMap
+UsdObject::GetAllMetadata() const
 {
-  UsdMetadataValueMap result;
-  _GetStage()->_GetAllMetadata(*this, /*useFallbacks=*/true, &result);
-  return result;
+    UsdMetadataValueMap result;
+    _GetStage()->_GetAllMetadata(*this, /*useFallbacks=*/true, &result);
+    return result;
 }
 
-UsdMetadataValueMap UsdObject::GetAllAuthoredMetadata() const
+UsdMetadataValueMap
+UsdObject::GetAllAuthoredMetadata() const
 {
-  UsdMetadataValueMap result;
-  _GetStage()->_GetAllMetadata(*this, /*useFallbacks=*/false, &result);
-  return result;
+    UsdMetadataValueMap result;
+    _GetStage()->_GetAllMetadata(*this, /*useFallbacks=*/false, &result);
+    return result;
 }
 
 // ------------------------------------------------------------------------- //
 // 'customData' Metadata
 // ------------------------------------------------------------------------- //
-VtDictionary UsdObject::GetCustomData() const
+VtDictionary
+UsdObject::GetCustomData() const
 {
-  VtDictionary dict;
-  GetMetadata(SdfFieldKeys->CustomData, &dict);
-  return dict;
+    VtDictionary dict;
+    GetMetadata(SdfFieldKeys->CustomData, &dict);
+    return dict;
 }
 
-VtValue UsdObject::GetCustomDataByKey(const TfToken &keyPath) const
+VtValue
+UsdObject::GetCustomDataByKey(const TfToken &keyPath) const
 {
-  VtValue val;
-  GetMetadataByDictKey(SdfFieldKeys->CustomData, keyPath, &val);
-  return val;
+    VtValue val;
+    GetMetadataByDictKey(SdfFieldKeys->CustomData, keyPath, &val);
+    return val;
 }
 
-void UsdObject::SetCustomData(const VtDictionary &customData) const
+void
+UsdObject::SetCustomData(const VtDictionary &customData) const
 {
-  SetMetadata(SdfFieldKeys->CustomData, customData);
+    SetMetadata(SdfFieldKeys->CustomData, customData);
 }
 
-void UsdObject::SetCustomDataByKey(const TfToken &keyPath, const VtValue &value) const
+void
+UsdObject::SetCustomDataByKey(
+    const TfToken &keyPath, const VtValue &value) const
 {
-  SetMetadataByDictKey(SdfFieldKeys->CustomData, keyPath, value);
+    SetMetadataByDictKey(SdfFieldKeys->CustomData, keyPath, value);
 }
 
-void UsdObject::ClearCustomData() const
+void
+UsdObject::ClearCustomData() const
 {
-  ClearMetadata(SdfFieldKeys->CustomData);
+    ClearMetadata(SdfFieldKeys->CustomData);
 }
 
-void UsdObject::ClearCustomDataByKey(const TfToken &keyPath) const
+void
+UsdObject::ClearCustomDataByKey(const TfToken &keyPath) const
 {
-  ClearMetadataByDictKey(SdfFieldKeys->CustomData, keyPath);
+    ClearMetadataByDictKey(SdfFieldKeys->CustomData, keyPath);
 }
 
-bool UsdObject::HasCustomData() const
+bool
+UsdObject::HasCustomData() const
 {
-  return HasMetadata(SdfFieldKeys->CustomData);
+    return HasMetadata(SdfFieldKeys->CustomData);
 }
 
-bool UsdObject::HasCustomDataKey(const TfToken &keyPath) const
+bool
+UsdObject::HasCustomDataKey(const TfToken &keyPath) const
 {
-  return HasMetadataDictKey(SdfFieldKeys->CustomData, keyPath);
+    return HasMetadataDictKey(SdfFieldKeys->CustomData, keyPath);
 }
 
-bool UsdObject::HasAuthoredCustomData() const
+bool
+UsdObject::HasAuthoredCustomData() const
 {
-  return HasAuthoredMetadata(SdfFieldKeys->CustomData);
+    return HasAuthoredMetadata(SdfFieldKeys->CustomData);
 }
 
-bool UsdObject::HasAuthoredCustomDataKey(const TfToken &keyPath) const
+bool
+UsdObject::HasAuthoredCustomDataKey(const TfToken &keyPath) const
 {
-  return HasAuthoredMetadataDictKey(SdfFieldKeys->CustomData, keyPath);
+    return HasAuthoredMetadataDictKey(SdfFieldKeys->CustomData, keyPath);
 }
 
 // ------------------------------------------------------------------------- //
 // 'assetInfo' Metadata
 // ------------------------------------------------------------------------- //
-VtDictionary UsdObject::GetAssetInfo() const
+VtDictionary
+UsdObject::GetAssetInfo() const
 {
-  VtDictionary dict;
-  GetMetadata(SdfFieldKeys->AssetInfo, &dict);
-  return dict;
+    VtDictionary dict;
+    GetMetadata(SdfFieldKeys->AssetInfo, &dict);
+    return dict;
 }
 
-VtValue UsdObject::GetAssetInfoByKey(const TfToken &keyPath) const
+VtValue
+UsdObject::GetAssetInfoByKey(const TfToken &keyPath) const
 {
-  VtValue val;
-  GetMetadataByDictKey(SdfFieldKeys->AssetInfo, keyPath, &val);
-  return val;
+    VtValue val;
+    GetMetadataByDictKey(SdfFieldKeys->AssetInfo, keyPath, &val);
+    return val;
 }
 
-void UsdObject::SetAssetInfo(const VtDictionary &customData) const
+void
+UsdObject::SetAssetInfo(const VtDictionary &customData) const
 {
-  SetMetadata(SdfFieldKeys->AssetInfo, customData);
+    SetMetadata(SdfFieldKeys->AssetInfo, customData);
 }
 
-void UsdObject::SetAssetInfoByKey(const TfToken &keyPath, const VtValue &value) const
+void
+UsdObject::SetAssetInfoByKey(
+    const TfToken &keyPath, const VtValue &value) const
 {
-  SetMetadataByDictKey(SdfFieldKeys->AssetInfo, keyPath, value);
+    SetMetadataByDictKey(SdfFieldKeys->AssetInfo, keyPath, value);
 }
 
-void UsdObject::ClearAssetInfo() const
+void
+UsdObject::ClearAssetInfo() const
 {
-  ClearMetadata(SdfFieldKeys->AssetInfo);
+    ClearMetadata(SdfFieldKeys->AssetInfo);
 }
 
-void UsdObject::ClearAssetInfoByKey(const TfToken &keyPath) const
+void
+UsdObject::ClearAssetInfoByKey(const TfToken &keyPath) const
 {
-  ClearMetadataByDictKey(SdfFieldKeys->AssetInfo, keyPath);
+    ClearMetadataByDictKey(SdfFieldKeys->AssetInfo, keyPath);
 }
 
-bool UsdObject::HasAssetInfo() const
+bool
+UsdObject::HasAssetInfo() const
 {
-  return HasMetadata(SdfFieldKeys->AssetInfo);
+    return HasMetadata(SdfFieldKeys->AssetInfo);
 }
 
-bool UsdObject::HasAssetInfoKey(const TfToken &keyPath) const
+bool
+UsdObject::HasAssetInfoKey(const TfToken &keyPath) const
 {
-  return HasMetadataDictKey(SdfFieldKeys->AssetInfo, keyPath);
+    return HasMetadataDictKey(SdfFieldKeys->AssetInfo, keyPath);
 }
 
-bool UsdObject::HasAuthoredAssetInfo() const
+bool
+UsdObject::HasAuthoredAssetInfo() const
 {
-  return HasAuthoredMetadata(SdfFieldKeys->AssetInfo);
+    return HasAuthoredMetadata(SdfFieldKeys->AssetInfo);
 }
 
-bool UsdObject::HasAuthoredAssetInfoKey(const TfToken &keyPath) const
+bool
+UsdObject::HasAuthoredAssetInfoKey(const TfToken &keyPath) const
 {
-  return HasAuthoredMetadataDictKey(SdfFieldKeys->AssetInfo, keyPath);
+    return HasAuthoredMetadataDictKey(SdfFieldKeys->AssetInfo, keyPath);
 }
+
 
 // ------------------------------------------------------------------------- //
 // 'Hidden' Metadata
 // ------------------------------------------------------------------------- //
 
-bool UsdObject::IsHidden() const
+bool
+UsdObject::IsHidden() const
 {
-  bool hidden = false;
-  GetMetadata(SdfFieldKeys->Hidden, &hidden);
-  return hidden;
+    bool hidden = false;
+    GetMetadata(SdfFieldKeys->Hidden, &hidden);
+    return hidden;
 }
 
-bool UsdObject::SetHidden(bool hidden) const
+bool
+UsdObject::SetHidden(bool hidden) const
 {
-  return SetMetadata(SdfFieldKeys->Hidden, hidden);
+    if (TfGetEnvSetting(SDF_LEGACY_UI_HINTS_WARN_ON_WRITE)) {
+        TF_WARN("Writing to deprecated metadata field 'hidden'");
+    }
+
+    return SetMetadata(SdfFieldKeys->Hidden, hidden);
 }
 
-bool UsdObject::ClearHidden() const
+bool
+UsdObject::ClearHidden() const
 {
-  return ClearMetadata(SdfFieldKeys->Hidden);
+    if (TfGetEnvSetting(SDF_LEGACY_UI_HINTS_WARN_ON_WRITE)) {
+        TF_WARN("Writing to deprecated metadata field 'hidden'");
+    }
+
+    return ClearMetadata(SdfFieldKeys->Hidden);
 }
 
-bool UsdObject::HasAuthoredHidden() const
+bool
+UsdObject::HasAuthoredHidden() const
 {
-  return HasAuthoredMetadata(SdfFieldKeys->Hidden);
+    return HasAuthoredMetadata(SdfFieldKeys->Hidden);
 }
+
 
 // ------------------------------------------------------------------------- //
 // 'Documentation' Metadata
 // ------------------------------------------------------------------------- //
 
-std::string UsdObject::GetDocumentation() const
+std::string
+UsdObject::GetDocumentation() const
 {
-  std::string documentation;
-  GetMetadata(SdfFieldKeys->Documentation, &documentation);
-  return documentation;
+    std::string documentation;
+    GetMetadata(SdfFieldKeys->Documentation, &documentation);
+    return documentation;
 }
 
-bool UsdObject::SetDocumentation(const std::string &documentation) const
+bool
+UsdObject::SetDocumentation(const std::string& documentation) const
 {
-  return SetMetadata(SdfFieldKeys->Documentation, documentation);
+    return SetMetadata(SdfFieldKeys->Documentation, documentation);
 }
 
-bool UsdObject::ClearDocumentation() const
+bool
+UsdObject::ClearDocumentation() const
 {
-  return ClearMetadata(SdfFieldKeys->Documentation);
+    return ClearMetadata(SdfFieldKeys->Documentation);
 }
 
-bool UsdObject::HasAuthoredDocumentation() const
+bool
+UsdObject::HasAuthoredDocumentation() const
 {
-  return HasAuthoredMetadata(SdfFieldKeys->Documentation);
+    return HasAuthoredMetadata(SdfFieldKeys->Documentation);
 }
 
 // ------------------------------------------------------------------------- //
 // 'DisplayName' Metadata
 // ------------------------------------------------------------------------- //
 
-std::string UsdObject::GetDisplayName() const
+std::string
+UsdObject::GetDisplayName() const
 {
-  std::string result;
-  GetMetadata(SdfFieldKeys->DisplayName, &result);
-  return result;
+    std::string result;
+    GetMetadata(SdfFieldKeys->DisplayName, &result);
+    return result;
 }
 
-bool UsdObject::SetDisplayName(const std::string &newDisplayName) const
+bool
+UsdObject::SetDisplayName(const std::string& newDisplayName) const
 {
-  return SetMetadata(SdfFieldKeys->DisplayName, newDisplayName);
+    if (TfGetEnvSetting(SDF_LEGACY_UI_HINTS_WARN_ON_WRITE)) {
+        TF_WARN("Writing to deprecated metadata field 'displayName'");
+    }
+
+    return SetMetadata(SdfFieldKeys->DisplayName, newDisplayName);
 }
 
-bool UsdObject::ClearDisplayName() const
+bool
+UsdObject::ClearDisplayName() const
 {
-  return ClearMetadata(SdfFieldKeys->DisplayName);
+    if (TfGetEnvSetting(SDF_LEGACY_UI_HINTS_WARN_ON_WRITE)) {
+        TF_WARN("Writing to deprecated metadata field 'displayName'");
+    }
+
+    return ClearMetadata(SdfFieldKeys->DisplayName);
 }
 
-bool UsdObject::HasAuthoredDisplayName() const
+bool
+UsdObject::HasAuthoredDisplayName() const
 {
-  return HasAuthoredMetadata(SdfFieldKeys->DisplayName);
+    return HasAuthoredMetadata(SdfFieldKeys->DisplayName);
 }
 
-SdfSpecType UsdObject::_GetDefiningSpecType() const
+SdfSpecType
+UsdObject::_GetDefiningSpecType() const
 {
-  return _GetStage()->_GetDefiningSpecType(get_pointer(_Prim()), _propName);
+    return _GetStage()->_GetDefiningSpecType(get_pointer(_Prim()), _propName);
 }
 
-std::string UsdObject::_GetObjectDescription(const std::string &preface) const
+std::string
+UsdObject::_GetObjectDescription(const std::string &preface) const
 {
-  if (_type == UsdTypePrim) {
-    return _Prim().GetDescription(_ProxyPrimPath());
-  }
-  else if (_type == UsdTypeAttribute) {
-    return TfStringPrintf("%sattribute '%s' on ", preface.c_str(), _PropName().GetText()) +
-           _Prim().GetDescription(_ProxyPrimPath());
-  }
-  else if (_type == UsdTypeRelationship) {
-    return TfStringPrintf("%srelationship '%s' on ", preface.c_str(), _PropName().GetText()) +
-           _Prim().GetDescription(_ProxyPrimPath());
-  }
-  else if (_type == UsdTypeProperty) {
-    return TfStringPrintf("%sproperty '%s' on ", preface.c_str(), _PropName().GetText()) +
-           _Prim().GetDescription(_ProxyPrimPath());
-  }
-  else if (_type == UsdTypeObject) {
-    return _Prim().GetDescription(_ProxyPrimPath());
-  }
+    if (_type == UsdTypePrim) {
+        return _Prim().GetDescription(_ProxyPrimPath());
+    } else if (_type == UsdTypeAttribute) {
+        return TfStringPrintf("%sattribute '%s' on ", 
+                              preface.c_str(),
+                              _PropName().GetText()) +
+            _Prim().GetDescription(_ProxyPrimPath());
+    } else if (_type == UsdTypeRelationship) {
+        return TfStringPrintf("%srelationship '%s' on ",
+                              preface.c_str(),
+                              _PropName().GetText()) +
+            _Prim().GetDescription(_ProxyPrimPath());
+    } else if (_type == UsdTypeProperty) {
+        return TfStringPrintf("%sproperty '%s' on ",
+                              preface.c_str(),
+                              _PropName().GetText()) +
+            _Prim().GetDescription(_ProxyPrimPath());
+    } else if (_type == UsdTypeObject) {
+        return _Prim().GetDescription(_ProxyPrimPath());
+    }
 
-  return TfStringPrintf("Unknown object type %d", _type);
+    return TfStringPrintf("Unknown object type %d", _type);
 }
 
-std::string UsdObject::GetDescription() const
+std::string 
+UsdObject::GetDescription() const
 {
-  return _GetObjectDescription("");
+    return _GetObjectDescription("");
 }
 
-std::string UsdDescribe(const UsdObject &obj)
-{
-  return obj.GetDescription();
+std::string
+UsdDescribe(const UsdObject &obj) {
+    return obj.GetDescription();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

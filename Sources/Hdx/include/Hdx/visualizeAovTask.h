@@ -7,6 +7,7 @@
 #ifndef HDX_VISUALIZE_AOV_TASK_H
 #define HDX_VISUALIZE_AOV_TASK_H
 
+#include "pxr/pxrns.h"
 #include "Gf/vec3i.h"
 #include "Hdx/api.h"
 #include "Hdx/task.h"
@@ -18,9 +19,10 @@
 #include "Hgi/shaderProgram.h"
 #include "Hgi/texture.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+struct HdxVisualizeAovTaskParams;
 
 /// \class HdxVisualizeAovTask
 ///
@@ -40,97 +42,104 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This task updates the 'color' entry of the task context with the colorized
 /// texture contents.
 ///
-class HdxVisualizeAovTask : public HdxTask {
- public:
-  HDX_API
-  HdxVisualizeAovTask(HdSceneDelegate *delegate, SdfPath const &id);
+class HdxVisualizeAovTask : public HdxTask
+{
+public:
+    using TaskParams = HdxVisualizeAovTaskParams;
 
-  HDX_API
-  ~HdxVisualizeAovTask() override;
+    HDX_API
+    HdxVisualizeAovTask(HdSceneDelegate* delegate, SdfPath const& id);
 
-  HDX_API
-  void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override;
+    HDX_API
+    ~HdxVisualizeAovTask() override;
 
-  HDX_API
-  void Execute(HdTaskContext *ctx) override;
+    HDX_API
+    void Prepare(HdTaskContext* ctx,
+                 HdRenderIndex* renderIndex) override;
 
- protected:
-  HDX_API
-  void _Sync(HdSceneDelegate *delegate, HdTaskContext *ctx, HdDirtyBits *dirtyBits) override;
+    HDX_API
+    void Execute(HdTaskContext* ctx) override;
 
- private:
-  // Enumeration of visualization kernels
-  enum VizKernel {
-    VizKernelDepth = 0,
-    VizKernelId,
-    VizKernelNormal,
-    VizKernelFallback,
-    VizKernelNone
-  };
+protected:
+    HDX_API
+    void _Sync(HdSceneDelegate* delegate,
+               HdTaskContext* ctx,
+               HdDirtyBits* dirtyBits) override;
 
-  HdxVisualizeAovTask() = delete;
-  HdxVisualizeAovTask(const HdxVisualizeAovTask &) = delete;
-  HdxVisualizeAovTask &operator=(const HdxVisualizeAovTask &) = delete;
+private:
+    // Enumeration of visualization kernels
+    enum VizKernel {
+        VizKernelDepth = 0,
+        VizKernelId,
+        VizKernelNormal,
+        VizKernelFallback,
+        VizKernelNone
+    };
 
-  // Returns true if the enum member was updated, indicating that the kernel
-  // to be used has changed.
-  bool _UpdateVizKernel(TfToken const &aovName);
+    HdxVisualizeAovTask() = delete;
+    HdxVisualizeAovTask(const HdxVisualizeAovTask &) = delete;
+    HdxVisualizeAovTask &operator =(const HdxVisualizeAovTask &) = delete;
 
-  // Returns a token used in sampling the texture based on the kernel used.
-  TfToken const &_GetTextureIdentifierForShader() const;
+    // Returns true if the enum member was updated, indicating that the kernel
+    // to be used has changed.
+    bool _UpdateVizKernel(TfToken const &aovName);
 
-  // Returns the fragment shader mixin based on the kernel used.
-  TfToken const &_GetFragmentMixin() const;
+    // Returns a token used in sampling the texture based on the kernel used.
+    TfToken const& _GetTextureIdentifierForShader() const;
 
-  // ------------- Hgi resource creation/deletion utilities ------------------
-  // Utility function to create the GL program for color correction
-  bool _CreateShaderResources(HgiTextureDesc const &inputAovTextureDesc);
+    // Returns the fragment shader mixin based on the kernel used.
+    TfToken const& _GetFragmentMixin() const;
 
-  // Utility function to create buffer resources.
-  bool _CreateBufferResources();
+    // ------------- Hgi resource creation/deletion utilities ------------------
+    // Utility function to create the GL program for color correction
+    bool _CreateShaderResources(HgiTextureDesc const& inputAovTextureDesc);
 
-  // Utility to create resource bindings
-  bool _CreateResourceBindings(HgiTextureHandle const &inputAovTexture);
+    // Utility function to create buffer resources.
+    bool _CreateBufferResources();
 
-  // Utility to create a pipeline
-  bool _CreatePipeline(HgiTextureDesc const &outputTextureDesc);
+    // Utility to create resource bindings
+    bool _CreateResourceBindings(HgiTextureHandle const& inputAovTexture);
 
-  // Utility to create a texture sampler
-  bool _CreateSampler();
+    // Utility to create a pipeline
+    bool _CreatePipeline(HgiTextureDesc const& outputTextureDesc);
 
-  // Create texture to write the colorized results into.
-  bool _CreateOutputTexture(GfVec3i const &dimensions);
+    // Utility to create a texture sampler
+    bool _CreateSampler(HgiTextureDesc const& inputAovTextureDesc);
 
-  // Destroy shader program and the shader functions it holds.
-  void _DestroyShaderProgram();
+    // Create texture to write the colorized results into.
+    bool _CreateOutputTexture(GfVec3i const &dimensions);
 
-  // Print shader compile errors.
-  void _PrintCompileErrors();
-  // -------------------------------------------------------------------------
+    // Destroy shader program and the shader functions it holds.
+    void _DestroyShaderProgram();
 
-  // Readback the depth AOV on the CPU to update min, max values.
-  void _UpdateMinMaxDepth(HgiTextureHandle const &inputAovTexture);
+    // Print shader compile errors.
+    void _PrintCompileErrors();
+    // -------------------------------------------------------------------------
+    
+    // Readback the depth AOV on the CPU to update min, max values.
+    void _UpdateMinMaxDepth(HgiTextureHandle const &inputAovTexture);
 
-  // Execute the appropriate kernel and update the task context 'color' entry.
-  void _ApplyVisualizationKernel(HgiTextureHandle const &outputTexture);
+    // Execute the appropriate kernel and update the task context 'color' entry.
+    void _ApplyVisualizationKernel(HgiTextureHandle const& outputTexture);
 
-  // Kernel dependent resources
-  HgiTextureHandle _outputTexture;
-  GfVec3i _outputTextureDimensions;
-  HgiAttachmentDesc _outputAttachmentDesc;
-  HgiShaderProgramHandle _shaderProgram;
-  HgiResourceBindingsHandle _resourceBindings;
-  HgiGraphicsPipelineHandle _pipeline;
+    // Kernel dependent resources
+    HgiTextureHandle _outputTexture;
+    GfVec3i _outputTextureDimensions;
+    HgiAttachmentDesc _outputAttachmentDesc;
+    HgiShaderProgramHandle _shaderProgram;
+    HgiResourceBindingsHandle _resourceBindings;
+    HgiGraphicsPipelineHandle _pipeline;
 
-  // Kernel independent resources
-  HgiBufferHandle _indexBuffer;
-  HgiBufferHandle _vertexBuffer;
-  HgiSamplerHandle _sampler;
+    // Kernel independent resources
+    HgiBufferHandle _indexBuffer;
+    HgiBufferHandle _vertexBuffer;
+    HgiSamplerHandle _sampler;
 
-  float _screenSize[2];
-  float _minMaxDepth[2];
-  VizKernel _vizKernel;
+    float _screenSize[2];
+    float _minMaxDepth[2];
+    VizKernel _vizKernel;
 };
+
 
 /// \class HdxVisualizeAovTaskParams
 ///
@@ -141,20 +150,23 @@ class HdxVisualizeAovTask : public HdxTask {
 /// HdxAovInputTask is responsible for updating the task context entry for
 /// the active AOV.
 ///
-struct HdxVisualizeAovTaskParams {
-  HDX_API
-  HdxVisualizeAovTaskParams();
+struct HdxVisualizeAovTaskParams
+{
+    HDX_API
+    HdxVisualizeAovTaskParams();
 
-  TfToken aovName;
+    TfToken aovName;
 };
 
 // VtValue requirements
 HDX_API
-std::ostream &operator<<(std::ostream &out, const HdxVisualizeAovTaskParams &pv);
+std::ostream& operator<<(std::ostream& out, const HdxVisualizeAovTaskParams& pv);
 HDX_API
-bool operator==(const HdxVisualizeAovTaskParams &lhs, const HdxVisualizeAovTaskParams &rhs);
+bool operator==(const HdxVisualizeAovTaskParams& lhs,
+                const HdxVisualizeAovTaskParams& rhs);
 HDX_API
-bool operator!=(const HdxVisualizeAovTaskParams &lhs, const HdxVisualizeAovTaskParams &rhs);
+bool operator!=(const HdxVisualizeAovTaskParams& lhs,
+                const HdxVisualizeAovTaskParams& rhs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

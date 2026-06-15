@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HDX_SELECTION_TASK_H
 #define PXR_IMAGING_HDX_SELECTION_TASK_H
 
-#include "Hd/task.h"
+#include "pxr/pxrns.h"
 #include "Hdx/api.h"
 #include "Hdx/version.h"
-#include "pxr/pxrns.h"
+#include "Hd/task.h"
 
 #include "Gf/vec4f.h"
 
@@ -18,16 +18,18 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class HdRenderIndex;
 class HdSceneDelegate;
 
-struct HdxSelectionTaskParams {
-  bool enableSelectionHighlight;
-  bool enableLocateHighlight;
-  float occludedSelectionOpacity;  // lerp factor when blending
-                                   // occluded selection
-  GfVec4f selectionColor;          // "active" selection color
-  GfVec4f locateColor;             // "rollover" selection color
+struct HdxSelectionTaskParams
+{
+    bool enableSelectionHighlight;
+    bool enableLocateHighlight;
+    float occludedSelectionOpacity; // lerp factor when blending 
+                                    // occluded selection
+    GfVec4f selectionColor; // "active" selection color
+    GfVec4f locateColor; // "rollover" selection color
 };
 
 using HdBufferArrayRangeSharedPtr = std::shared_ptr<class HdBufferArrayRange>;
@@ -40,47 +42,60 @@ using HdBufferArrayRangeSharedPtr = std::shared_ptr<class HdBufferArrayRange>;
 /// extract those buffers and bind them into the current render pass shader to
 /// enable selection highlighting.
 ///
-class HdxSelectionTask : public HdTask {
- public:
-  HDX_API
-  HdxSelectionTask(HdSceneDelegate *delegate, SdfPath const &id);
+class HdxSelectionTask : public HdTask
+{
+public:
+    using TaskParams = HdxSelectionTaskParams;
 
-  HDX_API
-  ~HdxSelectionTask() override;
+    HDX_API
+    HdxSelectionTask(HdSceneDelegate* delegate, SdfPath const& id);
 
-  /// Sync the render pass resources
-  HDX_API
-  void Sync(HdSceneDelegate *delegate, HdTaskContext *ctx, HdDirtyBits *dirtyBits) override;
+    HDX_API
+    ~HdxSelectionTask() override;
 
-  /// Prepare the tasks resources
-  HDX_API
-  void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override;
+    /// Sync the render pass resources
+    HDX_API
+    void Sync(HdSceneDelegate* delegate,
+              HdTaskContext* ctx,
+              HdDirtyBits* dirtyBits) override;
+    
 
-  /// Execute render pass task
-  HDX_API
-  void Execute(HdTaskContext *ctx) override;
+    /// Prepare the tasks resources
+    HDX_API
+    void Prepare(HdTaskContext* ctx,
+                 HdRenderIndex* renderIndex) override;
 
- private:
-  int _lastVersion;
-  bool _hasSelection;
-  HdxSelectionTaskParams _params;
-  HdBufferArrayRangeSharedPtr _selOffsetBar;
-  HdBufferArrayRangeSharedPtr _selUniformBar;
-  size_t _pointColorsBufferSize;
+    /// Execute render pass task
+    HDX_API
+    void Execute(HdTaskContext* ctx) override;
 
-  HdxSelectionTask() = delete;
-  HdxSelectionTask(const HdxSelectionTask &) = delete;
-  HdxSelectionTask &operator=(const HdxSelectionTask &) = delete;
+
+private:
+    int _lastVersion;
+    bool _hasSelection;
+    HdxSelectionTaskParams _params;
+    HdBufferArrayRangeSharedPtr _selOffsetBar;
+    HdBufferArrayRangeSharedPtr _selUniformBar;
+    size_t _pointColorsBufferSize;
+
+    HdxSelectionTask() = delete;
+    HdxSelectionTask(const HdxSelectionTask &) = delete;
+    HdxSelectionTask &operator =(const HdxSelectionTask &) = delete;
 };
 
 // VtValue requirements
 HDX_API
-std::ostream &operator<<(std::ostream &out, const HdxSelectionTaskParams &pv);
+std::ostream& operator<<(std::ostream& out,
+                         const HdxSelectionTaskParams& pv);
 HDX_API
-bool operator==(const HdxSelectionTaskParams &lhs, const HdxSelectionTaskParams &rhs);
+bool operator==(const HdxSelectionTaskParams& lhs,
+                const HdxSelectionTaskParams& rhs);
 HDX_API
-bool operator!=(const HdxSelectionTaskParams &lhs, const HdxSelectionTaskParams &rhs);
+bool operator!=(const HdxSelectionTaskParams& lhs,
+                const HdxSelectionTaskParams& rhs);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDX_SELECTION_TASK_H
+#endif //PXR_IMAGING_HDX_SELECTION_TASK_H
+

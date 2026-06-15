@@ -1,353 +1,447 @@
 //
-// Copyright 2023 Pixar
+// Copyright 2024 Pixar
 //
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
 
-#include "Tf/diagnostic.h"
+#include "pxr/pxrns.h"
+#include "Ts/tsTest_SplineData.h"
 #include "Tf/enum.h"
-#include "Tf/pyContainerConversions.h"
 #include "Tf/pyEnum.h"
+#include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/stringUtils.h"
-#include "Ts/tsTest_SplineData.h"
-#include "pxr/pxrns.h"
+#include "Tf/diagnostic.h"
 
-#include <boost/python.hpp>
-#include <cstdio>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/make_constructor.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <sstream>
 #include <string>
+#include <cstdio>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-using namespace boost::python;
+using namespace pxr_boost::python;
 
 using This = TsTest_SplineData;
 
-#define SET_MEMBER(result, type, member, value) \
-  if (!value.is_none()) { \
-    extract<type> extractor(value); \
-    if (extractor.check()) \
-      result->member = extractor(); \
-    else \
-      TF_CODING_ERROR("Unexpected type for " #member); \
-  }
 
-#define SET_METHOD(result, type, method, value) \
-  if (!value.is_none()) { \
-    extract<type> extractor(value); \
-    if (extractor.check()) \
-      result->method(extractor()); \
-    else \
-      TF_CODING_ERROR("Unexpected type for " #method); \
-  }
+#define SET_MEMBER(result, type, member, value)                   \
+    if (!value.is_none())                                         \
+    {                                                             \
+        extract<type> extractor(value);                           \
+        if (extractor.check())                                    \
+        {                                                         \
+            result->member = extractor();                         \
+        }                                                         \
+        else                                                      \
+        {                                                         \
+            TF_CODING_ERROR("Unexpected type for " #member);      \
+        }                                                         \
+    }
+
+#define SET_METHOD(result, type, method, value)                   \
+    if (!value.is_none())                                         \
+    {                                                             \
+        extract<type> extractor(value);                           \
+        if (extractor.check())                                    \
+        {                                                         \
+            result->method(extractor());                          \
+        }                                                         \
+        else                                                      \
+        {                                                         \
+            TF_CODING_ERROR("Unexpected type for " #method);      \
+        }                                                         \
+    }
 
 // Return a full-precision python repr for a double value.
-static std::string _HexFloatRepr(const double num)
+static std::string
+_HexFloatRepr(const double num)
 {
-  // XXX: work around std::hexfloat apparently not working in our libstdc++ as
-  // of this writing.
-  char buf[100];
-  sprintf(buf, "float.fromhex('%a')", num);
-  return std::string(buf);
+    // XXX: work around std::hexfloat apparently not working in our libstdc++ as
+    // of this writing.
+    char buf[100];
+    sprintf(buf, "float.fromhex('%a')", num);
+    return std::string(buf);
 }
 
-static This::Knot *_ConstructKnot(const object &timeIn,
-                                  const object &nextSegInterpMethodIn,
-                                  const object &valueIn,
-                                  const object &preValueIn,
-                                  const object &preSlopeIn,
-                                  const object &postSlopeIn,
-                                  const object &preLenIn,
-                                  const object &postLenIn,
-                                  const object &preAutoIn,
-                                  const object &postAutoIn)
+static This::Knot*
+_ConstructKnot(
+    const double timeIn,
+    const This::InterpMethod nextSegInterpMethodIn,
+    const double valueIn,
+    const object &preValueIn,
+    const object &preSlopeIn,
+    const object &postSlopeIn,
+    const object &preLenIn,
+    const object &postLenIn,
+    const object &preAutoIn,
+    const object &postAutoIn)
 {
-  This::Knot *result = new This::Knot();
+    This::Knot *result = new This::Knot();
 
-  SET_MEMBER(result, double, time, timeIn);
-  SET_MEMBER(result, This::InterpMethod, nextSegInterpMethod, nextSegInterpMethodIn);
-  SET_MEMBER(result, double, value, valueIn);
-  SET_MEMBER(result, double, preValue, preValueIn);
-  SET_MEMBER(result, double, preSlope, preSlopeIn);
-  SET_MEMBER(result, double, postSlope, postSlopeIn);
-  SET_MEMBER(result, double, preLen, preLenIn);
-  SET_MEMBER(result, double, postLen, postLenIn);
-  SET_MEMBER(result, bool, preAuto, preAutoIn);
-  SET_MEMBER(result, bool, postAuto, postAutoIn);
+    result->time = timeIn;
+    result->nextSegInterpMethod = nextSegInterpMethodIn;
+    result->value = valueIn;
 
-  if (!preValueIn.is_none())
-    result->isDualValued = true;
+    SET_MEMBER(result, double, preValue, preValueIn);
+    SET_MEMBER(result, double, preSlope, preSlopeIn);
+    SET_MEMBER(result, double, postSlope, postSlopeIn);
+    SET_MEMBER(result, double, preLen, preLenIn);
+    SET_MEMBER(result, double, postLen, postLenIn);
+    SET_MEMBER(result, bool, preAuto, preAutoIn);
+    SET_MEMBER(result, bool, postAuto, postAutoIn);
 
-  return result;
+    if (!preValueIn.is_none())
+    {
+        result->isDualValued = true;
+    }
+
+    return result;
 }
 
-static std::string _KnotRepr(const This::Knot &kf)
+static std::string
+_KnotRepr(const This::Knot &kf)
 {
-  std::ostringstream result;
-  result << "Ts.TsTest_SplineData.Knot("
-         << "time = " << _HexFloatRepr(kf.time) << ", nextSegInterpMethod = Ts.TsTest_SplineData."
-         << TfEnum::GetName(kf.nextSegInterpMethod) << ", value = " << _HexFloatRepr(kf.value)
-         << ", preSlope = " << _HexFloatRepr(kf.preSlope)
-         << ", postSlope = " << _HexFloatRepr(kf.postSlope)
-         << ", preLen = " << _HexFloatRepr(kf.preLen)
-         << ", postLen = " << _HexFloatRepr(kf.postLen)
-         << ", preAuto = " << (kf.preAuto ? "True" : "False")
-         << ", postAuto = " << (kf.postAuto ? "True" : "False");
+    std::ostringstream result;
+    result << "Ts.TsTest_SplineData.Knot("
+           << "time = " << _HexFloatRepr(kf.time)
+           << ", nextSegInterpMethod = Ts.TsTest_SplineData."
+           << TfEnum::GetName(kf.nextSegInterpMethod)
+           << ", value = " << _HexFloatRepr(kf.value)
+           << ", preSlope = " << _HexFloatRepr(kf.preSlope)
+           << ", postSlope = " << _HexFloatRepr(kf.postSlope)
+           << ", preLen = " << _HexFloatRepr(kf.preLen)
+           << ", postLen = " << _HexFloatRepr(kf.postLen)
+           << ", preAuto = " << (kf.preAuto ? "True" : "False")
+           << ", postAuto = " << (kf.postAuto ? "True" : "False");
 
-  if (kf.isDualValued)
-    result << ", preValue = " << _HexFloatRepr(kf.preValue);
+    if (kf.isDualValued)
+    {
+        result << ", preValue = " << _HexFloatRepr(kf.preValue);
+    }
 
-  result << ")";
+    result << ")";
 
-  return result.str();
+    return result.str();
 }
 
-static This::InnerLoopParams *_ConstructInnerLoopParams(const object &enabledIn,
-                                                        const object &protoStartIn,
-                                                        const object &protoEndIn,
-                                                        const object &preLoopStartIn,
-                                                        const object &postLoopEndIn,
-                                                        const object &closedEndIn,
-                                                        const object &valueOffsetIn)
+static This::InnerLoopParams*
+_ConstructInnerLoopParams(
+    const bool enabledIn,
+    const object &protoStartIn,
+    const object &protoEndIn,
+    const object &numPreLoopsIn,
+    const object &numPostLoopsIn,
+    const object &valueOffsetIn)
 {
-  This::InnerLoopParams *result = new This::InnerLoopParams();
+    This::InnerLoopParams *result = new This::InnerLoopParams();
 
-  SET_MEMBER(result, bool, enabled, enabledIn);
-  SET_MEMBER(result, double, protoStart, protoStartIn);
-  SET_MEMBER(result, double, protoEnd, protoEndIn);
-  SET_MEMBER(result, double, preLoopStart, preLoopStartIn);
-  SET_MEMBER(result, double, postLoopEnd, postLoopEndIn);
-  SET_MEMBER(result, bool, closedEnd, closedEndIn);
-  SET_MEMBER(result, double, valueOffset, valueOffsetIn);
+    result->enabled = enabledIn;
 
-  return result;
+    SET_MEMBER(result, double, protoStart, protoStartIn);
+    SET_MEMBER(result, double, protoEnd, protoEndIn);
+    SET_MEMBER(result, int, numPreLoops, numPreLoopsIn);
+    SET_MEMBER(result, int, numPostLoops, numPostLoopsIn);
+    SET_MEMBER(result, double, valueOffset, valueOffsetIn);
+
+    return result;
 }
 
-static std::string _InnerLoopParamsRepr(const This::InnerLoopParams &lp)
+static std::string
+_InnerLoopParamsRepr(const This::InnerLoopParams &lp)
 {
-  std::ostringstream result;
+    std::ostringstream result;
 
-  result << "Ts.TsTest_SplineData.InnerLoopParams("
-         << "enabled = " << (lp.enabled ? "True" : "False")
-         << ", protoStart = " << _HexFloatRepr(lp.protoStart)
-         << ", protoEnd = " << _HexFloatRepr(lp.protoEnd)
-         << ", preLoopStart = " << _HexFloatRepr(lp.preLoopStart)
-         << ", postLoopEnd = " << _HexFloatRepr(lp.postLoopEnd)
-         << ", closedEnd = " << (lp.closedEnd ? "True" : "False")
-         << ", valueOffset = " << _HexFloatRepr(lp.valueOffset) << ")";
+    result << "Ts.TsTest_SplineData.InnerLoopParams("
+           << "enabled = " << (lp.enabled ? "True" : "False")
+           << ", protoStart = " << _HexFloatRepr(lp.protoStart)
+           << ", protoEnd = " << _HexFloatRepr(lp.protoEnd)
+           << ", numPreLoops = " << lp.numPreLoops
+           << ", numPostLoops = " << lp.numPostLoops
+           << ", valueOffset = " << _HexFloatRepr(lp.valueOffset)
+           << ")";
 
-  return result.str();
+    return result.str();
 }
 
-static This::Extrapolation *_ConstructExtrapolation(const This::ExtrapMethod method,
-                                                    const double slope,
-                                                    const This::LoopMode loopMode)
+static This::Extrapolation*
+_ConstructExtrapolation(
+    const This::ExtrapMethod method,
+    const double slope,
+    const This::LoopMode loopMode)
 {
-  This::Extrapolation *result = new This::Extrapolation();
+    This::Extrapolation *result = new This::Extrapolation();
 
-  result->method = method;
-  result->slope = slope;
-  result->loopMode = loopMode;
+    result->method = method;
+    result->slope = slope;
+    result->loopMode = loopMode;
 
-  return result;
+    return result;
 }
 
-static std::string _ExtrapolationRepr(const This::Extrapolation &e)
+static std::string
+_ExtrapolationRepr(const This::Extrapolation &e)
 {
-  std::ostringstream result;
+    std::ostringstream result;
 
-  result << "Ts.TsTest_SplineData.Extrapolation("
-         << "method = Ts.TsTest_SplineData." << TfEnum::GetName(e.method);
+    result << "Ts.TsTest_SplineData.Extrapolation("
+           << "method = Ts.TsTest_SplineData." << TfEnum::GetName(e.method);
 
-  if (e.method == This::ExtrapSloped)
-    result << ", slope = " << _HexFloatRepr(e.slope);
-  else if (e.method == This::ExtrapLoop)
-    result << ", loopMode = Ts.TsTest_SplineData." << TfEnum::GetName(e.loopMode);
+    if (e.method == This::ExtrapSloped)
+    {
+        result << ", slope = " << _HexFloatRepr(e.slope);
+    }
+    else if (e.method == This::ExtrapLoop)
+    {
+        result << ", loopMode = Ts.TsTest_SplineData."
+               << TfEnum::GetName(e.loopMode);
+    }
 
-  result << ")";
+    result << ")";
 
-  return result.str();
+    return result.str();
 }
 
-static This *_ConstructSplineData(const bool isHermite,
-                                  const object &knots,
-                                  const object &preExtrap,
-                                  const object &postExtrap,
-                                  const object &loopParams)
+static void _SetKnots(
+    This &data,
+    const object &knots)
 {
-  This *result = new This();
-
-  result->SetIsHermite(isHermite);
-
-  SET_METHOD(result, This::KnotSet, SetKnots, knots);
-  SET_METHOD(result, This::InnerLoopParams, SetInnerLoopParams, loopParams);
-  SET_METHOD(result, This::Extrapolation, SetPreExtrapolation, preExtrap);
-  SET_METHOD(result, This::Extrapolation, SetPostExtrapolation, postExtrap);
-
-  return result;
+    // Convert list-of-knots to std::set-of-knots.
+    if (!knots.is_none())
+    {
+        extract<std::vector<This::Knot>> extractor(knots);
+        if (extractor.check())
+        {
+            std::vector<This::Knot> knotVec = extractor();
+            This::KnotSet knotSet(knotVec.begin(), knotVec.end());
+            data.SetKnots(knotSet);
+        }
+        else
+        {
+            TF_CODING_ERROR("Unexpected type for SetKnots");
+        }
+    }
 }
 
-static std::string _SplineDataRepr(const This &data)
+static This*
+_ConstructSplineData(
+    const bool isHermite,
+    const object &knots,
+    const object &preExtrap,
+    const object &postExtrap,
+    const object &loopParams)
 {
-  std::ostringstream result;
+    This *result = new This();
 
-  result << "Ts.TsTest_SplineData("
-         << "isHermite = " << (data.GetIsHermite() ? "True" : "False")
-         << ", preExtrapolation = " << _ExtrapolationRepr(data.GetPreExtrapolation())
-         << ", postExtrapolation = " << _ExtrapolationRepr(data.GetPostExtrapolation());
+    result->SetIsHermite(isHermite);
 
-  const This::KnotSet &knots = data.GetKnots();
-  if (!knots.empty()) {
-    std::vector<std::string> kfStrs;
-    for (const This::Knot &kf : knots)
-      kfStrs.push_back(_KnotRepr(kf));
+    // Convert list-of-knots to std::set-of-knots.
+    _SetKnots(*result, knots);
 
-    result << ", knots = [" << TfStringJoin(kfStrs, ", ") << "]";
-  }
+    SET_METHOD(result, This::InnerLoopParams, SetInnerLoopParams, loopParams);
+    SET_METHOD(result, This::Extrapolation, SetPreExtrapolation, preExtrap);
+    SET_METHOD(result, This::Extrapolation, SetPostExtrapolation, postExtrap);
 
-  if (data.GetInnerLoopParams().enabled) {
-    result << ", innerLoopParams = " << _InnerLoopParamsRepr(data.GetInnerLoopParams());
-  }
+    return result;
+}
 
-  result << ")";
+static std::string
+_SplineDataRepr(const This &data)
+{
+    std::ostringstream result;
 
-  return result.str();
+    result << "Ts.TsTest_SplineData("
+           << "isHermite = " << (data.GetIsHermite() ? "True" : "False")
+           << ", preExtrapolation = "
+           << _ExtrapolationRepr(data.GetPreExtrapolation())
+           << ", postExtrapolation = "
+           << _ExtrapolationRepr(data.GetPostExtrapolation());
+
+    const This::KnotSet &knots = data.GetKnots();
+    if (!knots.empty())
+    {
+        std::vector<std::string> kfStrs;
+        for (const This::Knot &kf : knots)
+            kfStrs.push_back(_KnotRepr(kf));
+
+        // Expose knots as a list, even though in C++ they're a std::set.
+        // We want them sorted, which Python sets are not.
+        result << ", knots = [" << TfStringJoin(kfStrs, ", ") << "]";
+    }
+
+    if (data.GetInnerLoopParams().enabled)
+    {
+        result << ", innerLoopParams = "
+               << _InnerLoopParamsRepr(data.GetInnerLoopParams());
+    }
+
+    result << ")";
+
+    return result.str();
+}
+
+static std::string
+_SplineDataDebugDescription(const This &data)
+{
+    return data.GetDebugDescription();
 }
 
 void wrapTsTest_SplineData()
 {
-  // First the class object, so we can create a scope for it...
-  class_<This> classObj("TsTest_SplineData", no_init);
-  scope classScope(classObj);
+    // First the class object, so we can create a scope for it...
+    class_<This> classObj("TsTest_SplineData", no_init);
+    scope classScope(classObj);
 
-  // ...then the nested type wrappings, which require the scope...
+    // ...then the nested type wrappings, which require the scope...
 
-  TfPyWrapEnum<This::InterpMethod>();
-  TfPyWrapEnum<This::ExtrapMethod>();
-  TfPyWrapEnum<This::LoopMode>();
-  TfPyWrapEnum<This::Feature>();
+    TfPyWrapEnum<This::InterpMethod>();
+    TfPyWrapEnum<This::ExtrapMethod>();
+    TfPyWrapEnum<This::LoopMode>();
+    TfPyWrapEnum<This::Feature>();
 
-  class_<This::Knot>("Knot", no_init)
-      .def(init<const This::Knot &>())
-      .def("__init__",
-           make_constructor(&_ConstructKnot,
-                            default_call_policies(),
-                            (arg("time") = object(),
-                             arg("nextSegInterpMethod") = object(),
-                             arg("value") = object(),
-                             arg("preValue") = object(),
-                             arg("preSlope") = object(),
-                             arg("postSlope") = object(),
-                             arg("preLen") = object(),
-                             arg("postLen") = object(),
-                             arg("preAuto") = object(),
-                             arg("postAuto") = object())))
-      .def("__repr__", &_KnotRepr)
-      .def(self == self)
-      .def(self != self)
-      .def(self < self)
-      .def_readwrite("time", &This::Knot::time)
-      .def_readwrite("nextSegInterpMethod", &This::Knot::nextSegInterpMethod)
-      .def_readwrite("value", &This::Knot::value)
-      .def_readwrite("isDualValued", &This::Knot::isDualValued)
-      .def_readwrite("preValue", &This::Knot::preValue)
-      .def_readwrite("preSlope", &This::Knot::preSlope)
-      .def_readwrite("postSlope", &This::Knot::postSlope)
-      .def_readwrite("preLen", &This::Knot::preLen)
-      .def_readwrite("postLen", &This::Knot::postLen)
-      .def_readwrite("preAuto", &This::Knot::preAuto)
-      .def_readwrite("postAuto", &This::Knot::postAuto);
+    class_<This::Knot>("Knot", no_init)
+        .def(init<const This::Knot&>())
+        .def("__init__",
+            make_constructor(
+                &_ConstructKnot, default_call_policies(), (
+                    arg("time") = 0.0,
+                    arg("nextSegInterpMethod") = This::InterpHeld,
+                    arg("value") = 0.0,
+                    arg("preValue") = object(),
+                    arg("preSlope") = object(),
+                    arg("postSlope") = object(),
+                    arg("preLen") = object(),
+                    arg("postLen") = object(),
+                    arg("preAuto") = object(),
+                    arg("postAuto") = object()
+                )))
+        .def("__repr__", &_KnotRepr)
+        .def(self == self)
+        .def(self != self)
+        .def(self < self)
+        .def_readwrite("time", &This::Knot::time)
+        .def_readwrite(
+            "nextSegInterpMethod", &This::Knot::nextSegInterpMethod)
+        .def_readwrite("value", &This::Knot::value)
+        .def_readwrite("isDualValued", &This::Knot::isDualValued)
+        .def_readwrite("preValue", &This::Knot::preValue)
+        .def_readwrite("preSlope", &This::Knot::preSlope)
+        .def_readwrite("postSlope", &This::Knot::postSlope)
+        .def_readwrite("preLen", &This::Knot::preLen)
+        .def_readwrite("postLen", &This::Knot::postLen)
+        .def_readwrite("preAuto", &This::Knot::preAuto)
+        .def_readwrite("postAuto", &This::Knot::postAuto)
+        ;
 
-  class_<This::InnerLoopParams>("InnerLoopParams", no_init)
-      .def(init<const This::InnerLoopParams &>())
-      .def("__init__",
-           make_constructor(&_ConstructInnerLoopParams,
-                            default_call_policies(),
-                            (arg("enabled") = object(),
-                             arg("protoStart") = object(),
-                             arg("protoEnd") = object(),
-                             arg("preLoopStart") = object(),
-                             arg("postLoopEnd") = object(),
-                             arg("closedEnd") = object(),
-                             arg("valueOffset") = object())))
-      .def("__repr__", &_InnerLoopParamsRepr)
-      .def(self == self)
-      .def(self != self)
-      .def_readwrite("enabled", &This::InnerLoopParams::enabled)
-      .def_readwrite("protoStart", &This::InnerLoopParams::protoStart)
-      .def_readwrite("protoEnd", &This::InnerLoopParams::protoEnd)
-      .def_readwrite("preLoopStart", &This::InnerLoopParams::preLoopStart)
-      .def_readwrite("postLoopEnd", &This::InnerLoopParams::postLoopEnd)
-      .def_readwrite("closedEnd", &This::InnerLoopParams::closedEnd)
-      .def_readwrite("valueOffset", &This::InnerLoopParams::valueOffset)
-      .def("IsValid", &This::InnerLoopParams::IsValid);
+    class_<This::InnerLoopParams>("InnerLoopParams", no_init)
+        .def(init<const This::InnerLoopParams&>())
+        .def("__init__",
+            make_constructor(
+                &_ConstructInnerLoopParams, default_call_policies(), (
+                    arg("enabled") = false,
+                    arg("protoStart") = object(),
+                    arg("protoEnd") = object(),
+                    arg("numPreLoops") = object(),
+                    arg("numPostLoops") = object(),
+                    arg("valueOffset") = object()
+                )))
+        .def("__repr__", &_InnerLoopParamsRepr)
+        .def(self == self)
+        .def(self != self)
+        .def_readwrite("enabled", &This::InnerLoopParams::enabled)
+        .def_readwrite("protoStart", &This::InnerLoopParams::protoStart)
+        .def_readwrite("protoEnd", &This::InnerLoopParams::protoEnd)
+        .def_readwrite("numPreLoops", &This::InnerLoopParams::numPreLoops)
+        .def_readwrite("numPostLoops", &This::InnerLoopParams::numPostLoops)
+        .def_readwrite("valueOffset", &This::InnerLoopParams::valueOffset)
+        .def("IsValid", &This::InnerLoopParams::IsValid)
+        ;
 
-  class_<This::Extrapolation>("Extrapolation", no_init)
-      .def(init<const This::Extrapolation &>())
-      .def("__init__",
-           make_constructor(&_ConstructExtrapolation,
-                            default_call_policies(),
-                            (arg("method") = This::ExtrapHeld,
-                             arg("slope") = 0.0,
-                             arg("loopMode") = This::LoopNone)))
-      .def("__repr__", &_ExtrapolationRepr)
-      .def(self == self)
-      .def(self != self)
-      .def_readwrite("method", &This::Extrapolation::method)
-      .def_readwrite("slope", &This::Extrapolation::slope)
-      .def_readwrite("loopMode", &This::Extrapolation::loopMode);
+    class_<This::Extrapolation>("Extrapolation", no_init)
+        .def(init<const This::Extrapolation&>())
+        .def("__init__",
+            make_constructor(
+                &_ConstructExtrapolation, default_call_policies(), (
+                    arg("method") = This::ExtrapHeld,
+                    arg("slope") = 0.0,
+                    arg("loopMode") = This::LoopNone
+                )))
+        .def("__repr__", &_ExtrapolationRepr)
+        .def(self == self)
+        .def(self != self)
+        .def_readwrite("method", &This::Extrapolation::method)
+        .def_readwrite("slope", &This::Extrapolation::slope)
+        .def_readwrite("loopMode", &This::Extrapolation::loopMode)
+        ;
 
-  TfPyRegisterStlSequencesFromPython<double>();
-  TfPyRegisterStlSequencesFromPython<This::Knot>();
+    TfPyRegisterStlSequencesFromPython<double>();
+    TfPyRegisterStlSequencesFromPython<This::Knot>();
 
-  // ...then the defs, which must occur after the nested type wrappings.
-  classObj
+    // ...then the defs, which must occur after the nested type wrappings.
+    classObj
 
-      .def("__init__",
-           make_constructor(&_ConstructSplineData,
-                            default_call_policies(),
-                            (arg("isHermite") = false,
-                             arg("knots") = object(),
-                             arg("preExtrapolation") = object(),
-                             arg("postExtrapolation") = object(),
-                             arg("innerLoopParams") = object())))
+        .def(init<const This&>())
+        .def("__init__",
+            make_constructor(
+                &_ConstructSplineData, default_call_policies(), (
+                    arg("isHermite") = false,
+                    arg("knots") = object(),
+                    arg("preExtrapolation") = object(),
+                    arg("postExtrapolation") = object(),
+                    arg("innerLoopParams") = object()
+                )))
 
-      .def("__repr__", &_SplineDataRepr)
+        .def("__repr__", &_SplineDataRepr)
+        .def("__str__", &_SplineDataDebugDescription)
 
-      .def(self == self)
-      .def(self != self)
+        .def(self == self)
+        .def(self != self)
 
-      .def("SetIsHermite", &This::SetIsHermite, (arg("isHermite")))
+        .def("SetIsHermite", &This::SetIsHermite,
+            (arg("isHermite")))
 
-      .def("AddKnot", &This::AddKnot, (arg("knot")))
+        .def("AddKnot", &This::AddKnot,
+            (arg("knot")))
 
-      .def("SetKnots", &This::SetKnots, (arg("knots")))
+        .def("SetKnots", &_SetKnots,
+            (arg("knots")))
 
-      .def("SetPreExtrapolation", &This::SetPreExtrapolation, (arg("preExtrap")))
+        .def("SetPreExtrapolation", &This::SetPreExtrapolation,
+            (arg("preExtrap")))
 
-      .def("SetPostExtrapolation", &This::SetPostExtrapolation, (arg("postExtrap")))
+        .def("SetPostExtrapolation", &This::SetPostExtrapolation,
+            (arg("postExtrap")))
 
-      .def("SetInnerLoopParams", &This::SetInnerLoopParams, (arg("params")))
+        .def("SetInnerLoopParams", &This::SetInnerLoopParams,
+            (arg("params")))
 
-      .def("GetIsHermite", &This::GetIsHermite)
+        .def("GetIsHermite", &This::GetIsHermite)
 
-      .def("GetKnots", &This::GetKnots, return_value_policy<TfPySequenceToList>())
+        .def("GetKnots", &This::GetKnots,
+            return_value_policy<TfPySequenceToList>())
 
-      .def("GetPreExtrapolation",
-           &This::GetPreExtrapolation,
-           return_value_policy<return_by_value>())
+        .def("GetPreExtrapolation", &This::GetPreExtrapolation,
+            return_value_policy<return_by_value>())
 
-      .def("GetPostExtrapolation",
-           &This::GetPostExtrapolation,
-           return_value_policy<return_by_value>())
+        .def("GetPostExtrapolation", &This::GetPostExtrapolation,
+            return_value_policy<return_by_value>())
 
-      .def("GetInnerLoopParams", &This::GetInnerLoopParams, return_value_policy<return_by_value>())
+        .def("GetInnerLoopParams", &This::GetInnerLoopParams,
+            return_value_policy<return_by_value>())
 
-      .def("GetRequiredFeatures", &This::GetRequiredFeatures)
+        .def("GetRequiredFeatures", &This::GetRequiredFeatures)
 
-      .def("GetDebugDescription", &This::GetDebugDescription)
+        .def("GetDebugDescription", &This::GetDebugDescription,
+            (arg("precision") = 6))
 
-      ;
+        ;
 }

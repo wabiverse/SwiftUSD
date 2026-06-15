@@ -8,13 +8,12 @@
 #ifndef PXR_BASE_TRACE_SERIALIZATION_H
 #define PXR_BASE_TRACE_SERIALIZATION_H
 
+#include "pxr/pxrns.h"
 #include "Trace/api.h"
 #include "Trace/collection.h"
-#include "pxr/pxrns.h"
 
-#include <istream>
+#include <iosfwd>
 #include <memory>
-#include <ostream>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -25,24 +24,26 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This class contains methods to read and write TraceCollection.
 ///
 class TraceSerialization {
- public:
-  /// Writes \p col to \p ostr.
-  /// Returns true if the write was successful, false otherwise.
-  TRACE_API static bool Write(std::ostream &ostr, const std::shared_ptr<TraceCollection> &col);
+public:
+    /// Writes \p col to \p ostr.
+    /// Returns true if the write was successful, false otherwise.
+    TRACE_API static bool Write(std::ostream& ostr,
+        const std::shared_ptr<TraceCollection>& col);
 
-  /// Writes \p collections to \p ostr.
-  /// Returns true if the write was successful, false otherwise.
-  TRACE_API static bool Write(std::ostream &ostr,
-                              const std::vector<std::shared_ptr<TraceCollection>> &collections);
+    /// Writes \p collections to \p ostr.
+    /// Returns true if the write was successful, false otherwise.
+    TRACE_API static bool Write(
+        std::ostream& ostr,
+        const std::vector<std::shared_ptr<TraceCollection>>& collections);
 
-  /// Tries to create a TraceCollection from the contexts of \p istr.
-  /// Returns a pointer to the created collection if it was successful.
-  /// If there is an error reading \p istr, \p error will be populated with a
-  /// description.
-  TRACE_API static std::unique_ptr<TraceCollection> Read(std::istream &istr,
-                                                         std::string *error = nullptr);
+    /// Tries to create a TraceCollection from the contexts of \p istr.
+    /// Returns a pointer to the created collection if it was successful.
+    /// If there is an error reading \p istr, \p error will be populated with a
+    /// description.
+    TRACE_API static std::unique_ptr<TraceCollection> Read(std::istream& istr,
+        std::string* error = nullptr);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TRACE_SERIALIZATION_H
+#endif // PXR_BASE_TRACE_SERIALIZATION_H

@@ -8,13 +8,13 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/Hdx/shaders/renderPassColorAndSelectionShader.glslfx
+--- #import $TOOLS/hdx/shaders/renderPassColorAndSelectionShader.glslfx
 // Render pass shader configuration that writes color and selection information
 // (whether the fragment is selected).
 
-#import $TOOLS/HdSt/shaders/renderPass.glslfx
-#import $TOOLS/Hdx/shaders/renderPass.glslfx
-#import $TOOLS/Hdx/shaders/selection.glslfx
+#import $TOOLS/hdSt/shaders/renderPass.glslfx
+#import $TOOLS/hdx/shaders/renderPass.glslfx
+#import $TOOLS/hdx/shaders/selection.glslfx
 
 -- configuration
 {

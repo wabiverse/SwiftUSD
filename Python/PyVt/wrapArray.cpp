@@ -5,10 +5,11 @@
 // https://openusd.org/license.
 //
 
-#include "Vt/wrapArray.h"
-#include "Tf/preprocessorUtilsLite.h"
 #include "pxr/pxrns.h"
+#include "Tf/preprocessorUtilsLite.h"
+#include "Vt/wrapArray.h"
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Vt_WrapArray {
@@ -18,13 +19,36 @@ namespace Vt_WrapArray {
 // simply return the "common name" for the VtArray.  For instance,
 // GetVtArrayName<VtArray<int> >() -> "VtIntArray".
 #define MAKE_NAME_FUNC(unused, elem) \
-  template<> VT_API string GetVtArrayName<VT_TYPE(elem)>() \
-  { \
+template <> \
+VT_API string GetVtArrayName< VT_TYPE(elem) >() { \
     return TF_PP_STRINGIZE(VT_TYPE_NAME(elem)); \
-  }
+}
 TF_PP_SEQ_FOR_EACH(MAKE_NAME_FUNC, ~, VT_ARRAY_VALUE_TYPES)
 #undef MAKE_NAME_FUNC
 
-}  // namespace Vt_WrapArray
+
+unsigned int
+Vt_ComputeEffectiveRankAndLastDimSize(
+    Vt_ShapeData const *sd, size_t *lastDimSize)
+{
+    unsigned int rank = sd->GetRank();
+    if (rank == 1)
+        return rank;
+
+    size_t divisor = std::accumulate(
+        sd->otherDims, sd->otherDims + rank-1,
+        1, [](size_t x, size_t y) { return x * y; });
+
+    size_t remainder = divisor ? sd->totalSize % divisor : 0;
+    *lastDimSize = divisor ? sd->totalSize / divisor : 0;
+    
+    if (remainder)
+        rank = 1;
+
+    return rank;
+}
+
+} // namespace Vt_WrapArray
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED

@@ -9,8 +9,8 @@
 
 /// \file ar/packageResolver.h
 
-#include "Ar/api.h"
 #include "pxr/pxrns.h"
+#include "Ar/api.h"
 
 #include <memory>
 #include <string>
@@ -21,13 +21,13 @@ class ArAsset;
 class VtValue;
 
 /// \class ArPackageResolver
-///
+/// 
 /// Interface for resolving assets within package assets. A package resolver
 /// is responsible for processing particular package asset formats and
 /// resolving information about assets stored within that package.
 ///
-/// Each package resolver is associated with particular file formats and is
-/// invoked by asset resolution when handling package-relative paths involving
+/// Each package resolver is associated with particular file formats and is 
+/// invoked by asset resolution when handling package-relative paths involving 
 /// those formats. ArPackageResolver instances are only used internally by Ar
 /// and are not directly exposed to clients.
 ///
@@ -67,90 +67,95 @@ class VtValue;
 ///                     }
 ///                 }
 ///             },
-///             ...
+///             ... 
 ///         },
 ///         ...
 ///     ]
-///
+/// 
 /// }
 /// \endcode
 ///
-class ArPackageResolver {
- public:
-  ArPackageResolver(const ArPackageResolver &) = delete;
-  ArPackageResolver &operator=(const ArPackageResolver &) = delete;
+class ArPackageResolver
+{
+public:
+    ArPackageResolver(const ArPackageResolver&) = delete;
+    ArPackageResolver& operator=(const ArPackageResolver&) = delete;
 
-  AR_API
-  virtual ~ArPackageResolver();
+    AR_API
+    virtual ~ArPackageResolver();
 
-  // --------------------------------------------------------------------- //
-  /// \name Packaged Path Resolution Operations
-  ///
-  /// @{
-  // --------------------------------------------------------------------- //
+    // --------------------------------------------------------------------- //
+    /// \name Packaged Path Resolution Operations
+    ///
+    /// @{
+    // --------------------------------------------------------------------- //
 
-  /// Returns the resolved path for the asset located at \p packagedPath
-  /// in the package specified by \p resolvedPackagePath if it exists.
-  /// If the asset does not exist in the package, returns an empty string.
-  ///
-  /// When ArResolver::Resolve is invoked on a package-relative path, the
-  /// path will be parsed into the outermost package path, and the inner
-  /// packaged path. The outermost package path will be resolved by the
-  /// primary resolver. ArPackageResolver::Resolve will then be called on
-  /// the corresponding package resolver with that resolved path and the
-  /// inner packaged path. If the inner packaged path is itself a
-  /// package-relative path, this process recurses until all paths have been
-  /// resolved.
-  ///
-  /// \see ArResolver::Resolve
-  AR_API
-  virtual std::string Resolve(const std::string &resolvedPackagePath,
-                              const std::string &packagedPath) = 0;
+    /// Returns the resolved path for the asset located at \p packagedPath 
+    /// in the package specified by \p resolvedPackagePath if it exists. 
+    /// If the asset does not exist in the package, returns an empty string.
+    ///
+    /// When ArResolver::Resolve is invoked on a package-relative path, the
+    /// path will be parsed into the outermost package path, and the inner
+    /// packaged path. The outermost package path will be resolved by the
+    /// primary resolver. ArPackageResolver::Resolve will then be called on
+    /// the corresponding package resolver with that resolved path and the
+    /// inner packaged path. If the inner packaged path is itself a 
+    /// package-relative path, this process recurses until all paths have been
+    /// resolved.
+    ///
+    /// \see ArResolver::Resolve
+    AR_API
+    virtual std::string Resolve(
+        const std::string& resolvedPackagePath,
+        const std::string& packagedPath) = 0;
+    
+    /// @}
 
-  /// @}
+    // --------------------------------------------------------------------- //
+    /// \name Asset-specific Operations
+    ///
+    /// @{
+    // --------------------------------------------------------------------- //
 
-  // --------------------------------------------------------------------- //
-  /// \name Asset-specific Operations
-  ///
-  /// @{
-  // --------------------------------------------------------------------- //
+    /// Returns an ArAsset object for the asset at \p resolvedPackagedPath
+    /// located in the package asset at \p resolvedPackagePath. 
+    /// Returns an invalid std::shared_ptr if object could not be created.
+    ///
+    /// \see ArResolver::OpenAsset
+    AR_API
+    virtual std::shared_ptr<ArAsset> OpenAsset(
+        const std::string& resolvedPackagePath,
+        const std::string& resolvedPackagedPath) = 0;
 
-  /// Returns an ArAsset object for the asset at \p resolvedPackagedPath
-  /// located in the package asset at \p resolvedPackagePath.
-  /// Returns an invalid std::shared_ptr if object could not be created.
-  ///
-  /// \see ArResolver::OpenAsset
-  AR_API
-  virtual std::shared_ptr<ArAsset> OpenAsset(const std::string &resolvedPackagePath,
-                                             const std::string &resolvedPackagedPath) = 0;
+    // --------------------------------------------------------------------- //
+    /// \name Scoped Resolution Cache
+    /// 
+    /// These functions are called when scoped resolution caches are enabled
+    /// via ArResolver. 
+    ///
+    /// \see \ref ArResolver_scopedCache "Scoped Resolution Cache"
+    /// @{
+    // --------------------------------------------------------------------- //
 
-  // --------------------------------------------------------------------- //
-  /// \name Scoped Resolution Cache
-  ///
-  /// These functions are called when scoped resolution caches are enabled
-  /// via ArResolver.
-  ///
-  /// \see \ref ArResolver_scopedCache "Scoped Resolution Cache"
-  /// @{
-  // --------------------------------------------------------------------- //
+    /// Mark the start of a resolution caching scope.
+    ///
+    /// \see ArResolver::BeginCacheScope
+    AR_API
+    virtual void BeginCacheScope(
+        VtValue* cacheScopeData) = 0;
 
-  /// Mark the start of a resolution caching scope.
-  ///
-  /// \see ArResolver::BeginCacheScope
-  AR_API
-  virtual void BeginCacheScope(VtValue *cacheScopeData) = 0;
-
-  /// Mark the end of a resolution caching scope.
-  ///
-  /// \see ArResolver::EndCacheScope
-  AR_API
-  virtual void EndCacheScope(VtValue *cacheScopeData) = 0;
-
- protected:
-  AR_API
-  ArPackageResolver();
+    /// Mark the end of a resolution caching scope.
+    ///
+    /// \see ArResolver::EndCacheScope
+    AR_API
+    virtual void EndCacheScope(
+        VtValue* cacheScopeData) = 0;
+    
+protected:
+    AR_API
+    ArPackageResolver();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_PACKAGE_RESOLVER_H
+#endif // PXR_USD_AR_PACKAGE_RESOLVER_H

@@ -19,85 +19,101 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrimvarsSchemaTokens, HD_PRIMVARS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrimvarsSchemaTokens,
+    HD_PRIMVARS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-TfTokenVector HdPrimvarsSchema::GetPrimvarNames() const
+TfTokenVector
+HdPrimvarsSchema::GetPrimvarNames() const
 {
-  if (_container) {
-    return _container->GetNames();
-  }
-  else {
-    return {};
-  }
+    if (_container) {
+        return _container->GetNames();
+    } else {
+        return {};
+    }
 }
 
-HdPrimvarSchema HdPrimvarsSchema::GetPrimvar(const TfToken &name) const
+HdPrimvarSchema
+HdPrimvarsSchema::GetPrimvar(const TfToken &name) const
 {
-  return HdPrimvarSchema(_GetTypedDataSource<HdContainerDataSource>(name));
-}
-
-/*static*/
-HdContainerDataSourceHandle HdPrimvarsSchema::BuildRetained(
-    const size_t count, const TfToken *const names, const HdDataSourceBaseHandle *const values)
-{
-  return HdRetainedContainerDataSource::New(count, names, values);
+    return HdPrimvarSchema(
+        _GetTypedDataSource<HdContainerDataSource>(name));
 }
 
 /*static*/
-HdPrimvarsSchema HdPrimvarsSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle
+HdPrimvarsSchema::BuildRetained(
+    const size_t count,
+    const TfToken * const names,
+    const HdDataSourceBaseHandle * const values)
 {
-  return HdPrimvarsSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(HdPrimvarsSchemaTokens->primvars)) :
-          nullptr);
+    return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-const TfToken &HdPrimvarsSchema::GetSchemaToken()
+HdPrimvarsSchema
+HdPrimvarsSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdPrimvarsSchemaTokens->primvars;
+    return HdPrimvarsSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdPrimvarsSchemaTokens->primvars))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdPrimvarsSchema::GetDefaultLocator()
+const TfToken &
+HdPrimvarsSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdPrimvarsSchemaTokens->primvars;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdPrimvarsSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdPrimvarsSchema::GetPointsLocator()
+const HdDataSourceLocator &
+HdPrimvarsSchema::GetPointsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdPrimvarsSchemaTokens->points);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdPrimvarsSchemaTokens->points);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdPrimvarsSchema::GetNormalsLocator()
+const HdDataSourceLocator &
+HdPrimvarsSchema::GetNormalsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdPrimvarsSchemaTokens->normals);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdPrimvarsSchemaTokens->normals);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdPrimvarsSchema::GetWidthsLocator()
+const HdDataSourceLocator &
+HdPrimvarsSchema::GetWidthsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdPrimvarsSchemaTokens->widths);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdPrimvarsSchemaTokens->widths);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

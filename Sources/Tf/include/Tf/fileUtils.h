@@ -11,12 +11,12 @@
 /// \ingroup group_tf_File
 /// Definitions of basic file utilities in tf.
 
-#include "Tf/api.h"
 #include "pxr/pxrns.h"
+#include "Tf/api.h"
 
-#include <functional>
 #include <string>
 #include <vector>
+#include <functional>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -25,28 +25,49 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// If \p resolveSymlinks is false (default), the path is checked using
 /// lstat(). if \p resolveSymlinks is true, the path is checked using stat(),
 /// which resolves all symbolic links in the path.
+///
+/// On Windows, if the path points to a reparse point symlink on a network
+/// share, even if resolveSymlinks is true we are unable to follow the
+/// symlink, and so will return true even if the destination of the symlink
+/// does not exist.
 TF_API
-bool TfPathExists(std::string const &path, bool resolveSymlinks = false);
+bool TfPathExists(std::string const& path, bool resolveSymlinks = false);
 
 /// Returns true if the path exists and is a directory.
 ///
 /// If \p resolveSymlinks is false (default), the path is checked using
 /// lstat(). if \p resolveSymlinks is true, the path is checked using stat(),
 /// which resolves all symbolic links in the path.
+///
+/// On Windows, if the path points to a reparse point symlink on a network
+/// share, even if resolveSymlinks is true we are unable to follow the
+/// symlink, and so will return true even if the destination of the symlink
+/// does not exist.
 TF_API
-bool TfIsDir(std::string const &path, bool resolveSymlinks = false);
+bool TfIsDir(std::string const& path, bool resolveSymlinks = false);
 
 /// Returns true if the path exists and is a file.
 ///
 /// If \p resolveSymlinks is false (default), the path is checked using
 /// lstat(). if \p resolveSymlinks is true, the path is checked using stat(),
 /// which resolves all symbolic links in the path.
+///
+/// On Windows, if the path points to a reparse point symlink on a network
+/// share, even if resolveSymlinks is true we are unable to follow the
+/// symlink, and so will return true even if the destination of the symlink
+/// does not exist.
 TF_API
-bool TfIsFile(std::string const &path, bool resolveSymlinks = false);
+bool TfIsFile(std::string const& path, bool resolveSymlinks = false);
 
 /// Returns true if the path exists and is a symbolic link.
+///
+/// On Windows, if the path points to a reparse point symlink on a network
+/// share, we are unable to follow the symlink, so we will return false for
+/// this directory even though it is a link. This is because any attempt to
+/// actually follow this link will fail, so it is safer to pretend it is not
+/// actually a link.
 TF_API
-bool TfIsLink(std::string const &path);
+bool TfIsLink(std::string const& path);
 
 /// Returns true if the file or directory at \p path is writable.
 ///
@@ -56,19 +77,19 @@ bool TfIsLink(std::string const &path);
 /// directory path is writable. If the file or directory does not exist, this
 /// function returns false.
 TF_API
-bool TfIsWritable(std::string const &path);
+bool TfIsWritable(std::string const& path);
 
 /// Returns true if the path is an empty directory.
 TF_API
-bool TfIsDirEmpty(std::string const &path);
+bool TfIsDirEmpty(std::string const& path);
 
 /// Creates a symbolic link from \p src to \p dst.
 TF_API
-bool TfSymlink(std::string const &src, std::string const &dst);
+bool TfSymlink(std::string const& src, std::string const& dst);
 
 /// Deletes a file at path.
 TF_API
-bool TfDeleteFile(std::string const &path);
+bool TfDeleteFile(std::string const& path);
 
 /// Creates a directory.
 ///
@@ -77,7 +98,7 @@ bool TfDeleteFile(std::string const &path);
 /// exists, or an error occurs while creating the directory, this method
 /// returns false.
 TF_API
-bool TfMakeDir(std::string const &path, int mode = -1);
+bool TfMakeDir(std::string const& path, int mode=-1);
 
 /// Creates a directory hierarchy.
 ///
@@ -87,7 +108,7 @@ bool TfMakeDir(std::string const &path, int mode = -1);
 /// target directory exists, this function returns false if \p existOk is
 /// false.
 TF_API
-bool TfMakeDirs(std::string const &path, int mode = -1, bool existOk = false);
+bool TfMakeDirs(std::string const& path, int mode=-1, bool existOk=false);
 
 /// Function type for TfWalkDirs.
 ///
@@ -101,16 +122,17 @@ bool TfMakeDirs(std::string const &path, int mode = -1, bool existOk = false);
 /// with \c topDown set to \c false. The final parameter is a vector of file
 /// names found in the directory path. The returned value determines whether
 /// the walk should be terminated (\c false), or continue (\c true).
-typedef std::function<bool(
-    std::string const &, std::vector<std::string> *, std::vector<std::string> const &)>
-    TfWalkFunction;
+typedef std::function<bool (std::string const&,
+                            std::vector<std::string> *,
+                            std::vector<std::string> const&)> TfWalkFunction;
 
 /// TfRmTree error handler function.
 ///
 /// The first parameter is the path which caused the error (file or directory),
 /// and the second parameter is an error message indicating why the error
 /// occurred.
-typedef std::function<void(std::string const &, std::string const &)> TfWalkErrorHandler;
+typedef std::function<void (std::string const&,
+                            std::string const&)> TfWalkErrorHandler;
 
 /// error handler to use when you want to ignore errors
 ///
@@ -118,7 +140,7 @@ typedef std::function<void(std::string const &, std::string const &)> TfWalkErro
 /// you can pass in this public error handler which will ignore all the
 /// errors.
 TF_API
-void TfWalkIgnoreErrorHandler(std::string const &path, std::string const &msg);
+void TfWalkIgnoreErrorHandler(std::string const& path, std::string const& msg);
 
 /// Directory tree walker.
 ///
@@ -159,9 +181,9 @@ void TfWalkIgnoreErrorHandler(std::string const &path, std::string const &msg);
 /// the value of \p followLinks. Calling TfWalkDirs with a file argument
 /// returns immediately without calling \p fn.
 TF_API
-void TfWalkDirs(std::string const &top,
+void TfWalkDirs(std::string const& top,
                 TfWalkFunction fn,
-                bool topDown = true,
+                bool topDown=true,
                 TfWalkErrorHandler onError = 0,
                 bool followLinks = false);
 
@@ -173,7 +195,8 @@ void TfWalkDirs(std::string const &top,
 /// call this handler when errors occur.  This handler receives the path which
 /// caused the error, and a message indicating why the error occurred.
 TF_API
-void TfRmTree(std::string const &path, TfWalkErrorHandler onError = 0);
+void TfRmTree(std::string const& path,
+              TfWalkErrorHandler onError = 0);
 
 /// Return a list containing files and directories in \p path.
 ///
@@ -181,7 +204,8 @@ void TfRmTree(std::string const &path, TfWalkErrorHandler onError = 0);
 /// in the listing.  If \p recursive is true, the directory listing will
 /// include all subdirectory structure of \p path.
 TF_API
-std::vector<std::string> TfListDir(std::string const &path, bool recursive = false);
+std::vector<std::string> TfListDir(std::string const& path,
+                                   bool recursive = false);
 
 /// Read the contents of \p dirPath and append the names of the contained
 /// directories, files, and symlinks to \p dirnames, \p filenames, and
@@ -194,22 +218,23 @@ std::vector<std::string> TfListDir(std::string const &path, bool recursive = fal
 /// It is safe to pass NULL for any of \p dirnames, \p filenames, and
 /// \p symlinknames. In that case those elements are not reported
 TF_API
-bool TfReadDir(std::string const &dirPath,
-               std::vector<std::string> *dirnames,
-               std::vector<std::string> *filenames,
-               std::vector<std::string> *symlinknames,
-               std::string *errMsg = NULL);
+bool
+TfReadDir(std::string const &dirPath,
+          std::vector<std::string> *dirnames,
+          std::vector<std::string> *filenames,
+          std::vector<std::string> *symlinknames,
+          std::string *errMsg = NULL);
 
 /// Touch \p fileName, updating access and modification time to 'now'.
 ///
 /// A simple touch-like functionality. Simple in a sense that it does not
 /// offer as many options as the same-name unix touch command, but otherwise
-/// is identical to the default touch behavior. If \p create is true and
+/// is identical to the default touch behavior. If \p create is true and 
 /// the file does not already exist, an empty file gets created, otherwise
 /// the touch call fails if the file does not already exist.
 TF_API
-bool TfTouchFile(std::string const &fileName, bool create = true);
+bool TfTouchFile(std::string const &fileName, bool create=true);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_FILE_UTILS_H
+#endif // PXR_BASE_TF_FILE_UTILS_H

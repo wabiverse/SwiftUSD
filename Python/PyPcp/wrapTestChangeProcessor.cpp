@@ -5,101 +5,122 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Pcp/cache.h"
 #include "Pcp/changes.h"
-#include "pxr/pxrns.h"
 
 #include "Sdf/changeList.h"
 #include "Sdf/notice.h"
 
 #include "Tf/pyResultConversions.h"
 #include "Tf/weakBase.h"
-#include <boost/noncopyable.hpp>
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-class Pcp_PyTestChangeProcessor : public TfWeakBase, public boost::noncopyable {
- public:
-  Pcp_PyTestChangeProcessor(const PcpCache *cache) : _cache(cache) {}
-
-  void Enter()
-  {
-    _layerChangedNoticeKey = TfNotice::Register(TfCreateWeakPtr(this),
-                                                &Pcp_PyTestChangeProcessor::_HandleLayerDidChange);
-  }
-
-  void Exit(const object &, const object &, const object &)
-  {
-    TfNotice::Revoke(_layerChangedNoticeKey);
-    _changes = PcpChanges();
-  }
-
-  SdfPathVector GetSignificantChanges() const
-  {
-    TF_FOR_ALL(it, _changes.GetCacheChanges())
+class Pcp_PyTestChangeProcessor
+    : public TfWeakBase
+{
+public:
+    Pcp_PyTestChangeProcessor(const PcpCache* cache)
+        : _cache(cache)
     {
-      if (it->first == _cache) {
-        return SdfPathVector(it->second.didChangeSignificantly.begin(),
-                             it->second.didChangeSignificantly.end());
-      }
     }
-    return SdfPathVector();
-  }
 
-  SdfPathVector GetSpecChanges() const
-  {
-    TF_FOR_ALL(it, _changes.GetCacheChanges())
+    Pcp_PyTestChangeProcessor(const Pcp_PyTestChangeProcessor&) = delete;
+
+    Pcp_PyTestChangeProcessor&
+    operator=(const Pcp_PyTestChangeProcessor&) = delete;
+
+    void Enter()
     {
-      if (it->first == _cache) {
-        return SdfPathVector(it->second.didChangeSpecs.begin(), it->second.didChangeSpecs.end());
-      }
+        _layerChangedNoticeKey = TfNotice::Register(
+            TfCreateWeakPtr(this),
+            &Pcp_PyTestChangeProcessor::_HandleLayerDidChange);
     }
-    return SdfPathVector();
-  }
 
-  SdfPathVector GetPrimChanges() const
-  {
-    TF_FOR_ALL(it, _changes.GetCacheChanges())
+    void Exit(const object&, const object&, const object&)
     {
-      if (it->first == _cache) {
-        return SdfPathVector(it->second.didChangePrims.begin(), it->second.didChangePrims.end());
-      }
+        TfNotice::Revoke(_layerChangedNoticeKey);
+        _changes = PcpChanges();
     }
-    return SdfPathVector();
-  }
 
- private:
-  void _HandleLayerDidChange(const SdfNotice::LayersDidChange &n)
-  {
-    _changes.DidChange(_cache, n.GetChangeListVec());
-    _changes.Apply();
-  }
+    SdfPathVector GetSignificantChanges() const
+    {
+        TF_FOR_ALL(it, _changes.GetCacheChanges()) {
+            if (it->first == _cache) {
+                return SdfPathVector(
+                    it->second.didChangeSignificantly.begin(), 
+                    it->second.didChangeSignificantly.end());
+            }
+        }
+        return SdfPathVector();
+    }
 
- private:
-  const PcpCache *_cache;
-  TfNotice::Key _layerChangedNoticeKey;
-  PcpChanges _changes;
+    SdfPathVector GetSpecChanges() const
+    {
+        TF_FOR_ALL(it, _changes.GetCacheChanges()) {
+            if (it->first == _cache) {
+                return SdfPathVector(
+                    it->second.didChangeSpecs.begin(), 
+                    it->second.didChangeSpecs.end());
+            }
+        }
+        return SdfPathVector();
+    }
+
+    SdfPathVector GetPrimChanges() const
+    {
+        TF_FOR_ALL(it, _changes.GetCacheChanges()) {
+            if (it->first == _cache) {
+                return SdfPathVector(
+                    it->second.didChangePrims.begin(), 
+                    it->second.didChangePrims.end());
+            }
+        }
+        return SdfPathVector();
+    }
+
+private:
+    void _HandleLayerDidChange(const SdfNotice::LayersDidChange& n)
+    {
+        _changes.DidChange(_cache, n.GetChangeListVec());
+        _changes.Apply();
+    }
+
+private:
+    const PcpCache* _cache;
+    TfNotice::Key _layerChangedNoticeKey;
+    PcpChanges _changes;
 };
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapTestChangeProcessor()
+void
+wrapTestChangeProcessor()
 {
-  typedef Pcp_PyTestChangeProcessor This;
-  typedef TfWeakPtr<Pcp_PyTestChangeProcessor> ThisPtr;
+    typedef Pcp_PyTestChangeProcessor This;
+    typedef TfWeakPtr<Pcp_PyTestChangeProcessor> ThisPtr;
 
-  class_<This, ThisPtr, boost::noncopyable>("_TestChangeProcessor", init<PcpCache *>())
-      .def("__enter__", &This::Enter, return_self<>())
-      .def("__exit__", &This::Exit)
+    class_<This, ThisPtr, noncopyable>
+        ("_TestChangeProcessor", init<PcpCache*>())
+        .def("__enter__", &This::Enter, return_self<>())
+        .def("__exit__", &This::Exit)
 
-      .def("GetSignificantChanges",
-           &This::GetSignificantChanges,
-           return_value_policy<TfPySequenceToList>())
-      .def("GetSpecChanges", &This::GetSpecChanges, return_value_policy<TfPySequenceToList>())
-      .def("GetPrimChanges", &This::GetPrimChanges, return_value_policy<TfPySequenceToList>());
+        .def("GetSignificantChanges", 
+            &This::GetSignificantChanges,
+            return_value_policy<TfPySequenceToList>())
+        .def("GetSpecChanges", 
+            &This::GetSpecChanges,
+            return_value_policy<TfPySequenceToList>())
+        .def("GetPrimChanges", 
+            &This::GetPrimChanges,
+            return_value_policy<TfPySequenceToList>())
+        ;
 }

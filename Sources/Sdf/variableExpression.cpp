@@ -4,11 +4,13 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Sdf/variableExpression.h"
 #include "pxr/pxrns.h"
+#include "Sdf/variableExpression.h"
 
 #include "Sdf/variableExpressionImpl.h"
 #include "Sdf/variableExpressionParser.h"
+
+#include "Sdf/fileIO_Common.h"
 
 #include "Tf/stringUtils.h"
 
@@ -16,70 +18,193 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 SdfVariableExpression::SdfVariableExpression()
 {
-  _errors.push_back("No expression specified");
+    _errors.push_back("No expression specified");
 }
 
-SdfVariableExpression::SdfVariableExpression(const std::string &expr) : _expressionStr(expr)
+SdfVariableExpression::SdfVariableExpression(
+    const std::string& expr)
+    : SdfVariableExpression(std::string(expr))
 {
-  using ParserResult = Sdf_VariableExpressionParserResult;
+}
 
-  ParserResult parseResult = Sdf_ParseVariableExpression(expr);
-  _expression.reset(parseResult.expression.release());
-  _errors = std::move(parseResult.errors);
+SdfVariableExpression::SdfVariableExpression(
+    std::string&& expr)
+    : _expressionStr(std::move(expr))
+{
+    using ParserResult = Sdf_VariableExpressionParserResult;
+
+    ParserResult parseResult = Sdf_ParseVariableExpression(_expressionStr);
+    _expression.reset(parseResult.expression.release());
+    _errors = std::move(parseResult.errors);
 }
 
 SdfVariableExpression::~SdfVariableExpression() = default;
 
-bool SdfVariableExpression::IsExpression(const std::string &s)
+bool
+SdfVariableExpression::IsExpression(const std::string& s)
 {
-  return Sdf_IsVariableExpression(s);
+    return Sdf_IsVariableExpression(s);
 }
 
-bool SdfVariableExpression::IsValidVariableType(const VtValue &value)
+bool
+SdfVariableExpression::IsValidVariableType(const VtValue& value)
 {
-  using namespace Sdf_VariableExpressionImpl;
+    using namespace Sdf_VariableExpressionImpl;
 
-  const VtValue coerced = CoerceIfUnsupportedValueType(value);
-  return (coerced.IsEmpty() ? GetValueType(value) : GetValueType(coerced)) != ValueType::Unknown;
+    const VtValue coerced = CoerceIfUnsupportedValueType(value);
+    return 
+        (coerced.IsEmpty() ? GetValueType(value) : GetValueType(coerced)) != 
+        ValueType::Unknown;
 }
 
 SdfVariableExpression::operator bool() const
 {
-  return static_cast<bool>(_expression);
+    return static_cast<bool>(_expression);
 }
 
-const std::string &SdfVariableExpression::GetString() const
+const std::string&
+SdfVariableExpression::GetString() const
 {
-  return _expressionStr;
+    return _expressionStr;
 }
 
-const std::vector<std::string> &SdfVariableExpression::GetErrors() const
+const std::vector<std::string>&
+SdfVariableExpression::GetErrors() const
 {
-  return _errors;
+    return _errors;
 }
 
-SdfVariableExpression::Result SdfVariableExpression::Evaluate(
-    const VtDictionary &stageVariables) const
+SdfVariableExpression::Result
+SdfVariableExpression::Evaluate(const VtDictionary& stageVariables) const
 {
-  namespace Impl = Sdf_VariableExpressionImpl;
+    namespace Impl = Sdf_VariableExpressionImpl;
 
-  if (!_expression) {
-    return {VtValue(), GetErrors()};
-  }
+    if (!_expression) {
+        return { VtValue(), GetErrors() };
+    }
 
-  Impl::EvalContext ctx(&stageVariables);
-  Impl::EvalResult result = _expression->Evaluate(&ctx);
+    Impl::EvalContext ctx(&stageVariables);
+    Impl::EvalResult result = _expression->Evaluate(&ctx);
 
-  return {
-      std::move(result.value), std::move(result.errors), std::move(ctx.GetRequestedVariables())};
+    return { std::move(result.value), 
+             std::move(result.errors),
+             std::move(ctx.GetRequestedVariables()) };
 }
 
-std::string SdfVariableExpression::_FormatUnexpectedTypeError(const VtValue &got,
-                                                              const VtValue &expected)
+std::string
+SdfVariableExpression::_FormatUnexpectedTypeError(
+    const VtValue& got, const VtValue& expected)
 {
-  return TfStringPrintf("Expression evaluated to '%s' but expected '%s'",
-                        got.GetTypeName().c_str(),
-                        expected.GetTypeName().c_str());
+    return TfStringPrintf(
+        "Expression evaluated to '%s' but expected '%s'",
+        got.GetTypeName().c_str(), expected.GetTypeName().c_str());
+}
+
+SdfVariableExpression::Builder::
+operator SdfVariableExpression() const
+{
+    return SdfVariableExpression('`' + _expr + '`');
+}
+
+SdfVariableExpression::FunctionBuilder::
+operator SdfVariableExpression() const
+{ 
+    return SdfVariableExpression('`' + _expr + ")`");
+}
+
+SdfVariableExpression::FunctionBuilder::
+operator SdfVariableExpression::Builder() const &
+{ 
+    return Builder(_expr + ')');
+}
+
+SdfVariableExpression::FunctionBuilder::
+operator SdfVariableExpression::Builder() &&
+{ 
+    _expr += ')';
+    return Builder(std::move(_expr));
+}
+
+SdfVariableExpression::ListBuilder::
+operator SdfVariableExpression() const
+{ 
+    return SdfVariableExpression('`' + _expr + "]`");
+}
+
+SdfVariableExpression::ListBuilder::
+operator SdfVariableExpression::Builder() const &
+{ 
+    return Builder(_expr + ']');
+}
+
+SdfVariableExpression::ListBuilder::
+operator SdfVariableExpression::Builder() &&
+{ 
+    _expr += ']';
+    return Builder(std::move(_expr));
+}
+
+void
+SdfVariableExpression::_AppendExpression(
+    std::string* expr, const SdfVariableExpression& arg, bool first)
+{
+    if (const std::string& e = arg.GetString(); IsExpression(e)) {
+        if (!first) {
+            (*expr) += ", ";
+        }
+        // Expression strings returned by SdfVariableExpression are
+        // bracketed by "`" characters, so we need to strip them off
+        // before appending them.
+        (*expr) += e.substr(1, e.size() - 2);
+    }
+}
+
+void
+SdfVariableExpression::_AppendBuilder(
+    std::string* expr, const Builder& b, bool first)
+{
+    if (!first) {
+        (*expr) += ", ";
+    }
+    (*expr) += b._expr;
+}
+
+SdfVariableExpression::Builder
+SdfVariableExpression::MakeLiteral(int64_t value)
+{
+    return Builder(TfStringify(value));
+}
+
+SdfVariableExpression::Builder
+SdfVariableExpression::MakeLiteral(bool value)
+{
+    return Builder(std::string(value ? "True" : "False"));
+}
+
+SdfVariableExpression::Builder
+SdfVariableExpression::MakeLiteral(const std::string& value)
+{
+    // Variable expression syntax does not allow triple quotes.
+    return Builder(
+        Sdf_FileIOUtility::Quote(value, /* allowTripleQuotes = */ false));
+}
+
+SdfVariableExpression::Builder
+SdfVariableExpression::MakeLiteral(const char* value)
+{
+    return MakeLiteral(std::string(value));
+}
+
+SdfVariableExpression::Builder
+SdfVariableExpression::MakeNone()
+{
+    return Builder("None");
+}
+
+SdfVariableExpression::Builder
+SdfVariableExpression::MakeVariable(const std::string& name)
+{
+    return Builder("${" + name + "}");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

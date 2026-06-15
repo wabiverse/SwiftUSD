@@ -46,6 +46,7 @@ class _WrapStaticToken {
   const TfToken *_token;
 };
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 template<typename T> void _AddToken(T &cls, const char *name, const TfToken &token)
 {
   cls.add_static_property(name,
@@ -53,14 +54,17 @@ template<typename T> void _AddToken(T &cls, const char *name, const TfToken &tok
                               _WrapStaticToken(&token),
                               boost::python::return_value_policy<boost::python::return_by_value>(),
                               boost::mpl::vector1<std::string>()));
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 }
 
 }  // namespace
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 void wrapUsdSchemaExamplesTokens()
 {
   boost::python::class_<UsdSchemaExamplesTokensType, boost::noncopyable> cls(
       "Tokens", boost::python::no_init);
+#endif // PXR_PYTHON_SUPPORT_ENABLED
   _AddToken(cls, "complexString", UsdSchemaExamplesTokens->complexString);
   _AddToken(cls, "intAttr", UsdSchemaExamplesTokens->intAttr);
   _AddToken(cls, "paramsMass", UsdSchemaExamplesTokens->paramsMass);

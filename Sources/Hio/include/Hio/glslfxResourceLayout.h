@@ -11,22 +11,36 @@
 
 #include "Hio/types.h"
 
-#include "Tf/staticTokens.h"
 #include "Tf/token.h"
+#include "Tf/staticTokens.h"
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HIO_GLSLFX_RESOURCE_LAYOUT_TOKENS \
-  (unknown)(block)((inValue, "in"))((outValue, "out"))((inBlock, "in block"))( \
-      (outBlock, "out block"))((inValueArray, "in array"))((outValueArray, "out array"))( \
-      (inBlockArray, "in block array"))((outBlockArray, "out block array"))( \
-      (uniformBlock, "uniform block"))((bufferReadOnly, "buffer readOnly"))( \
-      (bufferReadWrite, "buffer readWrite"))(centroid)(sample)(smooth)(flat)(noperspective)
 
-TF_DECLARE_PUBLIC_TOKENS(HioGlslfxResourceLayoutTokens,
-                         HIO_API,
+#define HIO_GLSLFX_RESOURCE_LAYOUT_TOKENS       \
+    (unknown)                                   \
+    (block)                                     \
+    ((inValue, "in"))                           \
+    ((outValue, "out"))                         \
+    ((inBlock, "in block"))                     \
+    ((outBlock, "out block"))                   \
+    ((inValueArray, "in array"))                \
+    ((outValueArray, "out array"))              \
+    ((inBlockArray, "in block array"))          \
+    ((outBlockArray, "out block array"))        \
+    ((uniformBlock, "uniform block"))           \
+    ((bufferReadOnly, "buffer readOnly"))       \
+    ((bufferReadWrite, "buffer readWrite"))     \
+    (centroid)                                  \
+    (sample)                                    \
+    (smooth)                                    \
+    (flat)                                      \
+    (noperspective)
+
+
+TF_DECLARE_PUBLIC_TOKENS(HioGlslfxResourceLayoutTokens, HIO_API,
                          HIO_GLSLFX_RESOURCE_LAYOUT_TOKENS);
 
 class VtDictionary;
@@ -52,119 +66,122 @@ class VtDictionary;
 /// The dictionary layouts have been designed to match the concepts
 /// and syntax used by GLSL.
 ///
-class HioGlslfxResourceLayout {
- public:
-  /// Specifies whether a resource element is a shader input,
-  /// a shader output (i.e. an input or output variable or input
-  /// or output interface block), or neither (i.e. a buffer or texture).
-  enum class InOut {
-    NONE,
-    STAGE_IN,
-    STAGE_OUT,
-  };
+class HioGlslfxResourceLayout
+{
+public:
+    /// Specifies whether a resource element is a shader input,
+    /// a shader output (i.e. an input or output variable or input
+    /// or output interface block), or neither (i.e. a buffer or texture).
+    enum class InOut {
+        NONE,
+        STAGE_IN,
+        STAGE_OUT,
+    };
 
-  /// Specifies the kind of resource element.
-  enum class Kind {
-    NONE,
-    VALUE,
-    BLOCK,
-    QUALIFIER,
-    UNIFORM_VALUE,
-    UNIFORM_BLOCK,
-    UNIFORM_BLOCK_CONSTANT_PARAMS,
-    BUFFER_READ_ONLY,
-    BUFFER_READ_WRITE,
-  };
+    /// Specifies the kind of resource element.
+    enum class Kind {
+        NONE,
+        VALUE,
+        BLOCK,
+        QUALIFIER,
+        UNIFORM_VALUE,
+        UNIFORM_BLOCK,
+        UNIFORM_BLOCK_CONSTANT_PARAMS,
+        BUFFER_READ_ONLY,
+        BUFFER_READ_WRITE,
+    };
 
-  /// Specifies a member of an aggregate resource element.
-  struct Member {
-    Member(TfToken const &dataType,
-           TfToken const &name,
-           TfToken const &arraySize = TfToken(),
-           TfToken const &qualifiers = TfToken())
-        : dataType(dataType), name(name), arraySize(arraySize)
-    {
-    }
-    TfToken dataType;
-    TfToken name;
-    TfToken arraySize;
-    TfToken qualifiers;
-  };
-  using MemberVector = std::vector<Member>;
+    /// Specifies a member of an aggregate resource element.
+    struct Member {
+        Member(TfToken const & dataType,
+               TfToken const & name,
+               TfToken const & arraySize = TfToken(),
+               TfToken const & qualifiers = TfToken())
+            : dataType(dataType)
+            , name(name)
+            , arraySize(arraySize)
+            { }
+        TfToken dataType;
+        TfToken name;
+        TfToken arraySize;
+        TfToken qualifiers;
+    };
+    using MemberVector = std::vector<Member>;
 
-  /// Specifies a resource element.
-  struct Element {
-    Element(InOut inOut = InOut::NONE,
-            Kind kind = Kind::NONE,
-            TfToken dataType = HioGlslfxResourceLayoutTokens->unknown,
-            TfToken name = HioGlslfxResourceLayoutTokens->unknown,
-            TfToken arraySize = TfToken(),
-            TfToken qualifiers = TfToken())
-        : inOut(inOut),
-          kind(kind),
-          location(-1),
-          dataType(dataType),
-          name(name),
-          qualifiers(qualifiers),
-          arraySize(arraySize),
-          aggregateName(),
-          members()
-    {
-    }
-    InOut inOut;
-    Kind kind;
-    int location;
-    TfToken dataType;
-    TfToken name;
-    TfToken qualifiers;
-    TfToken arraySize;
-    TfToken aggregateName;
-    MemberVector members;
-  };
-  using ElementVector = std::vector<Element>;
+    /// Specifies a resource element.
+    struct Element {
+        Element(InOut inOut = InOut::NONE,
+                Kind kind = Kind::NONE,
+                TfToken dataType = HioGlslfxResourceLayoutTokens->unknown,
+                TfToken name = HioGlslfxResourceLayoutTokens->unknown,
+                TfToken arraySize = TfToken(),
+                TfToken qualifiers = TfToken())
+            : inOut(inOut)
+            , kind(kind)
+            , location(-1)
+            , dataType(dataType)
+            , name(name)
+            , qualifiers(qualifiers)
+            , arraySize(arraySize)
+            , aggregateName()
+            , members()
+            { }
+        InOut inOut;
+        Kind kind;
+        int location;
+        TfToken dataType;
+        TfToken name;
+        TfToken qualifiers;
+        TfToken arraySize;
+        TfToken aggregateName;
+        MemberVector members;
+    };
+    using ElementVector = std::vector<Element>;
 
-  /// Specifies the type of a texture element.
-  enum class TextureType {
-    TEXTURE,         // a texture
-    SHADOW_TEXTURE,  // a texture used as a shadow
-    ARRAY_TEXTURE,   // e.g. texture1DArray, texture2DArray, etc.
-  };
+    /// Specifies the type of a texture element.
+    enum class TextureType {
+        TEXTURE,                // a texture
+        SHADOW_TEXTURE,         // a texture used as a shadow
+        ARRAY_TEXTURE,          // e.g. texture1DArray, texture2DArray, etc.
+        CUBEMAP_TEXTURE,        // a cubemap texture
+    };
 
-  /// Specifies a texture element.
-  struct TextureElement {
-    TextureElement(TfToken name,
-                   int dim,
-                   int bindingIndex,
-                   HioFormat format = HioFormatFloat32Vec4,
-                   TextureType textureType = TextureType::TEXTURE,
-                   int arraySize = 0)
-        : name(name),
-          dim(dim),
-          bindingIndex(bindingIndex),
-          format(format),
-          textureType(textureType),
-          arraySize(arraySize)
-    {
-    }
-    TfToken name;
-    int dim;
-    int bindingIndex;
-    HioFormat format;
-    TextureType textureType;
-    int arraySize;
-  };
-  using TextureElementVector = std::vector<TextureElement>;
+    /// Specifies a texture element.
+    struct TextureElement {
+        TextureElement(TfToken name,
+                int dim,
+                int bindingIndex,
+                HioFormat format = HioFormatFloat32Vec4,
+                TextureType textureType = TextureType::TEXTURE,
+                int arraySize = 0)
+            : name(name)
+            , dim(dim)
+            , bindingIndex(bindingIndex)
+            , format(format)
+            , textureType(textureType)
+            , arraySize(arraySize)
+            { }
+        TfToken name;
+        int dim;
+        int bindingIndex;
+        HioFormat format;
+        TextureType textureType;
+        int arraySize;
+    };
+    using TextureElementVector = std::vector<TextureElement>;
 
-  HioGlslfxResourceLayout();
-  ~HioGlslfxResourceLayout();
+    HioGlslfxResourceLayout();
+    ~HioGlslfxResourceLayout();
 
-  /// Parses GLSLFX resource layout elements from the specified
-  /// \a layoutDict and appends the parsed elements to \a result.
-  HIO_API
-  static void ParseLayout(ElementVector *result,
-                          TfToken const &shaderStage,
-                          VtDictionary const &layoutDict);
+    /// Parses GLSLFX resource layout elements from the specified
+    /// \a layoutDict and appends the parsed elements to \a result.
+    HIO_API
+    static void ParseLayout(
+        ElementVector *result,
+        TfToken const &shaderStage,
+        VtDictionary const &layoutDict);
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

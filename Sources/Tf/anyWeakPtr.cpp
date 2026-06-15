@@ -5,126 +5,151 @@
 // https://openusd.org/license.
 //
 
-#include "Tf/anyWeakPtr.h"
 #include "pxr/pxrns.h"
+#include "Tf/anyWeakPtr.h"
 
 using std::string;
 using std::type_info;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfAnyWeakPtr::_EmptyHolder::~_EmptyHolder() {}
-
-void TfAnyWeakPtr::_EmptyHolder::Clone(_Data *target) const
+TfAnyWeakPtr::_EmptyHolder::~_EmptyHolder()
 {
-  new (target) _EmptyHolder;
 }
 
-bool TfAnyWeakPtr::_EmptyHolder::IsInvalid() const
+void
+TfAnyWeakPtr::_EmptyHolder::Clone(_Data *target) const
 {
-  return false;
+    new (target) _EmptyHolder;
 }
 
-void const *TfAnyWeakPtr::_EmptyHolder::GetUniqueIdentifier() const
+bool
+TfAnyWeakPtr::_EmptyHolder::IsInvalid() const
 {
-  return 0;
+    return false;
 }
 
-TfWeakBase const *TfAnyWeakPtr::_EmptyHolder::GetWeakBase() const
+void const *
+TfAnyWeakPtr::_EmptyHolder::GetUniqueIdentifier() const
 {
-  return 0;
+    return 0;
+}
+
+TfWeakBase const *
+TfAnyWeakPtr::_EmptyHolder::GetWeakBase() const
+{
+    return 0;
 }
 
 TfAnyWeakPtr::_EmptyHolder::operator bool() const
 {
-  return false;
+    return false;
 }
 
-bool TfAnyWeakPtr::_EmptyHolder::_IsConst() const
+bool
+TfAnyWeakPtr::_EmptyHolder::_IsConst() const
 {
-  return true;
+    return true;
 }
 
-TfPyObjWrapper TfAnyWeakPtr::_EmptyHolder::GetPythonObject() const
+TfPyObjWrapper
+TfAnyWeakPtr::_EmptyHolder::GetPythonObject() const
 {
-  return {};
+    return {};
 }
 
-const std::type_info &TfAnyWeakPtr::_EmptyHolder::GetTypeInfo() const
+const std::type_info &
+TfAnyWeakPtr::_EmptyHolder::GetTypeInfo() const
 {
-  return typeid(void);
+    return typeid(void);
 }
 
-TfType const &TfAnyWeakPtr::_EmptyHolder::GetType() const
+TfType const&
+TfAnyWeakPtr::_EmptyHolder::GetType() const
 {
-  return TfType::GetUnknownType();
+    return TfType::GetUnknownType();
 }
 
-const void *TfAnyWeakPtr::_EmptyHolder::_GetMostDerivedPtr() const
+const void *
+TfAnyWeakPtr::_EmptyHolder::_GetMostDerivedPtr() const
 {
-  return 0;
+    return 0;
 }
 
-bool TfAnyWeakPtr::_EmptyHolder::_IsPolymorphic() const
+bool
+TfAnyWeakPtr::_EmptyHolder::_IsPolymorphic() const
 {
-  return false;
-}
+    return false;
+}    
+
+
 
 //! Return true *only* if this expiry checker is watching a weak pointer
 // which has expired.
-bool TfAnyWeakPtr::IsInvalid() const
+bool
+TfAnyWeakPtr::IsInvalid() const
 {
-  return _Get()->IsInvalid();
+    return _Get()->IsInvalid();
 }
 
-void const *TfAnyWeakPtr::GetUniqueIdentifier() const
+void const *
+TfAnyWeakPtr::GetUniqueIdentifier() const
 {
-  return _Get()->GetUniqueIdentifier();
+    return _Get()->GetUniqueIdentifier();
 }
 
-TfWeakBase const *TfAnyWeakPtr::GetWeakBase() const
+TfWeakBase const *
+TfAnyWeakPtr::GetWeakBase() const
 {
-  return _Get()->GetWeakBase();
+    return _Get()->GetWeakBase();
 }
 
 TfAnyWeakPtr::operator bool() const
 {
-  return bool(*_Get());
+    return bool(*_Get());
 }
 
-bool TfAnyWeakPtr::operator!() const
+bool
+TfAnyWeakPtr::operator !() const
 {
-  return !bool(*this);
+    return !bool(*this);
+
 }
 
-bool TfAnyWeakPtr::operator==(const TfAnyWeakPtr &rhs) const
+bool
+TfAnyWeakPtr::operator ==(const TfAnyWeakPtr &rhs) const
 {
-  return GetUniqueIdentifier() == rhs.GetUniqueIdentifier();
+    return GetUniqueIdentifier() == rhs.GetUniqueIdentifier();
 }
 
-bool TfAnyWeakPtr::operator<(const TfAnyWeakPtr &rhs) const
+bool
+TfAnyWeakPtr::operator <(const TfAnyWeakPtr &rhs) const
 {
-  return GetUniqueIdentifier() < rhs.GetUniqueIdentifier();
+    return GetUniqueIdentifier() < rhs.GetUniqueIdentifier();
 }
 
-const std::type_info &TfAnyWeakPtr::GetTypeInfo() const
+const std::type_info &
+TfAnyWeakPtr::GetTypeInfo() const
 {
-  return _Get()->GetTypeInfo();
+    return _Get()->GetTypeInfo();
 }
 
-TfType const &TfAnyWeakPtr::GetType() const
+TfType const&
+TfAnyWeakPtr::GetType() const
 {
-  return _Get()->GetType();
+    return _Get()->GetType();
 }
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-boost::python::api::object TfAnyWeakPtr::_GetPythonObject() const
+#if PXR_PYTHON_SUPPORT_ENABLED
+pxr_boost::python::api::object
+TfAnyWeakPtr::_GetPythonObject() const
 {
-  TfPyLock pyLock;
-  return _Get()->GetPythonObject().Get();
+    TfPyLock pyLock;
+    return _Get()->GetPythonObject().Get();
 }
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-TfAnyWeakPtr::_PointerHolderBase::~_PointerHolderBase() {}
+TfAnyWeakPtr::_PointerHolderBase::~_PointerHolderBase() {
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

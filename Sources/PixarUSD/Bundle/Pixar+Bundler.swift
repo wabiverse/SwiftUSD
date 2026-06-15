@@ -57,7 +57,7 @@ public extension Pixar
       let resources = BundleFramework.allCases.compactMap(\.resourcePath)
 
       /* 2. fill a std.vector of std.string plugin paths. */
-      var plugPaths = Pixar.PlugRegistry.PlugPathsVector()
+      var plugPaths = Overlay.MakeStringVector()
       _ = resources.map
       { path in
 

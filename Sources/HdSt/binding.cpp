@@ -8,22 +8,32 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool HdStBindingRequest::operator==(HdStBindingRequest const &other) const
+bool
+HdStBindingRequest::operator==(HdStBindingRequest const &other) const
 {
-  return _bindingType == other._bindingType && _dataType == other._dataType &&
-         _name == other._name && _resource == other._resource && _bar == other._bar &&
-         _isInterleaved == other._isInterleaved && _isWritable == other._isWritable &&
-         _arraySize == other._arraySize && _concatenateNames == other._concatenateNames;
+    return
+        _bindingType == other._bindingType &&
+        _dataType == other._dataType &&
+        _name == other._name &&
+        _resource == other._resource &&
+        _bar == other._bar &&
+        _isInterleaved == other._isInterleaved &&
+        _isWritable == other._isWritable &&
+        _arraySize == other._arraySize &&
+        _concatenateNames == other._concatenateNames;
 }
 
-bool HdStBindingRequest::operator!=(HdStBindingRequest const &other) const
+bool
+HdStBindingRequest::operator!=(HdStBindingRequest const &other) const
 {
-  return !(*this == other);
+    return !(*this == other);
 }
 
-size_t HdStBindingRequest::ComputeHash() const
+size_t
+HdStBindingRequest::ComputeHash() const
 {
-  return TfHash()(*this);
+    return TfHash()(*this);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

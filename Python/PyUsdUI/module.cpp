@@ -4,15 +4,18 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Tf/pyModule.h"
 #include "pxr/pxrns.h"
+#include "Tf/pyModule.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 TF_WRAP_MODULE
 {
-  TF_WRAP(UsdUIBackdrop);
-  TF_WRAP(UsdUINodeGraphNodeAPI);
-  TF_WRAP(UsdUISceneGraphPrimAPI);
-  TF_WRAP(UsdUITokens);
+    TF_WRAP(UsdUIObjectHints);
+    TF_WRAP(UsdUIPrimHints);
+    TF_WRAP(UsdUIPropertyHints);
+    TF_WRAP(UsdUIAttributeHints);
+
+    // Generated Schema classes.  Do not remove or edit the following line.
+    #include "generatedSchema.module.h"
 }

@@ -10,9 +10,9 @@
 /// \file arch/hash.h
 /// Hash functions.
 
+#include "pxr/pxrns.h"
 #include "Arch/api.h"
 #include "Arch/inttypes.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,4 +40,4 @@ ARCH_API uint64_t ArchHash64(const char *data, size_t len, uint64_t seed);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_HASH_H
+#endif // PXR_BASE_ARCH_HASH_H

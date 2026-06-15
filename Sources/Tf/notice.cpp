@@ -5,11 +5,13 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Tf/notice.h"
 #include "Tf/iterator.h"
 #include "Tf/noticeRegistry.h"
 #include "Tf/type.h"
-#include "pxr/pxrns.h"
+
+#include <thread>
 
 using std::type_info;
 using std::vector;
@@ -19,110 +21,165 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Note:  We do not register a TfType for TfNotice here.
 // Instead, we register it in Type.cpp.  See Tf_TypeRegistry's constructor.
 
-TfNotice::~TfNotice() {}
-
-TfNotice::_DelivererBase::~_DelivererBase() {}
-
-void TfNotice::_DelivererBase::_BeginDelivery(const TfNotice &notice,
-                                              const TfWeakBase *sender,
-                                              const type_info &senderType,
-                                              const TfWeakBase *listener,
-                                              const type_info &listenerType,
-                                              const vector<TfNotice::WeakProbePtr> &probes)
+TfNotice::~TfNotice()
 {
-  Tf_NoticeRegistry::_GetInstance()._BeginDelivery(
-      notice, sender, senderType, listener, listenerType, probes);
 }
 
-void TfNotice::_DelivererBase::_EndDelivery(const vector<TfNotice::WeakProbePtr> &probes)
+
+TfNotice::_DelivererBase::~_DelivererBase()
 {
-  Tf_NoticeRegistry::_GetInstance()._EndDelivery(probes);
 }
 
-TfNotice::Probe::~Probe() {}
-
-void TfNotice::InsertProbe(const WeakProbePtr &probe)
+void
+TfNotice::_DelivererBase::
+_BeginDelivery(const TfNotice &notice,
+               const TfWeakBase *sender,
+               const type_info &senderType,
+               const TfWeakBase *listener,
+               const type_info &listenerType,
+               const vector<TfNotice::WeakProbePtr> &probes)
 {
-  Tf_NoticeRegistry::_GetInstance()._InsertProbe(probe);
+    Tf_NoticeRegistry::_GetInstance().
+        _BeginDelivery(notice, sender, senderType,
+                        listener, listenerType, probes);
 }
 
-void TfNotice::RemoveProbe(const WeakProbePtr &probe)
+void
+TfNotice::_DelivererBase::
+_EndDelivery(const vector<TfNotice::WeakProbePtr> &probes)
 {
-  Tf_NoticeRegistry::_GetInstance()._RemoveProbe(probe);
+    Tf_NoticeRegistry::_GetInstance()._EndDelivery(probes);
 }
 
-TfNotice::Key TfNotice::_Register(_DelivererBase *deliverer)
+void
+TfNotice::_DelivererBase::_WaitUntilNotSending()
 {
-  return Tf_NoticeRegistry::_GetInstance()._Register(deliverer);
+    // Spin wait until no sends are in progress.  This presumes
+    // _WaitForSendsToFinish() has been called.
+    do {
+        std::this_thread::yield();
+    } while (_busy.load(std::memory_order_acquire) != _waitBit);
 }
 
-size_t TfNotice::_Send(const TfWeakBase *s,
-                       const void *senderUniqueId,
-                       const type_info &senderType) const
+TfNotice::Probe::~Probe()
 {
-  // Look up the notice type using the static type_info.
-  // This is faster than TfType::Find().
-  auto& thisType = (*this);
-  TfType noticeType = TfType::Find(typeid(thisType));
-
-  return Tf_NoticeRegistry::_GetInstance()._Send(*this, noticeType, s, senderUniqueId, senderType);
 }
 
-size_t TfNotice::_SendWithType(const TfType &noticeType,
-                               const TfWeakBase *s,
-                               const void *senderUniqueId,
-                               const type_info &senderType) const
+
+void
+TfNotice::InsertProbe(const WeakProbePtr &probe)
 {
-  return Tf_NoticeRegistry::_GetInstance()._Send(*this, noticeType, s, senderUniqueId, senderType);
+    Tf_NoticeRegistry::_GetInstance()._InsertProbe(probe);
 }
 
-size_t TfNotice::Send() const
+void
+TfNotice::RemoveProbe(const WeakProbePtr &probe)
 {
-  return _Send(0, 0, typeid(void));
+    Tf_NoticeRegistry::_GetInstance()._RemoveProbe(probe);
 }
 
-size_t TfNotice::SendWithWeakBase(const TfWeakBase *senderWeakBase,
-                                  const void *senderUniqueId,
-                                  const std::type_info &senderType) const
+TfNotice::Key
+TfNotice::_Register(_DelivererBase *deliverer)
 {
-  return _Send(senderWeakBase, senderUniqueId, senderWeakBase ? senderType : typeid(void));
+    return Tf_NoticeRegistry::_GetInstance()._Register(deliverer);
 }
 
-bool TfNotice::Revoke(Key &key)
+size_t 
+TfNotice::_Send(const TfWeakBase *s,
+                const void *senderUniqueId,
+                const type_info &senderType) const
 {
-  if (!key) {
-    return false;
-  }
+    // Look up the notice type using the static type_info.
+    // This is faster than TfType::Find().
+    TfType noticeType = TfType::Find(typeid(*this));
 
-  Tf_NoticeRegistry::_GetInstance()._Revoke(key);
-
-  return true;
+    return Tf_NoticeRegistry::_GetInstance().
+        _Send(*this, noticeType, s, senderUniqueId, senderType);
 }
 
-void TfNotice::Revoke(Keys *keys)
+size_t 
+TfNotice::_SendWithType(const TfType &noticeType,
+                        const TfWeakBase *s,
+                        const void *senderUniqueId,
+                        const type_info &senderType) const
 {
-  TF_FOR_ALL(i, *keys)
-  {
-    Revoke(*i);
-  }
-  keys->clear();
+    return Tf_NoticeRegistry::_GetInstance().
+        _Send(*this, noticeType, s, senderUniqueId, senderType);
 }
 
-void TfNotice::_VerifyFailedCast(const type_info &toType,
-                                 const TfNotice &notice,
-                                 const TfNotice *castNotice)
+size_t
+TfNotice::Send() const
 {
-  Tf_NoticeRegistry::_GetInstance()._VerifyFailedCast(toType, notice, castNotice);
+    return _Send(0, 0, typeid(void));
+}
+
+size_t 
+TfNotice::SendWithWeakBase(const TfWeakBase *senderWeakBase,
+                           const void *senderUniqueId,
+                           const std::type_info &senderType) const
+{
+    return _Send(senderWeakBase, senderUniqueId,
+                 senderWeakBase ? senderType : typeid(void));
+}
+
+bool
+TfNotice::Revoke(Key& key)
+{
+    if (!key) {
+        return false;
+    }
+    
+    Tf_NoticeRegistry::_GetInstance()._Revoke(key);
+
+    return true;
+}
+
+void
+TfNotice::Revoke(Keys* keys)
+{
+    TF_FOR_ALL(i, *keys) {
+        Revoke(*i);
+    }
+    keys->clear();
+}
+
+bool
+TfNotice::RevokeAndWait(Key& key)
+{
+    if (!key) {
+        return false;
+    }
+    
+    Tf_NoticeRegistry::_GetInstance()._Revoke(key, true);
+
+    return true;
+}
+
+void
+TfNotice::RevokeAndWait(Keys* keys)
+{
+    TF_FOR_ALL(i, *keys) {
+        RevokeAndWait(*i);
+    }
+    keys->clear();
+}
+
+void
+TfNotice::_VerifyFailedCast(const type_info& toType,
+                            const TfNotice& notice, const TfNotice* castNotice)
+{
+    Tf_NoticeRegistry::_GetInstance()
+        ._VerifyFailedCast(toType, notice, castNotice);
 }
 
 TfNotice::Block::Block()
 {
-  Tf_NoticeRegistry::_GetInstance()._IncrementBlockCount();
+    Tf_NoticeRegistry::_GetInstance()._IncrementBlockCount();
 }
 
 TfNotice::Block::~Block()
 {
-  Tf_NoticeRegistry::_GetInstance()._DecrementBlockCount();
+    Tf_NoticeRegistry::_GetInstance()._DecrementBlockCount();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

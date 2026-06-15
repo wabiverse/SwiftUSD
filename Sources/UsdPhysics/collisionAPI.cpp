@@ -8,123 +8,141 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsCollisionAPI, TfType::Bases<UsdAPISchemaBase>>();
+    TfType::Define<UsdPhysicsCollisionAPI,
+        TfType::Bases< UsdAPISchemaBase > >();
+    
 }
 
 /* virtual */
-UsdPhysicsCollisionAPI::~UsdPhysicsCollisionAPI() {}
+UsdPhysicsCollisionAPI::~UsdPhysicsCollisionAPI()
+{
+}
 
 /* static */
-UsdPhysicsCollisionAPI UsdPhysicsCollisionAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsCollisionAPI
+UsdPhysicsCollisionAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdPhysicsCollisionAPI();
-  }
-  return UsdPhysicsCollisionAPI(stage->GetPrimAtPath(path));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdPhysicsCollisionAPI();
+    }
+    return UsdPhysicsCollisionAPI(stage->GetPrimAtPath(path));
 }
+
 
 /* virtual */
 UsdSchemaKind UsdPhysicsCollisionAPI::_GetSchemaKind() const
 {
-  return UsdPhysicsCollisionAPI::schemaKind;
+    return UsdPhysicsCollisionAPI::schemaKind;
 }
 
 /* static */
-bool UsdPhysicsCollisionAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
+bool
+UsdPhysicsCollisionAPI::CanApply(
+    const UsdPrim &prim, std::string *whyNot)
 {
-  return prim.CanApplyAPI<UsdPhysicsCollisionAPI>(whyNot);
+    return prim.CanApplyAPI<UsdPhysicsCollisionAPI>(whyNot);
 }
 
 /* static */
-UsdPhysicsCollisionAPI UsdPhysicsCollisionAPI::Apply(const UsdPrim &prim)
+UsdPhysicsCollisionAPI
+UsdPhysicsCollisionAPI::Apply(const UsdPrim &prim)
 {
-  if (prim.ApplyAPI<UsdPhysicsCollisionAPI>()) {
-    return UsdPhysicsCollisionAPI(prim);
-  }
-  return UsdPhysicsCollisionAPI();
+    if (prim.ApplyAPI<UsdPhysicsCollisionAPI>()) {
+        return UsdPhysicsCollisionAPI(prim);
+    }
+    return UsdPhysicsCollisionAPI();
 }
 
 /* static */
-const TfType &UsdPhysicsCollisionAPI::_GetStaticTfType()
+const TfType &
+UsdPhysicsCollisionAPI::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdPhysicsCollisionAPI>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdPhysicsCollisionAPI>();
+    return tfType;
 }
 
 /* static */
-bool UsdPhysicsCollisionAPI::_IsTypedSchema()
+bool 
+UsdPhysicsCollisionAPI::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdPhysicsCollisionAPI::_GetTfType() const
+const TfType &
+UsdPhysicsCollisionAPI::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
-UsdAttribute UsdPhysicsCollisionAPI::GetCollisionEnabledAttr() const
+UsdAttribute
+UsdPhysicsCollisionAPI::GetCollisionEnabledAttr() const
 {
-  return GetPrim().GetAttribute(UsdPhysicsTokens->physicsCollisionEnabled);
+    return GetPrim().GetAttribute(UsdPhysicsTokens->physicsCollisionEnabled);
 }
 
-UsdAttribute UsdPhysicsCollisionAPI::CreateCollisionEnabledAttr(VtValue const &defaultValue,
-                                                                bool writeSparsely) const
+UsdAttribute
+UsdPhysicsCollisionAPI::CreateCollisionEnabledAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsCollisionEnabled,
-                                    SdfValueTypeNames->Bool,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsCollisionEnabled,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
-UsdRelationship UsdPhysicsCollisionAPI::GetSimulationOwnerRel() const
+UsdRelationship
+UsdPhysicsCollisionAPI::GetSimulationOwnerRel() const
 {
-  return GetPrim().GetRelationship(UsdPhysicsTokens->physicsSimulationOwner);
+    return GetPrim().GetRelationship(UsdPhysicsTokens->physicsSimulationOwner);
 }
 
-UsdRelationship UsdPhysicsCollisionAPI::CreateSimulationOwnerRel() const
+UsdRelationship
+UsdPhysicsCollisionAPI::CreateSimulationOwnerRel() const
 {
-  return GetPrim().CreateRelationship(UsdPhysicsTokens->physicsSimulationOwner,
-                                      /* custom = */ false);
+    return GetPrim().CreateRelationship(UsdPhysicsTokens->physicsSimulationOwner,
+                       /* custom = */ false);
 }
 
 namespace {
-static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
-                                                       const TfTokenVector &right)
+static inline TfTokenVector
+_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 {
-  TfTokenVector result;
-  result.reserve(left.size() + right.size());
-  result.insert(result.end(), left.begin(), left.end());
-  result.insert(result.end(), right.begin(), right.end());
-  return result;
+    TfTokenVector result;
+    result.reserve(left.size() + right.size());
+    result.insert(result.end(), left.begin(), left.end());
+    result.insert(result.end(), right.begin(), right.end());
+    return result;
 }
-}  // namespace
+}
 
 /*static*/
-const TfTokenVector &UsdPhysicsCollisionAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector&
+UsdPhysicsCollisionAPI::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames = {
-      UsdPhysicsTokens->physicsCollisionEnabled,
-  };
-  static TfTokenVector allNames = _ConcatenateAttributeNames(
-      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
+    static TfTokenVector localNames = {
+        UsdPhysicsTokens->physicsCollisionEnabled,
+    };
+    static TfTokenVector allNames =
+        _ConcatenateAttributeNames(
+            UsdAPISchemaBase::GetSchemaAttributeNames(true),
+            localNames);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

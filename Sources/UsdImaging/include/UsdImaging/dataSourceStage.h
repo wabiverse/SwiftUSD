@@ -20,21 +20,22 @@ TF_DECLARE_REF_PTRS(UsdStage);
 
 /// Returns a dataSource that contains UsdStage level data.  In particular, this
 /// populates the HdarSystem data.
-class UsdImagingDataSourceStage : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceStage);
+class UsdImagingDataSourceStage : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceStage);
 
- public:  //  HdContainerDataSource overrides
-  USDIMAGING_API
-  TfTokenVector GetNames() override;
+public: //  HdContainerDataSource overrides
+    USDIMAGING_API
+    TfTokenVector GetNames() override;
 
-  USDIMAGING_API
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    USDIMAGING_API
+    HdDataSourceBaseHandle Get(const TfToken& name) override;
 
- private:
-  UsdImagingDataSourceStage(UsdStageRefPtr stage);
+private:
+    UsdImagingDataSourceStage(UsdStageRefPtr stage);
 
-  UsdStageRefPtr _stage;
+    UsdStageRefPtr _stage;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceStage);

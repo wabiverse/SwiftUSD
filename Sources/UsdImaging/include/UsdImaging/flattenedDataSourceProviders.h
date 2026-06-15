@@ -19,7 +19,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Can be given as inputArgs to HdFlatteningSceneIndex.
 ///
 USDIMAGING_API
-HdContainerDataSourceHandle UsdImagingFlattenedDataSourceProviders();
+HdContainerDataSourceHandle
+UsdImagingFlattenedDataSourceProviders();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

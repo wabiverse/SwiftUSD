@@ -23,32 +23,40 @@ TF_DECLARE_REF_PTRS(UsdImaging_NiPrototypePruningSceneIndex);
 /// Intended to be used by the UsdImagingNiPrototypePropagatingSceneIndex
 /// to obtain the Usd Stage without the prototypes.
 ///
-class UsdImaging_NiPrototypePruningSceneIndex final : public HdSingleInputFilteringSceneIndexBase {
- public:
-  static UsdImaging_NiPrototypePruningSceneIndexRefPtr New(
-      HdSceneIndexBaseRefPtr const &inputSceneIndex)
-  {
-    return TfCreateRefPtr(new UsdImaging_NiPrototypePruningSceneIndex(inputSceneIndex));
-  }
+class UsdImaging_NiPrototypePruningSceneIndex final
+            : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    static UsdImaging_NiPrototypePruningSceneIndexRefPtr New(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex)
+    {
+        return TfCreateRefPtr(
+            new UsdImaging_NiPrototypePruningSceneIndex(
+                inputSceneIndex));
+    }
 
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
- protected:
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+protected:
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
- private:
-  UsdImaging_NiPrototypePruningSceneIndex(HdSceneIndexBaseRefPtr const &inputSceneIndex);
+private:
+    UsdImaging_NiPrototypePruningSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex);
 
-  SdfPathSet _prototypes;
+    SdfPathSet _prototypes;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

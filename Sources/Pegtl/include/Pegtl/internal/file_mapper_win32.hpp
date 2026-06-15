@@ -4,8 +4,6 @@
 #ifndef PXR_PEGTL_INTERNAL_FILE_MAPPER_WIN32_HPP
 #define PXR_PEGTL_INTERNAL_FILE_MAPPER_WIN32_HPP
 
-#if defined(_WIN32)
-
 #if !defined( NOMINMAX )
 #define NOMINMAX
 #define PXR_PEGTL_NOMINMAX_WAS_DEFINED
@@ -241,7 +239,5 @@ namespace PXR_PEGTL_NAMESPACE::internal
    };
 
 }  // namespace PXR_PEGTL_NAMESPACE::internal
-
-#endif // defined(_WIN32)
 
 #endif

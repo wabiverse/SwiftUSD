@@ -14,121 +14,145 @@
 
 #include "UsdRender/pass.h"
 
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingRenderPassAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingRenderPassAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingRenderPassAdapter::~UsdImagingRenderPassAdapter() {}
+UsdImagingRenderPassAdapter::~UsdImagingRenderPassAdapter() 
+{
+}
 
 // -------------------------------------------------------------------------- //
 // 2.0 Prim adapter API
 // -------------------------------------------------------------------------- //
 
-TfTokenVector UsdImagingRenderPassAdapter::GetImagingSubprims(UsdPrim const &prim)
+TfTokenVector
+UsdImagingRenderPassAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  return {TfToken()};
+    return { TfToken() };
 }
 
-TfToken UsdImagingRenderPassAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                           TfToken const &subprim)
+TfToken
+UsdImagingRenderPassAdapter::GetImagingSubprimType(
+    UsdPrim const& prim,
+    TfToken const& subprim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->renderPass;
-  }
-  return TfToken();
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->renderPass;
+    }
+    return TfToken();
 }
 
-HdContainerDataSourceHandle UsdImagingRenderPassAdapter::GetImagingSubprimData(
-    UsdPrim const &prim,
-    TfToken const &subprim,
+HdContainerDataSourceHandle
+UsdImagingRenderPassAdapter::GetImagingSubprimData(
+    UsdPrim const& prim,
+    TfToken const& subprim,
     const UsdImagingDataSourceStageGlobals &stageGlobals)
 {
-  if (subprim.IsEmpty()) {
-    return UsdImagingDataSourceRenderPassPrim::New(prim.GetPath(), prim, stageGlobals);
-  }
+    if (subprim.IsEmpty()) {
+        return UsdImagingDataSourceRenderPassPrim::New(
+                    prim.GetPath(), prim, stageGlobals);
+    }
 
-  return nullptr;
+    return nullptr;
 }
 
-HdDataSourceLocatorSet UsdImagingRenderPassAdapter::InvalidateImagingSubprim(
-    UsdPrim const &prim,
-    TfToken const &subprim,
-    TfTokenVector const &properties,
+HdDataSourceLocatorSet
+UsdImagingRenderPassAdapter::InvalidateImagingSubprim(
+    UsdPrim const& prim,
+    TfToken const& subprim,
+    TfTokenVector const& properties,
     const UsdImagingPropertyInvalidationType invalidationType)
 {
-  if (subprim.IsEmpty()) {
-    return UsdImagingDataSourceRenderPassPrim::Invalidate(
-        prim, subprim, properties, invalidationType);
-  }
+    if (subprim.IsEmpty()) {
+        return UsdImagingDataSourceRenderPassPrim::Invalidate(
+            prim, subprim, properties, invalidationType);
+    }
 
-  return HdDataSourceLocatorSet();
+    return HdDataSourceLocatorSet();
 }
 
 // -------------------------------------------------------------------------- //
 // 1.0 Prim adapter API
 // -------------------------------------------------------------------------- //
 
-bool UsdImagingRenderPassAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+bool
+UsdImagingRenderPassAdapter::IsSupported(
+    UsdImagingIndexProxy const* index) const
 {
-  // Note that we do not plan to implement render pass prims for Hydra 1.0.
-  return false;
+    // Note that we do not plan to implement render pass prims for Hydra 1.0.
+    return false;
 }
 
-SdfPath UsdImagingRenderPassAdapter::Populate(UsdPrim const &prim,
-                                              UsdImagingIndexProxy *index,
-                                              UsdImagingInstancerContext const *instancerContext)
+SdfPath
+UsdImagingRenderPassAdapter::Populate(
+    UsdPrim const& prim, 
+    UsdImagingIndexProxy* index,
+    UsdImagingInstancerContext const* instancerContext)
 {
-  return SdfPath();
+    return SdfPath();
 }
 
-void UsdImagingRenderPassAdapter::_RemovePrim(SdfPath const &cachePath,
-                                              UsdImagingIndexProxy *index)
-{
-}
-
-void UsdImagingRenderPassAdapter::TrackVariability(
-    UsdPrim const &prim,
-    SdfPath const &cachePath,
-    HdDirtyBits *timeVaryingBits,
-    UsdImagingInstancerContext const *instancerContext) const
+void
+UsdImagingRenderPassAdapter::_RemovePrim(
+    SdfPath const& cachePath,
+    UsdImagingIndexProxy* index)
 {
 }
 
-void UsdImagingRenderPassAdapter::UpdateForTime(
-    UsdPrim const &prim,
-    SdfPath const &cachePath,
+void 
+UsdImagingRenderPassAdapter::TrackVariability(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    HdDirtyBits* timeVaryingBits,
+    UsdImagingInstancerContext const* instancerContext) const
+{
+}
+
+void 
+UsdImagingRenderPassAdapter::UpdateForTime(
+    UsdPrim const& prim,
+    SdfPath const& cachePath, 
     UsdTimeCode time,
     HdDirtyBits requestedBits,
-    UsdImagingInstancerContext const *instancerContext) const
+    UsdImagingInstancerContext const* 
+    instancerContext) const
 {
 }
 
-HdDirtyBits UsdImagingRenderPassAdapter::ProcessPropertyChange(UsdPrim const &prim,
-                                                               SdfPath const &cachePath,
-                                                               TfToken const &propertyName)
+HdDirtyBits
+UsdImagingRenderPassAdapter::ProcessPropertyChange(
+    UsdPrim const& prim,
+    SdfPath const& cachePath, 
+    TfToken const& propertyName)
 {
-  return HdDirtyBits();
+    return HdDirtyBits();
 }
 
-void UsdImagingRenderPassAdapter::MarkDirty(UsdPrim const &prim,
-                                            SdfPath const &cachePath,
-                                            HdDirtyBits dirty,
-                                            UsdImagingIndexProxy *index)
+void
+UsdImagingRenderPassAdapter::MarkDirty(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    HdDirtyBits dirty,
+    UsdImagingIndexProxy* index)
 {
 }
 
-VtValue UsdImagingRenderPassAdapter::Get(UsdPrim const &prim,
-                                         SdfPath const &cachePath,
-                                         TfToken const &key,
-                                         UsdTimeCode time,
-                                         VtIntArray *outIndices) const
+VtValue
+UsdImagingRenderPassAdapter::Get(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    TfToken const& key,
+    UsdTimeCode time,
+    VtIntArray *outIndices) const
 {
-  return VtValue();
+    return VtValue();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

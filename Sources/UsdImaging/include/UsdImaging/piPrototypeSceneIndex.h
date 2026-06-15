@@ -115,41 +115,47 @@ TF_DECLARE_REF_PTRS(UsdImaging_PiPrototypeSceneIndex);
 ///                  # inserted by the propagating scene index.
 ///     dataSource: unchanged.
 ///
-class UsdImaging_PiPrototypeSceneIndex final : public HdSingleInputFilteringSceneIndexBase {
- public:
-  static UsdImaging_PiPrototypeSceneIndexRefPtr New(HdSceneIndexBaseRefPtr const &inputSceneIndex,
-                                                    const SdfPath &instancer,
-                                                    const SdfPath &prototypeRoot);
+class UsdImaging_PiPrototypeSceneIndex final
+                                : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    static UsdImaging_PiPrototypeSceneIndexRefPtr New(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        const SdfPath &instancer,
+        const SdfPath &prototypeRoot);
 
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
- protected:
-  UsdImaging_PiPrototypeSceneIndex(HdSceneIndexBaseRefPtr const &inputSceneIndex,
-                                   const SdfPath &instancer,
-                                   const SdfPath &prototypeRoot);
+protected:
+    UsdImaging_PiPrototypeSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        const SdfPath &instancer,
+        const SdfPath &prototypeRoot);
 
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  void _Populate();
+    void _Populate();
 
-  SdfPath _prototypeRoot;
-  HdContainerDataSourceHandle _underlaySource;
-  HdContainerDataSourceHandle _prototypeRootOverlaySource;
+    SdfPath _instancer;
+    SdfPath _prototypeRoot;
 
-  // Instancers and overs within the prototype.
-  // Note that this does not include instancers or overs nested
-  // under an instancer or over.
-  using _PathSet = std::unordered_set<SdfPath, SdfPath::Hash>;
-  _PathSet _instancersAndOvers;
+    // Instancers and overs within the prototype.
+    // Note that this does not include instancers or overs nested
+    // under an instancer or over.
+    using _PathSet = std::unordered_set<SdfPath, SdfPath::Hash>;
+    _PathSet _instancersAndOvers;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

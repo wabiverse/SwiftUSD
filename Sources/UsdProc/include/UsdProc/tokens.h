@@ -10,19 +10,20 @@
 /// \file usdProc/tokens.h
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//
+// 
 // This is an automatically generated file (by usdGenSchema.py).
 // Do not hand-edit!
-//
+// 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+#include "pxr/pxrns.h"
+#include "UsdProc/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
-#include "UsdProc/api.h"
-#include "pxr/pxrns.h"
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \class UsdProcTokensType
 ///
@@ -43,17 +44,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///     gprim.GetMyTokenValuedAttr().Set(UsdProcTokens->proceduralSystem);
 /// \endcode
 struct UsdProcTokensType {
-  USDPROC_API UsdProcTokensType();
-  /// \brief "proceduralSystem"
-  ///
-  /// UsdProcGenerativeProcedural
-  const TfToken proceduralSystem;
-  /// \brief "GenerativeProcedural"
-  ///
-  /// Schema identifer and family for UsdProcGenerativeProcedural
-  const TfToken GenerativeProcedural;
-  /// A vector of all of the tokens listed above.
-  const std::vector<TfToken> allTokens;
+    USDPROC_API UsdProcTokensType();
+    /// \brief "proceduralSystem"
+    /// 
+    /// UsdProcGenerativeProcedural
+    const TfToken proceduralSystem;
+    /// \brief "GenerativeProcedural"
+    /// 
+    /// Schema identifer and family for UsdProcGenerativeProcedural
+    const TfToken GenerativeProcedural;
+    /// A vector of all of the tokens listed above.
+    const std::vector<TfToken> allTokens;
 };
 
 /// \var UsdProcTokens

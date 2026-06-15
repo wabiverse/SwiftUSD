@@ -3,26 +3,11 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
-//
+
+#import $TOOLS/hdSt/shaders/surfaceHelpers.glslfx
 
 -- configuration
 {
@@ -33,8 +18,10 @@
             },
             "surfaceShader": {
                 "source": [ "Preview.LightStructures",
+                            "SurfaceHelpers.Lighting", 
                             "Preview.Lighting",
                             "Preview.LightIntegration",
+                            "SurfaceHelpers.TangentSpace",
                             "Preview.NormalMapping",
                             "Preview.Surface" ]
             }
@@ -74,22 +61,59 @@ surfaceShader(vec4 Peye, vec3 Neye, vec4 color, vec4 patchCoord)
 
     vec3 clearcoatColor      = vec3(1.0);
     float specularAmount     = 1.0;
+    const int opacityMode    = HdGet_opacityMode();
 
-#ifdef HD_MATERIAL_TAG_MASKED   
+#ifdef HD_MATERIAL_TAG_MASKED
+
     if (opacity < opacityThreshold) {
         discard;
+        return vec4(1.0);
     } 
     opacity = 1.0;
-#endif            
+
+#else // !HD_MATERIAL_TAG_MASKED
+
+    // We need to ensure that the opacity is applied correctly to diffuseColor.
+    //
+    // In general, in the simple cases, if opacity has already been
+    // pre-multiplied, we could just use the pre-multiplied diffuseColor.
+    //
+    // However, if we have diffuseColor coming from a pre-multiplied texture
+    // which had biasing applied to it, or which had opacity scale and biasing,
+    // we need to take extra steps to ensure the diffuseColor is scaled
+    // appropriately.
+#ifdef diffuseColor_IS_PREMULTIPLIED
+    // We want to undo the pre-multiplication of diffuseColor.  To do this
+    // correctly we need to work with the diffuseColor and opacity without any
+    // scale or biasing having been applied to either.
+    diffuseColor = HdGet_diffuseColor_withoutScaleAndBias();
+    const float opacity_withoutScaleAndBias =
+        HdGet_opacity_withoutScaleAndBias();
+    if (opacity_withoutScaleAndBias > 0) {
+        diffuseColor.rgb /= opacity_withoutScaleAndBias;
+    }
+
+    // Now we can apply the diffuseColor scale and/or bias to the
+    // un-pre-multiplied diffuseColor if present.
+    diffuseColor = HdGet_diffuseColor_applyScaleAndBias(diffuseColor);
+#endif // diffuseColor_IS_PREMULTIPLIED
+
+    // At this point, diffuseColor has had the pre-multiplication of the
+    // original opacity removed if it was present, and any scale or biasing
+    // applied to it.  And since the opacity has had its scale and/or biasing
+    // applied to it by this point, it can now be applied when appropriate.
+
+    // If opacityMode is "transparent", opacity should only apply to the
+    // diffuseColor component.
+    if (opacityMode == 1) {
+        diffuseColor *= opacity;
+    }
+
+#endif // HD_MATERIAL_TAG_MASKED
 
     // Selection highlighting.
     vec4 colorAndOpacity = vec4(diffuseColor, opacity);
     diffuseColor = ApplyColorOverrides(colorAndOpacity).rgb;
-
-    // Pre-multiply diffuse color by opacity if not done so already
-#ifndef diffuseColor_IS_PREMULTIPLIED
-    diffuseColor *= opacity;
-#endif    
 
     // Evaluate all lights.
     vec3 c = evaluateLights(
@@ -108,7 +132,12 @@ surfaceShader(vec4 Peye, vec3 Neye, vec4 color, vec4 patchCoord)
         Peye,
         perturbFragmentNormal(Peye.xyz, Neye));
 
-    return vec4(c, colorAndOpacity.a);
+    // If opacityMode is "presence", opacity applies to all color components.
+    if (opacityMode == 0) {
+        c *= opacity;
+    }
+
+    return vec4(c, opacity);
 }
 
 
@@ -123,7 +152,6 @@ struct LightingContributions
 
 -- glsl Preview.Lighting
 
-#define PI 3.1415
 #define EPSILON 0.001
 
 
@@ -266,15 +294,6 @@ evaluateLight(
 
 -- glsl Preview.LightIntegration
 
-vec2 projectToLatLong(vec3 sample3D)
-{
-    // project spherical coord onto latitude-longitude map with
-    // latitude: +y == pi/2 and longitude: +z == 0, +x == pi/2
-    vec2 coord = vec2((atan(sample3D.z, sample3D.x) + 0.5 * PI) / (2.0 * PI),
-                      acos(sample3D.y) / PI);
-    return coord;
-}
-
 mat4 GetDomeLightTransform(mat4 worldToLightTransform)
 {
     // transform from view space to light space
@@ -326,16 +345,14 @@ evaluateIndirectLighting(
 
     // Diffuse Component
     vec3 dir = normalize((transformationMatrix * vec4(Neye,0.0)).xyz);
-    vec2 coord = projectToLatLong(dir);
-    vec3 diffuse = HdGet_domeLightIrradiance(coord).rgb;
+    vec3 diffuse = HdGet_domeLightIrradiance(dir).rgb;
 
     // Specular Component 
     const float MAX_REFLECTION_LOD = 
         textureQueryLevels(HdGetSampler_domeLightPrefilter());
     float lod = roughness * MAX_REFLECTION_LOD;
     vec3 Rdir = normalize((transformationMatrix * vec4(Reye,0.0)).xyz);
-    vec2 Rcoord = projectToLatLong(Rdir);
-    vec3 prefilter = HdTextureLod_domeLightPrefilter(Rcoord, lod).rgb;
+    vec3 prefilter = HdTextureLod_domeLightPrefilter(Rdir, lod).rgb;
 
     vec2 brdf = HdGet_domeLightBRDF(vec2(NdotE, roughness)).rg;
 
@@ -349,7 +366,8 @@ evaluateIndirectLighting(
             clearcoatColor,         // Clearcoat F90
             fresnel);
         lod = clearcoatRoughness * MAX_REFLECTION_LOD;
-        prefilter = HdTextureLod_domeLightPrefilter(Rcoord, lod).rgb;
+        prefilter = HdTextureLod_domeLightPrefilter(Rdir, lod).rgb;
+        brdf = HdGet_domeLightBRDF(vec2(NdotE, clearcoatRoughness)).rg;
         clearcoat = prefilter * (clearcoatF * brdf.x + brdf.y);
     }
 
@@ -389,7 +407,7 @@ evaluateLights(
     vec3 indirectLight = vec3(0.0);
 
 #if NUM_LIGHTS > 0
-    for (int i = 0; i < NUM_LIGHTS; ++i) {
+    for (int i = 0; i < GetLightCount(); ++i) {
         LightSource light = GetLightSource(i);
 
         // Calculate necessary vector information for lighting
@@ -468,43 +486,9 @@ vec3
 perturbFragmentNormal(vec3 P, vec3 N)
 {
 #ifdef HD_HAS_COORD_normal
-    // Calculation of TBN matrix and terminology based on "Surface 
-    // Gradient-Based Bump Mapping Framework" (2020)
     vec3 Nt = normalize(HdGet_normal().xyz);
     vec2 st = HdGetCoord_normal().xy;
-
-    // Get screen space derivatives of position
-    vec3 dPdx = dFdx(P);
-    vec3 dPdy = dFdy(P);
-
-    // Ensure position derivatives are perpendicular to N
-    vec3 sigmaX = dPdx - dot(dPdx, N) * N;
-    vec3 sigmaY = dPdy - dot(dPdy, N) * N;
-
-    float flipSign = dot(dPdy, cross(N, dPdx)) < 0 ? -1 : 1;
-
-    // Get screen space derivatives of st
-    vec2 dSTdx = dFdx(st);
-    vec2 dSTdy = dFdy(st);
-
-    // Get determinant and determinant sign of st matrix
-    float det = dot(dSTdx, vec2(dSTdy.y, -dSTdy.x));
-    float signDet = det < 0 ? -1 : 1;
-
-    // Get first column of inv st matrix
-    // Don't divide by det, but scale by its sign
-    vec2 invC0 = signDet * vec2(dSTdy.y, -dSTdx.y);
-
-    vec3 T = sigmaX * invC0.x + sigmaY * invC0.y;
-
-    if (abs(det) > 0) {
-        T = normalize(T);
-    }
-
-    vec3 B = (signDet * flipSign) * cross(N, T);
-
-    mat3 TBN = mat3(T, B, N);
-    return normalize(TBN * Nt);
+    return PerturbNormal(P, N, st, Nt);
 #endif
     return N;
 }

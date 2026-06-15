@@ -16,124 +16,153 @@
 
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
-#include "Hgi/hgiImpl.h"
+#include "Hgi/hgi.h"
 #include "Hgi/tokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens, ((colorChannelFrag, "ColorChannelFragment"))(colorIn));
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
+    ((colorChannelFrag, "ColorChannelFragment"))
+);
 
-HdxColorChannelTask::HdxColorChannelTask(HdSceneDelegate *delegate, SdfPath const &id)
-    : HdxTask(id), _channel(HdxColorChannelTokens->color)
+HdxColorChannelTask::HdxColorChannelTask(
+    HdSceneDelegate* delegate, 
+    SdfPath const& id)
+  : HdxTask(id)
+  , _channel(HdxColorChannelTokens->color)
 {
 }
 
 HdxColorChannelTask::~HdxColorChannelTask() = default;
 
-void HdxColorChannelTask::_Sync(HdSceneDelegate *delegate,
-                                HdTaskContext *ctx,
-                                HdDirtyBits *dirtyBits)
+void
+HdxColorChannelTask::_Sync(HdSceneDelegate* delegate,
+                           HdTaskContext* ctx,
+                           HdDirtyBits* dirtyBits)
 {
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  if (!_compositor) {
-    _compositor = std::make_unique<HdxFullscreenShader>(_GetHgi(), "ColorChannel");
-  }
-
-  if ((*dirtyBits) & HdChangeTracker::DirtyParams) {
-    HdxColorChannelTaskParams params;
-
-    if (_GetTaskParams(delegate, &params)) {
-      _channel = params.channel;
+    if (!_compositor) {
+        _compositor = std::make_unique<HdxFullscreenShader>(
+            _GetHgi(), "ColorChannel");
     }
-  }
 
-  *dirtyBits = HdChangeTracker::Clean;
+    if ((*dirtyBits) & HdChangeTracker::DirtyParams) {
+        HdxColorChannelTaskParams params;
+
+        if (_GetTaskParams(delegate, &params)) {
+            _channel = params.channel;
+        }
+    }
+
+    *dirtyBits = HdChangeTracker::Clean;
 }
 
-void HdxColorChannelTask::Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) {}
-
-void HdxColorChannelTask::Execute(HdTaskContext *ctx)
+void
+HdxColorChannelTask::Prepare(HdTaskContext* ctx,
+                             HdRenderIndex* renderIndex)
 {
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
-
-  HgiTextureHandle aovTexture;
-  _GetTaskContextData(ctx, HdAovTokens->color, &aovTexture);
-
-  HgiShaderFunctionDesc fragDesc;
-  fragDesc.debugName = _tokens->colorChannelFrag.GetString();
-  fragDesc.shaderStage = HgiShaderStageFragment;
-  HgiShaderFunctionAddStageInput(&fragDesc, "uvOut", "vec2");
-  HgiShaderFunctionAddTexture(&fragDesc, "colorIn");
-  HgiShaderFunctionAddStageOutput(&fragDesc, "hd_FragColor", "vec4", "color");
-
-  // The order of the constant parameters has to match the order in the
-  // _ParameterBuffer struct
-  HgiShaderFunctionAddConstantParam(&fragDesc, "screenSize", "vec2");
-  HgiShaderFunctionAddConstantParam(&fragDesc, "channel", "int");
-
-  _compositor->SetProgram(HdxPackageColorChannelShader(), _tokens->colorChannelFrag, fragDesc);
-  const auto &aovDesc = aovTexture->GetDescriptor();
-  if (_UpdateParameterBuffer(static_cast<float>(aovDesc.dimensions[0]),
-                             static_cast<float>(aovDesc.dimensions[1])))
-  {
-    size_t byteSize = sizeof(_ParameterBuffer);
-    _compositor->SetShaderConstants(byteSize, &_parameterData);
-  }
-
-  _compositor->BindTextures({aovTexture});
-
-  _compositor->Draw(aovTexture, /*no depth*/ HgiTextureHandle());
 }
 
-bool HdxColorChannelTask::_UpdateParameterBuffer(float screenSizeX, float screenSizeY)
+void
+HdxColorChannelTask::Execute(HdTaskContext* ctx)
 {
-  _ParameterBuffer pb;
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  // Get an integer that represents the color channel. This can be used to
-  // pass the color channel option as into the glsl shader.
-  // (see the `#define CHANNEL_*` lines in the shader).
-  // If _channel contains an invalid entry the shader will return 'color'.
-  int i = 0;
-  for (const TfToken &channelToken : HdxColorChannelTokens->allTokens) {
-    if (channelToken == _channel)
-      break;
-    ++i;
-  }
-  pb.channel = i;
-  pb.screenSize[0] = screenSizeX;
-  pb.screenSize[1] = screenSizeY;
+    HgiTextureHandle aovTexture;
+    _GetTaskContextData(ctx, HdAovTokens->color, &aovTexture);
+    
+    HgiShaderFunctionDesc fragDesc;
+    fragDesc.debugName = _tokens->colorChannelFrag.GetString();
+    fragDesc.shaderStage = HgiShaderStageFragment;
+    HgiShaderFunctionAddStageInput(
+        &fragDesc, "uvOut", "vec2");
+    HgiShaderFunctionAddTexture(
+        &fragDesc, "colorIn");
+    HgiShaderFunctionAddStageOutput(
+        &fragDesc, "hd_FragColor", "vec4", "color");
 
-  // All data is still the same, no need to update the storage buffer
-  if (pb == _parameterData) {
-    return false;
-  }
+    // The order of the constant parameters has to match the order in the 
+    // _ParameterBuffer struct
+    HgiShaderFunctionAddConstantParam(
+        &fragDesc, "screenSize", "vec2");
+    HgiShaderFunctionAddConstantParam(
+        &fragDesc, "channel", "int");
 
-  _parameterData = pb;
+    _compositor->SetProgram(
+        HdxPackageColorChannelShader(), 
+        _tokens->colorChannelFrag,
+        fragDesc);
+    const auto &aovDesc = aovTexture->GetDescriptor();
+    if (_UpdateParameterBuffer(
+            static_cast<float>(aovDesc.dimensions[0]),
+            static_cast<float>(aovDesc.dimensions[1]))) {
+        size_t byteSize = sizeof(_ParameterBuffer);
+        _compositor->SetShaderConstants(byteSize, &_parameterData);
+    }
 
-  return true;
+    _compositor->BindTextures({aovTexture});
+
+    _compositor->Draw(aovTexture, /*no depth*/HgiTextureHandle());
 }
+
+bool
+HdxColorChannelTask::_UpdateParameterBuffer(
+    float screenSizeX, float screenSizeY)
+{
+    _ParameterBuffer pb;
+
+    // Get an integer that represents the color channel. This can be used to
+    // pass the color channel option as into the glsl shader.
+    // (see the `#define CHANNEL_*` lines in the shader). 
+    // If _channel contains an invalid entry the shader will return 'color'.
+    int i = 0;
+    for(const TfToken& channelToken : HdxColorChannelTokens->allTokens) {
+        if (channelToken == _channel) break;
+        ++i;
+    }
+    pb.channel = i;
+    pb.screenSize[0] = screenSizeX;
+    pb.screenSize[1] = screenSizeY;
+
+    // All data is still the same, no need to update the storage buffer
+    if (pb == _parameterData) {
+        return false;
+    }
+
+    _parameterData = pb;
+
+    return true;
+}
+
 
 // -------------------------------------------------------------------------- //
 // VtValue Requirements
 // -------------------------------------------------------------------------- //
 
-std::ostream &operator<<(std::ostream &out, const HdxColorChannelTaskParams &pv)
+std::ostream& operator<<(
+    std::ostream& out, 
+    const HdxColorChannelTaskParams& pv)
 {
-  out << "ColorChannelTask Params: (...) " << pv.channel << " ";
-  return out;
+    out << "ColorChannelTask Params: (...) "
+        << pv.channel << " "
+    ;
+    return out;
 }
 
-bool operator==(const HdxColorChannelTaskParams &lhs, const HdxColorChannelTaskParams &rhs)
+bool operator==(const HdxColorChannelTaskParams& lhs,
+                const HdxColorChannelTaskParams& rhs)
 {
-  return lhs.channel == rhs.channel;
+    return lhs.channel == rhs.channel;
 }
 
-bool operator!=(const HdxColorChannelTaskParams &lhs, const HdxColorChannelTaskParams &rhs)
+bool operator!=(const HdxColorChannelTaskParams& lhs,
+                const HdxColorChannelTaskParams& rhs)
 {
-  return !(lhs == rhs);
+    return !(lhs == rhs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

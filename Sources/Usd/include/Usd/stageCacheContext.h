@@ -7,22 +7,22 @@
 #ifndef PXR_USD_USD_STAGE_CACHE_CONTEXT_H
 #define PXR_USD_USD_STAGE_CACHE_CONTEXT_H
 
-#include "Tf/stacked.h"
-#include "Usd/api.h"
 #include "pxr/pxrns.h"
-
-#include "Arch/swiftInterop.h"
+#include "Usd/api.h"
+#include "Tf/stacked.h"
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class UsdStageCache;
 
 // Private helper wrapper class, holds a const reference to a stage cache.
 struct Usd_NonPopulatingStageCacheWrapper {
-  explicit Usd_NonPopulatingStageCacheWrapper(const UsdStageCache &cache) : cache(cache) {}
-  const UsdStageCache &cache;
+    explicit Usd_NonPopulatingStageCacheWrapper(const UsdStageCache &cache)
+        : cache(cache) {}
+    const UsdStageCache &cache;
 };
 
 // Using a template arg for 'cache' in UsdUseButDoNotPopulateCache enforces
@@ -33,23 +33,24 @@ struct Usd_NonPopulatingStageCacheWrapper {
 /// Calls to UsdStage::Open() will attempt to find stages in \p cache when a
 /// UsdStageCacheContext is present on the stack.  See UsdStageCacheContext for
 /// more details and example use.
-template<class StageCache>
-Usd_NonPopulatingStageCacheWrapper UsdUseButDoNotPopulateCache(StageCache &cache)
-{
-  return Usd_NonPopulatingStageCacheWrapper(cache);
+template <class StageCache>
+Usd_NonPopulatingStageCacheWrapper
+UsdUseButDoNotPopulateCache(StageCache &cache) {
+    return Usd_NonPopulatingStageCacheWrapper(cache);
 }
 
-enum UsdStageCacheContextBlockType {
-  /// Indicate that a UsdStageCacheContext should ignore all currently bound
-  /// UsdStageCacheContexts, preventing reading from or writing to their
-  /// UsdStageCaches.  See UsdStageCache for more details and example use.
-  UsdBlockStageCaches,
-  /// Indicate that a UsdStageCacheContext should ignore all currently bound
-  /// writable UsdStageCacheContexts, writing to their UsdStageCaches.  See
-  /// UsdStageCache for more details and example use.
-  UsdBlockStageCachePopulation,
+enum UsdStageCacheContextBlockType
+{
+    /// Indicate that a UsdStageCacheContext should ignore all currently bound
+    /// UsdStageCacheContexts, preventing reading from or writing to their
+    /// UsdStageCaches.  See UsdStageCache for more details and example use.
+    UsdBlockStageCaches,
+    /// Indicate that a UsdStageCacheContext should ignore all currently bound
+    /// writable UsdStageCacheContexts, writing to their UsdStageCaches.  See
+    /// UsdStageCache for more details and example use.
+    UsdBlockStageCachePopulation,
 
-  Usd_NoBlock
+    Usd_NoBlock
 };
 
 /// \class UsdStageCacheContext
@@ -74,7 +75,7 @@ enum UsdStageCacheContextBlockType {
 ///     auto stage = UsdStage::Open(<args>);
 ///
 ///     assert(stageCache.Contains(stage));
-///
+///     
 ///     // A subsequent Open() call with the same arguments will retrieve the
 ///     // stage from cache.
 ///     auto stage2 = UsdStage::Open(<args>);
@@ -102,55 +103,42 @@ enum UsdStageCacheContextBlockType {
 ///
 TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)
 {
- public:
-  /// Bind a cache for calls to UsdStage::Open() to read from and write to.
-  explicit UsdStageCacheContext(UsdStageCache & cache)
-      : _rwCache(&cache), _isReadOnlyCache(false), _blockType(Usd_NoBlock)
-  {
-  }
+public:
+    /// Bind a cache for calls to UsdStage::Open() to read from and write to.
+    explicit UsdStageCacheContext(UsdStageCache &cache)
+        : _rwCache(&cache)
+        , _isReadOnlyCache(false)
+        , _blockType(Usd_NoBlock) {}
 
-  /// Bind a cache for calls to UsdStage::Open() to read from.
-  /// \see UsdUseButDoNotPopulateCache()
-  explicit UsdStageCacheContext(Usd_NonPopulatingStageCacheWrapper holder)
-      : _roCache(&holder.cache), _isReadOnlyCache(true), _blockType(Usd_NoBlock)
-  {
-  }
+    /// Bind a cache for calls to UsdStage::Open() to read from.
+    /// \see UsdUseButDoNotPopulateCache()
+    explicit UsdStageCacheContext(Usd_NonPopulatingStageCacheWrapper holder)
+        : _roCache(&holder.cache)
+        , _isReadOnlyCache(true)
+        , _blockType(Usd_NoBlock) {}
 
-  /// Disable cache use completely (with UsdBlockStageCaches) or only
-  /// for writing (with UsdBlockStageCacheWrites).
-  explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType) : _blockType(blockType) {}
+    /// Disable cache use completely (with UsdBlockStageCaches) or only
+    /// for writing (with UsdBlockStageCacheWrites).
+    explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType)
+        : _blockType(blockType) {}
 
-  /// Bind a cache for calls to UsdStage::Open() to read from and write to.
-  /// For constructing UsdStageCacheContext in Swift. Swift programmers, if
-  /// if you are reading this, this is an implementation detail, please instead
-  /// call the following in your swift code:
-  ///
-  /// ```swift
-  /// var stageCache = UsdStageCache()
-  /// let context = UsdStageCacheContext.bind(cache: &stageCache)
-  /// ```
-  ///
-  static UsdStageCacheContext *CreateCache(UsdStageCache &cache)
-  {
-    return new UsdStageCacheContext(cache);
-  }
+private:
+    friend class UsdStage;
 
- private:
-  friend class UsdStage;
+    static std::vector<const UsdStageCache *> _GetReadOnlyCaches();
+    static std::vector<const UsdStageCache *> _GetReadableCaches();
+    static std::vector<UsdStageCache *> _GetWritableCaches();
 
-  static std::vector<const UsdStageCache *> _GetReadOnlyCaches();
-  static std::vector<const UsdStageCache *> _GetReadableCaches();
-  static std::vector<UsdStageCache *> _GetWritableCaches();
+    // A blocking context is encoded with both members variables null.
+    union {
+        UsdStageCache *_rwCache;
+        const UsdStageCache *_roCache;
+    };
+    bool _isReadOnlyCache;
+    UsdStageCacheContextBlockType _blockType;
+};
 
-  // A blocking context is encoded with both members variables null.
-  union {
-    UsdStageCache *_rwCache;
-    const UsdStageCache *_roCache;
-  };
-  bool _isReadOnlyCache;
-  UsdStageCacheContextBlockType _blockType;
-} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_STAGE_CACHE_CONTEXT_H
+#endif // PXR_USD_USD_STAGE_CACHE_CONTEXT_H

@@ -9,9 +9,9 @@
 
 /// \file sdf/namespaceEdit.h
 
+#include "pxr/pxrns.h"
 #include "Sdf/api.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
 
 #include <functional>
 #include <iosfwd>
@@ -26,132 +26,144 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// with a rename, reordering, and removal.
 ///
 struct SdfNamespaceEdit {
- public:
-  typedef SdfNamespaceEdit This;
-  typedef SdfPath Path;
-  typedef int Index;
+public:
+    typedef SdfNamespaceEdit This;
+    typedef SdfPath Path;
+    typedef int Index;
 
-  /// Special index that means at the end.
-  static const Index AtEnd = -1;
+    /// Special index that means at the end.
+    static const Index AtEnd = -1;
 
-  /// Special index that means don't move.  It's only meaningful when
-  /// renaming.  In other cases implementations may assume \c AtEnd.
-  static const Index Same = -2;
+    /// Special index that means don't move.  It's only meaningful when
+    /// renaming.  In other cases implementations may assume \c AtEnd.
+    static const Index Same  = -2;
 
-  /// The default edit maps the empty path to the empty path.
-  SdfNamespaceEdit() : index(AtEnd) {}
+    /// The default edit maps the empty path to the empty path.
+    SdfNamespaceEdit() : index(AtEnd) { }
 
-  /// The fully general edit.
-  SdfNamespaceEdit(const Path &currentPath_, const Path &newPath_, Index index_ = AtEnd)
-      : currentPath(currentPath_), newPath(newPath_), index(index_)
-  {
-  }
+    /// The fully general edit.
+    SdfNamespaceEdit(const Path& currentPath_, const Path& newPath_,
+                     Index index_ = AtEnd) :
+        currentPath(currentPath_), newPath(newPath_), index(index_) { }
 
-  /// Returns a namespace edit that removes the object at \p currentPath.
-  static This Remove(const Path &currentPath)
-  {
-    return This(currentPath, Path::EmptyPath());
-  }
+    /// Returns a namespace edit that removes the object at \p currentPath.
+    static This Remove(const Path& currentPath)
+    {
+        return This(currentPath, Path::EmptyPath());
+    }
 
-  /// Returns a namespace edit that renames the prim or property at
-  /// \p currentPath to \p name
-  static This Rename(const Path &currentPath, const TfToken &name)
-  {
-    return This(currentPath, currentPath.ReplaceName(name), Same);
-  }
+    /// Returns a namespace edit that renames the prim or property at
+    /// \p currentPath to \p name
+    static This Rename(const Path& currentPath, const TfToken& name)
+    {
+        return This(currentPath, currentPath.ReplaceName(name), Same);
+    }
 
-  /// Returns a namespace edit to reorder the prim or property at
-  /// \p currentPath to index \p index.
-  static This Reorder(const Path &currentPath, Index index)
-  {
-    return This(currentPath, currentPath, index);
-  }
+    /// Returns a namespace edit to reorder the prim or property at
+    /// \p currentPath to index \p index.
+    static This Reorder(const Path& currentPath, Index index)
+    {
+        return This(currentPath, currentPath, index);
+    }
 
-  /// Returns a namespace edit to reparent the prim or property at
-  /// \p currentPath to be under \p newParentPath at index \p index.
-  static This Reparent(const Path &currentPath, const Path &newParentPath, Index index)
-  {
-    return This(
-        currentPath, currentPath.ReplacePrefix(currentPath.GetParentPath(), newParentPath), index);
-  }
+    /// Returns a namespace edit to reparent the prim or property at
+    /// \p currentPath to be under \p newParentPath at index \p index.
+    static This Reparent(const Path& currentPath,
+                         const Path& newParentPath,
+                         Index index)
+    {
+        return This(currentPath,
+                    currentPath.ReplacePrefix(currentPath.GetParentPath(),
+                                              newParentPath),
+                    index);
+    }
 
-  /// Returns a namespace edit to reparent the prim or property at
-  /// \p currentPath to be under \p newParentPath at index \p index
-  /// with the name \p name.
-  static This ReparentAndRename(const Path &currentPath,
-                                const Path &newParentPath,
-                                const TfToken &name,
-                                Index index)
-  {
-    return This(
-        currentPath,
-        currentPath.ReplacePrefix(currentPath.GetParentPath(), newParentPath).ReplaceName(name),
-        index);
-  }
+    /// Returns a namespace edit to reparent the prim or property at
+    /// \p currentPath to be under \p newParentPath at index \p index
+    /// with the name \p name.
+    static This ReparentAndRename(const Path& currentPath,
+                                  const Path& newParentPath,
+                                  const TfToken& name,
+                                  Index index)
+    {
+        return This(currentPath,
+                    currentPath.ReplacePrefix(currentPath.GetParentPath(),
+                                              newParentPath).
+                                ReplaceName(name),
+                    index);
+    }
 
-  SDF_API bool operator==(const This &rhs) const;
-  SDF_API bool operator!=(const This &rhs) const;
+    SDF_API bool operator==(const This& rhs) const;
+    SDF_API bool operator!=(const This& rhs) const;
 
- public:
-  Path currentPath;  ///< Path of the object when this edit starts.
-  Path newPath;      ///< Path of the object when this edit ends.
-  Index index;       ///< Index for prim insertion.
+public:
+    Path currentPath;   ///< Path of the object when this edit starts.
+    Path newPath;       ///< Path of the object when this edit ends.
+    Index index;        ///< Index for prim insertion.
 };
 
 /// A sequence of \c SdfNamespaceEdit.
 typedef std::vector<SdfNamespaceEdit> SdfNamespaceEditVector;
 
-SDF_API std::ostream &operator<<(std::ostream &, const SdfNamespaceEdit &);
-SDF_API std::ostream &operator<<(std::ostream &, const SdfNamespaceEditVector &);
+SDF_API std::ostream& operator<<(std::ostream&, const SdfNamespaceEdit&);
+SDF_API std::ostream& operator<<(std::ostream&, const SdfNamespaceEditVector&);
 
 /// \struct SdfNamespaceEditDetail
 ///
 /// Detailed information about a namespace edit.
 ///
 struct SdfNamespaceEditDetail {
- public:
-  /// Validity of an edit.
-  enum Result {
-    Error,      ///< Edit will fail.
-    Unbatched,  ///< Edit will succeed but not batched.
-    Okay,       ///< Edit will succeed as a batch.
-  };
+public:
+    /// Validity of an edit.
+    enum Result {
+        Error,          ///< Edit will fail.
+        Unbatched,      ///< Edit will succeed but not batched.
+        Okay,           ///< Edit will succeed as a batch.
+    };
 
-  SDF_API SdfNamespaceEditDetail();
-  SDF_API SdfNamespaceEditDetail(Result, const SdfNamespaceEdit &edit, const std::string &reason);
+    SDF_API SdfNamespaceEditDetail();
+    SDF_API SdfNamespaceEditDetail(Result, const SdfNamespaceEdit& edit,
+                           const std::string& reason);
 
-  SDF_API bool operator==(const SdfNamespaceEditDetail &rhs) const;
-  SDF_API bool operator!=(const SdfNamespaceEditDetail &rhs) const;
+    SDF_API bool operator==(const SdfNamespaceEditDetail& rhs) const;
+    SDF_API bool operator!=(const SdfNamespaceEditDetail& rhs) const;
 
- public:
-  Result result;          ///< Validity.
-  SdfNamespaceEdit edit;  ///< The edit.
-  std::string reason;     ///< The reason the edit will not succeed cleanly.
+public:
+    Result result;          ///< Validity.
+    SdfNamespaceEdit edit;  ///< The edit.
+    std::string reason;     ///< The reason the edit will not succeed cleanly.
 };
 
 /// A sequence of \c SdfNamespaceEditDetail.
 typedef std::vector<SdfNamespaceEditDetail> SdfNamespaceEditDetailVector;
 
-SDF_API std::ostream &operator<<(std::ostream &, const SdfNamespaceEditDetail &);
-SDF_API std::ostream &operator<<(std::ostream &, const SdfNamespaceEditDetailVector &);
+SDF_API std::ostream& operator<<(std::ostream&, const SdfNamespaceEditDetail&);
+SDF_API std::ostream& operator<<(std::ostream&, const SdfNamespaceEditDetailVector&);
 
 /// Combine two results, yielding Error over Unbatched over Okay.
-inline SdfNamespaceEditDetail::Result CombineResult(SdfNamespaceEditDetail::Result lhs,
-                                                    SdfNamespaceEditDetail::Result rhs)
+inline
+SdfNamespaceEditDetail::Result
+CombineResult(
+    SdfNamespaceEditDetail::Result lhs,
+    SdfNamespaceEditDetail::Result rhs)
 {
-  return lhs < rhs ? lhs : rhs;
+    return lhs < rhs ? lhs : rhs;
 }
 
 /// Combine a result with Error, yielding Error over Unbatched over Okay.
-inline SdfNamespaceEditDetail::Result CombineError(SdfNamespaceEditDetail::Result)
+inline
+SdfNamespaceEditDetail::Result
+CombineError(SdfNamespaceEditDetail::Result)
 {
-  return SdfNamespaceEditDetail::Error;
+    return SdfNamespaceEditDetail::Error;
 }
 
 /// Combine a result with Unbatched, yielding Error over Unbatched over Okay.
-inline SdfNamespaceEditDetail::Result CombineUnbatched(SdfNamespaceEditDetail::Result other)
+inline
+SdfNamespaceEditDetail::Result
+CombineUnbatched(SdfNamespaceEditDetail::Result other)
 {
-  return CombineResult(other, SdfNamespaceEditDetail::Unbatched);
+    return CombineResult(other, SdfNamespaceEditDetail::Unbatched);
 }
 
 /// \class SdfBatchNamespaceEdit
@@ -180,91 +192,91 @@ inline SdfNamespaceEditDetail::Result CombineUnbatched(SdfNamespaceEditDetail::R
 /// edit that clients must be able to know but otherwise cannot determine.
 ///
 class SdfBatchNamespaceEdit {
- public:
-  /// Create an empty sequence of edits.
-  SDF_API SdfBatchNamespaceEdit();
-  SDF_API SdfBatchNamespaceEdit(const SdfBatchNamespaceEdit &);
-  SDF_API SdfBatchNamespaceEdit(const SdfNamespaceEditVector &);
-  SDF_API ~SdfBatchNamespaceEdit();
+public:
+    /// Create an empty sequence of edits.
+    SDF_API SdfBatchNamespaceEdit();
+    SDF_API SdfBatchNamespaceEdit(const SdfBatchNamespaceEdit&);
+    SDF_API SdfBatchNamespaceEdit(const SdfNamespaceEditVector&);
+    SDF_API ~SdfBatchNamespaceEdit();
 
-  SDF_API SdfBatchNamespaceEdit &operator=(const SdfBatchNamespaceEdit &);
+    SDF_API SdfBatchNamespaceEdit& operator=(const SdfBatchNamespaceEdit&);
 
-  /// Add a namespace edit.
-  void Add(const SdfNamespaceEdit &edit)
-  {
-    _edits.push_back(edit);
-  }
+    /// Add a namespace edit.
+    void Add(const SdfNamespaceEdit& edit)
+    {
+        _edits.push_back(edit);
+    }
 
-  /// Add a namespace edit.
-  void Add(const SdfNamespaceEdit::Path &currentPath,
-           const SdfNamespaceEdit::Path &newPath,
-           SdfNamespaceEdit::Index index = SdfNamespaceEdit::AtEnd)
-  {
-    Add(SdfNamespaceEdit(currentPath, newPath, index));
-  }
+    /// Add a namespace edit.
+    void Add(const SdfNamespaceEdit::Path& currentPath,
+             const SdfNamespaceEdit::Path& newPath,
+             SdfNamespaceEdit::Index index = SdfNamespaceEdit::AtEnd)
+    {
+        Add(SdfNamespaceEdit(currentPath, newPath, index));
+    }
 
-  /// Returns the edits.
-  const SdfNamespaceEditVector &GetEdits() const
-  {
-    return _edits;
-  }
+    /// Returns the edits.
+    const SdfNamespaceEditVector& GetEdits() const
+    {
+        return _edits;
+    }
 
-  /// Functor that returns \c true iff an object exists at the given path.
-  typedef std::function<bool(const SdfPath &)> HasObjectAtPath;
+    /// Functor that returns \c true iff an object exists at the given path.
+    typedef std::function<bool(const SdfPath&)> HasObjectAtPath;
 
-  /// Functor that returns \c true iff the namespace edit will succeed.
-  /// If not it returns \c false and sets the string argument.
-  typedef std::function<bool(const SdfNamespaceEdit &, std::string *)> CanEdit;
+    /// Functor that returns \c true iff the namespace edit will succeed.
+    /// If not it returns \c false and sets the string argument.
+    typedef std::function<bool(const SdfNamespaceEdit&,std::string*)> CanEdit;
 
-  /// Validate the edits and generate a possibly more efficient edit
-  /// sequence.  Edits are treated as if they were performed one at time
-  /// in sequence, therefore each edit occurs in the namespace resulting
-  /// from all previous edits.
-  ///
-  /// Editing the descendants of the object in each edit is implied.  If
-  /// an object is removed then the new path will be empty.  If an object
-  /// is removed after being otherwise edited, the other edits will be
-  /// processed and included in \p processedEdits followed by the removal.
-  /// This allows clients to fixup references to point to the object's
-  /// final location prior to removal.
-  ///
-  /// This function needs help to determine if edits are allowed.  The
-  /// callbacks provide that help.  \p hasObjectAtPath returns \c true
-  /// iff there's an object at the given path.  This path will be in the
-  /// original namespace not any intermediate or final namespace.
-  /// \p canEdit returns \c true iff the object at the current path can
-  /// be namespace edited to the new path, ignoring whether an object
-  /// already exists at the new path.  Both paths are in the original
-  /// namespace.  If it returns \c false it should set the string to the
-  /// reason why the edit isn't allowed.  It should not write either path
-  /// to the string.
-  ///
-  /// If \p hasObjectAtPath is invalid then this assumes objects exist
-  /// where they should and don't exist where they shouldn't.  Use this
-  /// with care.  If \p canEdit in invalid then it's assumed all edits
-  /// are valid.
-  ///
-  /// If \p fixBackpointers is \c true then target/connection paths are
-  /// expected to be in the intermediate namespace resulting from all
-  /// previous edits.  If \c false and any current or new path contains a
-  /// target or connection path that has been edited then this will
-  /// generate an error.
-  ///
-  /// This method returns \c true if the edits are allowed and sets
-  /// \p processedEdits to a new edit sequence at least as efficient as
-  /// the input sequence.  If not allowed it returns \c false and appends
-  /// reasons why not to \p details.
-  SDF_API
-  bool Process(SdfNamespaceEditVector *processedEdits,
-               const HasObjectAtPath &hasObjectAtPath,
-               const CanEdit &canEdit,
-               SdfNamespaceEditDetailVector *details = NULL,
-               bool fixBackpointers = true) const;
+    /// Validate the edits and generate a possibly more efficient edit
+    /// sequence.  Edits are treated as if they were performed one at time
+    /// in sequence, therefore each edit occurs in the namespace resulting
+    /// from all previous edits.
+    ///
+    /// Editing the descendants of the object in each edit is implied.  If
+    /// an object is removed then the new path will be empty.  If an object
+    /// is removed after being otherwise edited, the other edits will be
+    /// processed and included in \p processedEdits followed by the removal. 
+    /// This allows clients to fixup references to point to the object's
+    /// final location prior to removal.
+    ///
+    /// This function needs help to determine if edits are allowed.  The
+    /// callbacks provide that help.  \p hasObjectAtPath returns \c true
+    /// iff there's an object at the given path.  This path will be in the
+    /// original namespace not any intermediate or final namespace.
+    /// \p canEdit returns \c true iff the object at the current path can
+    /// be namespace edited to the new path, ignoring whether an object
+    /// already exists at the new path.  Both paths are in the original
+    /// namespace.  If it returns \c false it should set the string to the
+    /// reason why the edit isn't allowed.  It should not write either path
+    /// to the string.
+    ///
+    /// If \p hasObjectAtPath is invalid then this assumes objects exist
+    /// where they should and don't exist where they shouldn't.  Use this
+    /// with care.  If \p canEdit in invalid then it's assumed all edits
+    /// are valid.
+    ///
+    /// If \p fixBackpointers is \c true then target/connection paths are
+    /// expected to be in the intermediate namespace resulting from all
+    /// previous edits.  If \c false and any current or new path contains a
+    /// target or connection path that has been edited then this will
+    /// generate an error.
+    ///
+    /// This method returns \c true if the edits are allowed and sets
+    /// \p processedEdits to a new edit sequence at least as efficient as
+    /// the input sequence.  If not allowed it returns \c false and appends
+    /// reasons why not to \p details.
+    SDF_API
+    bool Process(SdfNamespaceEditVector* processedEdits,
+                 const HasObjectAtPath& hasObjectAtPath,
+                 const CanEdit& canEdit,
+                 SdfNamespaceEditDetailVector* details = NULL,
+                 bool fixBackpointers = true) const;
 
- private:
-  SdfNamespaceEditVector _edits;
+private:
+    SdfNamespaceEditVector _edits;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_SDF_NAMESPACE_EDIT_H
+#endif // PXR_USD_SDF_NAMESPACE_EDIT_H

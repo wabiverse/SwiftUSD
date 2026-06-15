@@ -7,15 +7,16 @@
 #ifndef PXR_IMAGING_HF_PLUGIN_DESC_H
 #define PXR_IMAGING_HF_PLUGIN_DESC_H
 
-#include "Tf/token.h"
 #include "pxr/pxrns.h"
+#include "Tf/token.h"
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 ///
-/// Common structure used to report registered plugins in one of the plugin
+/// Common structure used to report registered plugins in one of the plugin 
 /// registries.  The id token is used for internal api communication
 /// about the name of the plugin.
 /// displayName is a human readable name given to the plugin intended
@@ -27,13 +28,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// over 'b').
 ///
 struct HfPluginDesc {
-  TfToken id;
-  std::string displayName;
-  int priority;
+    TfToken     id;
+    std::string displayName;
+    int         priority;
 };
 
 typedef std::vector<HfPluginDesc> HfPluginDescVector;
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HF_PLUGIN_DESC_H
+#endif // PXR_IMAGING_HF_PLUGIN_DESC_H

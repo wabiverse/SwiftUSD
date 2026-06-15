@@ -1,50 +1,32 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #ifndef PXR_USD_PLUGIN_SDR_OSL_OSL_PARSER_H
 #define PXR_USD_PLUGIN_SDR_OSL_OSL_PARSER_H
 
 /// \file sdrOsl/oslParser.h
-#if PXR_OSL_SUPPORT_ENABLED
 
-#  include "Ndr/parserPlugin.h"
-#  include "Sdr/declare.h"
-#  include "SdrOsl/api.h"
-#  include "Vt/value.h"
-#  include <OSL/oslquery.h>
-#  include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
+#include "SdrOsl/api.h"
+#include "Vt/value.h"
+#include "Sdr/parserPlugin.h"
+#include "Sdr/declare.h"
+#include <OSL/oslquery.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Forward declarations
-class NdrNode;
-struct NdrNodeDiscoveryResult;
+class SdrShaderNode;
+struct SdrShaderNodeDiscoveryResult;
 
 /// \class SdrOslParserPlugin
 ///
 /// Parses OSL nodes. For more information on parser plugins, see the
-/// documentation for `NdrParserPlugin`.
+/// documentation for `SdrParserPlugin`.
 ///
 /// \section metadata_schema Metadata Schema
 /// The following metadata is pulled out of the shader and available on the
@@ -67,7 +49,7 @@ struct NdrNodeDiscoveryResult;
 /// OSL Metadata Key    | Destination
 /// ------------------- | ------------
 /// connectable         | IsConnectable()
-/// sdrDefinitionName   | renames parameter, sends original osl param name to
+/// sdrDefinitionName   | renames parameter, sends original osl param name to 
 ///                     | SdrShaderProperty::GetImplementationName()
 /// page                | GetPage()
 /// help                | GetHelp()
@@ -109,60 +91,74 @@ struct NdrNodeDiscoveryResult;
 ///     </li>
 /// </ul>
 ///
-class SdrOslParserPlugin : public NdrParserPlugin {
- public:
-  typedef OSL::OSLQuery::Parameter OslParameter;
+class SdrOslParserPlugin : public SdrParserPlugin
+{
+public:
+    typedef OSL::OSLQuery::Parameter OslParameter;
 
-  SDROSL_API
-  SdrOslParserPlugin();
-  SDROSL_API
-  ~SdrOslParserPlugin();
+    SDROSL_API
+    SdrOslParserPlugin();
+    SDROSL_API
+    ~SdrOslParserPlugin();
 
-  SDROSL_API
-  NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult &discoveryResult) override;
+    SDROSL_API
+    SdrShaderNodeUniquePtr ParseShaderNode(
+        const SdrShaderNodeDiscoveryResult& discoveryResult) override;
 
-  SDROSL_API
-  const NdrTokenVec &GetDiscoveryTypes() const override;
+    SDROSL_API
+    const SdrTokenVec& GetDiscoveryTypes() const override;
 
-  SDROSL_API
-  const TfToken &GetSourceType() const override;
+    SDROSL_API
+    const TfToken& GetShadingSystem() const override;
 
- private:
-  // Gets a vector of properties that are present on the specified OSL
-  // query object
-  NdrPropertyUniquePtrVec _getNodeProperties(const OSL::OSLQuery &query,
-                                             const NdrNodeDiscoveryResult &discoveryResult) const;
+private:
+    // Sets the shader's sdr metadata context.
+    // - If the metadata already has a "context" item, this does nothing.
+    // - If the metadata has a "schemaBase" item, sets "context" mapped
+    //   from the "schemaBase" item value.
+    // - Otherwise, does nothing
+    void _setSdrContext(SdrTokenMap& metadata) const;
 
-  // Gets all metadata for the node that's present on the specified OSL
-  // query object
-  NdrTokenMap _getNodeMetadata(const OSL::OSLQuery &query, const NdrTokenMap &baseMetadata) const;
+    // Gets a vector of properties that are present on the specified OSL
+    // query object
+    SdrShaderPropertyUniquePtrVec _getNodeProperties(
+        const OSL::OSLQuery &query,
+        const SdrShaderNodeDiscoveryResult& discoveryResult,
+        const std::string& fallbackprefix) const;
 
-  // Gets all metadata for the specified OSL parameter
-  NdrTokenMap _getPropertyMetadata(const OslParameter *param,
-                                   const NdrNodeDiscoveryResult &discoveryResult) const;
+    // Gets all metadata for the node that's present on the specified OSL
+    // query object
+    SdrTokenMap _getNodeMetadata(const OSL::OSLQuery &query,
+                                 const SdrTokenMap &baseMetadata) const;
 
-  // Injects any metadata that is generated by the parser. This type of
-  // metadata provides additional hints to the property.
-  void _injectParserMetadata(NdrTokenMap &metadata, const TfToken &typeName) const;
+    // Gets all metadata for the specified OSL parameter
+    SdrTokenMap _getPropertyMetadata(const OslParameter* param,
+        const SdrShaderNodeDiscoveryResult& discoveryResult) const;
 
-  // Gets the specified parameter's value as a string. Can handle string,
-  // float, and integer values (if not one of these types, an empty string
-  // is returned).
-  std::string _getParamAsString(const OslParameter &param) const;
+    // Injects any metadata that is generated by the parser. This type of
+    // metadata provides additional hints to the property.
+    void _injectParserMetadata(SdrTokenMap& metadata,
+        const TfToken& typeName) const;
 
-  // Gets a common type + array size (if array) from the OSL parameter
-  std::tuple<TfToken, size_t> _getTypeName(const OslParameter *param,
-                                           const NdrTokenMap &metadata) const;
+    // Gets the specified parameter's value as a string. Can handle string,
+    // float, and integer values (if not one of these types, an empty string
+    // is returned).
+    std::string _getParamAsString(const OslParameter& param) const;
 
-  // Gets the default value of the specified param.
-  VtValue _getDefaultValue(const SdrOslParserPlugin::OslParameter &param,
-                           const std::string &oslType,
-                           size_t arraySize,
-                           const NdrTokenMap &metadata) const;
+    // Gets a common type + array size (if array) from the OSL parameter
+    std::tuple<TfToken, size_t> _getTypeName(
+        const OslParameter* param,
+        const SdrTokenMap& metadata) const;
+
+    // Gets the default value of the specified param.
+    VtValue _getDefaultValue(
+        const SdrOslParserPlugin::OslParameter& param,
+        const std::string& oslType,
+        size_t arraySize,
+        const SdrTokenMap& metadata
+    ) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif /* PXR_OSL_SUPPORT_ENABLED */
-
-#endif  // PXR_USD_PLUGIN_SDR_OSL_OSL_PARSER_H
+#endif // PXR_USD_PLUGIN_SDR_OSL_OSL_PARSER_H

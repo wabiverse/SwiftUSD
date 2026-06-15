@@ -4,42 +4,52 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
 #include "Hd/points.h"
 #include "Hd/tokens.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdPoints::HdPoints(SdfPath const &id) : HdRprim(id)
+
+HdPoints::HdPoints(SdfPath const& id)
+    : HdRprim(id)
 {
-  /*NOTHING*/
+    /*NOTHING*/
 }
 
 HdPoints::~HdPoints() = default;
 
 /* virtual */
-TfTokenVector const &HdPoints::GetBuiltinPrimvarNames() const
+TfTokenVector const &
+HdPoints::GetBuiltinPrimvarNames() const
 {
-  static const TfTokenVector primvarNames = {
-      HdTokens->points, HdTokens->normals, HdTokens->widths};
-  return primvarNames;
+    static const TfTokenVector primvarNames = {
+        HdTokens->points,
+        HdTokens->normals,
+        HdTokens->widths
+    };
+    return primvarNames;
 }
 
 // static repr configuration
 HdPoints::_PointsReprConfig HdPoints::_reprDescConfig;
 
 /* static */
-void HdPoints::ConfigureRepr(TfToken const &reprName, const HdPointsReprDesc &desc)
+void
+HdPoints::ConfigureRepr(TfToken const &reprName,
+                        const HdPointsReprDesc &desc)
 {
-  HD_TRACE_FUNCTION();
+    HD_TRACE_FUNCTION();
 
-  _reprDescConfig.AddOrUpdate(reprName, _PointsReprConfig::DescArray{desc});
+    _reprDescConfig.AddOrUpdate(reprName, _PointsReprConfig::DescArray{desc});
 }
 
 /* static */
-HdPoints::_PointsReprConfig::DescArray HdPoints::_GetReprDesc(TfToken const &reprName)
+HdPoints::_PointsReprConfig::DescArray
+HdPoints::_GetReprDesc(TfToken const &reprName)
 {
-  return _reprDescConfig.Find(reprName);
+    return _reprDescConfig.Find(reprName);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

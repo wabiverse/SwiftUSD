@@ -7,10 +7,10 @@
 #ifndef PXR_BASE_PLUG_NOTICE_H
 #define PXR_BASE_PLUG_NOTICE_H
 
+#include "pxr/pxrns.h"
 #include "Plug/api.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/notice.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -18,34 +18,35 @@ TF_DECLARE_WEAK_PTRS(PlugPlugin);
 
 /// \class PlugNotice
 /// Notifications sent by the Plug library.
-class PlugNotice {
- public:
-  /// Base class for all Plug notices.
-  class Base : public TfNotice {
-   public:
-    PLUG_API virtual ~Base();
-  };
-
-  /// Notice sent after new plugins have been registered with the Plug
-  /// registry.
-  class DidRegisterPlugins : public Base {
-   public:
-    explicit DidRegisterPlugins(const PlugPluginPtrVector &newPlugins);
-    PLUG_API virtual ~DidRegisterPlugins();
-
-    const PlugPluginPtrVector &GetNewPlugins() const
+class PlugNotice
+{
+public:
+    /// Base class for all Plug notices.
+    class Base : public TfNotice
     {
-      return _plugins;
-    }
+    public:
+        PLUG_API virtual ~Base();
+    };
 
-   private:
-    PlugPluginPtrVector _plugins;
-  };
+    /// Notice sent after new plugins have been registered with the Plug
+    /// registry.
+    class DidRegisterPlugins : public Base
+    {
+    public:
+        explicit DidRegisterPlugins(const PlugPluginPtrVector& newPlugins);
+        PLUG_API virtual ~DidRegisterPlugins();
 
- private:
-  PlugNotice();
+        const PlugPluginPtrVector& GetNewPlugins() const
+        { return _plugins; }
+
+    private:
+        PlugPluginPtrVector _plugins;
+    };
+
+private:
+    PlugNotice();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_PLUG_NOTICE_H
+#endif // PXR_BASE_PLUG_NOTICE_H

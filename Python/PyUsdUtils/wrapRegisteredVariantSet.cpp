@@ -5,30 +5,38 @@
 // https://openusd.org/license.
 //
 #include "pxr/pxrns.h"
-#include <boost/python.hpp>
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "UsdUtils/registeredVariantSet.h"
 
-#include "Tf/pyEnum.h"
 #include "Tf/pyResultConversions.h"
-
-using namespace boost::python;
+#include "Tf/pyEnum.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 void wrapRegisteredVariantSet()
 {
-  scope registeredVariantSet =
-      class_<UsdUtilsRegisteredVariantSet>(
-          "RegisteredVariantSet", "Info for registered variant set", no_init)
-          .def_readonly("name", &UsdUtilsRegisteredVariantSet::name)
-          .def_readonly("selectionExportPolicy",
-                        &UsdUtilsRegisteredVariantSet::selectionExportPolicy);
-
-  typedef UsdUtilsRegisteredVariantSet::SelectionExportPolicy SelectionExportPolicy;
-  enum_<SelectionExportPolicy>("SelectionExportPolicy")
-      .value("IfAuthored", SelectionExportPolicy::IfAuthored)
-      .value("Always", SelectionExportPolicy::Always)
-      .value("Never", SelectionExportPolicy::Never);
+    scope registeredVariantSet =
+        class_<UsdUtilsRegisteredVariantSet>(
+                        "RegisteredVariantSet", 
+                        "Info for registered variant set",
+                        no_init)
+            .def_readonly("name", &UsdUtilsRegisteredVariantSet::name)
+            .def_readonly("selectionExportPolicy", &UsdUtilsRegisteredVariantSet::selectionExportPolicy)
+    ;
+    
+    typedef UsdUtilsRegisteredVariantSet::SelectionExportPolicy SelectionExportPolicy;
+    enum_<SelectionExportPolicy>("SelectionExportPolicy")
+        .value("IfAuthored", SelectionExportPolicy::IfAuthored)
+        .value("Always", SelectionExportPolicy::Always)
+        .value("Never", SelectionExportPolicy::Never)
+    ;
+    
 }

@@ -5,14 +5,15 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Arch/library.h"
 #include "Arch/errno.h"
-#include "pxr/pxrns.h"
 
 #if defined(ARCH_OS_WINDOWS)
-#  include <Windows.h>
+#include <Windows.h>
+#include <filesystem>
 #else
-#  include <dlfcn.h>
+#include <dlfcn.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -23,57 +24,57 @@ DWORD arch_lastLibraryError = 0;
 }
 #endif
 
-void *ArchLibraryOpen(const std::string &filename, int flag)
+void* ArchLibraryOpen(const std::string &filename, int flag)
 {
 #if defined(ARCH_OS_WINDOWS)
-  arch_lastLibraryError = 0;
-  if (void *result = LoadLibrary(filename.c_str())) {
-    return result;
-  }
-  else {
-    arch_lastLibraryError = GetLastError();
-    return nullptr;
-  }
+    arch_lastLibraryError = 0;
+    if (void* result = LoadLibraryW(std::filesystem::u8path(filename).c_str())) {
+        return result;
+    }
+    else {
+        arch_lastLibraryError = GetLastError();
+        return nullptr;
+    }
 #else
-  // Clear any unchecked error first.
-  (void)dlerror();
-  return dlopen(filename.c_str(), flag);
+    // Clear any unchecked error first.
+    (void)dlerror();
+    return dlopen(filename.c_str(), flag);
 #endif
 }
 
 std::string ArchLibraryError()
 {
 #if defined(ARCH_OS_WINDOWS)
-  const DWORD error = arch_lastLibraryError;
-  return error ? ArchStrSysError(error) : std::string();
+    const DWORD error = arch_lastLibraryError;
+    return error ? ArchStrSysError(error) : std::string();
 #else
-  const char *const error = dlerror();
-  return error ? std::string(error) : std::string();
+    const char* const error = dlerror();
+    return error ? std::string(error) : std::string();
 #endif
 }
 
-int ArchLibraryClose(void *handle)
+int ArchLibraryClose(void* handle)
 {
 #if defined(ARCH_OS_WINDOWS)
-  arch_lastLibraryError = 0;
-  // dlclose() returns 0 on success and non-zero on error, the opposite of
-  // FreeLibrary().
-  int status = ::FreeLibrary(reinterpret_cast<HMODULE>(handle)) ? 0 : -1;
-  if (status) {
-    arch_lastLibraryError = GetLastError();
-  }
+    arch_lastLibraryError = 0;
+    // dlclose() returns 0 on success and non-zero on error, the opposite of
+    // FreeLibrary().
+    int status = ::FreeLibrary(reinterpret_cast<HMODULE>(handle)) ? 0 : -1;
+    if (status) {
+        arch_lastLibraryError = GetLastError();
+    }
 #else
-  int status = dlclose(handle);
+    int status = dlclose(handle);
 #endif
-  return status;
+    return status;
 }
 
-void *ArchLibraryGetSymbolAddress(void *handle, const char *name)
+void* ArchLibraryGetSymbolAddress(void* handle, const char* name)
 {
 #if defined(ARCH_OS_WINDOWS)
-  return GetProcAddress(reinterpret_cast<HMODULE>(handle), name);
+    return GetProcAddress(reinterpret_cast<HMODULE>(handle), name);
 #else
-  return dlsym(handle, name);
+    return dlsym(handle, name);
 #endif
 }
 

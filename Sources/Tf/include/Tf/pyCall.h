@@ -7,72 +7,73 @@
 #ifndef PXR_BASE_TF_PY_CALL_H
 #define PXR_BASE_TF_PY_CALL_H
 
-#include "pxr/pxrns.h"
-
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
 /// \file tf/pyCall.h
 /// Utilities for calling python callables.
-///
+/// 
 /// These functions handle trapping python errors and converting them to \a
 /// TfErrors.
+
+#include "pxr/pxrns.h"
 
 #include "Tf/pyError.h"
 #include "Tf/pyLock.h"
 #include "Tf/pyObjWrapper.h"
 
-#if __has_include(<boost/python/call.hpp>)
-#include <boost/python/call.hpp>
-#endif // __has_include(<boost/python/call.hpp>)
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/call.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class TfPyCall
 ///
 /// Provide a way to call a Python callable.
-///
+/// 
 /// Usage is as follows:
 /// \code
 ///     return TfPyCall<RetType>(callable)(arg1, arg2, ... argN);
 /// \endcode
 /// Generally speaking, TfPyCall instances may be copied, assigned, destroyed,
 /// and invoked without the client holding the GIL.  However, if the \a Return
-/// template parameter is a \a boost::python::object (or a derived class, such
+/// template parameter is a \a pxr_boost::python::object (or a derived class, such
 /// as list or tuple) then the client must hold the GIL in order to invoke the
 /// call operator.
-template<typename Return> struct TfPyCall {
-  /// Construct with callable \a c.  Constructing with a \c
-  /// boost::python::object works, since those implicitly convert to \c
-  /// TfPyObjWrapper, however in that case the GIL must be held by the caller.
-  explicit TfPyCall(TfPyObjWrapper const &c) : _callable(c) {}
+template <typename Return>
+struct TfPyCall {
+    /// Construct with callable \a c.  Constructing with a \c
+    /// pxr_boost::python::object works, since those implicitly convert to \c
+    /// TfPyObjWrapper, however in that case the GIL must be held by the caller.
+    explicit TfPyCall(TfPyObjWrapper const &c) : _callable(c) {}
 
-  template<typename... Args> Return operator()(Args... args);
+    template <typename... Args>
+    Return operator()(Args... args);
 
- private:
-  TfPyObjWrapper _callable;
+private:
+    TfPyObjWrapper _callable;
 };
 
-template<typename Return>
-template<typename... Args>
-inline Return TfPyCall<Return>::operator()(Args... args)
+template <typename Return>
+template <typename... Args>
+inline Return
+TfPyCall<Return>::operator()(Args... args)
 {
-  TfPyLock pyLock;
-  // Do *not* call through if there's an active python exception.
-  if (!PyErr_Occurred()) {
-    try {
-      return boost::python::call<Return>(_callable.ptr(), args...);
+    TfPyLock pyLock;
+    // Do *not* call through if there's an active python exception.
+    if (!PyErr_Occurred()) {
+        try {
+            return pxr_boost::python::call<Return>
+                (_callable.ptr(), args...);
+        } catch (pxr_boost::python::error_already_set const &) {
+            // Convert any exception to TF_ERRORs.
+            TfPyConvertPythonExceptionToTfErrors();
+            PyErr_Clear();
+        }
     }
-    catch (boost::python::error_already_set const &) {
-      // Convert any exception to TF_ERRORs.
-      TfPyConvertPythonExceptionToTfErrors();
-      PyErr_Clear();
-    }
-  }
-  return Return();
+    return Return();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #endif

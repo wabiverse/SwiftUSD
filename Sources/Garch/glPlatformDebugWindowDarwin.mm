@@ -4,24 +4,16 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Arch/defines.h"
 
-#if defined(__APPLE__)
-/* -----------------------------------------------------------------
- * to reduce the need to explicitly exclude platform specific source
- * from SwiftPM, we will just guard the compilation by its platform,
- * thus we can prefer the ease of including all sources in the build
- * which is far more maintainable, especially for package consumers.
- * ----------------------------------------------------------------- */
-#  include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
-#  include "Garch/glDebugWindow.h"
-#  include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
+#include "Garch/glDebugWindow.h"
+#include "Garch/glPlatformDebugWindowDarwin.h"
 
-#  if defined(ARCH_OS_OSX)
-#    import <Cocoa/Cocoa.h>
-#    import <OpenGL/OpenGL.h>
-#    import <OpenGL/gl.h>
-#  endif
+#if defined(ARCH_OS_OSX)
+#import <Cocoa/Cocoa.h>
+#import <OpenGL/OpenGL.h>
+#import <OpenGL/gl.h>
+#endif
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -236,25 +228,30 @@ Garch_GLPlatformDebugWindow::ExitApp()
     [NSApp stop:nil];
 }
 
-#else // !defined(ARCH_OS_OSX)
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#else // IPHONE Derivatives
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 Garch_GLPlatformDebugWindow::Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w)
-{}
+{
+}
 
 void Garch_GLPlatformDebugWindow::Init(const char *title, int width, int height, int nSamples)
-{}
+{
+}
 
 void
 Garch_GLPlatformDebugWindow::Run()
-{}
+{
+}
 
 void
 Garch_GLPlatformDebugWindow::ExitApp()
-{}
-#endif // defined(ARCH_OS_OSX)
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif /* defined(__APPLE__) && defined(ARCH_OS_OSX) */
+#endif

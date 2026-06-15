@@ -32,75 +32,110 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_MATERIAL_INTERFACE_MAPPING_SCHEMA_TOKENS (nodePath)(inputName)
+#define HD_MATERIAL_INTERFACE_MAPPING_SCHEMA_TOKENS \
+    (nodePath) \
+    (inputName) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialInterfaceMappingSchemaTokens,
-                         HD_API,
-                         HD_MATERIAL_INTERFACE_MAPPING_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialInterfaceMappingSchemaTokens, HD_API,
+    HD_MATERIAL_INTERFACE_MAPPING_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialInterfaceMappingSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdMaterialInterfaceMappingSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdMaterialInterfaceMappingSchema
+///
+/// The MaterialInterfaceMapping schema identifies a material node parameter
+/// using its two members 'nodePath' and 'inputName'.
+///
+/// For example, if we are looking at some material network at
+/// material/<renderContext>/... and we have a mapping target defined by the
+/// following data sources:
+///
+/// ds at: material/<renderContext>/.../nodePath = Color_Manipulate
+///
+/// ds at: material/<renderContext>/.../inputName = adjustVal
+///
+/// The above defines a mapping target to the material node parameter under
+/// that material network, eg:
+///
+/// ds at: material/<renderContext>/nodes/Color_Manipulate/parameters/
+/// adjustVal
+///
+class HdMaterialInterfaceMappingSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdMaterialInterfaceMappingSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  HdDataSourceLocator BuildNetworkRelativeLocator();
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdTokenDataSourceHandle GetNodePath() const;
+    /// Returns the data source locator relative to the material network for the
+    /// material node parameter indicated by the interface mapping.
+    /// Ie. Returns locator: nodes/<nodePath>/parameters/<inputName>
+    HdDataSourceLocator BuildNetworkRelativeLocator();
+    
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdTokenDataSourceHandle GetInputName() const;
+    /// \name Member accessor
+    /// @{
 
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(const HdTokenDataSourceHandle &nodePath,
-                                                   const HdTokenDataSourceHandle &inputName);
-
-  /// \class HdMaterialInterfaceMappingSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetNodePath(const HdTokenDataSourceHandle &nodePath);
+    HdTokenDataSourceHandle GetNodePath() const;
+
     HD_API
-    Builder &SetInputName(const HdTokenDataSourceHandle &inputName);
+    HdTokenDataSourceHandle GetInputName() const; 
 
-    /// Returns a container data source containing the members set thus far.
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
     HD_API
-    HdContainerDataSourceHandle Build();
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdTokenDataSourceHandle &nodePath,
+        const HdTokenDataSourceHandle &inputName
+    );
 
-   private:
-    HdTokenDataSourceHandle _nodePath;
-    HdTokenDataSourceHandle _inputName;
-  };
+    /// \class HdMaterialInterfaceMappingSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetNodePath(
+            const HdTokenDataSourceHandle &nodePath);
+        HD_API
+        Builder &SetInputName(
+            const HdTokenDataSourceHandle &inputName);
 
-  /// @}
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdTokenDataSourceHandle _nodePath;
+        HdTokenDataSourceHandle _inputName;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

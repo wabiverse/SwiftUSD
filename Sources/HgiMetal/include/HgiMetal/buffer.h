@@ -9,11 +9,13 @@
 
 #include <Metal/Metal.h>
 
-#include "Hgi/buffer.h"
-#include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
+#include "HgiMetal/api.h"
+#include "Hgi/buffer.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 class HgiMetal;
 
@@ -22,34 +24,32 @@ class HgiMetal;
 /// Represents a Metal GPU buffer resource.
 ///
 class HgiMetalBuffer final : public HgiBuffer {
- public:
-  HGIMETAL_API
-  HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const &desc);
+public:
+    HGIMETAL_API
+    HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const & desc);
 
-  HGIMETAL_API
-  ~HgiMetalBuffer() override;
+    HGIMETAL_API
+    ~HgiMetalBuffer() override;
 
-  HGIMETAL_API
-  size_t GetByteSizeOfResource() const override;
+    HGIMETAL_API
+    size_t GetByteSizeOfResource() const override;
 
-  HGIMETAL_API
-  uint64_t GetRawResource() const override;
+    HGIMETAL_API
+    uint64_t GetRawResource() const override;
+    
+    HGIMETAL_API
+    void* GetCPUStagingAddress() override;
 
-  HGIMETAL_API
-  void *GetCPUStagingAddress() override;
+    id<MTLBuffer> GetBufferId() const {return _bufferId;}
 
-  id<MTLBuffer> GetBufferId() const
-  {
-    return _bufferId;
-  }
+private:
+    HgiMetalBuffer() = delete;
+    HgiMetalBuffer & operator=(const HgiMetalBuffer&) = delete;
+    HgiMetalBuffer(const HgiMetalBuffer&) = delete;
 
- private:
-  HgiMetalBuffer() = delete;
-  HgiMetalBuffer &operator=(const HgiMetalBuffer &) = delete;
-  HgiMetalBuffer(const HgiMetalBuffer &) = delete;
-
-  id<MTLBuffer> _bufferId;
+    id<MTLBuffer> _bufferId;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

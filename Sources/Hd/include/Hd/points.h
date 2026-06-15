@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HD_POINTS_H
 #define PXR_IMAGING_HD_POINTS_H
 
-#include "Hd/api.h"
-#include "Hd/rprim.h"
-#include "Hd/version.h"
 #include "pxr/pxrns.h"
+#include "Hd/api.h"
+#include "Hd/version.h"
+#include "Hd/rprim.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -18,53 +18,66 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Descriptor to configure a drawItem for a repr.
 ///
-struct HdPointsReprDesc {
-  HdPointsReprDesc(HdPointsGeomStyle geomStyle = HdPointsGeomStyleInvalid) : geomStyle(geomStyle)
-  {
-  }
+struct HdPointsReprDesc
+{
+    HdPointsReprDesc(
+        HdPointsGeomStyle geomStyle = HdPointsGeomStyleInvalid)
+        : geomStyle(geomStyle)
+        {}
+    
+    bool IsEmpty() const {
+        return geomStyle == HdPointsGeomStyleInvalid;
+    }
 
-  bool IsEmpty() const
-  {
-    return geomStyle == HdPointsGeomStyleInvalid;
-  }
-
-  HdPointsGeomStyle geomStyle;
+    HdPointsGeomStyle geomStyle;
 };
 
 /// Hydra Schema for a point cloud.
 ///
-class HdPoints : public HdRprim {
- public:
-  HD_API
-  ~HdPoints() override;
+class HdPoints: public HdRprim
+{
+public:
+    HD_API
+    ~HdPoints() override;
 
-  HD_API
-  TfTokenVector const &GetBuiltinPrimvarNames() const override;
+    inline HdDisplayStyle  GetDisplayStyle(HdSceneDelegate* delegate)  const;
 
-  /// Configure geometric style of drawItems for \p reprName
-  HD_API
-  static void ConfigureRepr(TfToken const &reprName, const HdPointsReprDesc &desc);
+    HD_API
+    TfTokenVector const & GetBuiltinPrimvarNames() const override;
 
- protected:
-  /// Constructor. instancerId, if specified, is the instancer which uses
-  /// this point cloud as a prototype.
-  HD_API
-  HdPoints(SdfPath const &id);
+    /// Configure geometric style of drawItems for \p reprName
+    HD_API
+    static void ConfigureRepr(TfToken const &reprName,
+                              const HdPointsReprDesc &desc);
 
-  using _PointsReprConfig = _ReprDescConfigs<HdPointsReprDesc>;
+protected:
+    /// Constructor. instancerId, if specified, is the instancer which uses
+    /// this point cloud as a prototype.
+    HD_API
+    HdPoints(SdfPath const& id);
 
-  HD_API
-  static _PointsReprConfig::DescArray _GetReprDesc(TfToken const &reprName);
+    using _PointsReprConfig = _ReprDescConfigs<HdPointsReprDesc>;
 
- private:
-  // Class can not be default constructed or copied.
-  HdPoints() = delete;
-  HdPoints(const HdPoints &) = delete;
-  HdPoints &operator=(const HdPoints &) = delete;
+    HD_API
+    static _PointsReprConfig::DescArray _GetReprDesc(TfToken const &reprName);
 
-  static _PointsReprConfig _reprDescConfig;
+private:
+
+    // Class can not be default constructed or copied.
+    HdPoints()                             = delete;
+    HdPoints(const HdPoints &)             = delete;
+    HdPoints &operator =(const HdPoints &) = delete;
+
+    static _PointsReprConfig _reprDescConfig;
 };
+
+inline HdDisplayStyle
+HdPoints::GetDisplayStyle(HdSceneDelegate* delegate) const
+{
+    return delegate->GetDisplayStyle(GetId());
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_POINTS_H
+#endif // PXR_IMAGING_HD_POINTS_H

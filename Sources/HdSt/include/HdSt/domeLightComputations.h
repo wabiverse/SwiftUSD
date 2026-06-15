@@ -7,10 +7,11 @@
 #ifndef PXR_IMAGING_HD_ST_DOME_LIGHT_COMPUTATIONS_H
 #define PXR_IMAGING_HD_ST_DOME_LIGHT_COMPUTATIONS_H
 
+#include "pxr/pxrns.h"
 #include "HdSt/api.h"
 #include "HdSt/computation.h"
-#include "pxr/pxrns.h"
 
+#include "Gf/vec3i.h"
 #include "Tf/token.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -18,60 +19,100 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Dome Light texture computations GPU
 ///
 ///
-using HdSt_DomeLightComputationGPUSharedPtr = std::shared_ptr<class HdSt_DomeLightComputationGPU>;
-using HdStSimpleLightingShaderPtr = std::weak_ptr<class HdStSimpleLightingShader>;
+
+using HdStSimpleLightingShaderPtr =
+    std::weak_ptr<class HdStSimpleLightingShader>;
+struct HgiTextureDesc;
 
 ////
 //// \class HdSt_DomeLightComputationGPU
 ///
-/// Given an OpenGL texture at construction time, create a new OpenGL
-/// texture (computed from the contents of the given texture) and sets
-/// the GL name on the given lighting shader during Execute (also
-/// freeing previous texture).
+/// Given a source texture at construction time, create a new texture from
+/// its contents with the provided name using the corresponding shader source.
 ///
 /// If the texture to be created has several mip levels, the texture
 /// will only be created by the computation with level = 0 and the
 /// computations with level > 0 will use the same texture.
 ///
-class HdSt_DomeLightComputationGPU : public HdStComputation {
- public:
-  /// Constructor
-  HDST_API
-  HdSt_DomeLightComputationGPU(
-      // Name of computation shader to use, also used as
-      // key when setting the GL name on the lighting shader
-      const TfToken &shaderToken,
-      // Lighting shader that remembers the GL texture names
-      HdStSimpleLightingShaderPtr const &lightingShader,
-      // Number of mip levels.
-      unsigned int numLevels = 1,
-      // Level to be filled (0 means also to allocate texture)
-      unsigned int level = 0,
-      float roughness = -1.0);
+class HdSt_DomeLightComputationGPU : public HdStComputation
+{
+public:
+    /// Constructor
+    HDST_API
+    HdSt_DomeLightComputationGPU(
+        // Name of computation shader to use, also used as texture name.
+        const TfToken & shaderToken,
+        // Whether to use the dome light cubemap texture or the dome light
+        // latlong texture as the input for the computation.
+        bool useCubemapAsSourceTexture,
+        // Lighting shader for accessing any referenced textures.
+        HdStSimpleLightingShaderPtr const &lightingShader,
+        // Dimension of the dome light cubemap texture. NOTE: this is only used  
+        // when the latlong texture is input for the compuation.  
+        unsigned int computedCubeMapDim,
+        // Number of mip levels.
+        unsigned int numLevels = 1,
+        // Level to be filled (0 means also to allocate texture).
+        unsigned int level = 0,
+        // Roughness associated with the texture level.
+        float roughness = -1.0);
 
-  HDST_API
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override {}
+    HDST_API
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override {}
+   
+    HDST_API
+    void Execute(HdBufferArrayRangeSharedPtr const &range,
+                 HdResourceRegistry *resourceRegistry) override;
 
-  HDST_API
-  void Execute(HdBufferArrayRangeSharedPtr const &range,
-               HdResourceRegistry *resourceRegistry) override;
+    /// This computation doesn't generate buffer source (i.e. 2nd phase)
+    /// This is a gpu computation, but no need to resize the destination
+    /// since it belongs the same range as src buffer.
+    int GetNumOutputElements() const override { return 0; }
 
-  /// This computation doesn't generate buffer source (i.e. 2nd phase)
-  /// This is a gpu computation, but no need to resize the destination
-  /// since it belongs the same range as src buffer.
-  int GetNumOutputElements() const override
-  {
-    return 0;
-  }
-
- private:
-  const TfToken _shaderToken;
-  HdStSimpleLightingShaderPtr const _lightingShader;
-  const unsigned int _numLevels;
-  const unsigned int _level;
-  const float _roughness;
+private:
+    const TfToken _shaderToken;
+    const bool _useCubemapAsSourceTexture;
+    const HdStSimpleLightingShaderPtr _lightingShader;
+    const unsigned int _computedCubeMapDim;
+    const unsigned int _numLevels;
+    const unsigned int _level;
+    const float _roughness;
 };
+
+////
+//// \class HdSt_DomeLightMipmapComputationGPU
+///
+/// Generate mipmaps for the provided dome light cubemap texture.
+///
+class HdSt_DomeLightMipmapComputationGPU : public HdStComputation
+{
+public:
+    HDST_API
+    HdSt_DomeLightMipmapComputationGPU(
+        // Lighting shader for accessing textures.
+        HdStSimpleLightingShaderPtr const &lightingShader);
+
+    HDST_API
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override {}
+   
+    HDST_API
+    void Execute(HdBufferArrayRangeSharedPtr const &range,
+                 HdResourceRegistry *resourceRegistry) override;
+
+    int GetNumOutputElements() const override { return 0; }
+
+private:
+    const HdStSimpleLightingShaderPtr _lightingShader;
+};
+
+// For the given 2D dome light texture, compute the resulting dimensions of 
+// the cubemap.
+HDST_API
+int HdSt_ComputeDomeLightCubemapWidth(
+    const std::string& domeLightFilePath,
+    const HgiTextureDesc& domelightTextureDesc,
+    const unsigned int cubemapTargetMemoryMB);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_DOME_LIGHT_COMPUTATIONS_H
+#endif // PXR_IMAGING_HD_ST_DOME_LIGHT_COMPUTATIONS_H

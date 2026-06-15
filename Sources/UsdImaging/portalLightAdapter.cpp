@@ -13,46 +13,56 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingPortalLightAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingPortalLightAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingPortalLightAdapter::~UsdImagingPortalLightAdapter() {}
-
-bool UsdImagingPortalLightAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+UsdImagingPortalLightAdapter::~UsdImagingPortalLightAdapter() 
 {
-  return false;
 }
 
-TfTokenVector UsdImagingPortalLightAdapter::GetImagingSubprims(UsdPrim const &prim)
+bool
+UsdImagingPortalLightAdapter::IsSupported(UsdImagingIndexProxy const* index) const
 {
-  return {TfToken()};
+    return false;
 }
 
-TfToken UsdImagingPortalLightAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                            TfToken const &subprim)
+TfTokenVector
+UsdImagingPortalLightAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->light;
-  }
-  return TfToken();
+    return { TfToken() };
 }
 
-SdfPath UsdImagingPortalLightAdapter::Populate(UsdPrim const &prim,
-                                               UsdImagingIndexProxy *index,
-                                               UsdImagingInstancerContext const *instancerContext)
+TfToken
+UsdImagingPortalLightAdapter::GetImagingSubprimType(
+    UsdPrim const& prim, TfToken const& subprim)
 {
-  TF_CODING_ERROR("Portal lights are not yet supported in USD imaging");
-  return prim.GetPath();
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->light;
+    }
+    return TfToken();
 }
 
-void UsdImagingPortalLightAdapter::_RemovePrim(SdfPath const &cachePath,
-                                               UsdImagingIndexProxy *index)
+SdfPath
+UsdImagingPortalLightAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
 {
-  TF_CODING_ERROR("Portal lights are not yet supported in USD imaging");
+    TF_CODING_ERROR("Portal lights are not yet supported in USD imaging");
+    return prim.GetPath();
 }
+
+void
+UsdImagingPortalLightAdapter::_RemovePrim(SdfPath const& cachePath,
+                                            UsdImagingIndexProxy* index)
+{
+    TF_CODING_ERROR("Portal lights are not yet supported in USD imaging");
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

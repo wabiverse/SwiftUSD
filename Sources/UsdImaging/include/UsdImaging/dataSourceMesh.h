@@ -20,20 +20,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// A container data source representing subdivision tags.
 ///
-class UsdImagingDataSourceSubdivisionTags : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceSubdivisionTags);
+class UsdImagingDataSourceSubdivisionTags : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceSubdivisionTags);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
- private:
-  UsdImagingDataSourceSubdivisionTags(UsdGeomMesh usdMesh,
-                                      const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceSubdivisionTags(
+            UsdGeomMesh usdMesh,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  UsdGeomMesh _usdMesh;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    UsdGeomMesh _usdMesh;
+    const UsdImagingDataSourceStageGlobals & _stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceSubdivisionTags);
@@ -44,48 +46,53 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceSubdivisionTags);
 ///
 /// A container data source representing mesh topology.
 ///
-class UsdImagingDataSourceMeshTopology : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceMeshTopology);
+class UsdImagingDataSourceMeshTopology : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceMeshTopology);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
- private:
-  UsdImagingDataSourceMeshTopology(const SdfPath &sceneIndexPath,
-                                   UsdGeomMesh usdMesh,
-                                   const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceMeshTopology(
+            const SdfPath &sceneIndexPath,
+            UsdGeomMesh usdMesh,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  const SdfPath _sceneIndexPath;
-  UsdGeomMesh _usdMesh;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    const SdfPath _sceneIndexPath;
+    UsdGeomMesh _usdMesh;
+    const UsdImagingDataSourceStageGlobals & _stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceMeshTopology);
 
 // ----------------------------------------------------------------------------
 
+
 /// \class UsdImagingDataSourceMesh
 ///
 /// A container data source representing data unique to meshes
 ///
-class UsdImagingDataSourceMesh : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceMesh);
+class UsdImagingDataSourceMesh : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceMesh);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
- private:
-  UsdImagingDataSourceMesh(const SdfPath &sceneIndexPath,
-                           UsdGeomMesh usdMesh,
-                           const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceMesh(
+            const SdfPath &sceneIndexPath,
+            UsdGeomMesh usdMesh,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  const SdfPath _sceneIndexPath;
-  UsdGeomMesh _usdMesh;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    const SdfPath _sceneIndexPath;
+    UsdGeomMesh _usdMesh;
+    const UsdImagingDataSourceStageGlobals & _stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceMesh);
@@ -96,27 +103,30 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceMesh);
 ///
 /// A prim data source representing UsdGeomMesh.
 ///
-class UsdImagingDataSourceMeshPrim : public UsdImagingDataSourceGprim {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceMeshPrim);
+class UsdImagingDataSourceMeshPrim : public UsdImagingDataSourceGprim
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceMeshPrim);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
-  USDIMAGING_API
-  static HdDataSourceLocatorSet Invalidate(UsdPrim const &prim,
-                                           const TfToken &subprim,
-                                           const TfTokenVector &properties,
-                                           UsdImagingPropertyInvalidationType invalidationType);
+    USDIMAGING_API
+    static HdDataSourceLocatorSet Invalidate(
+            UsdPrim const& prim,
+            const TfToken &subprim,
+            const TfTokenVector &properties,
+            UsdImagingPropertyInvalidationType invalidationType);
 
- private:
-  UsdImagingDataSourceMeshPrim(const SdfPath &sceneIndexPath,
-                               UsdPrim usdPrim,
-                               const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceMeshPrim(
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceMeshPrim);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_MESH_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_MESH_H

@@ -32,80 +32,96 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_INSTANCE_INDICES_SCHEMA_TOKENS (instancer)(prototypeIndex)(instanceIndices)
+#define HD_INSTANCE_INDICES_SCHEMA_TOKENS \
+    (instancer) \
+    (prototypeIndex) \
+    (instanceIndices) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdInstanceIndicesSchemaTokens, HD_API, HD_INSTANCE_INDICES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdInstanceIndicesSchemaTokens, HD_API,
+    HD_INSTANCE_INDICES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdInstanceIndicesSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdInstanceIndicesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdInstanceIndicesSchema
+///
+class HdInstanceIndicesSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdInstanceIndicesSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdPathDataSourceHandle GetInstancer() const;
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  HdIntDataSourceHandle GetPrototypeIndex() const;
-
-  HD_API
-  HdIntArrayDataSourceHandle GetInstanceIndices() const;
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdPathDataSourceHandle &instancer,
-      const HdIntDataSourceHandle &prototypeIndex,
-      const HdIntArrayDataSourceHandle &instanceIndices);
-
-  /// \class HdInstanceIndicesSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetInstancer(const HdPathDataSourceHandle &instancer);
-    HD_API
-    Builder &SetPrototypeIndex(const HdIntDataSourceHandle &prototypeIndex);
-    HD_API
-    Builder &SetInstanceIndices(const HdIntArrayDataSourceHandle &instanceIndices);
+    HdPathDataSourceHandle GetInstancer() const;
 
-    /// Returns a container data source containing the members set thus far.
     HD_API
-    HdContainerDataSourceHandle Build();
+    HdIntDataSourceHandle GetPrototypeIndex() const;
 
-   private:
-    HdPathDataSourceHandle _instancer;
-    HdIntDataSourceHandle _prototypeIndex;
-    HdIntArrayDataSourceHandle _instanceIndices;
-  };
+    HD_API
+    HdIntArrayDataSourceHandle GetInstanceIndices() const; 
 
-  /// @}
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdPathDataSourceHandle &instancer,
+        const HdIntDataSourceHandle &prototypeIndex,
+        const HdIntArrayDataSourceHandle &instanceIndices
+    );
+
+    /// \class HdInstanceIndicesSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetInstancer(
+            const HdPathDataSourceHandle &instancer);
+        HD_API
+        Builder &SetPrototypeIndex(
+            const HdIntDataSourceHandle &prototypeIndex);
+        HD_API
+        Builder &SetInstanceIndices(
+            const HdIntArrayDataSourceHandle &instanceIndices);
+
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdPathDataSourceHandle _instancer;
+        HdIntDataSourceHandle _prototypeIndex;
+        HdIntArrayDataSourceHandle _instanceIndices;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

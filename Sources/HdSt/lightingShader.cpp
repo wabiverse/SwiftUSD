@@ -8,14 +8,17 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdStLightingShader::HdStLightingShader() : HdStShaderCode()
+
+HdStLightingShader::HdStLightingShader()
+ : HdStShaderCode()
 {
-  /*NOTHING*/
+    /*NOTHING*/
 }
 
 HdStLightingShader::~HdStLightingShader()
 {
-  /*NOTHING*/
+    /*NOTHING*/
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

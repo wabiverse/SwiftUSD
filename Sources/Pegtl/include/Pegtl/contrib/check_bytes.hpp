@@ -24,8 +24,8 @@ namespace PXR_PEGTL_NAMESPACE
       : maybe_nothing
    {
       template< typename Rule,
-                PXR_PEGTL_NAMESPACE::apply_mode A,
-                PXR_PEGTL_NAMESPACE::rewind_mode M,
+                pegtl::apply_mode A,
+                pegtl::rewind_mode M,
                 template< typename... >
                 class Action,
                 template< typename... >

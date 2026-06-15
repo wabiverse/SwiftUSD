@@ -8,66 +8,77 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdTyped, TfType::Bases<UsdSchemaBase>>();
+    TfType::Define<UsdTyped,
+        TfType::Bases< UsdSchemaBase > >();
+    
 }
 
 /* virtual */
-UsdTyped::~UsdTyped() {}
+UsdTyped::~UsdTyped()
+{
+}
 
 /* static */
-UsdTyped UsdTyped::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdTyped
+UsdTyped::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdTyped();
-  }
-  return UsdTyped(stage->GetPrimAtPath(path));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdTyped();
+    }
+    return UsdTyped(stage->GetPrimAtPath(path));
 }
+
 
 /* virtual */
 UsdSchemaKind UsdTyped::_GetSchemaKind() const
 {
-  return UsdTyped::schemaKind;
+    return UsdTyped::schemaKind;
 }
 
 /* static */
-const TfType &UsdTyped::_GetStaticTfType()
+const TfType &
+UsdTyped::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdTyped>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdTyped>();
+    return tfType;
 }
 
 /* static */
-bool UsdTyped::_IsTypedSchema()
+bool 
+UsdTyped::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdTyped::_GetTfType() const
+const TfType &
+UsdTyped::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &UsdTyped::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector&
+UsdTyped::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames;
-  static TfTokenVector allNames = UsdSchemaBase::GetSchemaAttributeNames(true);
+    static TfTokenVector localNames;
+    static TfTokenVector allNames =
+        UsdSchemaBase::GetSchemaAttributeNames(true);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -83,12 +94,13 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool UsdTyped::_IsCompatible() const
+bool
+UsdTyped::_IsCompatible() const
 {
-  if (!UsdSchemaBase::_IsCompatible())
-    return false;
+    if (!UsdSchemaBase::_IsCompatible())
+        return false;
 
-  return GetPrim().IsA(_GetType());
+    return GetPrim().IsA(_GetType());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

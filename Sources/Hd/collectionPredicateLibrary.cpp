@@ -24,193 +24,252 @@ namespace {
 using FnArg = SdfPredicateExpression::FnArg;
 using FnArgs = std::vector<FnArg>;
 
-TfToken _BuildTokenFromPredicateArg(const FnArgs &args, const size_t &idx)
+TfToken
+_BuildTokenFromPredicateArg(
+    const FnArgs &args,
+    const size_t &idx)
 {
-  if (idx < args.size()) {
-    const FnArg &arg = args[idx];
-    if (arg.value.IsHolding<std::string>()) {
-      return TfToken(arg.value.UncheckedGet<std::string>());
+    if (idx < args.size()) {
+        const FnArg &arg = args[idx];
+        if (arg.value.IsHolding<std::string>()) {
+            return TfToken(arg.value.UncheckedGet<std::string>());
+        }
     }
-  }
 
-  return {};
+    return {};
 }
 
-HdDataSourceLocator _BuildLocatorFromPredicateArg(const FnArgs &args, const size_t &idx)
+HdDataSourceLocator
+_BuildLocatorFromPredicateArg(
+    const FnArgs &args,
+    const size_t &idx)
 {
-  if (idx < args.size()) {
-    const FnArg &arg = args[idx];
-    if (arg.value.IsHolding<std::string>()) {
-      const std::string locator = arg.value.UncheckedGet<std::string>();
-      const std::string delimiter(".");
-      const TfTokenVector tokens = TfToTokenVector(TfStringSplit(locator, delimiter));
+    if (idx < args.size()) {
+        const FnArg &arg = args[idx];
+        if (arg.value.IsHolding<std::string>()) {
+            const std::string locator = arg.value.UncheckedGet<std::string>();
+            const std::string delimiter("."); 
+            const TfTokenVector tokens =
+                TfToTokenVector(TfStringSplit(locator, delimiter));
 
-      return HdDataSourceLocator(tokens.size(), tokens.data());
+            return HdDataSourceLocator(tokens.size(), tokens.data());
+        }
     }
-  }
 
-  return {};
+    return {};
 }
 
-HdCollectionPredicateLibrary _MakeCollectionPredicateLibrary()
+HdCollectionPredicateLibrary
+_MakeCollectionPredicateLibrary()
 {
-  using PredicateFunction = HdCollectionPredicateLibrary::PredicateFunction;
-  using PredResult = SdfPredicateFunctionResult;
+    using PredicateFunction = HdCollectionPredicateLibrary::PredicateFunction;
+    using PredResult = SdfPredicateFunctionResult;
 
-  /// Note: The return value of a predicate function is a pair of the
-  ///       boolean result and a Constancy token indicating whether the
-  ///       result is constant over descendants of the queried prim.
-  ///       For scene index prims, it is typically the case that the query
-  ///       needs to be evaluated for each of the descendant prims.
-  ///       We choose to be explicit in the usage of "MakeVarying" below
-  ///       for clarity, even though SdfPredicateFunctionResults defaults to
-  ///       to MayVaryOverDescendants constancy.
+    /// Note: The return value of a predicate function is a pair of the
+    ///       boolean result and a Constancy token indicating whether the
+    ///       result is constant over descendants of the queried prim.
+    ///       For scene index prims, it is typically the case that the query
+    ///       needs to be evaluated for each of the descendant prims.
+    ///       We choose to be explicit in the usage of "MakeVarying" below
+    ///       for clarity, even though SdfPredicateFunctionResult defaults to
+    ///       to MayVaryOverDescendants constancy.
 
-  HdCollectionPredicateLibrary lib;
+    HdCollectionPredicateLibrary lib;
 
-  lib
-      /// Returns true if the prim type of the given scene index prim is
-      /// \p type.
-      ///
-      /// e.g. "/Foo//{type:mesh}" would match all descendant prims of /Foo
-      ///      that are meshes.
-      ///
-      .Define("type",
-              [](const HdSceneIndexPrim &p, const std::string &type) {
-                const std::string &primType = p.primType.GetString();
-                // Type can vary for descendant prims.
-                return PredResult::MakeVarying(primType == type);
-              })
+    auto hdTypeImpl =
+        [](const HdSceneIndexPrim &p, const std::string &type) {
+            const std::string &primType = p.primType.GetString();
+            // Type can vary for descendant prims.
+            return PredResult::MakeVarying(primType == type);
+        };
 
-      /// Returns true if the scene index prim's visibility is \p visibility.
-      /// Returns false if the prim has no visibility opinion.
-      ///
-      /// e.g. "//{visible:false}" would match all scene index prims that are
-      ///      invisible.
-      ///
-      /// If \p visibililty is not provided, it defaults to true.
-      ///
-      /// e.g. "//{visible}" would match all scene index prims that are visible.
-      ///
-      .Define("visible",
-              [](const HdSceneIndexPrim &p, bool visibility) {
-                HdBoolDataSourceHandle visDs =
-                    HdVisibilitySchema::GetFromParent(p.dataSource).GetVisibility();
+    /// Returns true if the prim type of the given scene index prim is
+    /// \p hdType.
+    ///
+    /// e.g. "/Foo//{hdType:mesh}" would match all descendant prims of /Foo
+    ///      that are meshes.
+    ///
+    lib
+    .Define("hdType", std::move(hdTypeImpl))
 
-                // If visibility isn't authored, always return false.
-                const bool result = visDs && (visDs->GetTypedValue(0.0) == visibility);
+    /// \deprecated Use hdType instead.
+    /// Note: The "double move" on the lambda is safe here (and below) because
+    ///       no variables are captured.
+    .Define("type", std::move(hdTypeImpl));
+    ///
+    /// -----------------------------------------------------------------------
 
-                return PredResult::MakeVarying(result);
-              },
-              {{"isVisible", true}})
+    auto hdVisibleImpl = [](const HdSceneIndexPrim &p, bool visibility) {
+        HdBoolDataSourceHandle visDs =
+            HdVisibilitySchema::GetFromParent(p.dataSource).GetVisibility();
 
-      /// Returns true if the scene index prim's purpose is \p purpose.
-      /// Return false if the prim does not have a purpose opinion.
-      ///
-      /// e.g. "//{purpose:guide}" would match all scene index prims whose
-      ///      purpose is 'guide'.
-      ///
-      .DefineBinder("purpose",
-                    [](const FnArgs &args) -> PredicateFunction {
-                      // Build a token from the predicate argument once and capture it in the
-                      // lambda returned below.
-                      const size_t argIdx = 0;  // Expect only one argument for this predicate.
-                      const TfToken purpose = _BuildTokenFromPredicateArg(args, argIdx);
+        // If visibility isn't authored, always return false.
+        const bool result = visDs && (visDs->GetTypedValue(0.0) == visibility);
 
-                      return [purpose](const HdSceneIndexPrim &p) {
-                        HdTokenDataSourceHandle purposeDs =
-                            HdPurposeSchema::GetFromParent(p.dataSource).GetPurpose();
+        return PredResult::MakeVarying(result);
+    };
 
-                        // If purpose isn't authored, we always return false.
-                        const bool result = purposeDs &&
-                                            (purposeDs->GetTypedValue(0.0) == purpose);
+    /// Returns true if the scene index prim's visibility is \p visibility.
+    /// Returns false if the prim has no visibility opinion.
+    ///
+    /// e.g. "//{hdVisible:false}" would match all scene index prims that are
+    ///      invisible.
+    ///
+    /// If \p visibililty is not provided, it defaults to true.
+    ///
+    /// e.g. "//{hdVisible}" would match all scene index prims that are visible.
+    ///
+    /// The predicate may also be invoked using the named argument "isVisible",
+    /// like: //{hdVisible(isVisible=true)}.
+    ///
+    lib
+    .Define("hdVisible", std::move(hdVisibleImpl), {{"isVisible", true}})
 
-                        return PredResult::MakeVarying(result);
-                      };
-                    })
+    /// \deprecated Use hdVisible instead.
+    .Define("visible", std::move(hdVisibleImpl), {{"isVisible", true}});
+    ///
+    /// -----------------------------------------------------------------------
 
-      /// Returns true if querying the scene index prim's container with the
-      /// data source locator string \p locatorStr results in a valid data source.
-      ///
-      /// \note Use . as the separator when providing multiple locator tokens.
-      ///       A locator token may contain a namespace prefix.
-      ///
-      /// e.g. "/Foo//{hasDataSource:"primvars.ri:bar"}" would match all
-      ///      descendant prims of /Foo that have a primvar named "bar".
-      ///
-      /// \note This predicate does not check the value of the data source.
-      ///       It is merely a presence test.
-      ///
-      .DefineBinder("hasDataSource",
-                    [](const FnArgs &args) -> PredicateFunction {
-                      // Build the locator from the predicate argument once and capture it in
-                      // the lambda returned below.
-                      const size_t argIdx = 0;  // Expect only one argument for this predicate.
-                      const HdDataSourceLocator locator = _BuildLocatorFromPredicateArg(args,
-                                                                                        argIdx);
+    auto hdPurposeImpl = [](const FnArgs &args) -> PredicateFunction {
+        // Build a token from the predicate argument once and capture it in the
+        // lambda returned below.
+        const size_t argIdx = 0; // Expect only one argument for this predicate.
+        const TfToken purpose = _BuildTokenFromPredicateArg(args, argIdx);
+        
+        return [purpose](const HdSceneIndexPrim &p) {
+            HdTokenDataSourceHandle purposeDs =
+                HdPurposeSchema::GetFromParent(p.dataSource).GetPurpose();
 
-                      return [locator](const HdSceneIndexPrim &p) {
-                        return PredResult::MakeVarying(
-                            bool(HdContainerDataSource::Get(p.dataSource, locator)));
-                      };
-                    })
+            // If purpose isn't authored, we always return false.
+            const bool result = 
+                purposeDs && (purposeDs->GetTypedValue(0.0) == purpose);
+            
+            return PredResult::MakeVarying(result);
+        };
+    };
 
-      /// Convenience form of the "hasDataSource" predicate to query presence of a
-      /// primvar \p primvarName.
-      ///
-      /// e.g. "/Foo//{hasPrimvar:baz}" would match all descendant prims of Foo
-      ///      that have a primvar named "baz".
-      ///
-      .DefineBinder("hasPrimvar",
-                    [](const FnArgs &args) -> PredicateFunction {
-                      // Build a token from the predicate argument once and capture it in the
-                      // lambda returned below.
-                      const size_t argIdx = 0;  // Expect only one argument for this predicate.
-                      const TfToken primvarName = _BuildTokenFromPredicateArg(args, argIdx);
+    /// Returns true if the scene index prim's purpose is \p purpose.
+    /// Return false if the prim does not have a purpose opinion.
+    ///
+    /// e.g. "//{hdPurpose:guide}" would match all scene index prims whose
+    ///      purpose is 'guide'.
+    ///
+    lib
+    .DefineBinder("hdPurpose", std::move(hdPurposeImpl))
 
-                      return [primvarName](const HdSceneIndexPrim &p) {
-                        const bool hasPrimvar = HdPrimvarsSchema::GetFromParent(p.dataSource)
-                                                    .GetPrimvar(primvarName)
-                                                    .IsDefined();
+    /// \deprecated Use hdPurpose instead.
+    .DefineBinder("purpose", std::move(hdPurposeImpl));
+    ///
+    /// -----------------------------------------------------------------------
 
-                        return PredResult::MakeVarying(hasPrimvar);
-                      };
-                    })
+    auto hdHasDataSourceImpl =
+        [](const FnArgs &args) -> PredicateFunction {
 
-      /// Returns true if the scene index prim's resolved material binding path
-      /// contains the substring \p materialPath.
-      ///
-      /// Note that the default/allPurpose material binding is queried below.
-      ///
-      /// e.g. "//{hasMaterialBinding:"GlossyMat"}" would match all scene index
-      ///      prims whose resolved (allPurpose) material binding path contains
-      ///      the string "GlossyMat".
-      ///
-      .Define("hasMaterialBinding",
-              [](const HdSceneIndexPrim &p, const std::string &materialPath) {
-                HdPathDataSourceHandle pathDs = HdMaterialBindingsSchema::GetFromParent(
-                                                    p.dataSource)
-                                                    .GetMaterialBinding()
-                                                    .GetPath();
+        // Build the locator from the predicate argument once and capture it in
+        // the lambda returned below.
+        const size_t argIdx = 0; // Expect only one argument for this predicate.
+        const HdDataSourceLocator locator =
+            _BuildLocatorFromPredicateArg(args, argIdx);
+        
+        return [locator](const HdSceneIndexPrim &p) {
+            return PredResult::MakeVarying(bool(
+                HdContainerDataSource::Get(p.dataSource, locator)));
+        };
+    };
 
-                const bool result = pathDs && pathDs->GetTypedValue(0.0).GetString().find(
-                                                  materialPath) != std::string::npos;
+    /// Returns true if querying the scene index prim's container with the 
+    /// data source locator string \p locatorStr results in a valid data source.
+    ///
+    /// \note Use . as the separator when providing multiple locator tokens.
+    ///       A locator token may contain a namespace prefix.
+    ///
+    /// e.g. "/Foo//{hdHasDataSource:"primvars.ri:bar"}" would match all
+    ///      descendant prims of /Foo that have a primvar named "bar".
+    ///
+    /// \note This predicate does not check the value of the data source.
+    ///       It is merely a presence test.
+    ///
+    lib
+    .DefineBinder("hdHasDataSource", std::move(hdHasDataSourceImpl))
 
-                return PredResult::MakeVarying(result);
-              })
+    /// \deprecated Use hdHasDataSource instead.
+    .DefineBinder("hasDataSource", std::move(hdHasDataSourceImpl));
+    ///
+    /// -----------------------------------------------------------------------
 
-      ;
+    auto hdHasPrimvarImpl = [](const FnArgs &args) -> PredicateFunction {
 
-  return lib;
+        // Build a token from the predicate argument once and capture it in the
+        // lambda returned below.
+        const size_t argIdx = 0; // Expect only one argument for this predicate.
+        const TfToken primvarName = _BuildTokenFromPredicateArg(args, argIdx);
+
+        return [primvarName](const HdSceneIndexPrim &p) {
+            const bool hasPrimvar =
+                HdPrimvarsSchema::GetFromParent(p.dataSource)
+                .GetPrimvar(primvarName).IsDefined();
+
+            return PredResult::MakeVarying(hasPrimvar);
+        };
+    };
+
+    /// Convenience form of the "hasDataSource" predicate to query presence of a
+    /// primvar \p primvarName.
+    ///
+    /// e.g. "/Foo//{hdHasPrimvar:baz}" would match all descendant prims of Foo
+    ///      that have a primvar named "baz".
+    ///
+    lib
+    .DefineBinder("hdHasPrimvar", std::move(hdHasPrimvarImpl))
+
+    /// \deprecated Use hdHasPrimvar instead.
+    .DefineBinder("hasPrimvar", std::move(hdHasPrimvarImpl));
+    ///
+    /// -----------------------------------------------------------------------
+
+    auto hdHasMaterialBindingImpl =
+        [](const HdSceneIndexPrim &p, const std::string &materialPath) {
+            HdPathDataSourceHandle pathDs =
+                HdMaterialBindingsSchema::GetFromParent(p.dataSource)
+                .GetMaterialBinding().GetPath();
+            
+            const bool result =
+                pathDs &&
+                pathDs->GetTypedValue(0.0).GetString().find(materialPath)
+                    != std::string::npos;
+
+            return PredResult::MakeVarying(result);
+        };
+
+    /// Returns true if the scene index prim's resolved material binding path
+    /// contains the substring \p materialPath.
+    ///
+    /// Note that the default/allPurpose material binding is queried below.
+    ///
+    /// e.g. "//{hdHasMaterialBinding:"GlossyMat"}" would match all scene index 
+    ///      prims whose resolved (allPurpose) material binding path contains
+    ///      the string "GlossyMat".
+    ///
+    lib
+    .Define("hdHasMaterialBinding", std::move(hdHasMaterialBindingImpl))
+
+    /// \deprecated Use hdHasMaterialBinding instead.
+    .Define("hasMaterialBinding", std::move(hdHasMaterialBindingImpl));
+    ///
+    /// -----------------------------------------------------------------------
+
+    return lib;
 }
 
-}  // namespace
+} // anon
 
-HdCollectionPredicateLibrary const &HdGetCollectionPredicateLibrary()
+HdCollectionPredicateLibrary const &
+HdGetCollectionPredicateLibrary()
 {
-  static const HdCollectionPredicateLibrary library = _MakeCollectionPredicateLibrary();
-
-  return library;
+    static const HdCollectionPredicateLibrary library =
+        _MakeCollectionPredicateLibrary();
+    
+    return library;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

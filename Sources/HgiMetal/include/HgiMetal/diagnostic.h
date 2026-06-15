@@ -8,40 +8,37 @@
 #define PXR_IMAGING_HGI_METAL_DIAGNOSTIC_H
 
 #include "pxr/pxrns.h"
-
 #include "HgiMetal/api.h"
 #include "Arch/functionLite.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 /// Posts diagnostic errors for all Metal errors in the current context.
 /// This macro tags the diagnostic errors with the name of the calling
 /// function.
 #define HGIMETAL_POST_PENDING_METAL_ERRORS() \
-  HgiMetalPostPendingMetalErrors(__ARCH_PRETTY_FUNCTION__)
+        HgiMetalPostPendingMetalErrors(__ARCH_PRETTY_FUNCTION__)
 
 HGIMETAL_API
 bool HgiMetalDebugEnabled();
 
 #define HGIMETAL_DEBUG_LABEL(_obj, label) \
-  if (HgiMetalDebugEnabled()) { \
-    [_obj setLabel:@(label)]; \
-  }
+    if (HgiMetalDebugEnabled()) { [_obj setLabel:@(label)]; }
 
 #define HGIMETAL_DEBUG_PUSH_GROUP(_obj, label) \
-  if (HgiMetalDebugEnabled()) { \
-    [_obj pushDebugGroup:@(label)]; \
-  }
+    if (HgiMetalDebugEnabled()) { [_obj pushDebugGroup:@(label)]; }
 
 #define HGIMETAL_DEBUG_POP_GROUP(_obj) \
-  if (HgiMetalDebugEnabled()) { \
-    [_obj popDebugGroup]; \
-  }
+    if (HgiMetalDebugEnabled()) { [_obj popDebugGroup]; }
+
+#define HGIMETAL_DEBUG_INSERT_DEBUG_MARKER(_obj, label) \
+    if (HgiMetalDebugEnabled()) { [_obj insertDebugSignpost:@(label)]; }
 
 /// Posts diagnostic errors for all Metal errors in the current context.
 HGIMETAL_API
-void HgiMetalPostPendingErrors(std::string const &where = std::string());
+void HgiMetalPostPendingErrors(std::string const & where = std::string());
 
 /// Setup Metal debug facilities
 HGIMETAL_API

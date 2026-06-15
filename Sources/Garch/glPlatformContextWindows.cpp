@@ -1,72 +1,84 @@
+#if defined(_WIN32)
+
 //
 // Copyright 2017 Pixar
 //
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#if defined(_WIN32)
-
-#include "Garch/GarchWindows/glPlatformContextWindows.h"
+#include "Garch/glPlatformContextWindows.h"
 #include "Tf/hash.h"
 
 #include <Windows.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchWGLContextState::_Detail {
- public:
-  _Detail(HDC hdc, HGLRC hglrc) : hdc(hdc), hglrc(hglrc) {}
 
-  HDC hdc;
-  HGLRC hglrc;
+class GarchWGLContextState::_Detail {
+public:
+    _Detail(HDC hdc, HGLRC hglrc) : hdc(hdc), hglrc(hglrc) { }
+
+    HDC hdc;
+    HGLRC hglrc;
 };
 
 //
 // GarchWGLContextState
 //
 
-GarchWGLContextState::GarchWGLContextState()
-    : _detail(std::make_shared<_Detail>(wglGetCurrentDC(), wglGetCurrentContext()))
+GarchWGLContextState::GarchWGLContextState() :
+    _detail(std::make_shared<_Detail>(wglGetCurrentDC(),wglGetCurrentContext()))
 {
-  // Do nothing
+    // Do nothing
 }
 
-GarchWGLContextState::GarchWGLContextState(NullState)
-    : _detail(std::make_shared<_Detail>(HDC(0), HGLRC(0)))
+GarchWGLContextState::GarchWGLContextState(NullState) :
+    _detail(std::make_shared<_Detail>(HDC(0), HGLRC(0)))
 {
-  // Do nothing
+    // Do nothing
 }
 
-bool GarchWGLContextState::operator==(const GarchWGLContextState &rhs) const
+bool
+GarchWGLContextState::operator==(const GarchWGLContextState& rhs) const
 {
-  return _detail->hdc == rhs._detail->hdc && _detail->hglrc == rhs._detail->hglrc;
+    return _detail->hdc   == rhs._detail->hdc &&
+           _detail->hglrc == rhs._detail->hglrc;
 }
 
-size_t GarchWGLContextState::GetHash() const
+size_t
+GarchWGLContextState::GetHash() const
 {
-  return TfHash::Combine(_detail->hdc, _detail->hglrc);
+    return TfHash::Combine(
+        _detail->hdc,
+        _detail->hglrc
+    );
 }
 
-bool GarchWGLContextState::IsValid() const
+bool
+GarchWGLContextState::IsValid() const
 {
-  return _detail->hdc && _detail->hglrc;
+    return _detail->hdc && _detail->hglrc;
 }
 
-void GarchWGLContextState::MakeCurrent()
+void
+GarchWGLContextState::MakeCurrent()
 {
-  wglMakeCurrent(_detail->hdc, _detail->hglrc);
+    wglMakeCurrent(_detail->hdc, _detail->hglrc);
 }
 
-void GarchWGLContextState::DoneCurrent()
+void
+GarchWGLContextState::DoneCurrent()
 {
-  wglMakeCurrent(NULL, NULL);
+    wglMakeCurrent(NULL, NULL);
 }
 
 GARCH_API
-GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
+GarchGLPlatformContextState
+GarchGetNullGLPlatformContextState()
 {
-  return GarchWGLContextState(GarchWGLContextState::NullState::nullstate);
+    return GarchWGLContextState(GarchWGLContextState::NullState::nullstate);
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

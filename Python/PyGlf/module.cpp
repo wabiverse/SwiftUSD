@@ -4,16 +4,16 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Tf/pyModule.h"
 #include "pxr/pxrns.h"
+#include "Tf/pyModule.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 TF_WRAP_MODULE
 {
-  TF_WRAP(Diagnostic);
-  TF_WRAP(DrawTarget);
-  TF_WRAP(Texture);
-  TF_WRAP(SimpleLight);
-  TF_WRAP(SimpleMaterial);
+    TF_WRAP( Diagnostic );
+    TF_WRAP( DrawTarget );
+    TF_WRAP( Texture );
+    TF_WRAP( SimpleLight );
+    TF_WRAP( SimpleMaterial );
 }

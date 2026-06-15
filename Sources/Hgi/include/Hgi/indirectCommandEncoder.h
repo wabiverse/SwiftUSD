@@ -7,11 +7,11 @@
 #ifndef PXR_IMAGING_HGI_INDIRECT_COMMAND_ENCODER_H
 #define PXR_IMAGING_HGI_INDIRECT_COMMAND_ENCODER_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/api.h"
 #include "Hgi/cmds.h"
-#include "Hgi/graphicsPipeline.h"
 #include "Hgi/resourceBindings.h"
-#include "pxr/pxrns.h"
+#include "Hgi/graphicsPipeline.h"
 
 #include <memory>
 #include <stdint.h>
@@ -22,21 +22,22 @@ class Hgi;
 class HgiComputeCmds;
 class HgiGraphicsCmds;
 
-struct HgiIndirectCommands {
-  HgiIndirectCommands(uint32_t drawCount,
-                      HgiGraphicsPipelineHandle const &graphicsPipeline,
-                      HgiResourceBindingsHandle const &resourceBindings)
-      : drawCount(drawCount),
-        graphicsPipeline(graphicsPipeline),
-        resourceBindings(resourceBindings)
-  {
-  }
+struct HgiIndirectCommands
+{
+    HgiIndirectCommands(uint32_t drawCount,
+                        HgiGraphicsPipelineHandle const &graphicsPipeline,
+                        HgiResourceBindingsHandle const &resourceBindings)
+        : drawCount(drawCount)
+        , graphicsPipeline(graphicsPipeline)
+        , resourceBindings(resourceBindings)
+    {
+    }
 
-  virtual ~HgiIndirectCommands() = default;
+    virtual ~HgiIndirectCommands() = default;
 
-  uint32_t drawCount;
-  HgiGraphicsPipelineHandle graphicsPipeline;
-  HgiResourceBindingsHandle resourceBindings;
+    uint32_t drawCount;
+    HgiGraphicsPipelineHandle graphicsPipeline;
+    HgiResourceBindingsHandle resourceBindings;
 };
 
 using HgiIndirectCommandsUniquePtr = std::unique_ptr<HgiIndirectCommands>;
@@ -52,53 +53,56 @@ using HgiIndirectCommandsUniquePtr = std::unique_ptr<HgiIndirectCommands>;
 /// Execute draw takes the HgiIndirectCommands structure and replays it on the
 /// device.  Currently this is only implemented on the Metal HGI device.
 ///
-class HgiIndirectCommandEncoder : public HgiCmds {
- public:
-  HGI_API
-  ~HgiIndirectCommandEncoder() override;
+class HgiIndirectCommandEncoder : public HgiCmds
+{
+public:
+    HGI_API
+    ~HgiIndirectCommandEncoder() override;
+    
+    /// Encodes a batch of draw commands from the drawParameterBuffer.
+    /// Returns a HgiIndirectCommands which holds the necessary buffers and
+    /// state for replaying the batch.
+    HGI_API
+    virtual HgiIndirectCommandsUniquePtr EncodeDraw(
+        HgiComputeCmds * computeCmds,
+        HgiGraphicsPipelineHandle const& pipeline,
+        HgiResourceBindingsHandle const& resourceBindings,
+        HgiVertexBufferBindingVector const& vertexBindings,
+        HgiBufferHandle const& drawParameterBuffer,
+        uint32_t drawBufferByteOffset,
+        uint32_t drawCount,
+        uint32_t stride) = 0;
+    
+    /// Encodes a batch of indexed draw commands from the drawParameterBuffer.
+    /// Returns a HgiIndirectCommands which holds the necessary buffers and
+    /// state for replaying the batch.
+    HGI_API
+    virtual HgiIndirectCommandsUniquePtr EncodeDrawIndexed(
+        HgiComputeCmds * computeCmds,
+        HgiGraphicsPipelineHandle const& pipeline,
+        HgiResourceBindingsHandle const& resourceBindings,
+        HgiVertexBufferBindingVector const& vertexBindings,
+        HgiBufferHandle const& indexBuffer,
+        HgiBufferHandle const& drawParameterBuffer,
+        uint32_t drawBufferByteOffset,
+        uint32_t drawCount,
+        uint32_t stride,
+        uint32_t patchBaseVertexByteOffset) = 0;
+    
+    /// Excutes an indirect command batch from the HgiIndirectCommands
+    /// structure.
+    HGI_API
+    virtual void ExecuteDraw(
+        HgiGraphicsCmds * gfxCmds,
+        HgiIndirectCommands const* commands) = 0;
 
-  /// Encodes a batch of draw commands from the drawParameterBuffer.
-  /// Returns a HgiIndirectCommands which holds the necessary buffers and
-  /// state for replaying the batch.
-  HGI_API
-  virtual HgiIndirectCommandsUniquePtr EncodeDraw(
-      HgiComputeCmds *computeCmds,
-      HgiGraphicsPipelineHandle const &pipeline,
-      HgiResourceBindingsHandle const &resourceBindings,
-      HgiVertexBufferBindingVector const &vertexBindings,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride) = 0;
+protected:
+    HGI_API
+    HgiIndirectCommandEncoder();
 
-  /// Encodes a batch of indexed draw commands from the drawParameterBuffer.
-  /// Returns a HgiIndirectCommands which holds the necessary buffers and
-  /// state for replaying the batch.
-  HGI_API
-  virtual HgiIndirectCommandsUniquePtr EncodeDrawIndexed(
-      HgiComputeCmds *computeCmds,
-      HgiGraphicsPipelineHandle const &pipeline,
-      HgiResourceBindingsHandle const &resourceBindings,
-      HgiVertexBufferBindingVector const &vertexBindings,
-      HgiBufferHandle const &indexBuffer,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride,
-      uint32_t patchBaseVertexByteOffset) = 0;
-
-  /// Excutes an indirect command batch from the HgiIndirectCommands
-  /// structure.
-  HGI_API
-  virtual void ExecuteDraw(HgiGraphicsCmds *gfxCmds, HgiIndirectCommands const *commands) = 0;
-
- protected:
-  HGI_API
-  HgiIndirectCommandEncoder();
-
- private:
-  HgiIndirectCommandEncoder &operator=(const HgiIndirectCommandEncoder &) = delete;
-  HgiIndirectCommandEncoder(const HgiIndirectCommandEncoder &) = delete;
+private:
+    HgiIndirectCommandEncoder & operator=(const HgiIndirectCommandEncoder&) = delete;
+    HgiIndirectCommandEncoder(const HgiIndirectCommandEncoder&) = delete;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

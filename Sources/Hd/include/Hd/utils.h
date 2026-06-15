@@ -8,14 +8,14 @@
 #ifndef PXR_IMAGING_HD_UTILS_H
 #define PXR_IMAGING_HD_UTILS_H
 
-#include "CameraUtil/conformWindow.h"
+#include "pxr/pxrns.h"
 #include "Hd/api.h"
 #include "Hd/dataSource.h"
 #include "Hd/material.h"
-#include "pxr/pxrns.h"
+#include "CameraUtil/conformWindow.h"
 
-#include "Sdf/path.h"
 #include "Tf/declarePtrs.h"
+#include "Sdf/path.h"
 
 #include <iosfwd>
 #include <memory>
@@ -51,106 +51,134 @@ namespace HdUtils {
 ///
 /// The \em UnregisterInstance method is typically invoked prior to render
 /// index destruction.
-///
+/// 
 /// \note This facility isn't thread-safe.
 ///
 /// \sa HdSceneIndexPluginRegistry::SceneIndexAppendCallback
 /// \sa HdSceneIndexPluginRegistry::RegisterSceneIndexForRenderer
 ///
-template<typename T> class RenderInstanceTracker {
- public:
-  using TWeakPtr = std::weak_ptr<T>;
-  using TSharedPtr = std::shared_ptr<T>;
+template <typename T>
+class RenderInstanceTracker
+{
+public:
+    using TWeakPtr = std::weak_ptr<T>;
+    using TSharedPtr = std::shared_ptr<T>;
 
-  void RegisterInstance(std::string const &renderInstanceId, TSharedPtr const &sp)
-  {
-    if (!sp) {
-      return;
+    void RegisterInstance(
+        std::string const &renderInstanceId,
+        TSharedPtr const &sp)
+    {
+        if (!sp) {
+            return;
+        }
+
+        auto res = idInstanceMap.insert({renderInstanceId, sp});
+        if (!res.second) { // wasn't inserted
+            TWeakPtr &wp = res.first->second;
+            if (auto handle = wp.lock()) {
+                // Found entry with valid handle. This can happen if the
+                // renderInstanceId isn't unique enough. Leave the existing
+                // entry as-is.
+                TF_WARN(
+                    "An instance with renderInstanceId %s was already "
+                    "registered previously.", renderInstanceId.c_str());
+                return;
+            }
+            res.first->second = sp;
+        }
     }
 
-    auto res = idInstanceMap.insert({renderInstanceId, sp});
-    if (!res.second) {  // wasn't inserted
-      TWeakPtr &wp = res.first->second;
-      if (auto handle = wp.lock()) {
-        // Found entry with valid handle. This can happen if the
-        // renderInstanceId isn't unique enough. Leave the existing
-        // entry as-is.
-        TF_WARN(
-            "An instance with renderInstanceId %s was already "
-            "registered previously.",
-            renderInstanceId.c_str());
-        return;
-      }
-      res.first->second = sp;
+    void UnregisterInstance(
+        std::string const &renderInstanceId)
+    {
+        idInstanceMap.erase(renderInstanceId);
     }
-  }
 
-  void UnregisterInstance(std::string const &renderInstanceId)
-  {
-    idInstanceMap.erase(renderInstanceId);
-  }
-
-  TSharedPtr GetInstance(std::string const &id)
-  {
-    const auto it = idInstanceMap.find(id);
-    if (it != idInstanceMap.end()) {
-      if (TSharedPtr sp = it->second.lock()) {
-        return sp;
-      }
+    TSharedPtr GetInstance(
+        std::string const &id)
+    {
+        const auto it = idInstanceMap.find(id);
+        if (it != idInstanceMap.end()) {
+            if (TSharedPtr sp = it->second.lock()) {
+                return sp;
+            }
+        }
+        return nullptr;
     }
-    return nullptr;
-  }
-
- private:
-  // Use a weak reference to the object.
-  using _IdToInstanceMap = std::unordered_map<std::string, TWeakPtr>;
-  _IdToInstanceMap idInstanceMap;
+    
+private:
+    // Use a weak reference to the object.
+    using _IdToInstanceMap = std::unordered_map<std::string, TWeakPtr>;
+    _IdToInstanceMap idInstanceMap;
 };
 
 /// Retreives the active render settings prim path from the input scene index
-/// \p si. Returns true if a data source for the associated locator was found
-/// with the result in \p primPath, and false otherwise.
+/// \p si. Returns true with the result in \p primPath if the path points to
+/// a render settings prim with a valid prim container, and false otherwise.
 ///
 HD_API
-bool HasActiveRenderSettingsPrim(const HdSceneIndexBaseRefPtr &si, SdfPath *primPath = nullptr);
+bool
+HasActiveRenderSettingsPrim(
+    const HdSceneIndexBaseRefPtr &si,
+    SdfPath *primPath = nullptr);
 
-/// Retreives the current frame number from the input scene index \p si.
+/// Retreives the active render pass prim path from the input scene index
+/// \p si. Returns true with the result in \p primPath if the path points to
+/// a render pass prim with a valid prim container, and false otherwise.
+///
+HD_API
+bool
+HasActiveRenderPassPrim(
+    const HdSceneIndexBaseRefPtr &si,
+    SdfPath *primPath = nullptr);
+
+/// Retreives the current frame number from the input scene index \p si. 
 /// Returns true if a data source for the associated locator was found
 /// with the result in \p frame, and false otherwise.
 ///
 HD_API
-bool GetCurrentFrame(const HdSceneIndexBaseRefPtr &si, double *frame);
+bool
+GetCurrentFrame(const HdSceneIndexBaseRefPtr &si, double *frame);
 
-/// Translate the given aspect ratio conform policy \p token into an equivalent
-/// CameraUtilConformWindowPolicy enum.
+/// Translate the given aspect ratio conform policy \p token into an equivalent 
+/// CameraUtilConformWindowPolicy enum. 
 ///
 HD_API
-CameraUtilConformWindowPolicy ToConformWindowPolicy(const TfToken &token);
+CameraUtilConformWindowPolicy
+ToConformWindowPolicy(const TfToken &token);
 
 /// Lexicographically sorts the scene index prims in the subtree rooted at
 /// \p rootPath and writes them out.
 ///
 HD_API
-void PrintSceneIndex(std::ostream &out,
-                     const HdSceneIndexBaseRefPtr &si,
-                     const SdfPath &rootPath = SdfPath::AbsoluteRootPath());
+void
+PrintSceneIndex(
+    std::ostream &out,
+    const HdSceneIndexBaseRefPtr &si,
+    const SdfPath &rootPath = SdfPath::AbsoluteRootPath());
 
-/// Convert the supplied HdMaterialNetworkMap to an HdMaterialNetworkSchema
+/// Convert the supplied HdMaterialNetworkMap to an HdMaterialNetworkSchema 
+/// container data source.
+/// 
+HD_API
+HdContainerDataSourceHandle
+ConvertHdMaterialNetworkToHdMaterialNetworkSchema(
+    const HdMaterialNetworkMap& hdNetworkMap);
+
+/// Convert the supplied HdMaterialNetworkMap to an HdMaterialSchema 
 /// container data source.
 ///
 HD_API
-HdContainerDataSourceHandle ConvertHdMaterialNetworkToHdMaterialNetworkSchema(
+HdContainerDataSourceHandle
+ConvertHdMaterialNetworkToHdMaterialSchema(
     const HdMaterialNetworkMap &hdNetworkMap);
 
-/// Convert the supplied HdMaterialNetworkMap to an HdMaterialSchema
-/// container data source.
-///
 HD_API
-HdContainerDataSourceHandle ConvertHdMaterialNetworkToHdMaterialSchema(
-    const HdMaterialNetworkMap &hdNetworkMap);
+HdContainerDataSourceHandle
+ConvertVtDictionaryToContainerDS(const VtDictionary &dict);
 
-}  // namespace HdUtils
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_UTILS_H
+#endif // PXR_IMAGING_HD_UTILS_H

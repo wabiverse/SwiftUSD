@@ -6,10 +6,12 @@
 
 // Define PXR_PEGTL_NAMESPACE based on internal namespace to isolate
 // it from other versions of USD/PEGTL in client code.
-#include "pxr/pxr.h"
+#include "pxr/pxrns.h"
 
 #if PXR_USE_NAMESPACES
-#define PXR_PEGTL_NAMESPACE PXR_INTERNAL_NS ## _pegtl
+#define PXR_PEGTL_impl_PASTE2(x, y) x ## y
+#define PXR_PEGTL_impl_PASTE(x, y) PXR_PEGTL_impl_PASTE2(x, y)
+#define PXR_PEGTL_NAMESPACE PXR_PEGTL_impl_PASTE(PXR_INTERNAL_NS, _pegtl)
 #else
 #define PXR_PEGTL_NAMESPACE pxr_pegtl
 #endif

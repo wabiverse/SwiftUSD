@@ -4,16 +4,19 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Tf/pyModule.h"
 #include "pxr/pxrns.h"
+#include "Tf/pyModule.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 TF_WRAP_MODULE
 {
-  TF_WRAP(CapsuleMeshGenerator);
-  TF_WRAP(ConeMeshGenerator);
-  TF_WRAP(CuboidMeshGenerator);
-  TF_WRAP(CylinderMeshGenerator);
-  TF_WRAP(SphereMeshGenerator);
+    TF_WRAP(Tokens);
+    TF_WRAP(CapsuleMeshGenerator);
+    TF_WRAP(ConeMeshGenerator);
+    TF_WRAP(CuboidMeshGenerator);
+    TF_WRAP(CylinderMeshGenerator);
+    TF_WRAP(DiskMeshGenerator);
+    TF_WRAP(PlaneMeshGenerator);
+    TF_WRAP(SphereMeshGenerator);
 }

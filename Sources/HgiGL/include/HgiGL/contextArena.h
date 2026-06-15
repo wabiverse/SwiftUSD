@@ -7,12 +7,12 @@
 #ifndef PXR_IMAGING_HGIGL_CONTEXT_ARENA_H
 #define PXR_IMAGING_HGIGL_CONTEXT_ARENA_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/handle.h"
 #include "HgiGL/api.h"
-#include "pxr/pxrns.h"
 
-#include <memory>
 #include <ostream>
+#include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -26,31 +26,36 @@ struct HgiGraphicsCmdsDesc;
 ///
 /// See notes and relevant API in hgiGL/hgi.h
 ///
-class HgiGLContextArena final {
- public:
-  HGIGL_API
-  ~HgiGLContextArena();
+class HgiGLContextArena final
+{
+public:
+    HGIGL_API
+    ~HgiGLContextArena();
 
- private:
-  friend class HgiGL;
-  friend class HgiGLDevice;
+private:
+    friend class HgiGL;
+    friend class HgiGLDevice;
 
-  HGIGL_API
-  HgiGLContextArena();
+    HGIGL_API
+    HgiGLContextArena();
 
-  /// Returns a framebuffer id that matches the descriptor.
-  uint32_t _AcquireFramebuffer(HgiGraphicsCmdsDesc const &desc, bool resolved = false);
+    /// Returns a framebuffer id that matches the descriptor.
+    uint32_t _AcquireFramebuffer(
+        HgiGraphicsCmdsDesc const& desc,
+        bool resolved = false);
 
-  void _GarbageCollect();
+    void _GarbageCollect();
+    
+    HgiGLContextArena & operator=(const HgiGLContextArena&) = delete;
+    HgiGLContextArena(const HgiGLContextArena&) = delete;
 
-  HgiGLContextArena &operator=(const HgiGLContextArena &) = delete;
-  HgiGLContextArena(const HgiGLContextArena &) = delete;
+    friend std::ostream& operator<<(
+        std::ostream& out,
+        const HgiGLContextArena& arena);
 
-  friend std::ostream &operator<<(std::ostream &out, const HgiGLContextArena &arena);
-
-  // Implementation detail.
-  class _FramebufferCache;
-  std::unique_ptr<_FramebufferCache> _framebufferCache;
+    // Implementation detail.
+    class _FramebufferCache;
+    std::unique_ptr<_FramebufferCache> _framebufferCache;
 };
 
 using HgiGLContextArenaHandle = HgiHandle<HgiGLContextArena>;

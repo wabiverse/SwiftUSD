@@ -5,40 +5,42 @@
 // https://openusd.org/license.
 //
 #include "pxr/pxrns.h"
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "UsdUtils/introspection.h"
 
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyStaticTokens.h"
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
-VtDictionary _WrapUsdUtilsComputeUsdStageStats_1(const std::string &rootLayerPath)
-{
-  VtDictionary stats;
-  UsdUtilsComputeUsdStageStats(rootLayerPath, &stats);
-  return stats;
+VtDictionary 
+_WrapUsdUtilsComputeUsdStageStats_1(const std::string &rootLayerPath) {
+    VtDictionary stats;
+    UsdUtilsComputeUsdStageStats(rootLayerPath, &stats);
+    return stats;    
 }
 
-VtDictionary _WrapUsdUtilsComputeUsdStageStats_2(const UsdStageWeakPtr &stage)
-{
-  VtDictionary stats;
-  UsdUtilsComputeUsdStageStats(stage, &stats);
-  return stats;
+VtDictionary 
+_WrapUsdUtilsComputeUsdStageStats_2(const UsdStageWeakPtr &stage) {
+    VtDictionary stats;
+    UsdUtilsComputeUsdStageStats(stage, &stats);
+    return stats;
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapIntrospection()
 {
-  TF_PY_WRAP_PUBLIC_TOKENS(
-      "UsdStageStatsKeys", UsdUtilsUsdStageStatsKeys, USDUTILS_USDSTAGE_STATS);
+    TF_PY_WRAP_PUBLIC_TOKENS("UsdStageStatsKeys", UsdUtilsUsdStageStatsKeys, 
+                             USDUTILS_USDSTAGE_STATS);
 
-  def("ComputeUsdStageStats", _WrapUsdUtilsComputeUsdStageStats_1);
-  def("ComputeUsdStageStats", _WrapUsdUtilsComputeUsdStageStats_2);
+    def("ComputeUsdStageStats", _WrapUsdUtilsComputeUsdStageStats_1);
+    def("ComputeUsdStageStats", _WrapUsdUtilsComputeUsdStageStats_2);
 }

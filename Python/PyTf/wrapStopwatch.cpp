@@ -9,27 +9,30 @@
 
 #include "Tf/stopwatch.h"
 
-#include <boost/python/class.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapStopwatch()
-{
+using namespace pxr_boost::python;
 
-  typedef TfStopwatch This;
+void wrapStopwatch() {
 
-  class_<This>("Stopwatch")
+    typedef TfStopwatch This;
 
-      .def("Start", &This::Start)
-      .def("Stop", &This::Stop)
-      .def("Reset", &This::Reset)
-      .def("AddFrom", &This::AddFrom)
+    class_<This>("Stopwatch")
 
-      .add_property("nanoseconds", &This::GetNanoseconds)
-      .add_property("microseconds", &This::GetMicroseconds)
-      .add_property("milliseconds", &This::GetMilliseconds)
-      .add_property("sampleCount", &This::GetSampleCount)
-      .add_property("seconds", &This::GetSeconds);
+        .def("Start", &This::Start)
+        .def("Stop", &This::Stop)
+        .def("Reset", &This::Reset)
+        .def("AddFrom", &This::AddFrom)
+
+        .add_property("nanoseconds", &This::GetNanoseconds)
+        .add_property("microseconds", &This::GetMicroseconds)
+        .add_property("milliseconds", &This::GetMilliseconds)
+        .add_property("sampleCount", &This::GetSampleCount)
+        .add_property("seconds", &This::GetSeconds)
+        ;
 }

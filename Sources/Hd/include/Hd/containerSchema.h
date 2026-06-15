@@ -15,48 +15,68 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Base class for a schema backed by a container whose children have
 /// arbitrary names.
 ///
-class HdContainerSchema : public HdSchema {
- public:
-  HdContainerSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+class HdContainerSchema : public HdSchema
+{
+public:
 
-  HD_API
-  TfTokenVector GetNames() const;
+    HdContainerSchema(HdContainerDataSourceHandle container)
+     : HdSchema(std::move(container))
+    {}
 
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(size_t count,
-                                                   const TfToken *names,
-                                                   const HdDataSourceBaseHandle *values);
+    HD_API
+    TfTokenVector GetNames() const;
+
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        size_t count,
+        const TfToken *names,
+        const HdDataSourceBaseHandle *values);
 };
 
 /// Template class for a schema backed by a container whose children have
 /// arbitrary names but an expected data source type.
 ///
-template<typename T> class HdTypedContainerSchema : public HdContainerSchema {
- public:
-  HdTypedContainerSchema(HdContainerDataSourceHandle container) : HdContainerSchema(container) {}
+template<typename T>
+class HdContainerOfTypedSampledDataSourcesSchema : public HdContainerSchema
+{
+public:
 
-  typename T::Handle Get(const TfToken &name)
-  {
-    return _GetTypedDataSource<T>(name);
-  }
+    HdContainerOfTypedSampledDataSourcesSchema(
+        HdContainerDataSourceHandle container)
+     : HdContainerSchema(std::move(container))
+    {}
+
+    typename T::Handle Get(const TfToken &name) const {
+        return _GetTypedDataSource<T>(name);
+    }
 };
+
+/// \deprecated
+template<typename T>
+using HdTypedContainerSchema = HdContainerOfTypedSampledDataSourcesSchema<T>;
 
 /// Template class for a schema backed by a container whose children have
 /// arbitrary names but an expected schema type.
 ///
-template<typename Schema> class HdSchemaBasedContainerSchema : public HdContainerSchema {
- public:
-  HdSchemaBasedContainerSchema(HdContainerDataSourceHandle container)
-      : HdContainerSchema(container)
-  {
-  }
+template<typename Schema>
+class HdContainerOfSchemasSchema : public HdContainerSchema
+{
+public:
 
-  Schema Get(const TfToken &name)
-  {
-    using DataSource = typename Schema::UnderlyingDataSource;
-    return Schema(_GetTypedDataSource<DataSource>(name));
-  }
+    HdContainerOfSchemasSchema(HdContainerDataSourceHandle container)
+     : HdContainerSchema(std::move(container))
+    {}
+
+    Schema Get(const TfToken &name) const {
+        using DataSource = typename Schema::UnderlyingDataSource;
+        return Schema(_GetTypedDataSource<DataSource>(name));
+    }
 };
+
+/// \deprecated
+template<typename T>
+using HdSchemaBasedContainerSchema = HdContainerOfSchemasSchema<T>;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

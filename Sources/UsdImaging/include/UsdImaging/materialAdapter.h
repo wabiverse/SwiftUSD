@@ -9,151 +9,170 @@
 
 /// \file usdImaging/materialAdapter.h
 
+#include "pxr/pxrns.h"
 #include "UsdImaging/primAdapter.h"
 #include "UsdImaging/representedByAncestorPrimAdapter.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct HdMaterialNetworkMap;
 
+
 /// \class UsdImagingMaterialAdapter
 /// \brief Provides information that can be used to generate a material.
-class UsdImagingMaterialAdapter : public UsdImagingPrimAdapter {
- public:
-  using BaseAdapter = UsdImagingPrimAdapter;
+class UsdImagingMaterialAdapter : public UsdImagingPrimAdapter
+{
+public:
+    using BaseAdapter = UsdImagingPrimAdapter;
 
-  UsdImagingMaterialAdapter() : UsdImagingPrimAdapter() {}
+    UsdImagingMaterialAdapter()
+        : UsdImagingPrimAdapter()
+    {}
 
-  USDIMAGING_API
-  ~UsdImagingMaterialAdapter() override;
+    USDIMAGING_API
+    ~UsdImagingMaterialAdapter() override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Scene Index Support
-  // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  TfTokenVector GetImagingSubprims(UsdPrim const &prim) override;
 
-  USDIMAGING_API
-  TfToken GetImagingSubprimType(UsdPrim const &prim, TfToken const &subprim) override;
+    // ---------------------------------------------------------------------- //
+    /// \name Scene Index Support
+    // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  HdContainerDataSourceHandle GetImagingSubprimData(
-      UsdPrim const &prim,
-      TfToken const &subprim,
-      const UsdImagingDataSourceStageGlobals &stageGlobals) override;
+    USDIMAGING_API
+    TfTokenVector GetImagingSubprims(UsdPrim const& prim) override;
 
-  USDIMAGING_API
-  HdDataSourceLocatorSet InvalidateImagingSubprim(
-      UsdPrim const &prim,
-      TfToken const &subprim,
-      TfTokenVector const &properties,
-      UsdImagingPropertyInvalidationType invalidationType) override;
+    USDIMAGING_API
+    TfToken GetImagingSubprimType(
+            UsdPrim const& prim,
+            TfToken const& subprim) override;
 
-  /// Returns RepresentsSelfAndDescendents to suppress population of child
-  /// Shader prims and receive notice when their properties change/
-  USDIMAGING_API
-  PopulationMode GetPopulationMode() override;
+    USDIMAGING_API
+    HdContainerDataSourceHandle GetImagingSubprimData(
+            UsdPrim const& prim,
+            TfToken const& subprim,
+            const UsdImagingDataSourceStageGlobals &stageGlobals) override;
 
-  USDIMAGING_API
-  HdDataSourceLocatorSet InvalidateImagingSubprimFromDescendent(
-      UsdPrim const &prim,
-      UsdPrim const &descendentPrim,
-      TfToken const &subprim,
-      TfTokenVector const &properties,
-      UsdImagingPropertyInvalidationType invalidationType) override;
+    USDIMAGING_API
+    HdDataSourceLocatorSet InvalidateImagingSubprim(
+            UsdPrim const& prim,
+            TfToken const& subprim,
+            TfTokenVector const& properties,
+            UsdImagingPropertyInvalidationType invalidationType) override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Initialization
-  // ---------------------------------------------------------------------- //
+    /// Returns RepresentsSelfAndDescendents to suppress population of child
+    /// Shader prims and receive notice when their properties change/
+    USDIMAGING_API
+    PopulationMode GetPopulationMode() override;
 
-  USDIMAGING_API
-  SdfPath Populate(UsdPrim const &prim,
-                   UsdImagingIndexProxy *index,
-                   UsdImagingInstancerContext const *instancerContext = NULL) override;
+    USDIMAGING_API
+    HdDataSourceLocatorSet InvalidateImagingSubprimFromDescendent(
+            UsdPrim const& prim,
+            UsdPrim const& descendentPrim,
+            TfToken const& subprim,
+            TfTokenVector const& properties,
+            UsdImagingPropertyInvalidationType invalidationType) override;
 
-  USDIMAGING_API
-  bool IsSupported(UsdImagingIndexProxy const *index) const override;
+    // ---------------------------------------------------------------------- //
+    /// \name Initialization
+    // ---------------------------------------------------------------------- //
 
-  // ---------------------------------------------------------------------- //
-  /// \name Parallel Setup and Resolve
-  // ---------------------------------------------------------------------- //
+    USDIMAGING_API
+    SdfPath Populate(UsdPrim const& prim,
+                     UsdImagingIndexProxy* index,
+                     UsdImagingInstancerContext const* instancerContext = NULL) override;
 
-  /// Thread Safe.
-  USDIMAGING_API
-  void TrackVariability(UsdPrim const &prim,
-                        SdfPath const &cachePath,
-                        HdDirtyBits *timeVaryingBits,
-                        UsdImagingInstancerContext const *instancerContext = NULL) const override;
+    USDIMAGING_API
+    bool IsSupported(UsdImagingIndexProxy const* index) const override;
 
-  /// Thread Safe.
-  USDIMAGING_API
-  void UpdateForTime(UsdPrim const &prim,
-                     SdfPath const &cachePath,
-                     UsdTimeCode time,
-                     HdDirtyBits requestedBits,
-                     UsdImagingInstancerContext const *instancerContext = NULL) const override;
+    // ---------------------------------------------------------------------- //
+    /// \name Parallel Setup and Resolve
+    // ---------------------------------------------------------------------- //
 
-  // ---------------------------------------------------------------------- //
-  /// \name Change Processing
-  // ---------------------------------------------------------------------- //
+    /// Thread Safe.
+    USDIMAGING_API
+    void TrackVariability(UsdPrim const& prim,
+                          SdfPath const& cachePath,
+                          HdDirtyBits* timeVaryingBits,
+                          UsdImagingInstancerContext const* 
+                              instancerContext = NULL) const override;
 
-  /// Returns a bit mask of attributes to be updated, or
-  /// HdChangeTracker::AllDirty if the entire prim must be resynchronized.
-  USDIMAGING_API
-  HdDirtyBits ProcessPropertyChange(UsdPrim const &prim,
-                                    SdfPath const &cachePath,
-                                    TfToken const &propertyName) override;
 
-  USDIMAGING_API
-  void MarkDirty(UsdPrim const &prim,
-                 SdfPath const &cachePath,
-                 HdDirtyBits dirty,
-                 UsdImagingIndexProxy *index) override;
+    /// Thread Safe.
+    USDIMAGING_API
+    void UpdateForTime(UsdPrim const& prim,
+                       SdfPath const& cachePath, 
+                       UsdTimeCode time,
+                       HdDirtyBits requestedBits,
+                       UsdImagingInstancerContext const* 
+                           instancerContext = NULL) const override;
 
-  USDIMAGING_API
-  void MarkMaterialDirty(UsdPrim const &prim,
-                         SdfPath const &cachePath,
-                         UsdImagingIndexProxy *index) override;
+    // ---------------------------------------------------------------------- //
+    /// \name Change Processing 
+    // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  void ProcessPrimResync(SdfPath const &cachePath, UsdImagingIndexProxy *index) override;
+    /// Returns a bit mask of attributes to be updated, or
+    /// HdChangeTracker::AllDirty if the entire prim must be resynchronized.
+    USDIMAGING_API
+    HdDirtyBits ProcessPropertyChange(UsdPrim const& prim,
+                                      SdfPath const& cachePath,
+                                      TfToken const& propertyName) override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Utilities
-  // ---------------------------------------------------------------------- //
+    USDIMAGING_API
+    void MarkDirty(UsdPrim const& prim,
+                   SdfPath const& cachePath,
+                   HdDirtyBits dirty,
+                   UsdImagingIndexProxy* index) override;
 
-  USDIMAGING_API
-  VtValue GetMaterialResource(UsdPrim const &prim,
-                              SdfPath const &cachePath,
-                              UsdTimeCode time) const override;
+    USDIMAGING_API
+    void MarkMaterialDirty(UsdPrim const& prim,
+                           SdfPath const& cachePath,
+                           UsdImagingIndexProxy* index) override;
 
- protected:
-  USDIMAGING_API
-  void _RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index) final;
+    USDIMAGING_API
+    void ProcessPrimResync(SdfPath const& cachePath,
+                           UsdImagingIndexProxy* index) override;
+
+    // ---------------------------------------------------------------------- //
+    /// \name Utilities 
+    // ---------------------------------------------------------------------- //
+
+    USDIMAGING_API
+    VtValue GetMaterialResource(UsdPrim const &prim,
+                                SdfPath const& cachePath, 
+                                UsdTimeCode time) const override;
+
+protected:
+    USDIMAGING_API
+    void _RemovePrim(SdfPath const& cachePath,
+                     UsdImagingIndexProxy* index) final;
 };
 
 /// \class UsdImagingShaderAdapter
 /// \brief Delegates invalidation responsibility of a Shader prim to an
 /// ancestor Material prim
-class UsdImagingShaderAdapter : public UsdImagingRepresentedByAncestorPrimAdapter {
- public:
-  using BaseAdapter = UsdImagingRepresentedByAncestorPrimAdapter;
+class UsdImagingShaderAdapter :
+        public UsdImagingRepresentedByAncestorPrimAdapter
+{
+public:
+    using BaseAdapter = UsdImagingRepresentedByAncestorPrimAdapter;
 
-  UsdImagingShaderAdapter() : UsdImagingRepresentedByAncestorPrimAdapter() {}
+    UsdImagingShaderAdapter()
+        : UsdImagingRepresentedByAncestorPrimAdapter() {}
 };
 
 /// \class UsdImagingNodeGraphAdapter
 /// \brief Delegates invalidation responsibility of a Noge Graph prim to an
 /// ancestor Material prim
-class UsdImagingNodeGraphAdapter : public UsdImagingRepresentedByAncestorPrimAdapter {
- public:
-  using BaseAdapter = UsdImagingRepresentedByAncestorPrimAdapter;
+class UsdImagingNodeGraphAdapter :
+        public UsdImagingRepresentedByAncestorPrimAdapter
+{
+public:
+    using BaseAdapter = UsdImagingRepresentedByAncestorPrimAdapter;
 
-  UsdImagingNodeGraphAdapter() : UsdImagingRepresentedByAncestorPrimAdapter() {}
+    UsdImagingNodeGraphAdapter()
+        : UsdImagingRepresentedByAncestorPrimAdapter() {}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_MATERIAL_ADAPTER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_MATERIAL_ADAPTER_H

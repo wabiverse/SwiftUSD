@@ -10,29 +10,41 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void UsdImaging_MaterialBindingImplData::ClearCaches()
+void
+UsdImaging_MaterialBindingImplData::ClearCaches()
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  // Speed up destuction of the cache by resetting the unique_ptrs held
-  // within in parallel.
-  tbb::parallel_for(_bindingsCache.range(), [](decltype(_bindingsCache)::range_type &range) {
-    for (auto entryIt = range.begin(); entryIt != range.end(); ++entryIt) {
-      entryIt->second.reset();
-    }
-  });
+    // Speed up destruction of the cache by resetting the unique_ptrs held 
+    // within in parallel.
+    using BindCacheRange = 
+        UsdShadeMaterialBindingAPI::BindingsCache::range_type;
+    WorkParallelForTBBRange(_bindingsCache.range(), 
+        []( const BindCacheRange &range) {
+            for (auto entryIt = range.begin(); entryIt != range.end(); 
+                ++entryIt) {
+                entryIt->second.reset();
+            }
+        }
+    );
 
-  tbb::parallel_for(_collQueryCache.range(), [](decltype(_collQueryCache)::range_type &range) {
-    for (auto entryIt = range.begin(); entryIt != range.end(); ++entryIt) {
-      entryIt->second.reset();
-    }
-  });
+    using CollQueryRange =
+        UsdShadeMaterialBindingAPI::CollectionQueryCache::range_type;
+    WorkParallelForTBBRange(_collQueryCache.range(), 
+        []( const CollQueryRange &range) {
+            for (auto entryIt = range.begin(); entryIt != range.end(); 
+                ++entryIt) {
+                entryIt->second.reset();
+            }
+        }
+    );
 
-  _bindingsCache.clear();
-  _collQueryCache.clear();
+    _bindingsCache.clear();
+    _collQueryCache.clear();
 }
 
-const UsdImaging_BlurScaleStrategy::value_type UsdImaging_BlurScaleStrategy::invalidValue = {
-    0.0f, false};
+const UsdImaging_BlurScaleStrategy::value_type
+UsdImaging_BlurScaleStrategy::invalidValue = { 0.0f, false };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

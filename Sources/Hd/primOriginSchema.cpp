@@ -19,65 +19,74 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrimOriginSchemaTokens, HD_PRIM_ORIGIN_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrimOriginSchemaTokens,
+    HD_PRIM_ORIGIN_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 
-SdfPath HdPrimOriginSchema::GetOriginPath(const TfToken &name) const
+SdfPath
+HdPrimOriginSchema::GetOriginPath(const TfToken &name) const
 {
-  if (!_container) {
-    return SdfPath();
-  }
-  OriginPathDataSource::Handle const ds = OriginPathDataSource::Cast(_container->Get(name));
-  if (!ds) {
-    return SdfPath();
-  }
-  return ds->GetTypedValue(0.0f).GetPath();
+    if (!_container) {
+        return SdfPath();
+    }
+    OriginPathDataSource::Handle const ds =
+        OriginPathDataSource::Cast(_container->Get(name));
+    if (!ds) {
+        return SdfPath();
+    }
+    return ds->GetTypedValue(0.0f).GetPath();
 }
 
-std::ostream &operator<<(std::ostream &stream, HdPrimOriginSchema::OriginPath const &p)
+std::ostream &
+operator <<(std::ostream &stream, HdPrimOriginSchema::OriginPath const &p)
 {
-  return stream << "HdPrimOriginSchema::OriginPath(" << p.GetPath() << ")";
+    return stream << "HdPrimOriginSchema::OriginPath(" << p.GetPath() << ")";
 }
 
 // --(END CUSTOM CODE: Schema Methods)--
 
 /*static*/
-HdPrimOriginSchema HdPrimOriginSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdPrimOriginSchema
+HdPrimOriginSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdPrimOriginSchema(fromParentContainer ?
-                                HdContainerDataSource::Cast(fromParentContainer->Get(
-                                    HdPrimOriginSchemaTokens->primOrigin)) :
-                                nullptr);
+    return HdPrimOriginSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdPrimOriginSchemaTokens->primOrigin))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdPrimOriginSchema::GetSchemaToken()
+const TfToken &
+HdPrimOriginSchema::GetSchemaToken()
 {
-  return HdPrimOriginSchemaTokens->primOrigin;
+    return HdPrimOriginSchemaTokens->primOrigin;
 }
 
 /*static*/
-const HdDataSourceLocator &HdPrimOriginSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdPrimOriginSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /*static*/
-const HdDataSourceLocator &HdPrimOriginSchema::GetScenePathLocator()
+const HdDataSourceLocator &
+HdPrimOriginSchema::GetScenePathLocator()
 {
-  static const HdDataSourceLocator locator(HdPrimOriginSchemaTokens->primOrigin,
-                                           HdPrimOriginSchemaTokens->scenePath);
-  return locator;
-}
+    static const HdDataSourceLocator locator(HdPrimOriginSchemaTokens->primOrigin,HdPrimOriginSchemaTokens->scenePath
+    );
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

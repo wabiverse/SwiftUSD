@@ -4,108 +4,153 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "UsdRi/rmanUtilities.h"
 #include "pxr/pxrns.h"
+#include "UsdRi/rmanUtilities.h"
 
+#include "Tf/stringUtils.h"
 #include "UsdGeom/tokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-int UsdRiConvertToRManInterpolateBoundary(TfToken const &token)
+
+int
+UsdRiConvertToRManInterpolateBoundary(TfToken const& token)
 {
-  if (token == UsdGeomTokens->none)
-    return 0;
-  else if (token == UsdGeomTokens->edgeAndCorner)
-    return 1;
-  else if (token == UsdGeomTokens->edgeOnly)
-    return 2;
-  else {
-    TF_CODING_ERROR("Invalid InterpolateBoundary Token: %s", token.GetText());
-    return 0;
-  }
+    if(token == UsdGeomTokens->none)
+        return 0;
+    else if(token == UsdGeomTokens->edgeAndCorner)
+        return 1;
+    else if(token == UsdGeomTokens->edgeOnly)
+        return 2;
+    else{
+        TF_CODING_ERROR("Invalid InterpolateBoundary Token: %s",
+            token.GetText());
+        return 0;
+    }
 }
 
-TfToken const &UsdRiConvertFromRManInterpolateBoundary(int i)
+TfToken const&
+UsdRiConvertFromRManInterpolateBoundary(int i)
 {
-  switch (i) {
+    switch(i){
     case 0:
-      return UsdGeomTokens->none;
+        return UsdGeomTokens->none;
     case 1:
-      return UsdGeomTokens->edgeAndCorner;
+        return UsdGeomTokens->edgeAndCorner;
     case 2:
-      return UsdGeomTokens->edgeOnly;
+        return UsdGeomTokens->edgeOnly;
     default:
-      TF_CODING_ERROR("Invalid InterpolateBoundary int: %d", i);
-      return UsdGeomTokens->none;
-  }
+        TF_CODING_ERROR("Invalid InterpolateBoundary int: %d", i);
+        return UsdGeomTokens->none;
+    }
 }
 
-int UsdRiConvertToRManFaceVaryingLinearInterpolation(TfToken const &token)
-{
-  if (token == UsdGeomTokens->all) {
-    return 0;
-  }
-  else if (token == UsdGeomTokens->cornersOnly || token == UsdGeomTokens->cornersPlus1 ||
-           token == UsdGeomTokens->cornersPlus2)
-  {
-    return 1;
-  }
-  else if (token == UsdGeomTokens->none) {
-    return 2;
-  }
-  else if (token == UsdGeomTokens->boundaries) {
-    return 3;
-  }
+int
+UsdRiConvertToRManFaceVaryingLinearInterpolation(TfToken const& token)
+{ 
+    if(token == UsdGeomTokens->all) {
+        return 0;
+    }
+    else if(token == UsdGeomTokens->cornersOnly
+            || token == UsdGeomTokens->cornersPlus1
+            || token == UsdGeomTokens->cornersPlus2) {
+        return 1;
+    }
+    else if(token == UsdGeomTokens->none) {
+        return 2;
+    }
+    else if(token == UsdGeomTokens->boundaries) {
+        return 3;
+    }
 
-  else {
-    TF_CODING_ERROR("Invalid FaceVaryingLinearInterpolation Token: %s", token.GetText());
-    return 1;
-  }
+    else{
+        TF_CODING_ERROR("Invalid FaceVaryingLinearInterpolation Token: %s",
+            token.GetText());
+        return 1;
+    }
 }
 
-TfToken const &UsdRiConvertFromRManFaceVaryingLinearInterpolation(int i)
+TfToken const&
+UsdRiConvertFromRManFaceVaryingLinearInterpolation(int i)
 {
-  switch (i) {
+    switch(i){
     case 0:
-      return UsdGeomTokens->all;
+        return UsdGeomTokens->all;
     case 1:
-      return UsdGeomTokens->cornersPlus1;
+        return UsdGeomTokens->cornersPlus1;
     case 2:
-      return UsdGeomTokens->none;
+        return UsdGeomTokens->none;
     case 3:
-      return UsdGeomTokens->boundaries;
+        return UsdGeomTokens->boundaries;
     default:
-      TF_CODING_ERROR("Invalid FaceVaryingLinearInterpolation int: %d", i);
-      return UsdGeomTokens->none;
-  }
+        TF_CODING_ERROR("Invalid FaceVaryingLinearInterpolation int: %d", i);
+        return UsdGeomTokens->none;
+    }
 }
 
-int UsdRiConvertToRManTriangleSubdivisionRule(TfToken const &token)
+int
+UsdRiConvertToRManTriangleSubdivisionRule(TfToken const& token)
 {
-  // XXX A value of 2 is needed in order for the smoothing algorithm to work.
-  if (token == UsdGeomTokens->catmullClark) {
-    return 0;
-  }
-  else if (token == UsdGeomTokens->smooth)
-    return 2;
-  else {
-    TF_CODING_ERROR("Invalid TriangleSubdivisionRule Token: %s", token.GetText());
-    return 0;
-  }
+    // XXX A value of 2 is needed in order for the smoothing algorithm to work.
+    if(token == UsdGeomTokens->catmullClark) {
+        return 0;
+    }
+    else if(token == UsdGeomTokens->smooth)
+        return 2;
+    else{
+        TF_CODING_ERROR("Invalid TriangleSubdivisionRule Token: %s",
+            token.GetText());
+        return 0;
+    }
 }
 
-TfToken const &UsdRiConvertFromRManTriangleSubdivisionRule(int i)
+TfToken const&
+UsdRiConvertFromRManTriangleSubdivisionRule(int i)
 {
-  // XXX A value of 2 is needed in order for the smoothing algorithm to work.
-  switch (i) {
+    // XXX A value of 2 is needed in order for the smoothing algorithm to work.
+    switch(i){
     case 0:
-      return UsdGeomTokens->catmullClark;
+        return UsdGeomTokens->catmullClark;
     case 2:
-      return UsdGeomTokens->smooth;
+        return UsdGeomTokens->smooth;
     default:
-      TF_CODING_ERROR("Invalid TriangleSubdivisionRule int: %d", i);
-      return UsdGeomTokens->catmullClark;
-  }
+        TF_CODING_ERROR("Invalid TriangleSubdivisionRule int: %d", i);
+        return UsdGeomTokens->catmullClark;
+    }
+}
+
+SdfStringListOp
+UsdRiConvertRManSetSpecificationToListOp(std::string const& repr)
+{
+    static const char* delimeters = " \t\n,";
+    SdfStringListOp result;
+    if (!repr.empty()) {
+        std::vector<std::string> elements;
+        if (repr[0] == '+') {
+            elements = TfStringTokenize(repr.substr(1), delimeters);
+            result.SetAppendedItems(elements);
+        } else if (repr[0] == '-') {
+            elements = TfStringTokenize(repr.substr(1), delimeters);
+            result.SetDeletedItems(elements);
+        } else {
+            elements = TfStringTokenize(repr, delimeters);
+            result.SetExplicitItems(elements);
+        }
+    }
+    return result;
+}
+
+bool
+UsdRiDoesAttributeUseSetSpecification(TfToken const& attrName)
+{
+    // Use endswidth to be robust with regard to various namespacing,
+    // e.g. primvars:ri:attributes, ri:attributes, or none at all.
+    return TfStringEndsWith(attrName, "grouping:membership")
+        || TfStringEndsWith(attrName, "lighting:excludesubset")
+        || TfStringEndsWith(attrName, "lighting:subset")
+        || TfStringEndsWith(attrName, "lightfilter:subset")
+        || TfStringEndsWith(attrName, "identifier:lpegroup");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

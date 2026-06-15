@@ -4,8 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Ar/writableAsset.h"
 #include "pxr/pxrns.h"
+#include "Ar/writableAsset.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

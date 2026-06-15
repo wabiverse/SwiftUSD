@@ -1,5 +1,5 @@
 //
-// Copyright 2023 Pixar
+// Copyright 2025 Pixar
 //
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
@@ -8,24 +8,23 @@
 #ifndef PXR_BASE_TS_DIFF_H
 #define PXR_BASE_TS_DIFF_H
 
+#include "pxr/pxrns.h"
 #include "Ts/api.h"
 #include "Ts/types.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class TsSpline;
+struct Ts_SplineData;
 
-/// Returns the interval in which the splines \p s1 and \p s2 will
-/// evaluate to different values or in which knots in the splines have
-/// different values.
+/// Compare two splines and return the time interval where they differ.
 ///
-/// In particular, if the rightmost changed knot is a dual-valued knot
-/// where the left value has changed and the right value is unchanged,
-/// the returned interval will be closed on the right, even though the
-/// value of the spline *at* the rightmost time does not change.
+/// The input compareInterval may be infinite. If the splines do not differ, an
+/// empty GfInterval is returned.
 TS_API
-GfInterval TsFindChangedInterval(const TsSpline &s1, const TsSpline &s2);
+GfInterval
+Ts_Diff(const Ts_SplineData* data1,
+        const Ts_SplineData* data2,
+        const GfInterval& compareInterval);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

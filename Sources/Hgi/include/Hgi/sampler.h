@@ -7,16 +7,26 @@
 #ifndef PXR_IMAGING_HGI_SAMPLER_H
 #define PXR_IMAGING_HGI_SAMPLER_H
 
+#include "pxr/pxrns.h"
+
+#include "Tf/envSetting.h"
+
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+/// Sets the maximum anisotropic filtering ratio for all samplers.
+/// By default this is 16x. The actual value used depends on the
+/// device limits. A value of 1 effectively disables anisotropic sampling.
+///
+HGI_API
+extern TfEnvSetting<int> HGI_MAX_ANISOTROPY;
 
 /// \struct HgiSamplerDesc
 ///
@@ -33,47 +43,59 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///    larger than a pixel.</li>
 /// <li> mipFilter:
 ///    The filter used for combining pixels between two mipmap levels.</li>
-/// <li>addressMode***:
+/// <li>addressMode***: 
 ///    Wrapping modes.</li>
-/// <li>borderColor:
+/// <li>borderColor: 
 ///    The border color for clamped texture values.</li>
-/// <li>enableCompare:
+/// <li>enableCompare: 
 ///    Enables sampler comparison against a reference value during lookups.</li>
-/// <li>compareFunction:
+/// <li>compareFunction: 
 ///    The comparison function to apply if sampler compare is enabled.</li>
+/// <li>maxAnisotropy:
+///    Maximum anisotropic filtering ratio. The default value of 16 corresponds
+///    to the previously internal default value. The actual value used is subject
+///    to the device maximum supported anisotropy and the HGI_MAX_ANISOTROPY
+///    setting. A value of 1 effectively disables anisotropic sampling.</li>
 /// </ul>
 ///
-struct HgiSamplerDesc {
-  HgiSamplerDesc()
-      : magFilter(HgiSamplerFilterNearest),
-        minFilter(HgiSamplerFilterNearest),
-        mipFilter(HgiMipFilterNotMipmapped),
-        addressModeU(HgiSamplerAddressModeClampToEdge),
-        addressModeV(HgiSamplerAddressModeClampToEdge),
-        addressModeW(HgiSamplerAddressModeClampToEdge),
-        borderColor(HgiBorderColorTransparentBlack),
-        enableCompare(false),
-        compareFunction(HgiCompareFunctionNever)
-  {
-  }
+struct HgiSamplerDesc
+{
+    HgiSamplerDesc()
+        : magFilter(HgiSamplerFilterNearest)
+        , minFilter(HgiSamplerFilterNearest)
+        , mipFilter(HgiMipFilterNotMipmapped)
+        , addressModeU(HgiSamplerAddressModeClampToEdge)
+        , addressModeV(HgiSamplerAddressModeClampToEdge)
+        , addressModeW(HgiSamplerAddressModeClampToEdge)
+        , borderColor(HgiBorderColorTransparentBlack)
+        , enableCompare(false)
+        , compareFunction(HgiCompareFunctionNever)
+        , maxAnisotropy(16)
+    {}
 
-  std::string debugName;
-  HgiSamplerFilter magFilter;
-  HgiSamplerFilter minFilter;
-  HgiMipFilter mipFilter;
-  HgiSamplerAddressMode addressModeU;
-  HgiSamplerAddressMode addressModeV;
-  HgiSamplerAddressMode addressModeW;
-  HgiBorderColor borderColor;
-  bool enableCompare;
-  HgiCompareFunction compareFunction;
+    std::string debugName;
+    HgiSamplerFilter magFilter;
+    HgiSamplerFilter minFilter;
+    HgiMipFilter mipFilter;
+    HgiSamplerAddressMode addressModeU;
+    HgiSamplerAddressMode addressModeV;
+    HgiSamplerAddressMode addressModeW;
+    HgiBorderColor borderColor;
+    bool enableCompare;
+    HgiCompareFunction compareFunction;
+    uint32_t maxAnisotropy;
 };
 
 HGI_API
-bool operator==(const HgiSamplerDesc &lhs, const HgiSamplerDesc &rhs);
+bool operator==(
+    const HgiSamplerDesc& lhs,
+    const HgiSamplerDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiSamplerDesc &lhs, const HgiSamplerDesc &rhs);
+bool operator!=(
+    const HgiSamplerDesc& lhs,
+    const HgiSamplerDesc& rhs);
+
 
 ///
 /// \class HgiSampler
@@ -82,42 +104,44 @@ bool operator!=(const HgiSamplerDesc &lhs, const HgiSamplerDesc &rhs);
 /// perform texture sampling operations.
 /// Samplers should be created via Hgi::CreateSampler.
 ///
-class HgiSampler {
- public:
-  HGI_API
-  virtual ~HgiSampler();
+class HgiSampler
+{
+public:
+    HGI_API
+    virtual ~HgiSampler();
 
-  /// The descriptor describes the object.
-  HGI_API
-  HgiSamplerDesc const &GetDescriptor() const;
+    /// The descriptor describes the object.
+    HGI_API
+    HgiSamplerDesc const& GetDescriptor() const;
 
-  /// This function returns the handle to the Hgi backend's gpu resource, cast
-  /// to a uint64_t. Clients should avoid using this function and instead
-  /// use Hgi base classes so that client code works with any Hgi platform.
-  /// For transitioning code to Hgi, it can however we useful to directly
-  /// access a platform's internal resource handles.
-  /// There is no safety provided in using this. If you by accident pass a
-  /// HgiMetal resource into an OpenGL call, bad things may happen.
-  /// In OpenGL this returns the GLuint resource name.
-  /// In Metal this returns the MTL::SamplerState* as uint64_t.
-  /// In Vulkan this returns the VkSampler as uint64_t.
-  HGI_API
-  virtual uint64_t GetRawResource() const = 0;
+    /// This function returns the handle to the Hgi backend's gpu resource, cast
+    /// to a uint64_t. Clients should avoid using this function and instead
+    /// use Hgi base classes so that client code works with any Hgi platform.
+    /// For transitioning code to Hgi, it can however we useful to directly
+    /// access a platform's internal resource handles.
+    /// There is no safety provided in using this. If you by accident pass a
+    /// HgiMetal resource into an OpenGL call, bad things may happen.
+    /// In OpenGL this returns the GLuint resource name.
+    /// In Metal this returns the id<MTLSamplerState> as uint64_t.
+    /// In Vulkan this returns the VkSampler as uint64_t.
+    HGI_API
+    virtual uint64_t GetRawResource() const = 0;
 
- protected:
-  HGI_API
-  HgiSampler(HgiSamplerDesc const &desc);
+protected:
+    HGI_API
+    HgiSampler(HgiSamplerDesc const& desc);
 
-  HgiSamplerDesc _descriptor;
+    HgiSamplerDesc _descriptor;
 
- private:
-  HgiSampler() = delete;
-  HgiSampler &operator=(const HgiSampler &) = delete;
-  HgiSampler(const HgiSampler &) = delete;
+private:
+    HgiSampler() = delete;
+    HgiSampler & operator=(const HgiSampler&) = delete;
+    HgiSampler(const HgiSampler&) = delete;
 };
 
 using HgiSamplerHandle = HgiHandle<HgiSampler>;
 using HgiSamplerHandleVector = std::vector<HgiSamplerHandle>;
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

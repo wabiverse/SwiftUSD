@@ -19,89 +19,117 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdInstancedBySchemaTokens, HD_INSTANCED_BY_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdInstancedBySchemaTokens,
+    HD_INSTANCED_BY_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathArrayDataSourceHandle HdInstancedBySchema::GetPaths() const
+HdPathArrayDataSourceHandle
+HdInstancedBySchema::GetPaths() const
 {
-  return _GetTypedDataSource<HdPathArrayDataSource>(HdInstancedBySchemaTokens->paths);
+    return _GetTypedDataSource<HdPathArrayDataSource>(
+        HdInstancedBySchemaTokens->paths);
 }
 
-HdPathArrayDataSourceHandle HdInstancedBySchema::GetPrototypeRoots() const
+HdPathArrayDataSourceHandle
+HdInstancedBySchema::GetPrototypeRoots() const
 {
-  return _GetTypedDataSource<HdPathArrayDataSource>(HdInstancedBySchemaTokens->prototypeRoots);
+    return _GetTypedDataSource<HdPathArrayDataSource>(
+        HdInstancedBySchemaTokens->prototypeRoots);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdInstancedBySchema::BuildRetained(
-    const HdPathArrayDataSourceHandle &paths, const HdPathArrayDataSourceHandle &prototypeRoots)
+HdContainerDataSourceHandle
+HdInstancedBySchema::BuildRetained(
+        const HdPathArrayDataSourceHandle &paths,
+        const HdPathArrayDataSourceHandle &prototypeRoots
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (paths) {
-    _names[_count] = HdInstancedBySchemaTokens->paths;
-    _values[_count++] = paths;
-  }
+    if (paths) {
+        _names[_count] = HdInstancedBySchemaTokens->paths;
+        _values[_count++] = paths;
+    }
 
-  if (prototypeRoots) {
-    _names[_count] = HdInstancedBySchemaTokens->prototypeRoots;
-    _values[_count++] = prototypeRoots;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (prototypeRoots) {
+        _names[_count] = HdInstancedBySchemaTokens->prototypeRoots;
+        _values[_count++] = prototypeRoots;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdInstancedBySchema::Builder &HdInstancedBySchema::Builder::SetPaths(
+HdInstancedBySchema::Builder &
+HdInstancedBySchema::Builder::SetPaths(
     const HdPathArrayDataSourceHandle &paths)
 {
-  _paths = paths;
-  return *this;
+    _paths = paths;
+    return *this;
 }
 
-HdInstancedBySchema::Builder &HdInstancedBySchema::Builder::SetPrototypeRoots(
+HdInstancedBySchema::Builder &
+HdInstancedBySchema::Builder::SetPrototypeRoots(
     const HdPathArrayDataSourceHandle &prototypeRoots)
 {
-  _prototypeRoots = prototypeRoots;
-  return *this;
+    _prototypeRoots = prototypeRoots;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdInstancedBySchema::Builder::Build()
+HdContainerDataSourceHandle
+HdInstancedBySchema::Builder::Build()
 {
-  return HdInstancedBySchema::BuildRetained(_paths, _prototypeRoots);
-}
-
-/*static*/
-HdInstancedBySchema HdInstancedBySchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdInstancedBySchema(fromParentContainer ?
-                                 HdContainerDataSource::Cast(fromParentContainer->Get(
-                                     HdInstancedBySchemaTokens->instancedBy)) :
-                                 nullptr);
+    return HdInstancedBySchema::BuildRetained(
+        _paths,
+        _prototypeRoots
+    );
 }
 
 /*static*/
-const TfToken &HdInstancedBySchema::GetSchemaToken()
+HdInstancedBySchema
+HdInstancedBySchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdInstancedBySchemaTokens->instancedBy;
+    return HdInstancedBySchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdInstancedBySchemaTokens->instancedBy))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdInstancedBySchema::GetDefaultLocator()
+const TfToken &
+HdInstancedBySchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdInstancedBySchemaTokens->instancedBy;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdInstancedBySchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+}
+
+/* static */
+const HdDataSourceLocator &
+HdInstancedBySchema::GetPathsLocator()
+{
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdInstancedBySchemaTokens->paths);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

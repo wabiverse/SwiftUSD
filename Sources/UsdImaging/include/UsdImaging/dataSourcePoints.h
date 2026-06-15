@@ -17,29 +17,32 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class UsdImagingDataSourcePointsPrim
 ///
-/// A prim data source representing a UsdGeomPoints prim.
+/// A prim data source representing a UsdGeomPoints prim. 
 ///
-class UsdImagingDataSourcePointsPrim : public UsdImagingDataSourceGprim {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointsPrim);
+class UsdImagingDataSourcePointsPrim : public UsdImagingDataSourceGprim
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourcePointsPrim);
 
-  USDIMAGING_API
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    USDIMAGING_API
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
-  USDIMAGING_API
-  static HdDataSourceLocatorSet Invalidate(UsdPrim const &prim,
-                                           const TfToken &subprim,
-                                           const TfTokenVector &properties,
-                                           UsdImagingPropertyInvalidationType invalidationType);
+    USDIMAGING_API
+    static HdDataSourceLocatorSet Invalidate(
+            UsdPrim const& prim,
+            const TfToken &subprim,
+            const TfTokenVector &properties,
+            UsdImagingPropertyInvalidationType invalidationType);
 
- private:
-  UsdImagingDataSourcePointsPrim(const SdfPath &sceneIndexPath,
-                                 UsdPrim usdPrim,
-                                 const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourcePointsPrim(
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourcePointsPrim);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_POINTS_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_POINTS_H

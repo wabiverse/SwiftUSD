@@ -7,17 +7,17 @@
 #ifndef PXR_IMAGING_HDX_PACKAGE_H
 #define PXR_IMAGING_HDX_PACKAGE_H
 
+#include "pxr/pxrns.h"
 #include "Hdx/version.h"
 #include "Tf/token.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 TfToken HdxPackageFullscreenShader();
 TfToken HdxPackageRenderPassColorShader();
 TfToken HdxPackageRenderPassColorAndSelectionShader();
 TfToken HdxPackageRenderPassColorWithOccludedSelectionShader();
-TfToken HdxPackageRenderPassIdShader();
 TfToken HdxPackageRenderPassPickingShader();
 TfToken HdxPackageRenderPassShadowShader();
 TfToken HdxPackageColorChannelShader();

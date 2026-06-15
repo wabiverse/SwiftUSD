@@ -31,7 +31,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \ingroup group_tf_SystemsExt
 TF_API
-bool TfSetenv(const std::string &envName, const std::string &value);
+bool TfSetenv(const std::string& envName, const std::string& value);
 
 /// Unset an environment variable.
 ///
@@ -40,14 +40,14 @@ bool TfSetenv(const std::string &envName, const std::string &value);
 /// been initialized, the variable \p envName is unset in the environment
 /// using \c unsetenv. Otherwise, it is unset both in the environment and in
 /// Python using \c TfPyUnsetenv.
-///
+/// 
 /// If the value cannot be unset, false is returned and a warning is posted.
 /// Otherwise, the return value is true.
 ///
 /// \ingroup group_tf_SystemsExt
 TF_API
-bool TfUnsetenv(const std::string &envName);
+bool TfUnsetenv(const std::string& envName);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_SETENV_H
+#endif // PXR_BASE_TF_SETENV_H

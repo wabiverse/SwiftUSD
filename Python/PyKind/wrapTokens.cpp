@@ -5,13 +5,14 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Kind/registry.h"
 #include "Tf/pyStaticTokens.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapTokens()
 {
-  TF_PY_WRAP_PUBLIC_TOKENS("Tokens", KindTokens, KIND_TOKENS);
+    TF_PY_WRAP_PUBLIC_TOKENS("Tokens", KindTokens,
+                             KIND_TOKENS);
 }

@@ -9,23 +9,25 @@
 
 /// \file usd/interpolation.h
 
-#include "Gf/declare.h"
-#include "Sdf/timeCode.h"
-#include "Usd/api.h"
-#include "Vt/array.h"
 #include "pxr/pxrns.h"
+#include "Usd/api.h"
+#include "Sdf/timeCode.h"
+#include "Vt/array.h"
+#include "Gf/declare.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 /// \enum UsdInterpolationType
 ///
-/// Attribute value interpolation options.
+/// Attribute value interpolation options. 
 ///
 /// See \ref Usd_AttributeInterpolation for more details.
 ///
-enum UsdInterpolationType {
-  UsdInterpolationTypeHeld,   ///< Held interpolation
-  UsdInterpolationTypeLinear  ///< Linear interpolation
+enum UsdInterpolationType
+{
+    UsdInterpolationTypeHeld,  ///< Held interpolation
+    UsdInterpolationTypeLinear ///< Linear interpolation
 };
 
 /// \anchor USD_LINEAR_INTERPOLATION_TYPES
@@ -51,10 +53,26 @@ enum UsdInterpolationType {
 /// \li <b>GfQuatf</b> (via quaternion slerp)
 /// \li <b>GfQuath</b> (via quaternion slerp)
 /// \hideinitializer
-#define USD_LINEAR_INTERPOLATION_TYPES \
-  (GfHalf)(VtArray<GfHalf>)( \
-      float)(VtArray<float>)(double)(VtArray<double>)(SdfTimeCode)(VtArray< \
-                                                                   SdfTimeCode>)(GfMatrix2d)(VtArray<GfMatrix2d>)(GfMatrix3d)(VtArray<GfMatrix3d>)(GfMatrix4d)(VtArray<GfMatrix4d>)(GfVec2d)(VtArray<GfVec2d>)(GfVec2f)(VtArray<GfVec2f>)(GfVec2h)(VtArray<GfVec2h>)(GfVec3d)(VtArray<GfVec3d>)(GfVec3f)(VtArray<GfVec3f>)(GfVec3h)(VtArray<GfVec3h>)(GfVec4d)(VtArray<GfVec4d>)(GfVec4f)(VtArray<GfVec4f>)(GfVec4h)(VtArray<GfVec4h>)(GfQuatd)(VtArray<GfQuatd>)(GfQuatf)(VtArray<GfQuatf>)(GfQuath)(VtArray<GfQuath>)
+#define USD_LINEAR_INTERPOLATION_TYPES               \
+    (GfHalf) (VtArray<GfHalf>)                       \
+    (float) (VtArray<float>)                         \
+    (double) (VtArray<double>)                       \
+    (SdfTimeCode) (VtArray<SdfTimeCode>)             \
+    (GfMatrix2d) (VtArray<GfMatrix2d>)               \
+    (GfMatrix3d) (VtArray<GfMatrix3d>)               \
+    (GfMatrix4d) (VtArray<GfMatrix4d>)               \
+    (GfVec2d) (VtArray<GfVec2d>)                     \
+    (GfVec2f) (VtArray<GfVec2f>)                     \
+    (GfVec2h) (VtArray<GfVec2h>)                     \
+    (GfVec3d) (VtArray<GfVec3d>)                     \
+    (GfVec3f) (VtArray<GfVec3f>)                     \
+    (GfVec3h) (VtArray<GfVec3h>)                     \
+    (GfVec4d) (VtArray<GfVec4d>)                     \
+    (GfVec4f) (VtArray<GfVec4f>)                     \
+    (GfVec4h) (VtArray<GfVec4h>)                     \
+    (GfQuatd) (VtArray<GfQuatd>)                     \
+    (GfQuatf) (VtArray<GfQuatf>)                     \
+    (GfQuath) (VtArray<GfQuath>)
 
 /// \struct UsdLinearInterpolationTraits
 ///
@@ -63,21 +81,27 @@ enum UsdInterpolationType {
 ///
 /// UsdLinearInterpolationTraits<T>::isSupported will be true for all
 /// types listed in the USD_LINEAR_INTERPOLATION_TYPES sequence.
-template<class T> struct UsdLinearInterpolationTraits {
-  static const bool isSupported = false;
+template <class T>
+struct UsdLinearInterpolationTraits
+{
+    static const bool isSupported = false;
 };
 
 /// \cond INTERNAL
-#define _USD_DECLARE_INTERPOLATION_TRAITS(unused, type) \
-  template<> struct UsdLinearInterpolationTraits<type> { \
-    static const bool isSupported = true; \
-  };
+#define _USD_DECLARE_INTERPOLATION_TRAITS(unused, type)         \
+template <>                                                     \
+struct UsdLinearInterpolationTraits<type>                       \
+{                                                               \
+    static const bool isSupported = true;                       \
+};
 
-TF_PP_SEQ_FOR_EACH(_USD_DECLARE_INTERPOLATION_TRAITS, ~, USD_LINEAR_INTERPOLATION_TYPES)
+TF_PP_SEQ_FOR_EACH(_USD_DECLARE_INTERPOLATION_TRAITS, ~,
+                   USD_LINEAR_INTERPOLATION_TYPES)
 
 #undef _USD_DECLARE_INTERPOLATION_TRAITS
 /// \endcond
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_INTERPOLATION_H
+#endif // PXR_USD_USD_INTERPOLATION_H

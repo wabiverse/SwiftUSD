@@ -5,45 +5,55 @@
 // https://openusd.org/license.
 //
 
-#include "Pcp/dependency.h"
-#include "Tf/makePyConstructor.h"
-#include "Tf/pyEnum.h"
 #include "pxr/pxrns.h"
+#include "Pcp/dependency.h"
+#include "Tf/pyEnum.h"
+#include "Tf/makePyConstructor.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static string _DependencyRepr(const PcpDependency &dep)
+static string
+_DependencyRepr(const PcpDependency &dep)
 {
-  return TF_PY_REPR_PREFIX + "Cache.Dependency(" + TfPyRepr(dep.indexPath) + ", " +
-         TfPyRepr(dep.sitePath) + ", " + TfPyRepr(dep.mapFunc) + ")";
+     return TF_PY_REPR_PREFIX + "Cache.Dependency("
+        + TfPyRepr(dep.indexPath) + ", "
+        + TfPyRepr(dep.sitePath) + ", "
+        + TfPyRepr(dep.mapFunc) + ")";
 }
 
-static PcpDependency *_DependencyInit(const SdfPath &indexPath,
-                                      const SdfPath &sitePath,
-                                      const PcpMapFunction &mapFunc)
+static PcpDependency*
+_DependencyInit(
+    const SdfPath &indexPath,
+    const SdfPath &sitePath,
+    const PcpMapFunction &mapFunc)
 {
-  return new PcpDependency{indexPath, sitePath, mapFunc};
+    return new PcpDependency{indexPath, sitePath, mapFunc};
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapDependency()
+void 
+wrapDependency()
 {
-  class_<PcpDependency>("Dependency", no_init)
-      .def_readwrite("indexPath", &PcpDependency::indexPath)
-      .def_readwrite("sitePath", &PcpDependency::sitePath)
-      .def_readwrite("mapFunc", &PcpDependency::mapFunc)
-      .def("__repr__", &_DependencyRepr)
-      .def("__init__", make_constructor(_DependencyInit))
-      .def(self == self)
-      .def(self != self);
+    class_<PcpDependency>("Dependency", no_init)
+        .def_readwrite("indexPath", &PcpDependency::indexPath)
+        .def_readwrite("sitePath", &PcpDependency::sitePath)
+        .def_readwrite("mapFunc", &PcpDependency::mapFunc)
+        .def("__repr__", &_DependencyRepr)
+        .def("__init__", make_constructor(_DependencyInit))
+        .def(self == self)
+        .def(self != self)
+        ;
 
-  TfPyWrapEnum<PcpDependencyType>();
+    TfPyWrapEnum<PcpDependencyType>();
 }

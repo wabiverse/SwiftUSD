@@ -37,185 +37,246 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(END CUSTOM CODE: Declares)--
 
 #define HD_RENDER_SETTINGS_SCHEMA_TOKENS \
-  (renderSettings)(namespacedSettings)( \
-      active)(renderProducts)(includedPurposes)(materialBindingPurposes)(renderingColorSpace)(shutterInterval)
+    (renderSettings) \
+    (namespacedSettings) \
+    (active) \
+    (camera) \
+    (disableMotionBlur) \
+    (disableDepthOfField) \
+    (renderProducts) \
+    (includedPurposes) \
+    (materialBindingPurposes) \
+    (renderingColorSpace) \
+    (unionedSamplingInterval) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsSchemaTokens, HD_API, HD_RENDER_SETTINGS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsSchemaTokens, HD_API,
+    HD_RENDER_SETTINGS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdRenderSettingsSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdRenderSettingsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdRenderSettingsSchema
+///
+class HdRenderSettingsSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "renderSettings" from the parent container and constructs a
-  /// HdRenderSettingsSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdRenderSettingsSchema GetFromParent(
-      const HdContainerDataSourceHandle &fromParentContainer);
+    HdRenderSettingsSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
-
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-
-  /// This locator is to pass along dirtying of the currentFrame locator
-  /// on the Scene Globals Scene Index through the render Settings prim.
-  HD_API
-  static const HdDataSourceLocator &GetFrameLocator();
-
-  // --(END CUSTOM CODE: Schema Methods)--
-
-  /// \name Member accessor
-  /// @{
-
-  HD_API
-  HdContainerDataSourceHandle GetNamespacedSettings() const;
-
-  HD_API
-  HdBoolDataSourceHandle GetActive() const;
-
-  HD_API
-  HdRenderProductVectorSchema GetRenderProducts() const;
-
-  HD_API
-  HdTokenArrayDataSourceHandle GetIncludedPurposes() const;
-
-  HD_API
-  HdTokenArrayDataSourceHandle GetMaterialBindingPurposes() const;
-
-  HD_API
-  HdTokenDataSourceHandle GetRenderingColorSpace() const;
-
-  /// Frame-relative time interval representing the sampling window for data
-  /// relevant to motion blur. Renderers can use this interval when querying
-  /// time-sampled data (e.g., xforms, points, velocities, ...) to simulate
-  /// motion blur effects. Note: This closely relates to the (frame-
-  /// relative) shutter interval of a camera specified via shutter open and
-  /// close times and is expected to span the union of the shutter intervals
-  /// of cameras used in generating the render artifacts.
-  HD_API
-  HdVec2dDataSourceHandle GetShutterInterval() const;
-
-  /// @}
-
-  /// \name Schema location
-  /// @{
-
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
-
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
-
-  /// @}
-
-  /// \name Data source locators for members
-  ///
-  /// The following methods return an HdDataSourceLocator (relative to the
-  /// prim-level data source) where the data source for a member can be found.
-  ///
-  /// This is often useful for checking intersection against the
-  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-  /// @{
-
-  /// Prim-level relative data source locator to locate namespacedSettings.
-  HD_API
-  static const HdDataSourceLocator &GetNamespacedSettingsLocator();
-
-  /// Prim-level relative data source locator to locate active.
-  HD_API
-  static const HdDataSourceLocator &GetActiveLocator();
-
-  /// Prim-level relative data source locator to locate renderProducts.
-  HD_API
-  static const HdDataSourceLocator &GetRenderProductsLocator();
-
-  /// Prim-level relative data source locator to locate includedPurposes.
-  HD_API
-  static const HdDataSourceLocator &GetIncludedPurposesLocator();
-
-  /// Prim-level relative data source locator to locate materialBindingPurposes.
-  HD_API
-  static const HdDataSourceLocator &GetMaterialBindingPurposesLocator();
-
-  /// Prim-level relative data source locator to locate renderingColorSpace.
-  HD_API
-  static const HdDataSourceLocator &GetRenderingColorSpaceLocator();
-
-  /// Prim-level relative data source locator to locate shutterInterval.
-  HD_API
-  static const HdDataSourceLocator &GetShutterIntervalLocator();
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdContainerDataSourceHandle &namespacedSettings,
-      const HdBoolDataSourceHandle &active,
-      const HdVectorDataSourceHandle &renderProducts,
-      const HdTokenArrayDataSourceHandle &includedPurposes,
-      const HdTokenArrayDataSourceHandle &materialBindingPurposes,
-      const HdTokenDataSourceHandle &renderingColorSpace,
-      const HdVec2dDataSourceHandle &shutterInterval);
-
-  /// \class HdRenderSettingsSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
+    /// Retrieves a container data source with the schema's default name token
+    /// "renderSettings" from the parent container and constructs a
+    /// HdRenderSettingsSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
     HD_API
-    Builder &SetNamespacedSettings(const HdContainerDataSourceHandle &namespacedSettings);
-    HD_API
-    Builder &SetActive(const HdBoolDataSourceHandle &active);
-    HD_API
-    Builder &SetRenderProducts(const HdVectorDataSourceHandle &renderProducts);
-    HD_API
-    Builder &SetIncludedPurposes(const HdTokenArrayDataSourceHandle &includedPurposes);
-    HD_API
-    Builder &SetMaterialBindingPurposes(
-        const HdTokenArrayDataSourceHandle &materialBindingPurposes);
-    HD_API
-    Builder &SetRenderingColorSpace(const HdTokenDataSourceHandle &renderingColorSpace);
-    HD_API
-    Builder &SetShutterInterval(const HdVec2dDataSourceHandle &shutterInterval);
+    static HdRenderSettingsSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Returns a container data source containing the members set thus far.
+    /// @}
+
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+
+    /// This locator is to pass along dirtying of the currentFrame locator 
+    /// on the Scene Globals Scene Index through the render Settings prim. 
     HD_API
-    HdContainerDataSourceHandle Build();
+    static const HdDataSourceLocator &GetFrameLocator();
 
-   private:
-    HdContainerDataSourceHandle _namespacedSettings;
-    HdBoolDataSourceHandle _active;
-    HdVectorDataSourceHandle _renderProducts;
-    HdTokenArrayDataSourceHandle _includedPurposes;
-    HdTokenArrayDataSourceHandle _materialBindingPurposes;
-    HdTokenDataSourceHandle _renderingColorSpace;
-    HdVec2dDataSourceHandle _shutterInterval;
-  };
+// --(END CUSTOM CODE: Schema Methods)--
 
-  /// @}
+    /// \name Member accessor
+    /// @{
+
+    HD_API
+    HdSampledDataSourceContainerSchema GetNamespacedSettings() const;
+
+    HD_API
+    HdBoolDataSourceHandle GetActive() const;
+
+    HD_API
+    HdPathDataSourceHandle GetCamera() const;
+
+    HD_API
+    HdBoolDataSourceHandle GetDisableMotionBlur() const;
+
+    HD_API
+    HdBoolDataSourceHandle GetDisableDepthOfField() const;
+
+    HD_API
+    HdRenderProductVectorSchema GetRenderProducts() const;
+
+    HD_API
+    HdTokenArrayDataSourceHandle GetIncludedPurposes() const;
+
+    HD_API
+    HdTokenArrayDataSourceHandle GetMaterialBindingPurposes() const;
+
+    HD_API
+    HdTokenDataSourceHandle GetRenderingColorSpace() const;
+
+    /// Frame-relative time interval representing the sampling window for data
+    /// relevant to motion blur. Renderers can use this interval when querying
+    /// time-sampled data (e.g., xforms, points, velocities, ...) to simulate
+    /// motion blur effects. Note: This closely relates to the (frame-
+    /// relative) shutter interval of a camera specified via shutter open and
+    /// close times and is expected to span the union of the shutter intervals
+    /// of cameras used in generating the render artifacts.
+    HD_API
+    HdVec2dDataSourceHandle GetUnionedSamplingInterval() const; 
+
+    /// @}
+
+    /// \name Schema location
+    /// @{
+
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
+
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
+
+    /// @}
+
+    /// \name Data source locators for members
+    ///
+    /// The following methods return an HdDataSourceLocator (relative to the
+    /// prim-level data source) where the data source for a member can be found.
+    ///
+    /// This is often useful for checking intersection against the
+    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+    /// @{
+
+    /// Prim-level relative data source locator to locate namespacedSettings.
+    HD_API
+    static const HdDataSourceLocator &GetNamespacedSettingsLocator();
+
+    /// Prim-level relative data source locator to locate active.
+    HD_API
+    static const HdDataSourceLocator &GetActiveLocator();
+
+    /// Prim-level relative data source locator to locate camera.
+    HD_API
+    static const HdDataSourceLocator &GetCameraLocator();
+
+    /// Prim-level relative data source locator to locate disableMotionBlur.
+    HD_API
+    static const HdDataSourceLocator &GetDisableMotionBlurLocator();
+
+    /// Prim-level relative data source locator to locate disableDepthOfField.
+    HD_API
+    static const HdDataSourceLocator &GetDisableDepthOfFieldLocator();
+
+    /// Prim-level relative data source locator to locate renderProducts.
+    HD_API
+    static const HdDataSourceLocator &GetRenderProductsLocator();
+
+    /// Prim-level relative data source locator to locate includedPurposes.
+    HD_API
+    static const HdDataSourceLocator &GetIncludedPurposesLocator();
+
+    /// Prim-level relative data source locator to locate materialBindingPurposes.
+    HD_API
+    static const HdDataSourceLocator &GetMaterialBindingPurposesLocator();
+
+    /// Prim-level relative data source locator to locate renderingColorSpace.
+    HD_API
+    static const HdDataSourceLocator &GetRenderingColorSpaceLocator();
+
+    /// Prim-level relative data source locator to locate unionedSamplingInterval.
+    HD_API
+    static const HdDataSourceLocator &GetUnionedSamplingIntervalLocator();
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdContainerDataSourceHandle &namespacedSettings,
+        const HdBoolDataSourceHandle &active,
+        const HdPathDataSourceHandle &camera,
+        const HdBoolDataSourceHandle &disableMotionBlur,
+        const HdBoolDataSourceHandle &disableDepthOfField,
+        const HdVectorDataSourceHandle &renderProducts,
+        const HdTokenArrayDataSourceHandle &includedPurposes,
+        const HdTokenArrayDataSourceHandle &materialBindingPurposes,
+        const HdTokenDataSourceHandle &renderingColorSpace,
+        const HdVec2dDataSourceHandle &unionedSamplingInterval
+    );
+
+    /// \class HdRenderSettingsSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetNamespacedSettings(
+            const HdContainerDataSourceHandle &namespacedSettings);
+        HD_API
+        Builder &SetActive(
+            const HdBoolDataSourceHandle &active);
+        HD_API
+        Builder &SetCamera(
+            const HdPathDataSourceHandle &camera);
+        HD_API
+        Builder &SetDisableMotionBlur(
+            const HdBoolDataSourceHandle &disableMotionBlur);
+        HD_API
+        Builder &SetDisableDepthOfField(
+            const HdBoolDataSourceHandle &disableDepthOfField);
+        HD_API
+        Builder &SetRenderProducts(
+            const HdVectorDataSourceHandle &renderProducts);
+        HD_API
+        Builder &SetIncludedPurposes(
+            const HdTokenArrayDataSourceHandle &includedPurposes);
+        HD_API
+        Builder &SetMaterialBindingPurposes(
+            const HdTokenArrayDataSourceHandle &materialBindingPurposes);
+        HD_API
+        Builder &SetRenderingColorSpace(
+            const HdTokenDataSourceHandle &renderingColorSpace);
+        HD_API
+        Builder &SetUnionedSamplingInterval(
+            const HdVec2dDataSourceHandle &unionedSamplingInterval);
+
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdContainerDataSourceHandle _namespacedSettings;
+        HdBoolDataSourceHandle _active;
+        HdPathDataSourceHandle _camera;
+        HdBoolDataSourceHandle _disableMotionBlur;
+        HdBoolDataSourceHandle _disableDepthOfField;
+        HdVectorDataSourceHandle _renderProducts;
+        HdTokenArrayDataSourceHandle _includedPurposes;
+        HdTokenArrayDataSourceHandle _materialBindingPurposes;
+        HdTokenDataSourceHandle _renderingColorSpace;
+        HdVec2dDataSourceHandle _unionedSamplingInterval;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

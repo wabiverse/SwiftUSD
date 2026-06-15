@@ -1,45 +1,14 @@
+#if defined(__ANDROID__) || defined(__linux__)
+
 //
 // Copyright 2016 Pixar
 //
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#if defined(__ANDROID__)
 
-#include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
 #include "Garch/glDebugWindow.h"
-
-PXR_NAMESPACE_OPEN_SCOPE
-
-// Android has no X11 event loop - these are intentional no-op stubs.
-// GL context management on Android is driven by the Android runtime
-// (GLSurfaceView / ANativeActivity), not by Garch's debug window.
-
-Garch_GLPlatformDebugWindow::Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w)
-    : _running(false), _callback(w),
-      _display(EGL_NO_DISPLAY), _window(EGL_NO_SURFACE), _glContext(EGL_NO_CONTEXT)
-{
-}
-
-void Garch_GLPlatformDebugWindow::Init(const char *, int, int, int)
-{
-}
-
-void Garch_GLPlatformDebugWindow::Run()
-{
-}
-
-void Garch_GLPlatformDebugWindow::ExitApp()
-{
-  _running = false;
-}
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
-#elif defined(__linux__)
-
-#include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
-#include "Garch/glDebugWindow.h"
+#include "Garch/glPlatformDebugWindowGLX.h"
 #include "Garch/glPlatformDebugContext.h"
 
 #include "Arch/defines.h"
@@ -47,201 +16,196 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-typedef GLXContext (*GLXCREATECONTEXTATTRIBSARBPROC)(
-    Display *, GLXFBConfig, GLXContext, Bool, const int *);
+
+typedef GLXContext (*GLXCREATECONTEXTATTRIBSARBPROC)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 // ---------------------------------------------------------------------------
 
 Garch_GLPlatformDebugWindow::Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w)
-    : _running(false), _callback(w), _display(NULL), _glContext(NULL)
+    : _running(false)
+    , _callback(w)
+    , _display(NULL)
+    , _glContext(NULL)
 {
 }
 
-void Garch_GLPlatformDebugWindow::Init(const char *title, int width, int height, int nSamples)
+void
+Garch_GLPlatformDebugWindow::Init(const char *title,
+                                  int width, int height, int nSamples)
 {
-  int attrib[] = {GLX_RENDER_TYPE,
-                  GLX_RGBA_BIT,
-                  GLX_DRAWABLE_TYPE,
-                  GLX_WINDOW_BIT,
-                  GLX_DOUBLEBUFFER,
-                  True,
-                  GLX_RED_SIZE,
-                  8,
-                  GLX_GREEN_SIZE,
-                  8,
-                  GLX_BLUE_SIZE,
-                  8,
-                  GLX_DEPTH_SIZE,
-                  24,
-                  GLX_SAMPLE_BUFFERS,
-                  (nSamples > 1 ? 1 : 0),
-                  GLX_SAMPLES,
-                  nSamples,
-                  None};
+    int attrib[] = {
+        GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        GLX_DOUBLEBUFFER, True,
+        GLX_RED_SIZE, 8,
+        GLX_GREEN_SIZE, 8,
+        GLX_BLUE_SIZE, 8,
+        GLX_DEPTH_SIZE, 24,
+        GLX_SAMPLE_BUFFERS, (nSamples > 1 ? 1 : 0),
+        GLX_SAMPLES, nSamples,
+        None
+    };
 
-  _display = XOpenDisplay(NULL);
-  int screen = DefaultScreen(_display);
-  Window root = RootWindow(_display, screen);
+    _display = XOpenDisplay(NULL);
+    int screen = DefaultScreen(_display);
+    Window root = RootWindow(_display, screen);
 
-  // X window
-  int fbcount;
-  GLXFBConfig *fbc = glXChooseFBConfig(_display, screen, attrib, &fbcount);
-  if (!fbc) {
-    TF_FATAL_ERROR("glXChooseFBConfig failed");
-    exit(1);
-  }
+    // X window
+    int fbcount;
+    GLXFBConfig *fbc = glXChooseFBConfig(_display, screen, attrib, &fbcount);
+    if (!fbc) {
+        TF_FATAL_ERROR("glXChooseFBConfig failed");
+        exit(1);
+    }
 
-  XVisualInfo *visinfo = glXGetVisualFromFBConfig(_display, fbc[0]);
-  if (!visinfo) {
-    TF_FATAL_ERROR("glXGetVisualFromFBConfig failed");
-    exit(1);
-  }
+    XVisualInfo *visinfo = glXGetVisualFromFBConfig(_display, fbc[0]);
+    if (!visinfo) {
+        TF_FATAL_ERROR("glXGetVisualFromFBConfig failed");
+        exit(1);
+    }
 
-  XSetWindowAttributes attr;
-  attr.background_pixel = 0;
-  attr.border_pixel = 0;
-  attr.colormap = XCreateColormap(_display, root, visinfo->visual, AllocNone);
-  attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask | KeyReleaseMask |
-                    PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
+    XSetWindowAttributes attr;
+    attr.background_pixel = 0;
+    attr.border_pixel = 0;
+    attr.colormap = XCreateColormap(_display, root, visinfo->visual, AllocNone);
+    attr.event_mask =
+        StructureNotifyMask | ExposureMask | KeyPressMask | KeyReleaseMask |
+        PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
 
-  _window = XCreateWindow(_display,
-                          root,
-                          0,
-                          0,
-                          width,
-                          height,
-                          0,
-                          visinfo->depth,
-                          InputOutput,
-                          visinfo->visual,
-                          CWBackPixel | CWBorderPixel | CWColormap | CWEventMask,
-                          &attr);
-  XStoreName(_display, _window, title);
+    _window = XCreateWindow(_display, root, 0, 0,
+                            width, height, 0,
+                            visinfo->depth,
+                            InputOutput,
+                            visinfo->visual,
+                            CWBackPixel|CWBorderPixel|CWColormap|CWEventMask,
+                            &attr);
+    XStoreName(_display, _window, title);
 
-  // GL context
-  GLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = (GLXCREATECONTEXTATTRIBSARBPROC)
-      glXGetProcAddress((const GLubyte *)"glXCreateContextAttribsARB");
+    // GL context
+    GLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB
+        = (GLXCREATECONTEXTATTRIBSARBPROC) glXGetProcAddress(
+            (const GLubyte*)"glXCreateContextAttribsARB");
 
-  int attribs[] = {0};
-  GLXContext tmpCtx = glXCreateContextAttribsARB(_display, fbc[0], 0, true, attribs);
-  glXMakeCurrent(_display, _window, tmpCtx);
+    int attribs[] = { 0 };
+    GLXContext tmpCtx = glXCreateContextAttribsARB(_display, fbc[0], 0, true, attribs);
+    glXMakeCurrent(_display, _window, tmpCtx);
 
-  if (GarchGLPlatformDebugContext::IsEnabledDebugOutput()) {
-    // switch to the debug context
-    _glDebugContext = GarchGLPlatformDebugContext::New(4, 5, true, true);
-    _glDebugContext->makeCurrent();
-    glXDestroyContext(_display, tmpCtx);
-  }
-  else {
-    // continue to use the GL context
-    _glContext = tmpCtx;
-  }
+    if (GarchGLPlatformDebugContext::IsEnabledDebugOutput()) {
+        // switch to the debug context
+        _glDebugContext = GarchGLPlatformDebugContext::New(4, 5, true, true);
+        _glDebugContext->makeCurrent();
+        glXDestroyContext(_display, tmpCtx);
+    } else {
+        // continue to use the GL context
+        _glContext = tmpCtx;
+    }
 
-  _callback->OnInitializeGL();
+    _callback->OnInitializeGL();
 }
 
-static int Garch_GetButton(unsigned int button)
+static int
+Garch_GetButton(unsigned int button)
 {
-  if (button == Button1)
-    return GarchGLDebugWindow::MyButton1;
-  else if (button == Button2)
-    return GarchGLDebugWindow::MyButton2;
-  else if (button == Button3)
-    return GarchGLDebugWindow::MyButton3;
-  return 0;
+    if (button == Button1) return GarchGLDebugWindow::MyButton1;
+    else if (button == Button2) return GarchGLDebugWindow::MyButton2;
+    else if (button == Button3) return GarchGLDebugWindow::MyButton3;
+    return 0;
 }
 
-static int Garch_GetModifierKeys(int state)
+static int
+Garch_GetModifierKeys(int state)
 {
-  int keys = 0;
-  if (state & ShiftMask)
-    keys |= GarchGLDebugWindow::Shift;
-  if (state & ControlMask)
-    keys |= GarchGLDebugWindow::Ctrl;
-  if (state & Mod1Mask)
-    keys |= GarchGLDebugWindow::Alt;
-  return keys;
+    int keys = 0;
+    if (state & ShiftMask)   keys |= GarchGLDebugWindow::Shift;
+    if (state & ControlMask) keys |= GarchGLDebugWindow::Ctrl;
+    if (state & Mod1Mask)    keys |= GarchGLDebugWindow::Alt;
+    return keys;
 }
 
-void Garch_GLPlatformDebugWindow::Run()
+void
+Garch_GLPlatformDebugWindow::Run()
 {
-  if (!_display)
-    return;
+    if (!_display) return;
 
-  XMapWindow(_display, _window);
+    XMapWindow(_display, _window);
 
-  _running = true;
-  XEvent event;
+    _running = true;
+    XEvent event;
 
-  while (_running) {
-    while (XPending(_display)) {
+    while (_running) {
+        while (XPending(_display)) {
 
-      XNextEvent(_display, &event);
+            XNextEvent(_display, &event);
 
-      switch (event.type) {
-        case Expose:
-          break;
-        case ConfigureNotify:
-          _callback->OnResize(event.xconfigure.width, event.xconfigure.height);
-          break;
-        case ButtonPress:
-          _callback->OnMousePress(Garch_GetButton(event.xbutton.button),
-                                  event.xbutton.x,
-                                  event.xbutton.y,
-                                  Garch_GetModifierKeys(event.xbutton.state));
-          break;
-        case ButtonRelease:
-          _callback->OnMouseRelease(Garch_GetButton(event.xbutton.button),
-                                    event.xbutton.x,
-                                    event.xbutton.y,
-                                    Garch_GetModifierKeys(event.xbutton.state));
-          break;
-        case MotionNotify:
-          _callback->OnMouseMove(
-              event.xmotion.x, event.xmotion.y, Garch_GetModifierKeys(event.xbutton.state));
-          break;
-        case KeyRelease: {
-          char key;
-          XLookupString(&event.xkey, &key, 1, NULL, NULL);
-          _callback->OnKeyRelease(key);
-          break;
+            switch(event.type) {
+            case Expose:
+                break;
+            case ConfigureNotify:
+                _callback->OnResize(event.xconfigure.width,
+                                    event.xconfigure.height);
+                break;
+            case ButtonPress:
+                _callback->OnMousePress(
+                    Garch_GetButton(event.xbutton.button),
+                    event.xbutton.x,
+                    event.xbutton.y,
+                    Garch_GetModifierKeys(event.xbutton.state));
+                break;
+            case ButtonRelease:
+                _callback->OnMouseRelease(
+                    Garch_GetButton(event.xbutton.button),
+                    event.xbutton.x,
+                    event.xbutton.y,
+                    Garch_GetModifierKeys(event.xbutton.state));
+                break;
+            case MotionNotify:
+                _callback->OnMouseMove(
+                    event.xmotion.x, event.xmotion.y,
+                    Garch_GetModifierKeys(event.xbutton.state));
+                break;
+            case KeyRelease:
+            {
+                char key;
+                XLookupString(&event.xkey, &key, 1, NULL, NULL);
+                _callback->OnKeyRelease(key);
+                break;
+            }
+            }
         }
-      }
+        if (_glDebugContext) {
+            _glDebugContext->makeCurrent();
+        } else {
+            glXMakeCurrent(_display, _window, _glContext);
+        }
+
+        // XXX: this should be constant interval
+        _callback->OnIdle();
+
+        _callback->OnPaintGL();
+
+        glFinish();
+        glXSwapBuffers(_display, _window);
     }
+
+    _callback->OnUninitializeGL();
+
+    glXMakeCurrent(_display, 0, 0);
     if (_glDebugContext) {
-      _glDebugContext->makeCurrent();
+        _glDebugContext.Reset();
+    } else {
+        glXDestroyContext(_display, _glContext);
     }
-    else {
-      glXMakeCurrent(_display, _window, _glContext);
-    }
-
-    // XXX: this should be constant interval
-    _callback->OnIdle();
-
-    _callback->OnPaintGL();
-
-    glFinish();
-    glXSwapBuffers(_display, _window);
-  }
-
-  _callback->OnUninitializeGL();
-
-  glXMakeCurrent(_display, 0, 0);
-  if (_glDebugContext) {
-    _glDebugContext.Reset();
-  }
-  else {
-    glXDestroyContext(_display, _glContext);
-  }
-  XDestroyWindow(_display, _window);
-  XCloseDisplay(_display);
+    XDestroyWindow(_display, _window);
+    XCloseDisplay(_display);
 }
 
-void Garch_GLPlatformDebugWindow::ExitApp()
+void
+Garch_GLPlatformDebugWindow::ExitApp()
 {
-  _running = false;
+    _running = false;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
 
 #endif // defined(__ANDROID__) || defined(__linux__)

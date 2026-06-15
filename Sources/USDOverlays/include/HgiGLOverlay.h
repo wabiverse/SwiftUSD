@@ -14,6 +14,7 @@
 #define SWIFTUSD_SWIFTOVERLAY_HGI_GL_OVERLAY_H
 
 #include "HgiGL/hgi.h"
+#include "Vt/value.h"
 
 /// `HgiGL::CreateHgi()` registers the `shared_ptr` it creates in
 /// `Tf_SharedPtrRetainReleaseHelper<HgiGL>`'s side table with an initial

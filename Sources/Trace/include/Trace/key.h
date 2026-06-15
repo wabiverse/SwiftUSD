@@ -8,54 +8,51 @@
 #ifndef PXR_BASE_TRACE_KEY_H
 #define PXR_BASE_TRACE_KEY_H
 
-#include "Trace/staticKeyData.h"
 #include "pxr/pxrns.h"
+#include "Trace/staticKeyData.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class TraceKey
 ///
-/// A wrapper around a TraceStaticKeyData pointer that is stored in TraceEvent
+/// A wrapper around a TraceStaticKeyData pointer that is stored in TraceEvent 
 /// instances.
 ///
 class TraceKey {
- public:
-  /// Constructor.
-  constexpr TraceKey(const TraceStaticKeyData &data) : _ptr(&data) {}
+public:
+    /// Constructor.
+    constexpr TraceKey(const TraceStaticKeyData& data) : _ptr(&data) {}
 
-  /// Equality comparison.
-  bool operator==(const TraceKey &other) const
-  {
-    if (_ptr == other._ptr) {
-      return true;
+    /// Equality comparison.
+    bool operator == (const TraceKey& other) const {
+        if (_ptr == other._ptr) {
+            return true;
+        } else {
+            return *_ptr == *other._ptr;
+        }
     }
-    else {
-      return *_ptr == *other._ptr;
+
+    /// Hash function.
+    size_t Hash() const {
+        return reinterpret_cast<size_t>(_ptr)/sizeof(TraceStaticKeyData);
     }
-  }
 
-  /// Hash function.
-  size_t Hash() const
-  {
-    return reinterpret_cast<size_t>(_ptr) / sizeof(TraceStaticKeyData);
-  }
+    /// A Hash functor which may be used to store keys in a TfHashMap.
+    struct HashFunctor {
+        size_t operator()(const TraceKey& key) const {
+            return key.Hash();
+        }
+    };
 
-  /// A Hash functor which may be used to store keys in a TfHashMap.
-  struct HashFunctor {
-    size_t operator()(const TraceKey &key) const
-    {
-      return key.Hash();
-    }
-  };
+private:
+    const TraceStaticKeyData* _ptr;
 
- private:
-  const TraceStaticKeyData *_ptr;
-
-  // TraceCollection converts TraceKeys to TfTokens for visitors.
-  friend class TraceCollection;
+    // TraceCollection converts TraceKeys to TfTokens for visitors.
+    friend class TraceCollection;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TRACE_KEY_H
+#endif // PXR_BASE_TRACE_KEY_H

@@ -11,39 +11,56 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 // -------------------------------------------------------------------------- //
-// HdTask Definitions
+// HdTask Definitions 
 // -------------------------------------------------------------------------- //
 
-HdTask::HdTask(SdfPath const &id) : _id(id) {}
-
-HdTask::~HdTask() {}
-
-const TfTokenVector &HdTask::GetRenderTags() const
+HdTask::HdTask(SdfPath const& id)
+ : _id(id)
 {
-  static TfTokenVector EMPTY_SET;
+}
 
-  return EMPTY_SET;
+HdTask::~HdTask() = default;
+
+bool
+HdTask::IsConverged() const
+{
+    return true;
+}
+
+const TfTokenVector &
+HdTask::GetRenderTags() const
+{
+    static TfTokenVector EMPTY_SET;
+
+    return EMPTY_SET;
 }
 
 /// Returns the minimal set of dirty bits to place in the
 /// change tracker for use in the first sync of this prim.
 /// Typically this would be all dirty bits.
-HdDirtyBits HdTask::GetInitialDirtyBitsMask() const
+HdDirtyBits
+HdTask::GetInitialDirtyBitsMask() const
 {
-  return HdChangeTracker::DirtyParams | HdChangeTracker::DirtyCollection |
-         HdChangeTracker::DirtyRenderTags;
+    return HdChangeTracker::DirtyParams     |
+           HdChangeTracker::DirtyCollection |
+           HdChangeTracker::DirtyRenderTags;
 }
 
-bool HdTask::_HasTaskContextData(HdTaskContext const *ctx, TfToken const &id)
+bool
+HdTask::_HasTaskContextData(
+    HdTaskContext const* ctx,
+    TfToken const& id)
 {
-  HdTaskContext::const_iterator valueIt = ctx->find(id);
-  return (valueIt != ctx->cend());
+    HdTaskContext::const_iterator valueIt = ctx->find(id);
+    return (valueIt != ctx->cend());
 }
 
-TfTokenVector HdTask::_GetTaskRenderTags(HdSceneDelegate *delegate)
+TfTokenVector HdTask::_GetTaskRenderTags(HdSceneDelegate* delegate)
 {
-  return delegate->GetTaskRenderTags(GetId());
+    return delegate->GetTaskRenderTags(GetId());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

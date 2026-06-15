@@ -9,13 +9,11 @@
 
 /// \file ar/defaultResolver.h
 
+#include "pxr/pxrns.h"
 #include "Ar/api.h"
 #include "Ar/defaultResolverContext.h"
 #include "Ar/resolvedPath.h"
 #include "Ar/resolver.h"
-#include "pxr/pxrns.h"
-
-#include <Arch/swiftInterop.h>
 
 #include <memory>
 #include <string>
@@ -49,84 +47,97 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ArDefaultResolver supports creating an ArDefaultResolverContext via
 /// ArResolver::CreateContextFromString by passing a list of directories
 /// delimited by the platform's standard path separator.
-class ArDefaultResolver : public ArResolver {
- public:
-  AR_API
-  ArDefaultResolver() = default;
+class ArDefaultResolver
+    : public ArResolver
+{
+public:
+    AR_API 
+    ArDefaultResolver() = default;
 
-  AR_API
-  virtual ~ArDefaultResolver() = default;
+    AR_API 
+    virtual ~ArDefaultResolver() = default;
 
-  /// Set the default search path that will be used during asset
-  /// resolution. Calling this function will trigger a ResolverChanged
-  /// notification to be sent if the search path differs from the
-  /// currently set default value.
-  ///
-  /// The inital search path may be specified using via the environment
-  /// variable PXR_AR_DEFAULT_SEARCH_PATH. Calling this function will
-  /// override any path specified in this manner.
-  ///
-  /// This function is not thread-safe and should not be called concurrently
-  /// with any other ArResolver operations
-  AR_API
-  static void SetDefaultSearchPath(const std::vector<std::string> &searchPath);
+    /// Set the default search path that will be used during asset
+    /// resolution. Calling this function will trigger a ResolverChanged
+    /// notification to be sent if the search path differs from the
+    /// currently set default value.
+    ///
+    /// The inital search path may be specified using via the environment
+    /// variable PXR_AR_DEFAULT_SEARCH_PATH. Calling this function will
+    /// override any path specified in this manner.
+    ///
+    /// This function is not thread-safe and should not be called concurrently
+    /// with any other ArResolver operations
+    AR_API
+    static void SetDefaultSearchPath(
+        const std::vector<std::string>& searchPath);
 
- protected:
-  AR_API
-  std::string _CreateIdentifier(const std::string &assetPath,
-                                const ArResolvedPath &anchorAssetPath) const override;
+protected:
+    AR_API
+    std::string _CreateIdentifier(
+        const std::string& assetPath,
+        const ArResolvedPath& anchorAssetPath) const override;
 
-  AR_API
-  std::string _CreateIdentifierForNewAsset(const std::string &assetPath,
-                                           const ArResolvedPath &anchorAssetPath) const override;
+    AR_API
+    std::string _CreateIdentifierForNewAsset(
+        const std::string& assetPath,
+        const ArResolvedPath& anchorAssetPath) const override;
 
-  AR_API
-  ArResolvedPath _Resolve(const std::string &assetPath) const override;
+    AR_API
+    ArResolvedPath _Resolve(
+        const std::string& assetPath) const override;
 
-  AR_API
-  ArResolvedPath _ResolveForNewAsset(const std::string &assetPath) const override;
+    AR_API
+    ArResolvedPath _ResolveForNewAsset(
+        const std::string& assetPath) const override;
 
-  AR_API
-  ArResolverContext _CreateDefaultContext() const override;
+    AR_API
+    ArResolverContext _CreateDefaultContext() const override;
 
-  /// Creates a context that adds the directory containing \p assetPath
-  /// as a first directory to be searched, when the resulting context is
-  /// bound (\see ArResolverContextBinder).
-  ///
-  /// If \p assetPath is empty, returns an empty context; otherwise, if
-  /// \p assetPath is not an absolute filesystem path, it will first be
-  /// anchored to the process's current working directory.
-  AR_API
-  ArResolverContext _CreateDefaultContextForAsset(const std::string &assetPath) const override;
+    /// Creates a context that adds the directory containing \p assetPath
+    /// as a first directory to be searched, when the resulting context is
+    /// bound (\see ArResolverContextBinder).  
+    ///
+    /// If \p assetPath is empty, returns an empty context; otherwise, if
+    /// \p assetPath is not an absolute filesystem path, it will first be
+    /// anchored to the process's current working directory.
+    AR_API
+    ArResolverContext _CreateDefaultContextForAsset(
+        const std::string& assetPath) const override;
 
-  /// Creates an ArDefaultResolverContext from \p contextStr. This
-  /// string is expected to be a list of directories delimited by
-  /// the platform's standard path separator.
-  AR_API
-  ArResolverContext _CreateContextFromString(const std::string &contextStr) const override;
+    /// Creates an ArDefaultResolverContext from \p contextStr. This
+    /// string is expected to be a list of directories delimited by
+    /// the platform's standard path separator.
+    AR_API
+    ArResolverContext _CreateContextFromString(
+        const std::string& contextStr) const override;
 
-  AR_API
-  bool _IsContextDependentPath(const std::string &assetPath) const override;
+    AR_API
+    bool _IsContextDependentPath(
+        const std::string& assetPath) const override;
 
-  AR_API
-  ArTimestamp _GetModificationTimestamp(const std::string &path,
-                                        const ArResolvedPath &resolvedPath) const override;
+    AR_API
+    ArTimestamp _GetModificationTimestamp(
+        const std::string& path,
+        const ArResolvedPath& resolvedPath) const override;
 
-  AR_API
-  std::shared_ptr<ArAsset> _OpenAsset(const ArResolvedPath &resolvedPath) const override;
+    AR_API
+    std::shared_ptr<ArAsset> _OpenAsset(
+        const ArResolvedPath& resolvedPath) const override;
 
-  /// Creates an ArFilesystemWriteableAsset for the asset at the
-  /// given \p resolvedPath.
-  AR_API
-  std::shared_ptr<ArWritableAsset> _OpenAssetForWrite(const ArResolvedPath &resolvedPath,
-                                                      WriteMode writeMode) const override;
+    /// Creates an ArFilesystemWriteableAsset for the asset at the
+    /// given \p resolvedPath.
+    AR_API
+    std::shared_ptr<ArWritableAsset> _OpenAssetForWrite(
+        const ArResolvedPath& resolvedPath,
+        WriteMode writeMode) const override;
 
- private:
-  const ArDefaultResolverContext *_GetCurrentContextPtr() const;
+private:
+    const ArDefaultResolverContext* _GetCurrentContextPtr() const;
 
-  ArResolverContext _defaultContext;
-} SWIFT_IMMORTAL_REFERENCE;
+    ArResolverContext _defaultContext;
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_DEFAULT_RESOLVER_H
+#endif // PXR_USD_AR_DEFAULT_RESOLVER_H

@@ -7,11 +7,11 @@
 #ifndef PXR_IMAGING_HGIVULKAN_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGIVULKAN_COMPUTE_CMDS_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -19,70 +19,79 @@ struct HgiComputeCmdsDesc;
 class HgiVulkan;
 class HgiVulkanCommandBuffer;
 
+
 /// \class HgiVulkanComputeCmds
 ///
 /// OpenGL implementation of HgiComputeCmds.
 ///
-class HgiVulkanComputeCmds final : public HgiComputeCmds {
- public:
-  HGIVULKAN_API
-  ~HgiVulkanComputeCmds() override;
+class HgiVulkanComputeCmds final : public HgiComputeCmds
+{
+public:
+    HGIVULKAN_API
+    ~HgiVulkanComputeCmds() override;
 
-  HGIVULKAN_API
-  void PushDebugGroup(const char *label) override;
+    HGIVULKAN_API
+    void PushDebugGroup(const char* label,
+        const GfVec4f& color = s_computeDebugColor) override;
 
-  HGIVULKAN_API
-  void PopDebugGroup() override;
+    HGIVULKAN_API
+    void PopDebugGroup() override;
 
-  HGIVULKAN_API
-  void BindPipeline(HgiComputePipelineHandle pipeline) override;
+    HGIVULKAN_API
+    void InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color = s_markerDebugColor) override;
 
-  HGIVULKAN_API
-  void BindResources(HgiResourceBindingsHandle resources) override;
+    HGIVULKAN_API
+    void BindPipeline(HgiComputePipelineHandle pipeline) override;
 
-  HGIVULKAN_API
-  void SetConstantValues(HgiComputePipelineHandle pipeline,
-                         uint32_t bindIndex,
-                         uint32_t byteSize,
-                         const void *data) override;
+    HGIVULKAN_API
+    void BindResources(HgiResourceBindingsHandle resources) override;
 
-  HGIVULKAN_API
-  void Dispatch(int dimX, int dimY) override;
+    HGIVULKAN_API
+    void SetConstantValues(
+        HgiComputePipelineHandle pipeline,
+        uint32_t bindIndex,
+        uint32_t byteSize,
+        const void* data) override;
+    
+    HGIVULKAN_API
+    void Dispatch(int dimX, int dimY) override;
 
-  HGIVULKAN_API
-  void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
+    HGIVULKAN_API
+    void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
 
-  HGIVULKAN_API
-  HgiComputeDispatch GetDispatchMethod() const override;
+    HGIVULKAN_API
+    HgiComputeDispatch GetDispatchMethod() const override;
 
- protected:
-  friend class HgiVulkan;
+protected:
+    friend class HgiVulkan;
 
-  HGIVULKAN_API
-  HgiVulkanComputeCmds(HgiVulkan *hgi, HgiComputeCmdsDesc const &desc);
+    HGIVULKAN_API
+    HgiVulkanComputeCmds(HgiVulkan* hgi, HgiComputeCmdsDesc const& desc);
 
-  HGIVULKAN_API
-  bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
+    HGIVULKAN_API
+    bool _Submit(Hgi* hgi, HgiSubmitWaitType wait) override;
 
- private:
-  HgiVulkanComputeCmds() = delete;
-  HgiVulkanComputeCmds &operator=(const HgiVulkanComputeCmds &) = delete;
-  HgiVulkanComputeCmds(const HgiVulkanComputeCmds &) = delete;
+private:
+    HgiVulkanComputeCmds() = delete;
+    HgiVulkanComputeCmds & operator=(const HgiVulkanComputeCmds&) = delete;
+    HgiVulkanComputeCmds(const HgiVulkanComputeCmds&) = delete;
 
-  void _BindResources();
-  void _CreateCommandBuffer();
+    void _BindResources();
+    void _CreateCommandBuffer();
 
-  HgiVulkan *_hgi;
-  HgiVulkanCommandBuffer *_commandBuffer;
-  VkPipelineLayout _pipelineLayout;
-  HgiResourceBindingsHandle _resourceBindings;
-  bool _pushConstantsDirty;
-  uint8_t *_pushConstants;
-  uint32_t _pushConstantsByteSize;
-  GfVec3i _localWorkGroupSize;
+    HgiVulkan* _hgi;
+    HgiVulkanCommandBuffer* _commandBuffer;
+    VkPipelineLayout _pipelineLayout;
+    HgiResourceBindingsHandle _resourceBindings;
+    bool _pushConstantsDirty;
+    uint8_t* _pushConstants;
+    uint32_t _pushConstantsByteSize;
+    GfVec3i _localWorkGroupSize;
 
-  // Cmds is used only one frame so storing multi-frame state on will not
-  // survive.
+    // Cmds is used only one frame so storing multi-frame state on will not
+    // survive.
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -5,12 +5,12 @@
 // https://openusd.org/license.
 //
 
-#include "Arch/attributes.h"
-#include "Arch/systemInfo.h"
+#include "pxr/pxrns.h"
 #include "Tf/debug.h"
 #include "Tf/getenv.h"
 #include "Tf/mallocTag.h"
-#include "pxr/pxrns.h"
+#include "Arch/attributes.h"
+#include "Arch/systemInfo.h"
 
 #include <string>
 
@@ -20,29 +20,28 @@ extern void Tf_DebugInitFromEnvironment();
 
 namespace {
 
-ARCH_CONSTRUCTOR(Tf_InitConfig, 2, void)
+ARCH_CONSTRUCTOR(Tf_InitConfig, 2)
 {
-  std::string capture = TfGetenv("TF_MALLOC_TAG_CAPTURE");
-  std::string debug = TfGetenv("TF_MALLOC_TAG_DEBUG");
-  if (!capture.empty() || !debug.empty() || TfGetenvBool("TF_MALLOC_TAG", false)) {
-    std::string errMsg;
+    std::string capture = TfGetenv("TF_MALLOC_TAG_CAPTURE");
+    std::string debug   = TfGetenv("TF_MALLOC_TAG_DEBUG");
+    if (!capture.empty() || !debug.empty() ||
+        TfGetenvBool("TF_MALLOC_TAG", false)) {
+        std::string errMsg;
 
-    /*
-     * Only the most basic error output can be done this early...
-     */
-
-    if (!TfMallocTag::Initialize(&errMsg)) {
-      fprintf(stderr,
-              "%s: TF_MALLOC_TAG environment variable set, but\n"
-              "            malloc tag initialization failed: %s\n",
-              ArchGetExecutablePath().c_str(),
-              errMsg.c_str());
+        /*
+         * Only the most basic error output can be done this early...
+         */
+        
+        if (!TfMallocTag::Initialize(&errMsg)) {
+            fprintf(stderr, "%s: TF_MALLOC_TAG environment variable set, but\n"
+                    "            malloc tag initialization failed: %s\n",
+                    ArchGetExecutablePath().c_str(), errMsg.c_str());
+        }
+        else {
+            TfMallocTag::SetCapturedMallocStacksMatchList(capture);
+            TfMallocTag::SetDebugMatchList(debug);
+        }
     }
-    else {
-      TfMallocTag::SetCapturedMallocStacksMatchList(capture);
-      TfMallocTag::SetDebugMatchList(debug);
-    }
-  }
 }
 
 // Run this after registry functions execute.  This is only necessary because
@@ -50,11 +49,11 @@ ARCH_CONSTRUCTOR(Tf_InitConfig, 2, void)
 // descriptions and exits.  If we call this before registry functions were
 // executed we would not see any added inside TF_REGISTRY_FUNCTION, which is
 // most of them.
-ARCH_CONSTRUCTOR(Tf_InitConfigPost, 202, void)
+ARCH_CONSTRUCTOR(Tf_InitConfigPost, 202)
 {
-  Tf_DebugInitFromEnvironment();
+    Tf_DebugInitFromEnvironment();
 }
 
-}  // namespace
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

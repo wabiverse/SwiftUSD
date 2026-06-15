@@ -11,12 +11,12 @@
 /// \ingroup group_gf_LinearAlgebra
 /// Utility functions for GfVec4f and GfVec4d as homogeneous vectors
 
-#include "Gf/api.h"
+#include "pxr/pxrns.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4d.h"
 #include "Gf/vec4f.h"
-#include "pxr/pxrns.h"
+#include "Gf/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -45,18 +45,16 @@ GfVec4d GfHomogeneousCross(const GfVec4d &a, const GfVec4d &b);
 
 /// Projects homogeneous \p v into Euclidean space and returns the result as a
 /// Vec3f.
-inline GfVec3f GfProject(const GfVec4f &v)
-{
-  float inv = (v[3] != 0.0f) ? 1.0f / v[3] : 1.0f;
-  return GfVec3f(inv * v[0], inv * v[1], inv * v[2]);
+inline GfVec3f GfProject(const GfVec4f &v) {
+    float inv = (v[3] != 0.0f) ? 1.0f/v[3] : 1.0f;
+    return GfVec3f(inv * v[0], inv * v[1], inv * v[2]);
 }
 
 /// Projects homogeneous \p v into Euclidean space and returns the result as a
 /// Vec3d.
-inline GfVec3d GfProject(const GfVec4d &v)
-{
-  double inv = (v[3] != 0.0) ? 1.0 / v[3] : 1.0;
-  return GfVec3d(inv * v[0], inv * v[1], inv * v[2]);
+inline GfVec3d GfProject(const GfVec4d &v) {
+    double inv = (v[3] != 0.0) ? 1.0/v[3] : 1.0;
+    return GfVec3d(inv * v[0], inv * v[1], inv * v[2]);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

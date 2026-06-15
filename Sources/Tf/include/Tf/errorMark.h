@@ -9,10 +9,10 @@
 
 /// \file tf/errorMark.h
 
-#include "Tf/api.h"
+#include "pxr/pxrns.h"
 #include "Tf/diagnosticMgr.h"
 #include "Tf/errorTransport.h"
-#include "pxr/pxrns.h"
+#include "Tf/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -44,138 +44,129 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///      }
 /// \endcode
 ///
-class TfErrorMark {
-  TfErrorMark(const TfErrorMark &) = delete;
-  TfErrorMark &operator=(const TfErrorMark &) = delete;
+class TfErrorMark
+{
+    TfErrorMark(const TfErrorMark&) = delete;
+    TfErrorMark& operator=(const TfErrorMark&) = delete;
+  public:
 
- public:
-  typedef TfDiagnosticMgr::ErrorIterator Iterator;
+    typedef TfDiagnosticMgr::ErrorIterator Iterator;
+    
+    /// Default constructor.
+    ///
+    /// The default constructor automatically calls \c SetMark() at the point
+    /// of declaration.
+    TF_API TfErrorMark();
 
-  /// Default constructor.
-  ///
-  /// The default constructor automatically calls \c SetMark() at the point
-  /// of declaration.
-  TF_API TfErrorMark();
+    /// Destroy this ErrorMark.
+    ///
+    /// If this is the last ErrorMark on this thread of execution and there
+    /// are pending errors, this will report them via the diagnostic delegate
+    /// (if one is installed) otherwise by printing to stderr.
+    TF_API ~TfErrorMark();
 
-  /// Destroy this ErrorMark.
-  ///
-  /// If this is the last ErrorMark on this thread of execution and there
-  /// are pending errors, this will report them via the diagnostic delegate
-  /// (if one is installed) otherwise by printing to stderr.
-  TF_API ~TfErrorMark();
-
-  /// Record future errors.
-  ///
-  /// \c SetMark() arranges to record future errors in \c *this.
-  inline void SetMark()
-  {
-    _mark = TfDiagnosticMgr::GetInstance()._nextSerial;
-  }
-
-  /// Return true if no new errors were posted in this thread since the last
-  /// call to \c SetMark(), false otherwise.
-  ///
-  /// When no threads are issuing errors the cost of this function is an
-  /// atomic integer read and comparison.  Otherwise thread-specific data is
-  /// accessed to make the determination.  Thus, this function is fast when
-  /// diagnostics are not being issued.
-  inline bool IsClean() const
-  {
-    TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
-    return _mark >= mgr._nextSerial || _IsCleanImpl(mgr);
-  }
-
-  /// Remove all errors in this mark from the error system.  Return true if
-  /// any errors were cleared, false if there were no errors in this mark.
-  ///
-  /// Clear all errors contained in this mark from the error system.
-  /// Subsequently, these errors will be considered handled.
-  inline bool Clear() const
-  {
-    TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
-    auto b = GetBegin(), e = mgr.GetErrorEnd();
-    if (b != e) {
-      mgr.EraseRange(b, e);
-      return true;
+    /// Record future errors.
+    ///
+    /// \c SetMark() arranges to record future errors in \c *this.
+    inline void SetMark() {
+        _mark = TfDiagnosticMgr::GetInstance()._nextSerial;
     }
-    return false;
-  }
 
-  /// Remove all errors in this mark fom the error system and return them in
-  /// a TfErrorTransport.
-  ///
-  /// This can be used to transfer errors from one thread to another.  See
-  /// TfErrorTransport for more information.  As with Clear(), all the
-  /// removed errors are considered handled for this thread.  See also
-  /// TransportTo().
-  inline TfErrorTransport Transport() const
-  {
-    TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
-    return TfErrorTransport(mgr._errorList.local(), GetBegin(), mgr.GetErrorEnd());
-  }
+    /// Return true if no new errors were posted in this thread since the last
+    /// call to \c SetMark(), false otherwise.
+    ///
+    /// When no threads are issuing errors the cost of this function is an
+    /// atomic integer read and comparison.  Otherwise thread-specific data is
+    /// accessed to make the determination.  Thus, this function is fast when
+    /// diagnostics are not being issued.
+    inline bool IsClean() const {
+        TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
+        return _mark >= mgr._nextSerial || _IsCleanImpl(mgr);
+    }
 
-  /// Remove all errors in this mark fom the error system and return them in
-  /// a TfErrorTransport.
-  ///
-  /// This is a variant of Transport().  Instead of returning a new
-  /// TfErrorTransport object it fills an existing one.
-  inline void TransportTo(TfErrorTransport &dest) const
-  {
-    Transport().swap(dest);
-  }
+    /// Remove all errors in this mark from the error system.  Return true if
+    /// any errors were cleared, false if there were no errors in this mark.
+    ///
+    /// Clear all errors contained in this mark from the error system.
+    /// Subsequently, these errors will be considered handled.
+    inline bool Clear() const {
+        TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
+        auto b = GetBegin(), e = mgr.GetErrorEnd();
+        if (b != e) {
+            mgr.EraseRange(b, e);
+            return true;
+        }
+        return false;
+    }
 
-  /// Return an iterator to the first error added to the error list after
-  /// \c SetMark().
-  ///
-  /// If there are no errors on the error list that were not already present
-  /// when \c SetMark() was called, the iterator returned is equal to the
-  /// iterator returned by \c TfDiagnosticMgr::GetErrorEnd(). Otherwise, the
-  /// iterator points to the earliest error added to the list since
-  /// \c SetMark() was called.
-  ///
-  /// This function takes O(n) time where n is the number of errors from the
-  /// end of the list to the mark i.e. \c GetMark() walks the list from the
-  /// end until it finds the mark and then returns an iterator to that spot.
-  ///
-  /// If \c nErrors is non-NULL, then \c *nErrors is set to the number of
-  /// errors between the returned iterator and the end of the list.
-  Iterator GetBegin(size_t *nErrors = 0) const
-  {
-    return TfDiagnosticMgr::GetInstance()._GetErrorMarkBegin(_mark, nErrors);
-  }
+    /// Remove all errors in this mark fom the error system and return them in
+    /// a TfErrorTransport.
+    /// 
+    /// This can be used to transfer errors from one thread to another.  See
+    /// TfErrorTransport for more information.  As with Clear(), all the
+    /// removed errors are considered handled for this thread.  See also
+    /// TransportTo().
+    inline TfErrorTransport Transport() const {
+        TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
+        return TfErrorTransport(mgr._errorList.local(),
+                                GetBegin(), mgr.GetErrorEnd());
+    }
 
-  /// Return an iterator past the last error in the error system.
-  ///
-  /// This iterator is always equivalent to the iterator returned by \c
-  /// TfDiagnosticMgr::GetErrorEnd().
-  Iterator GetEnd() const
-  {
-    return TfDiagnosticMgr::GetInstance().GetErrorEnd();
-  }
+    /// Remove all errors in this mark fom the error system and return them in
+    /// a TfErrorTransport.
+    /// 
+    /// This is a variant of Transport().  Instead of returning a new
+    /// TfErrorTransport object it fills an existing one.
+    inline void TransportTo(TfErrorTransport &dest) const {
+        Transport().swap(dest);
+    }
 
-  /// Equivalent to GetBegin()
-  Iterator begin() const
-  {
-    return GetBegin();
-  }
+    /// Return an iterator to the first error added to the error list after
+    /// \c SetMark().
+    ///
+    /// If there are no errors on the error list that were not already present
+    /// when \c SetMark() was called, the iterator returned is equal to the
+    /// iterator returned by \c TfDiagnosticMgr::GetErrorEnd(). Otherwise, the
+    /// iterator points to the earliest error added to the list since
+    /// \c SetMark() was called.
+    ///
+    /// This function takes O(n) time where n is the number of errors from the
+    /// end of the list to the mark i.e. \c GetMark() walks the list from the
+    /// end until it finds the mark and then returns an iterator to that spot.
+    ///
+    /// If \c nErrors is non-NULL, then \c *nErrors is set to the number of
+    /// errors between the returned iterator and the end of the list.
+    Iterator GetBegin(size_t *nErrors = 0) const {
+        return
+            TfDiagnosticMgr::GetInstance()._GetErrorMarkBegin(_mark, nErrors);
+    }
 
-  /// Equivalent to GetEnd()
-  Iterator end() const
-  {
-    return GetEnd();
-  }
+    /// Return an iterator past the last error in the error system.
+    ///
+    /// This iterator is always equivalent to the iterator returned by \c
+    /// TfDiagnosticMgr::GetErrorEnd().
+    Iterator GetEnd() const {
+        return TfDiagnosticMgr::GetInstance().GetErrorEnd();
+    }
 
- private:
-  friend class TfDiagnosticMgr;
+    /// Equivalent to GetBegin()
+    Iterator begin() const { return GetBegin(); }
 
-  // Helper to check if the _mark identifies any errors present on the
-  // thread-local error list.
-  TF_API bool _IsCleanImpl(TfDiagnosticMgr &mgr) const;
+    /// Equivalent to GetEnd()
+    Iterator end() const { return GetEnd(); }
+    
+  private:
+    friend class TfDiagnosticMgr;
 
-  void _ReportErrors(TfDiagnosticMgr &mgr) const;
+    // Helper to check if the _mark identifies any errors present on the
+    // thread-local error list.
+    TF_API bool _IsCleanImpl(TfDiagnosticMgr &mgr) const;
 
-  size_t _mark;
+    void _ReportErrors(TfDiagnosticMgr &mgr) const;
+
+    size_t _mark;
 };
+
 
 /// Convenience macro to check if errors occurred.
 ///
@@ -192,7 +183,8 @@ class TfErrorMark {
 ///
 /// \ingroup group_tf_TfError
 /// \hideinitializer
-#define TF_HAS_ERRORS(marker, expr) (marker.SetMark(), (expr), !marker.IsClean())
+#define TF_HAS_ERRORS(marker, expr) \
+        (marker.SetMark(), (expr), !marker.IsClean())
 
 /// Report current TfErrorMark instances and the stack traces that created
 /// them to stdout for debugging purposes.
@@ -206,4 +198,4 @@ void TfReportActiveErrorMarks();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_ERROR_MARK_H
+#endif // PXR_BASE_TF_ERROR_MARK_H

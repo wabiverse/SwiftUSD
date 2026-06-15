@@ -10,14 +10,15 @@
 #define DOUBLE_MULT_OPERATOR
 #define DOUBLE_DIV_OPERATOR
 
-#include "Tf/preprocessorUtilsLite.h"
+#include "pxr/pxrns.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/wrapArray.h"
-#include "pxr/pxrns.h"
+#include "Vt/wrapArrayEdit.h"
+#include "Tf/preprocessorUtilsLite.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayQuaternion()
-{
-  TF_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY, ~, VT_QUATERNION_VALUE_TYPES);
+void wrapArrayQuaternion() {
+    TF_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY, ~, VT_QUATERNION_VALUE_TYPES);
+    TF_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY_EDIT, ~, VT_QUATERNION_VALUE_TYPES);
 }

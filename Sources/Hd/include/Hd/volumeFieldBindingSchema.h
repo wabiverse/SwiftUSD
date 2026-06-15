@@ -32,69 +32,76 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_VOLUME_FIELD_BINDING_SCHEMA_TOKENS (volumeFieldBinding)
+#define HD_VOLUME_FIELD_BINDING_SCHEMA_TOKENS \
+    (volumeFieldBinding) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdVolumeFieldBindingSchemaTokens,
-                         HD_API,
-                         HD_VOLUME_FIELD_BINDING_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdVolumeFieldBindingSchemaTokens, HD_API,
+    HD_VOLUME_FIELD_BINDING_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdVolumeFieldBindingSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdVolumeFieldBindingSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdVolumeFieldBindingSchema
+///
+class HdVolumeFieldBindingSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "volumeFieldBinding" from the parent container and constructs a
-  /// HdVolumeFieldBindingSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdVolumeFieldBindingSchema GetFromParent(
-      const HdContainerDataSourceHandle &fromParentContainer);
+    HdVolumeFieldBindingSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
+    /// Retrieves a container data source with the schema's default name token
+    /// "volumeFieldBinding" from the parent container and constructs a
+    /// HdVolumeFieldBindingSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
+    HD_API
+    static HdVolumeFieldBindingSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  TfTokenVector GetVolumeFieldBindingNames() const;
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  HdPathDataSourceHandle GetVolumeFieldBinding(const TfToken &name) const;
+    HD_API
+    TfTokenVector GetVolumeFieldBindingNames() const;
 
-  /// @}
+    HD_API
+    HdPathDataSourceHandle GetVolumeFieldBinding(const TfToken &name) const; 
 
-  /// \name Schema location
-  /// @{
+    /// @}
 
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
+    /// \name Schema location
+    /// @{
 
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
 
-  /// @}
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
 
-  /// \name Schema construction
-  /// @{
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(size_t count,
-                                                   const TfToken *names,
-                                                   const HdDataSourceBaseHandle *values);
+    /// @} 
 
-  /// @}
+    /// \name Schema construction
+    /// @{
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        size_t count,
+        const TfToken *names,
+        const HdDataSourceBaseHandle *values);
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

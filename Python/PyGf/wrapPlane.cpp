@@ -5,93 +5,109 @@
 // https://openusd.org/license.
 //
 
-#include "Gf/matrix4d.h"
-#include "Gf/plane.h"
-#include "Gf/range3d.h"
 #include "pxr/pxrns.h"
+#include "Gf/plane.h"
+#include "Gf/matrix4d.h"
+#include "Gf/range3d.h"
 
-#include "Tf/pyContainerConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Tf/pyContainerConversions.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/copy_const_reference.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/return_arg.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/copy_const_reference.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/return_arg.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <string>
-
-using namespace boost::python;
 
 using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static string _Repr(GfPlane const &self)
-{
-  return TF_PY_REPR_PREFIX + "Plane(" + TfPyRepr(self.GetNormal()) + ", " +
-         TfPyRepr(self.GetDistanceFromOrigin()) + ")";
+static string _Repr(GfPlane const &self) {
+    return TF_PY_REPR_PREFIX + "Plane(" + TfPyRepr(self.GetNormal()) + ", " +
+        TfPyRepr(self.GetDistanceFromOrigin()) + ")";
 }
 
-static object _FitPlaneToPoints(const std::vector<GfVec3d> &points)
-{
-  GfPlane plane;
-  return GfFitPlaneToPoints(points, &plane) ? object(plane) : object();
+static object _FitPlaneToPoints(const std::vector<GfVec3d>& points) {
+    GfPlane plane;
+    return GfFitPlaneToPoints(points, &plane) ? object(plane) : object();
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapPlane()
-{
-  typedef GfPlane This;
+{    
+    typedef GfPlane This;
 
-  object getNormal = make_function(&This::GetNormal, return_value_policy<return_by_value>());
+    object getNormal = make_function(&This::GetNormal,
+                                     return_value_policy<return_by_value>());
 
-  def("FitPlaneToPoints", _FitPlaneToPoints);
+    def( "FitPlaneToPoints", _FitPlaneToPoints );
 
-  class_<This>("Plane", init<>())
-      .def(init<const GfVec3d &, double>())
-      .def(init<const GfVec3d &, const GfVec3d &>())
-      .def(init<const GfVec3d &, const GfVec3d &, const GfVec3d &>())
-      .def(init<const GfVec4d &>())
+    class_<This>( "Plane", init<>() )
+        .def(init< const GfVec3d &, double >())
+        .def(init< const GfVec3d &, const GfVec3d & >())
+        .def(init< const GfVec3d &, const GfVec3d &, const GfVec3d & >())
+        .def(init< const GfVec4d & >())
 
-      .def(TfTypePythonClass())
+        .def( TfTypePythonClass() )
 
-      .def("Set", (void(This::*)(const GfVec3d &, double)) & This::Set, return_self<>())
-      .def("Set", (void(This::*)(const GfVec3d &, const GfVec3d &)) & This::Set, return_self<>())
-      .def("Set",
-           (void(This::*)(const GfVec3d &, const GfVec3d &, const GfVec3d &)) & This::Set,
-           return_self<>())
-      .def("Set", (void(This::*)(const GfVec4d &)) & This::Set, return_self<>())
+        .def("Set", (void (This::*)(const GfVec3d &, double))
+             &This::Set, return_self<>())
+        .def("Set", (void (This::*)(const GfVec3d &, const GfVec3d &))
+             &This::Set, return_self<>())
+        .def("Set", (void (This::*)( const GfVec3d &, const GfVec3d &,
+                                     const GfVec3d & ))
+             &This::Set, return_self<>())
+        .def("Set", (void (This::*)(const GfVec4d &))
+             &This::Set, return_self<>())
 
-      .add_property("normal", getNormal)
-      .add_property("distanceFromOrigin", &This::GetDistanceFromOrigin)
+        .add_property( "normal", getNormal)
+        .add_property( "distanceFromOrigin", &This::GetDistanceFromOrigin )
 
-      .def("GetDistance", &This::GetDistance)
-      .def("GetDistanceFromOrigin", &This::GetDistanceFromOrigin)
-      .def("GetNormal", getNormal)
-      .def("GetEquation", &This::GetEquation)
-      .def("Project", &This::Project)
+        .def( "GetDistance", &This::GetDistance )
+        .def( "GetDistanceFromOrigin", &This::GetDistanceFromOrigin )
+        .def( "GetNormal", getNormal)
+        .def( "GetEquation", &This::GetEquation )
+        .def( "Project", &This::Project )
 
-      .def("Transform", &This::Transform, return_self<>())
+        .def( "Transform", &This::Transform, return_self<>() )
 
-      .def("Reorient", &This::Reorient, return_self<>())
+        .def( "Reorient", &This::Reorient, return_self<>() )
 
-      .def("IntersectsPositiveHalfSpace",
-           (bool(This::*)(const GfRange3d &) const) & This::IntersectsPositiveHalfSpace)
+        .def( "IntersectsPositiveHalfSpace",
+              (bool (This::*)( const GfRange3d & ) const)
+              &This::IntersectsPositiveHalfSpace )
 
-      .def("IntersectsPositiveHalfSpace",
-           (bool(This::*)(const GfVec3d &) const) & This::IntersectsPositiveHalfSpace)
+        .def( "IntersectsPositiveHalfSpace",
+              (bool (This::*)( const GfVec3d & ) const)
+              &This::IntersectsPositiveHalfSpace )
 
-      .def(str(self))
-      .def(self == self)
-      .def(self != self)
+        .def( str(self) )
+        .def( self == self )
+        .def( self != self )
 
-      .def("__repr__", _Repr)
-
-      ;
-  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
+        .def("__repr__", _Repr)
+        
+        ;
+    to_python_converter<std::vector<This>,
+        TfPySequenceToPython<std::vector<This> > >();
+    
 }

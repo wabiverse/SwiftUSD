@@ -4,73 +4,83 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Usd/schemaBase.h"
 #include "Usd/typed.h"
+#include "Usd/schemaBase.h"
 
 #include "Sdf/primSpec.h"
 
+#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "Usd/pyConversions.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <string>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
-#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM                                                     \
+    template <class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-static std::string _Repr(const UsdTyped &self)
+
+static std::string
+_Repr(const UsdTyped &self)
 {
-  std::string primRepr = TfPyRepr(self.GetPrim());
-  return TfStringPrintf("Usd.Typed(%s)", primRepr.c_str());
+    std::string primRepr = TfPyRepr(self.GetPrim());
+    return TfStringPrintf(
+        "Usd.Typed(%s)",
+        primRepr.c_str());
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
 void wrapUsdTyped()
 {
-  typedef UsdTyped This;
+    typedef UsdTyped This;
 
-  class_<This, bases<UsdSchemaBase>> cls("Typed");
+    class_<This, bases<UsdSchemaBase> >
+        cls("Typed");
 
-  cls.def(init<UsdPrim>(arg("prim")))
-      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
-      .def(TfTypePythonClass())
+    cls
+        .def(init<UsdPrim>(arg("prim")))
+        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
+        .def(TfTypePythonClass())
 
-      .def("Get", &This::Get, (arg("stage"), arg("path")))
-      .staticmethod("Get")
+        .def("Get", &This::Get, (arg("stage"), arg("path")))
+        .staticmethod("Get")
 
-      .def("GetSchemaAttributeNames",
-           &This::GetSchemaAttributeNames,
-           arg("includeInherited") = true,
-           return_value_policy<TfPySequenceToList>())
-      .staticmethod("GetSchemaAttributeNames")
+        .def("GetSchemaAttributeNames",
+             &This::GetSchemaAttributeNames,
+             arg("includeInherited")=true,
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType",
-           (TfType const &(*)())TfType::Find<This>,
-           return_value_policy<return_by_value>())
-      .staticmethod("_GetStaticTfType")
+        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
+             return_value_policy<return_by_value>())
+        .staticmethod("_GetStaticTfType")
 
-      .def(!self)
+        .def(!self)
 
-      .def("__repr__", ::_Repr);
 
-  _CustomWrapCode(cls);
+        .def("__repr__", ::_Repr)
+    ;
+
+    _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by
+// Feel free to add custom code below this line, it will be preserved by 
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -81,7 +91,7 @@ void wrapUsdTyped()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-//
+// 
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
@@ -90,6 +100,7 @@ void wrapUsdTyped()
 
 namespace {
 
-WRAP_CUSTOM {}
+WRAP_CUSTOM {
+}
 
-}  // namespace
+}

@@ -16,6 +16,7 @@
 #if __APPLE__
 
 #include "HgiMetal/hgi.h"
+#include "Vt/value.h"
 
 /// `HgiMetal::CreateHgi()` registers the `shared_ptr` it creates in
 /// `Tf_SharedPtrRetainReleaseHelper<HgiMetal>`'s side table with an initial

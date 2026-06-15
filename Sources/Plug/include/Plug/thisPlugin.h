@@ -7,9 +7,9 @@
 #ifndef PXR_BASE_PLUG_THIS_PLUGIN_H
 #define PXR_BASE_PLUG_THIS_PLUGIN_H
 
+#include "pxr/pxrns.h"
 #include "Plug/registry.h"
 #include "Tf/preprocessorUtilsLite.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -18,7 +18,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This uses the value of the MFB_PACKAGE_NAME macro defined at compile-time
 /// unless overridden.
 #ifndef PLUG_THIS_PLUGIN_NAME
-#  define PLUG_THIS_PLUGIN_NAME MFB_PACKAGE_NAME
+#define PLUG_THIS_PLUGIN_NAME MFB_PACKAGE_NAME
 #endif
 
 /// Returns a plugin registered with the name of the current library (as
@@ -26,8 +26,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// side effect of using this macro, at the point in time the code at the
 /// macro site is invoked.
 #define PLUG_THIS_PLUGIN \
-  PlugRegistry::GetInstance().GetPluginWithName(TF_PP_STRINGIZE(PLUG_THIS_PLUGIN_NAME))
+    PlugRegistry::GetInstance().GetPluginWithName(\
+        TF_PP_STRINGIZE(PLUG_THIS_PLUGIN_NAME))
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_PLUG_THIS_PLUGIN_H
+#endif // PXR_BASE_PLUG_THIS_PLUGIN_H

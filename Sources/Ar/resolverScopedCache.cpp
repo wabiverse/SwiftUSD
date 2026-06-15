@@ -5,26 +5,26 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Ar/resolverScopedCache.h"
 #include "Ar/resolver.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 ArResolverScopedCache::ArResolverScopedCache()
 {
-  ArGetResolver().BeginCacheScope(&_cacheScopeData);
+    ArGetResolver().BeginCacheScope(&_cacheScopeData);
 }
 
-ArResolverScopedCache::ArResolverScopedCache(const ArResolverScopedCache *parent)
+ArResolverScopedCache::ArResolverScopedCache(const ArResolverScopedCache* parent)
     : _cacheScopeData(parent->_cacheScopeData)
 {
-  ArGetResolver().BeginCacheScope(&_cacheScopeData);
+    ArGetResolver().BeginCacheScope(&_cacheScopeData);
 }
 
 ArResolverScopedCache::~ArResolverScopedCache()
 {
-  ArGetResolver().EndCacheScope(&_cacheScopeData);
+    ArGetResolver().EndCacheScope(&_cacheScopeData);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

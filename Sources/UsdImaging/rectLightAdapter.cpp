@@ -13,46 +13,58 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingRectLightAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingRectLightAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingRectLightAdapter::~UsdImagingRectLightAdapter() {}
-
-TfTokenVector UsdImagingRectLightAdapter::GetImagingSubprims(UsdPrim const &prim)
+UsdImagingRectLightAdapter::~UsdImagingRectLightAdapter() 
 {
-  return {TfToken()};
 }
 
-TfToken UsdImagingRectLightAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                          TfToken const &subprim)
+TfTokenVector
+UsdImagingRectLightAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->rectLight;
-  }
-
-  return TfToken();
+    return { TfToken() };
 }
 
-bool UsdImagingRectLightAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+TfToken
+UsdImagingRectLightAdapter::GetImagingSubprimType(
+    UsdPrim const& prim,
+    TfToken const& subprim)
 {
-  return UsdImagingLightAdapter::IsEnabledSceneLights() &&
-         index->IsSprimTypeSupported(HdPrimTypeTokens->rectLight);
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->rectLight;
+    }
+
+    return TfToken();
 }
 
-SdfPath UsdImagingRectLightAdapter::Populate(UsdPrim const &prim,
-                                             UsdImagingIndexProxy *index,
-                                             UsdImagingInstancerContext const *instancerContext)
+bool
+UsdImagingRectLightAdapter::IsSupported(UsdImagingIndexProxy const* index) const
 {
-  return _AddSprim(HdPrimTypeTokens->rectLight, prim, index, instancerContext);
+    return UsdImagingLightAdapter::IsEnabledSceneLights() &&
+           index->IsSprimTypeSupported(HdPrimTypeTokens->rectLight);
 }
 
-void UsdImagingRectLightAdapter::_RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index)
+SdfPath
+UsdImagingRectLightAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
 {
-  _RemoveSprim(HdPrimTypeTokens->rectLight, cachePath, index);
+    return _AddSprim(HdPrimTypeTokens->rectLight, prim, index, instancerContext);
 }
+
+void
+UsdImagingRectLightAdapter::_RemovePrim(SdfPath const& cachePath,
+                                         UsdImagingIndexProxy* index)
+{
+    _RemoveSprim(HdPrimTypeTokens->rectLight, cachePath, index);
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -1,25 +1,29 @@
 {
-  "Plugins": [
-    {
-      "Info": {
-        "Types": {
-          "UsdDracoFileFormat": {
-            "bases": ["SdfFileFormat"],
-            "displayName": "USD Draco File Format",
-            "extensions": ["drc"],
-            "formatId": "drc",
-            "primary": true,
-            "supportsEditing": false,
-            "supportsWriting": false,
-            "target": "usd"
-          }
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "UsdDracoFileFormat": {
+                        "bases": [
+                            "SdfFileFormat"
+                        ],
+                        "displayName": "USD Draco File Format",
+                        "extensions": [
+                            "drc"
+                        ],
+                        "formatId": "drc",
+                        "primary": true,
+                        "supportsEditing": false,
+                        "supportsWriting": false,
+                        "target": "usd"
+                    }
+                }
+            },
+            "LibraryPath": "",
+            "Name": "usdDraco",
+            "ResourcePath": ".",
+            "Root": ".",
+            "Type": "library"
         }
-      },
-      "LibraryPath": "",
-      "Name": "UsdDraco",
-      "ResourcePath": ".",
-      "Root": ".",
-      "Type": "library"
-    }
-  ]
+    ]
 }

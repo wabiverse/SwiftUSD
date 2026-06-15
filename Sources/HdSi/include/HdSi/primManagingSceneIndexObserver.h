@@ -16,10 +16,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HDSI_PRIM_MANAGING_SCENE_INDEX_OBSERVER_TOKENS (primFactory)
+#define HDSI_PRIM_MANAGING_SCENE_INDEX_OBSERVER_TOKENS \
+    (primFactory)
 
-TF_DECLARE_PUBLIC_TOKENS(HdsiPrimManagingSceneIndexObserverTokens,
-                         HDSI_API,
+TF_DECLARE_PUBLIC_TOKENS(HdsiPrimManagingSceneIndexObserverTokens, HDSI_API,
                          HDSI_PRIM_MANAGING_SCENE_INDEX_OBSERVER_TOKENS);
 
 TF_DECLARE_REF_PTRS(HdsiPrimManagingSceneIndexObserver);
@@ -45,99 +45,118 @@ TF_DECLARE_REF_PTRS(HdsiPrimManagingSceneIndexObserver);
 /// PrimBase::Dirty or releases the handles to the PrimBase's at paths
 /// prefixed by the RemovedPrimEntry's path.
 ///
-class HdsiPrimManagingSceneIndexObserver : public HdSceneIndexObserver, public TfRefBase {
- public:
-  /// \class HdsiPrimManagingSceneIndexObserver::PrimBase
-  ///
-  /// Base class for prims managed by the observer.
-  ///
-  class PrimBase {
-   public:
-    HDSI_API
-    virtual ~PrimBase();
-
-    void Dirty(const DirtiedPrimEntry &entry, const HdsiPrimManagingSceneIndexObserver *observer)
+class HdsiPrimManagingSceneIndexObserver
+    : public HdSceneIndexObserver, public TfRefBase
+{
+public:
+    /// \class HdsiPrimManagingSceneIndexObserver::PrimBase
+    ///
+    /// Base class for prims managed by the observer.
+    ///
+    class PrimBase
     {
-      // NVI so that we can later implement things like a
-      // mutex guarding against Dirty from several threads
-      // on the same prim.
-      _Dirty(entry, observer);
+    public:
+        HDSI_API
+        virtual ~PrimBase();
+        
+        void Dirty(
+            const DirtiedPrimEntry &entry,
+            const HdsiPrimManagingSceneIndexObserver * observer)
+        {
+            // NVI so that we can later implement things like a
+            // mutex guarding against Dirty from several threads
+            // on the same prim.
+            _Dirty(entry, observer);
+        }
+
+    private:
+        virtual void _Dirty(
+            const DirtiedPrimEntry &entry,
+            const HdsiPrimManagingSceneIndexObserver * observer) = 0;
+    };
+    using PrimBaseHandle = std::shared_ptr<PrimBase>;
+
+    /// \class HdsiPrimManagingSceneIndexObserver::PrimFactoryBase
+    ///
+    /// Base class for a prim factory given to the observer.
+    ///
+    class PrimFactoryBase 
+    {
+    public:
+        HDSI_API
+        virtual ~PrimFactoryBase();
+        virtual PrimBaseHandle CreatePrim(
+            const AddedPrimEntry &entry,
+            const HdsiPrimManagingSceneIndexObserver * observer) = 0;
+    };
+    using PrimFactoryBaseHandle = std::shared_ptr<PrimFactoryBase>;
+
+    /// C'tor. Prim factory can be given through inputArgs as
+    /// PrimFactoryBaseHandle typed data source under
+    /// HdsiPrimManagingSceneIndexObserverTokens->primFactory key.
+    ///
+    static HdsiPrimManagingSceneIndexObserverRefPtr New(
+            HdSceneIndexBaseRefPtr const &sceneIndex,
+            HdContainerDataSourceHandle const &inputArgs) {
+        return TfCreateRefPtr(
+            new HdsiPrimManagingSceneIndexObserver(
+                sceneIndex, inputArgs));
     }
 
-   private:
-    virtual void _Dirty(const DirtiedPrimEntry &entry,
-                        const HdsiPrimManagingSceneIndexObserver *observer) = 0;
-  };
-  using PrimBaseHandle = std::shared_ptr<PrimBase>;
-
-  /// \class HdsiPrimManagingSceneIndexObserver::PrimFactoryBase
-  ///
-  /// Base class for a prim factory given to the observer.
-  ///
-  class PrimFactoryBase {
-   public:
     HDSI_API
-    virtual ~PrimFactoryBase();
-    virtual PrimBaseHandle CreatePrim(const AddedPrimEntry &entry,
-                                      const HdsiPrimManagingSceneIndexObserver *observer) = 0;
-  };
-  using PrimFactoryBaseHandle = std::shared_ptr<PrimFactoryBase>;
+    ~HdsiPrimManagingSceneIndexObserver() override;
 
-  /// C'tor. Prim factory can be given through inputArgs as
-  /// PrimFactoryBaseHandle typed data source under
-  /// HdsiPrimManagingSceneIndexObserverTokens->primFactory key.
-  ///
-  static HdsiPrimManagingSceneIndexObserverRefPtr New(HdSceneIndexBaseRefPtr const &sceneIndex,
-                                                      HdContainerDataSourceHandle const &inputArgs)
-  {
-    return TfCreateRefPtr(new HdsiPrimManagingSceneIndexObserver(sceneIndex, inputArgs));
-  }
+    /// Get observed scene index.
+    ///
+    const HdSceneIndexBaseRefPtr &GetSceneIndex() const {
+        return _sceneIndex;
+    }
 
-  HDSI_API
-  ~HdsiPrimManagingSceneIndexObserver() override;
+    /// Get managed prim at path.
+    ///
+    /// Clients can prolong life-time of prim by holding on to the
+    /// resulting handle.
+    ///
+    HDSI_API
+    const PrimBaseHandle &GetPrim(const SdfPath &primPath) const;
 
-  /// Get observed scene index.
-  ///
-  const HdSceneIndexBaseRefPtr &GetSceneIndex() const
-  {
-    return _sceneIndex;
-  }
+    /// Get managed prim cast to a particular type.
+    template<typename PrimType>
+    std::shared_ptr<PrimType> GetTypedPrim(const SdfPath &primPath) const
+    {
+        return std::dynamic_pointer_cast<PrimType>(GetPrim(primPath));
+    }
 
-  /// Get managed prim at path.
-  ///
-  /// Clients can prolong life-time of prim by holding on to the
-  /// resulting handle.
-  ///
-  HDSI_API
-  const PrimBaseHandle &GetPrim(const SdfPath &primPath) const;
+protected:
+    void PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const AddedPrimEntries &entries) override;
 
-  /// Get managed prim cast to a particular type.
-  template<typename PrimType> std::shared_ptr<PrimType> GetTypedPrim(const SdfPath &primPath) const
-  {
-    return std::dynamic_pointer_cast<PrimType>(GetPrim(primPath));
-  }
+    void PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const DirtiedPrimEntries &entries) override;
 
- protected:
-  void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
+    void PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const RemovedPrimEntries &entries) override;
 
-  void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
+    void PrimsRenamed(
+        const HdSceneIndexBase &sender,
+        const RenamedPrimEntries &entries) override;
 
-  void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
+private:
+    HDSI_API
+    HdsiPrimManagingSceneIndexObserver(
+        HdSceneIndexBaseRefPtr const &sceneIndex,
+        HdContainerDataSourceHandle const &inputArgs);
 
-  void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
+    HdSceneIndexBaseRefPtr const _sceneIndex;
+    PrimFactoryBaseHandle const _primFactory;
 
- private:
-  HDSI_API
-  HdsiPrimManagingSceneIndexObserver(HdSceneIndexBaseRefPtr const &sceneIndex,
-                                     HdContainerDataSourceHandle const &inputArgs);
-
-  HdSceneIndexBaseRefPtr const _sceneIndex;
-  PrimFactoryBaseHandle const _primFactory;
-
-  // _prims defined after _primFactory so that all prims
-  // are destroyed before the handle to _primFactory is
-  // released.
-  std::map<SdfPath, PrimBaseHandle> _prims;
+    // _prims defined after _primFactory so that all prims
+    // are destroyed before the handle to _primFactory is
+    // released.
+    std::map<SdfPath, PrimBaseHandle> _prims;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

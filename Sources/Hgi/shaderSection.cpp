@@ -9,64 +9,76 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiShaderSection::HgiShaderSection(const std::string &identifier,
-                                   const HgiShaderSectionAttributeVector &attributes,
-                                   const std::string &defaultValue,
-                                   const std::string &arraySize,
-                                   const std::string &blockInstanceIdentifier)
-    : _identifierVar(identifier),
-      _attributes(attributes),
-      _defaultValue(defaultValue),
-      _arraySize(arraySize),
-      _blockInstanceIdentifier(blockInstanceIdentifier)
+HgiShaderSection::HgiShaderSection(
+    const std::string &identifier,
+    const HgiShaderSectionAttributeVector& attributes,
+    const std::string &defaultValue,
+    const std::string &arraySize,
+    const std::string &blockInstanceIdentifier)
+  : _identifierVar(identifier)
+  , _attributes(attributes)
+  , _defaultValue(defaultValue)
+  , _arraySize(arraySize)
+  , _blockInstanceIdentifier(blockInstanceIdentifier)
 {
 }
 
 HgiShaderSection::~HgiShaderSection() = default;
 
-void HgiShaderSection::WriteType(std::ostream &ss) const {}
-
-void HgiShaderSection::WriteIdentifier(std::ostream &ss) const
+void
+HgiShaderSection::WriteType(std::ostream& ss) const
 {
-  ss << _identifierVar;
 }
 
-void HgiShaderSection::WriteBlockInstanceIdentifier(std::ostream &ss) const
+void
+HgiShaderSection::WriteIdentifier(std::ostream& ss) const
 {
-  ss << _blockInstanceIdentifier;
+    ss << _identifierVar;
 }
 
-void HgiShaderSection::WriteDeclaration(std::ostream &ss) const
+void
+HgiShaderSection::WriteBlockInstanceIdentifier(std::ostream& ss) const
 {
-  WriteType(ss);
-  ss << " ";
-  WriteIdentifier(ss);
-  WriteArraySize(ss);
-  ss << ";";
+    ss << _blockInstanceIdentifier;
 }
 
-void HgiShaderSection::WriteParameter(std::ostream &ss) const
+void
+HgiShaderSection::WriteDeclaration(std::ostream& ss) const
 {
-  WriteType(ss);
-  ss << " ";
-  WriteIdentifier(ss);
+    WriteType(ss);
+    ss << " ";
+    WriteIdentifier(ss);
+    WriteArraySize(ss);
+    ss << ";";
 }
 
-void HgiShaderSection::WriteArraySize(std::ostream &ss) const
+void
+HgiShaderSection::WriteParameter(std::ostream& ss) const
 {
-  if (!_arraySize.empty()) {
-    ss << "[" << _arraySize << "]";
-  }
+    WriteType(ss);
+    ss << " ";
+    WriteIdentifier(ss);
 }
 
-const HgiShaderSectionAttributeVector &HgiShaderSection::GetAttributes() const
+void
+HgiShaderSection::WriteArraySize(std::ostream& ss) const
 {
-  return _attributes;
+    if (!_arraySize.empty()) {
+        ss << "[" << _arraySize << "]";
+    }
 }
 
-const std::string &HgiShaderSection::_GetDefaultValue() const
+const HgiShaderSectionAttributeVector&
+HgiShaderSection::GetAttributes() const
 {
-  return _defaultValue;
+    return _attributes;
 }
+
+const std::string&
+HgiShaderSection::_GetDefaultValue() const
+{
+    return _defaultValue;
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

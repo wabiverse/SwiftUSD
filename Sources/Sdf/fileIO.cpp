@@ -15,6 +15,7 @@
 #include "Sdf/fileIO_Common.h"
 #include "Sdf/primSpec.h"
 #include "Sdf/relationshipSpec.h"
+#include "Sdf/usdaFileFormat.h"
 #include "Sdf/variantSetSpec.h"
 #include "Sdf/variantSpec.h"
 
@@ -24,41 +25,163 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+// virtual
 Sdf_StreamWritableAsset::~Sdf_StreamWritableAsset() = default;
 
-bool Sdf_WriteToStream(const SdfSpec &baseSpec, std::ostream &o, size_t indent)
+static std::string
+_ComposeHeader(const std::string cookie,
+               const SdfFileVersion& version)
 {
-  Sdf_TextOutput out(o);
+    TF_AXIOM(version);
 
-  const SdfSpecType type = baseSpec.GetSpecType();
+    // Compose a suitable header string. See the long comment above titled
+    // "Caveat developer!". This is the place to add padding or format the
+    // version in base-16 or ...
+    const std::string versionString = version.AsString();
 
-  switch (type) {
-    case SdfSpecTypePrim: {
-      SdfPrimSpec spec = Sdf_CastAccess::CastSpec<SdfPrimSpec, SdfSpec>(baseSpec);
-      return Sdf_WritePrim(spec, out, indent);
+    // Note that cookie includes a leading "#" (e.g., "#usda")
+    std::string header = cookie + " " + versionString + "\n";
+
+    return header;
+}
+
+bool
+Sdf_TextOutput::WriteHeader(const std::string& cookie,
+                            const SdfFileVersion version /*= SdfFileVersion()*/)
+{
+    SdfFileVersion outputVersion = version;
+    if (!outputVersion) {
+        // No explicit version, fall back to the default output version.
+        outputVersion = SdfUsdaFileFormat::GetDefaultOutputVersion();
     }
-    case SdfSpecTypeAttribute: {
-      SdfAttributeSpec spec = Sdf_CastAccess::CastSpec<SdfAttributeSpec, SdfSpec>(baseSpec);
-      return Sdf_WriteAttribute(spec, out, indent);
+
+    // XXX: should this be a TF_AXIOM instead?
+    if (!TF_VERIFY(outputVersion,
+                   "Could not get usda file version when writing to '%s'",
+                   _name.c_str()))
+    {
+        return false;
     }
-    case SdfSpecTypeRelationship: {
-      SdfRelationshipSpec spec = Sdf_CastAccess::CastSpec<SdfRelationshipSpec, SdfSpec>(baseSpec);
-      return Sdf_WriteRelationship(spec, out, indent);
+
+    if (!_FlushBuffer()) {
+        return false;
     }
-    case SdfSpecTypeVariantSet: {
-      SdfVariantSetSpec spec = Sdf_CastAccess::CastSpec<SdfVariantSetSpec, SdfSpec>(baseSpec);
-      return Sdf_WriteVariantSet(spec, out, indent);
+
+    // Remember what we're writing so we can tell if it has been upgraded
+    _cookie = cookie;
+    _requestedVersion = _writtenVersion = outputVersion;
+
+    std::string header = _ComposeHeader(_cookie, _requestedVersion);
+
+    return Write(header);
+}
+
+bool
+Sdf_TextOutput::RequestWriteVersionUpgrade(const SdfFileVersion& ver,
+                                           std::string reason)
+{
+    if (ver > SdfUsdaFileFormat::GetMaxOutputVersion()) {
+        // The requested version cannot be written by this version of the
+        // software. This is a coding error.
+        TF_CODING_ERROR(
+            "Failed upgrade of usda file '%s' to version %s. Version %s is the"
+            " highest version that can be written.",
+            _name.c_str(),
+            ver.AsString().c_str(),
+            SdfUsdaFileFormat::GetMaxOutputVersion().AsString().c_str());
+        return false;
     }
-    case SdfSpecTypeVariant: {
-      SdfVariantSpec spec = Sdf_CastAccess::CastSpec<SdfVariantSpec, SdfSpec>(baseSpec);
-      return Sdf_WriteVariant(spec, out, indent);
+
+    if (!_requestedVersion.CanRead(ver)) {
+        TF_WARN("Upgrading usda file '%s' from version %s to %s: %s",
+                _name.c_str(),
+                _requestedVersion.AsString().c_str(),
+                ver.AsString().c_str(),
+                reason.c_str());
+        _requestedVersion = ver;
     }
+
+    return true;
+}
+
+bool
+Sdf_TextOutput::_UpdateHeader()
+{
+    if (_writtenVersion && _requestedVersion > _writtenVersion) {
+        bool ok = true;
+        // Seek to the beginning (which flushes pending output first) and try to
+        // write the header at the top of the file.
+        if (_Seek(0)) {
+            std::string header = _ComposeHeader(_cookie, _requestedVersion);
+            ok = Write(header);
+        } else {
+            ok = false;
+        }
+
+        ok = _FlushBuffer() && ok;
+        if (!ok) {
+            TF_RUNTIME_ERROR("Failed to update the usda layer '%s' from"
+                             " version '%s' to version '%s'.",
+                             _name.c_str(),
+                             _writtenVersion.AsString().c_str(),
+                             _requestedVersion.AsString().c_str());
+            return false;
+        }
+
+        _writtenVersion = _requestedVersion;
+
+        return true;
+    }
+
+    // _UpdateHeader always flushes output.
+    return _FlushBuffer();
+}
+
+bool
+Sdf_WriteToStream(const SdfSpec &baseSpec, std::ostream& o, size_t indent)
+{
+    Sdf_TextOutput out(o, "<ostream>");
+
+    const SdfSpecType type = baseSpec.GetSpecType();
+
+    switch (type) {
+    case SdfSpecTypePrim:
+        {
+            SdfPrimSpec spec =
+                Sdf_CastAccess::CastSpec<SdfPrimSpec, SdfSpec>(baseSpec);
+            return Sdf_WritePrim(spec, out, indent);
+        }
+    case SdfSpecTypeAttribute:
+        {
+            SdfAttributeSpec spec =
+                Sdf_CastAccess::CastSpec<SdfAttributeSpec, SdfSpec>(baseSpec);
+            return Sdf_WriteAttribute(spec, out, indent);
+        }
+    case SdfSpecTypeRelationship:
+        {
+            SdfRelationshipSpec spec =
+                Sdf_CastAccess::CastSpec<SdfRelationshipSpec, SdfSpec>(baseSpec);
+            return Sdf_WriteRelationship(spec, out, indent);
+        }
+    case SdfSpecTypeVariantSet:
+        {
+            SdfVariantSetSpec spec =
+                Sdf_CastAccess::CastSpec<SdfVariantSetSpec, SdfSpec>(baseSpec);
+            return Sdf_WriteVariantSet(spec, out, indent);
+        }
+    case SdfSpecTypeVariant:
+        {
+            SdfVariantSpec spec =
+                Sdf_CastAccess::CastSpec<SdfVariantSpec, SdfSpec>(baseSpec);
+            return Sdf_WriteVariant(spec, out, indent);
+        }
     default:
-      break;
-  }
+        break;
+    }
 
-  TF_CODING_ERROR("Cannot write spec of type %s to stream", TfStringify(type).c_str());
-  return false;
+    TF_CODING_ERROR("Cannot write spec of type %s to stream", 
+                    TfStringify(type).c_str());
+    return false;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

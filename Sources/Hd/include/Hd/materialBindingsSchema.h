@@ -33,70 +33,79 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_MATERIAL_BINDINGS_SCHEMA_TOKENS (materialBindings)((allPurpose, ""))
+#define HD_MATERIAL_BINDINGS_SCHEMA_TOKENS \
+    (materialBindings) \
+    ((allPurpose, "")) \
+    ((_allPurposeToken, "allPurpose")) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialBindingsSchemaTokens,
-                         HD_API,
-                         HD_MATERIAL_BINDINGS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialBindingsSchemaTokens, HD_API,
+    HD_MATERIAL_BINDINGS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialBindingsSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdMaterialBindingsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdMaterialBindingsSchema
+///
+class HdMaterialBindingsSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "materialBindings" from the parent container and constructs a
-  /// HdMaterialBindingsSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdMaterialBindingsSchema GetFromParent(
-      const HdContainerDataSourceHandle &fromParentContainer);
+    HdMaterialBindingsSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
+    /// Retrieves a container data source with the schema's default name token
+    /// "materialBindings" from the parent container and constructs a
+    /// HdMaterialBindingsSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
+    HD_API
+    static HdMaterialBindingsSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  HD_API
-  HdMaterialBindingSchema GetMaterialBinding() const;
+// --(BEGIN CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdMaterialBindingSchema GetMaterialBinding(TfToken const &purpose) const;
+    HD_API
+    HdMaterialBindingSchema GetMaterialBinding() const;
+    
+    HD_API
+    HdMaterialBindingSchema GetMaterialBinding(TfToken const &purpose) const;
 
-  // --(END CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  /// \name Member accessor
-  /// @{
+    /// \name Member accessor
+    /// @{ 
 
-  /// @}
+    /// @}
 
-  /// \name Schema location
-  /// @{
+    /// \name Schema location
+    /// @{
 
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
 
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
 
-  /// @}
+    /// @} 
 
-  /// \name Schema construction
-  /// @{
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(size_t count,
-                                                   const TfToken *names,
-                                                   const HdDataSourceBaseHandle *values);
+    /// \name Schema construction
+    /// @{
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        size_t count,
+        const TfToken *names,
+        const HdDataSourceBaseHandle *values);
 
-  /// @}
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

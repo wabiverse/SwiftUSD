@@ -13,10 +13,12 @@
 /// provide a hash_value function.  For documentation, of the half type,
 /// please see the half header in ilmbase_half.h.
 
+#include "pxr/pxrns.h"
 #include "Gf/ilmbase_half.h"
 #include "Gf/ilmbase_halfLimits.h"
 #include "Gf/traits.h"
-#include "pxr/pxrns.h"
+
+#include <cstddef>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -24,17 +26,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 using GfHalf = pxr_half::half;
 
 namespace pxr_half {
-/// Overload hash_value for half.
-inline std::size_t hash_value(const half h)
-{
-  return h.bits();
+    /// Overload hash_value for half.
+    inline std::size_t hash_value(const half h) { return h.bits(); }
+    // Explicitly delete hashing via implicit conversion of half to float
+    std::size_t hash_value(float) = delete;
 }
-// Explicitly delete hashing via implicit conversion of half to float
-std::size_t hash_value(float) = delete;
-}  // namespace pxr_half
 
-template<> struct GfIsFloatingPoint<GfHalf> : public std::integral_constant<bool, true> {};
+template <>
+struct GfIsFloatingPoint<GfHalf> : 
+    public std::integral_constant<bool, true>{};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_GF_HALF_H
+
+#endif // PXR_BASE_GF_HALF_H
