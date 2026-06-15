@@ -7,4 +7,5 @@
 #include <ExecIr/tokens.h>
 #include <ExecIr/api.h>
 #include <ExecIr/controllerBuilder.h>
+#include <ExecIr/xformable.h>
 #endif  // __PXR_EXEC_EXECIR_H__

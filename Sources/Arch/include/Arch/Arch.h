@@ -34,4 +34,5 @@
 #include <Arch/mallocHook.h>
 #include <Arch/hash.h>
 #include <Arch/function.h>
+#include <Arch/swiftInterop.h>
 #endif  // __PXR_BASE_ARCH_H__

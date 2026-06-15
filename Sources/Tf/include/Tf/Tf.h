@@ -129,4 +129,6 @@
 #include <Tf/pyEnum.h>
 #include <Tf/fastCompression.h>
 #include <Tf/ostreamMethods.h>
+#include <Tf/retainReleaseHelper.h>
+#include <Tf/sharedPtrRetainReleaseHelper.h>
 #endif  // __PXR_BASE_TF_H__
