@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 #include "Hdx/task.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 #include "Hdx/tokens.h"
 

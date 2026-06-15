@@ -9,7 +9,7 @@
 #include "HgiGL/shaderGenerator.h"
 #include "HgiGL/conversions.h"
 #include "Hgi/capabilities.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include <unordered_map>

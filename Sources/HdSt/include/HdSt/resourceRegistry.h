@@ -15,7 +15,7 @@
 #include "HdSt/enums.h"
 #include "HdSt/renderBufferPool.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Hd/bufferArrayRange.h"
 #include "Hd/bufferSource.h"

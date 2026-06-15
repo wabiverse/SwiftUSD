@@ -19,7 +19,7 @@
 #include "Hd/perfLog.h"
 #include "Hd/tokens.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/buffer.h"

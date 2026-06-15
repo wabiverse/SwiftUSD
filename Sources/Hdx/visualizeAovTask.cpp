@@ -12,7 +12,7 @@
 #include "Hd/tokens.h"
 #include "Hio/glslfx.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include "HdSt/textureUtils.h"
