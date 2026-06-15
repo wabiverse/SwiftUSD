@@ -12,7 +12,7 @@
 #include "UsdExecImaging/valueKey.h"
 
 #include "Gf/matrix4d.h"
-#include "pxr/exec/execGeom/tokens.h"
+#include "ExecGeom/tokens.h"
 #include "Hd/dataSource.h"
 #include "Hd/dataSourceLocator.h"
 #include "Hd/retainedDataSource.h"

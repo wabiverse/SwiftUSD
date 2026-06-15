@@ -11,8 +11,8 @@
 #include "UsdExecImaging/valueKey.h"
 
 #include "Gf/matrix4d.h"
-#include "pxr/exec/exec/builtinComputations.h"
-#include "pxr/exec/execIr/tokens.h"
+#include "Exec/builtinComputations.h"
+#include "ExecIr/tokens.h"
 #include "Hd/retainedDataSource.h"
 #include "Hd/xformSchema.h"
 #include "Usd/attribute.h"

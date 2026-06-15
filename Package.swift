@@ -262,6 +262,39 @@ let package = Package(
       name: "USDOverlays",
       targets: ["USDOverlays"]
     ),
+    // ----------- Pixar.Exec -----
+    .library(
+      name: "Vdf",
+      targets: ["Vdf"]
+    ),
+    .library(
+      name: "Esf",
+      targets: ["Esf"]
+    ),
+    .library(
+      name: "Ef",
+      targets: ["Ef"]
+    ),
+    .library(
+      name: "EsfUsd",
+      targets: ["EsfUsd"]
+    ),
+    .library(
+      name: "Exec",
+      targets: ["Exec"]
+    ),
+    .library(
+      name: "ExecUsd",
+      targets: ["ExecUsd"]
+    ),
+    .library(
+      name: "ExecGeom",
+      targets: ["ExecGeom"]
+    ),
+    .library(
+      name: "ExecIr",
+      targets: ["ExecIr"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -1781,6 +1814,172 @@ let package = Package(
     ),
 
     .target(
+      name: "Vdf",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Gf"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Work"),
+      ],
+      cxxSettings: [
+        .headerSearchPath("include/Vdf"),
+        .define("MFB_PACKAGE_NAME", to: "Vdf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Vdf"),
+        .define("MFB_PACKAGE_MODULE", to: "Vdf"),
+        .define("VDF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "Esf",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Sdf"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Usd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Esf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Esf"),
+        .define("MFB_PACKAGE_MODULE", to: "Esf"),
+        .define("ESF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "Ef",
+      dependencies: [
+        .target(name: "Vdf"),
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Usd"),
+        .target(name: "Work"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ef"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ef"),
+        .define("MFB_PACKAGE_MODULE", to: "Ef"),
+        .define("EF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "EsfUsd",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Esf"),
+        .target(name: "Tf"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "EsfUsd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "EsfUsd"),
+        .define("MFB_PACKAGE_MODULE", to: "EsfUsd"),
+        .define("ESFUSD_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "Exec",
+      dependencies: [
+        .target(name: "Ef"),
+        .target(name: "Esf"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Ts"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "Vdf"),
+        .target(name: "Vt"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Exec"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Exec"),
+        .define("MFB_PACKAGE_MODULE", to: "Exec"),
+        .define("EXEC_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "ExecUsd",
+      dependencies: [
+        .target(name: "Esf"),
+        .target(name: "EsfUsd"),
+        .target(name: "Exec"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "ExecUsd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "ExecUsd"),
+        .define("MFB_PACKAGE_MODULE", to: "ExecUsd"),
+        .define("EXECUSD_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "ExecGeom",
+      dependencies: [
+        .target(name: "Gf"),
+        .target(name: "Tf"),
+        .target(name: "ExecUsd"),
+        .target(name: "UsdGeom"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "ExecGeom"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "ExecGeom"),
+        .define("MFB_PACKAGE_MODULE", to: "ExecGeom"),
+        .define("EXECGEOM_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "ExecIr",
+      dependencies: [
+        .target(name: "Gf"),
+        .target(name: "Tf"),
+        .target(name: "ExecUsd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "ExecIr"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "ExecIr"),
+        .define("MFB_PACKAGE_MODULE", to: "ExecIr"),
+        .define("EXECIR_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
       name: "UsdExecImaging",
       dependencies: [
         .target(name: "Arch"),
@@ -1801,10 +2000,19 @@ let package = Package(
         .target(name: "Ar"),
         .target(name: "Sdf"),
         .target(name: "Sdr"),
+        .target(name: "Ts"),
         .target(name: "Usd"),
         .target(name: "UsdGeom"),
         .target(name: "UsdHydra"),
         .target(name: "UsdShade"),
+        .target(name: "Vdf"),
+        .target(name: "Esf"),
+        .target(name: "Ef"),
+        .target(name: "EsfUsd"),
+        .target(name: "Exec"),
+        .target(name: "ExecUsd"),
+        .target(name: "ExecGeom"),
+        .target(name: "ExecIr"),
         .target(name: "UsdImaging"),
       ],
       cxxSettings: [
@@ -2070,6 +2278,15 @@ let package = Package(
         .target(name: "UsdImaging"),
         .target(name: "UsdImagingGL"),
         .target(name: "UsdIRImaging"),
+        // ----------- exec. ------
+        .target(name: "Vdf"),
+        .target(name: "Esf"),
+        .target(name: "Ef"),
+        .target(name: "EsfUsd"),
+        .target(name: "Exec"),
+        .target(name: "ExecUsd"),
+        .target(name: "ExecGeom"),
+        .target(name: "ExecIr"),
         .target(name: "UsdExecImaging"),
         // -------- macros. ------
         .target(name: "PixarMacros"),

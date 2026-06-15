@@ -18,7 +18,7 @@
 #include "Tf/stringUtils.h"
 #include "Tf/weakBase.h"
 #include "Trace/trace.h"
-#include "pxr/exec/exec/systemDiagnostics.h"
+#include "Exec/systemDiagnostics.h"
 #include "Usd/primRange.h"
 #include "Usd/stage.h"
 

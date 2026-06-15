@@ -81,9 +81,10 @@ struct UpdateCommand: AsyncCommand
       async let img = try Pxr.imaging.enumerate(packagePath: pkgDir, exclusions: exclusions)
       async let usd = try Pxr.usd.enumerate(packagePath: pkgDir, exclusions: exclusions)
       async let uim = try Pxr.usdImaging.enumerate(packagePath: pkgDir, exclusions: exclusions)
+      async let exc = try Pxr.exec.enumerate(packagePath: pkgDir, exclusions: exclusions)
 
       // 4. wait for all usd source to be updated.
-      let _ = try await [bse, img, usd, uim]
+      let _ = try await [bse, img, usd, uim, exc]
     }
 
     // output elapsed time
@@ -211,6 +212,8 @@ public enum Pxr: String, CaseIterable
   case usd
   /** The pxr.usdImaging imaging package. */
   case usdImaging
+  /** The pxr.exec package. */
+  case exec
 
   /**
    * List the given package path, updating the source files for this
@@ -812,8 +815,9 @@ public enum Pxr: String, CaseIterable
        * #include "[pxr/imaging/glf]/texture.h"
        * #include "[pxr/usd/sdf]/layer.h"
        * #include "[pxr/usdImaging/hd]/engine.h"
-       * #include "[pxr/usd/plugin/usdAbc]/alembicData.h" */
-      let includeMatch = /(?:\G(?!\A)\s*,\s*|\b(?:pxr\/base\/|pxr\/imaging\/|pxr\/usd\/|pxr\/usdImaging\/)+(?:plugin\/)?)(\w+)/
+       * #include "[pxr/usd/plugin/usdAbc]/alembicData.h"
+       * #include "[pxr/exec/execIr]/tokens.h" */
+      let includeMatch = /(?:\G(?!\A)\s*,\s*|\b(?:pxr\/base\/|pxr\/imaging\/|pxr\/usd\/|pxr\/usdImaging\/|pxr\/exec\/)+(?:plugin\/)?)(\w+)/
       while let match = try includeMatch.firstMatch(in: pxrSrc)
       {
         /* 2. replace include with capitalized version.
@@ -901,6 +905,10 @@ public enum Pxr: String, CaseIterable
    */
   private static let targetCasing: [String: String] = [
     "camerautil": "CameraUtil",
+    "esfusd": "EsfUsd",
+    "execgeom": "ExecGeom",
+    "execir": "ExecIr",
+    "execusd": "ExecUsd",
     "geomutil": "GeomUtil",
     "hdar": "HdAr",
     "hdgp": "HdGp",
