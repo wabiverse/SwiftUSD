@@ -5,14 +5,18 @@
 // https://openusd.org/license.
 //
 
-#include "Arch/pragmas.h"
-
 // Not all functions in the OpenEXR library are used by Hio, and the OpenEXR
 // symbols themselves are declared static for inclusion within Hio.
 // Therefore, the unused function warning is suppressed as the messages are
 // not useful for development, as it is expected that many functions are
 // defined but not referenced or exported.
-ARCH_PRAGMA_UNUSED_FUNCTION
+#if defined(__clang__)
+_Pragma("clang diagnostic ignored \"-Wunused-function\"")
+#elif defined(__GNUC__)
+_Pragma("GCC diagnostic ignored \"-Wunused-function\"")
+#elif defined(_MSC_VER)
+__pragma(warning(disable:4505))
+#endif
 
 #include "openexr-c.h"
 

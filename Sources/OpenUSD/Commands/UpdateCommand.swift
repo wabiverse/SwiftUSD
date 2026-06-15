@@ -852,9 +852,10 @@ public enum Pxr: String, CaseIterable
       // such headers are renamed on disk (ex. "Tf/tf.h" -> "Tf/tfImpl.h").
       Patch.collidingUmbrellaInclude(to: &pxrSrc, target: target)
       
-      // because nanocolor is a plain-C header and bringing in Arch's entire
-      // C++ clang module is problematic.
+      // because plain-C header/source code should not bring in Arch's entire
+      // C++ clang module, which is problematic.
       Patch.nanocolorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.openexrCSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
 
       try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
     }
@@ -1089,6 +1090,26 @@ public enum Pxr: String, CaseIterable
             + "    ((guideLength, \"guide:length\"))\n"
         )
       }
+    }
+
+    /**
+     * replace `ARCH_PRAGMA_UNUSED_FUNCTION` with a self-contained fallback instead,
+     * so openexr-c.c (a plain-C source file) never needs to import the entire Arch C++ Clang module. */
+    public static func openexrCSource(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "openexr-c.c" else { return }
+
+      source = source.replacingOccurrences(of: "#include \"Arch/pragmas.h\"\n", with: "")
+      source = source.replacingOccurrences(
+        of: "ARCH_PRAGMA_UNUSED_FUNCTION",
+        with: "#if defined(__clang__)\n"
+          + "_Pragma(\"clang diagnostic ignored \\\"-Wunused-function\\\"\")\n"
+          + "#elif defined(__GNUC__)\n"
+          + "_Pragma(\"GCC diagnostic ignored \\\"-Wunused-function\\\"\")\n"
+          + "#elif defined(_MSC_VER)\n"
+          + "__pragma(warning(disable:4505))\n"
+          + "#endif"
+      )
     }
 
     /**
