@@ -11,7 +11,7 @@
 #include "HgiGL/api.h"
 #include "HgiGL/capabilities.h"
 #include "HgiGL/garbageCollector.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include <functional>

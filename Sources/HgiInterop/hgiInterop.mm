@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 #include "HgiInterop/hgiInteropImpl.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #if PXR_GL_SUPPORT_ENABLED

@@ -20,7 +20,7 @@
 #include "Hd/sceneDelegate.h"
 #include "Hd/vtBufferSource.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
 #include "Hgi/shaderProgram.h"

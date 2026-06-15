@@ -8,7 +8,7 @@
 #define PXR_IMAGING_HGIVULKAN_HGI_H
 
 #include "pxr/pxrns.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include "HgiVulkan/api.h"

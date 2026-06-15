@@ -11,7 +11,7 @@
 #include "Gf/math.h"
 #include "Trace/traceImpl.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/capabilities.h"

@@ -11,7 +11,7 @@
 #include "Gf/vec3i.h"
 #include "HdSt/api.h"
 #include "HdSt/renderBuffer.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/enums.h"
 #include "Hgi/texture.h"
 

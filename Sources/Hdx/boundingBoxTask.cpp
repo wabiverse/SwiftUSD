@@ -20,7 +20,7 @@
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/capabilities.h"
 #include "Hgi/graphicsCmdsDesc.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include "Gf/transform.h"

@@ -15,7 +15,7 @@
 
 #include "Hio/glslfx.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include "Tf/staticTokens.h"

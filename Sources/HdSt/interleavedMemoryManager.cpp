@@ -11,7 +11,7 @@
 #include "HdSt/stagingBuffer.h"
 #include "HdSt/tokens.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/buffer.h"

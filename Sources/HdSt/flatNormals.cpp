@@ -18,7 +18,7 @@
 
 #include "Hf/perfLog.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
 #include "Hgi/shaderProgram.h"

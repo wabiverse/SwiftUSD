@@ -10,7 +10,7 @@
 #include "pxr/pxrns.h"
 #include "Tf/diagnostic.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "HgiVulkan/api.h"
 
 #include <mutex>

@@ -21,7 +21,7 @@
 #include "HdSt/textureObjectRegistry.h"
 
 #include "Hio/glslfx.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/capabilities.h"
 #include "Hgi/computeCmdsDesc.h"
 

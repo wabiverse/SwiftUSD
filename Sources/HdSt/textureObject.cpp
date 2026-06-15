@@ -20,7 +20,7 @@
 #include "HdSt/tokens.h"
 #include "HdSt/udimTextureObject.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/blitCmds.h"
 
 #include "Hio/fieldTextureData.h"

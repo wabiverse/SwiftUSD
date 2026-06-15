@@ -11,7 +11,7 @@
 #include "HgiMetal/api.h"
 #include "HgiMetal/capabilities.h"
 #include "HgiMetal/indirectCommandEncoder.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #import <Metal/Metal.h>
