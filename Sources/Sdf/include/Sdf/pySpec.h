@@ -75,7 +75,7 @@
 #include "Tf/pyUtils.h"
 
 #include "Sdf/declareHandles.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/diagnostic.h"
 #include "Tf/stringUtils.h"
 #include "Arch/demangle.h"

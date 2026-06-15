@@ -7,7 +7,7 @@
 #ifndef PXR_BASE_TF_TF_H
 #define PXR_BASE_TF_TF_H
 
-/// \file tf/tf.h
+/// \file Tf/tfImpl.h
 /// A file containing basic constants and definitions.
 
 #if defined(__cplusplus) || defined(doxygen)

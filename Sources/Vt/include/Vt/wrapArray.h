@@ -29,7 +29,7 @@
 #include "Tf/meta.h"
 #include "Tf/span.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/wrapTypeHelpers.h"
 
 #if PXR_PYTHON_SUPPORT_ENABLED
