@@ -17,7 +17,7 @@
 #include "Tf/scopeDescription.h"
 #include "Tf/stringUtils.h"
 #include "Tf/weakBase.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Exec/systemDiagnostics.h"
 #include "Usd/primRange.h"
 #include "Usd/stage.h"
