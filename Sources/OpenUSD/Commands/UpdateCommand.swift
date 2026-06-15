@@ -1247,6 +1247,7 @@ public enum Pxr: String, CaseIterable
       // tf/tfImpl.h (see `collidingUmbrellaInclude(to:target:)`).
       source = source.replacingOccurrences(of: "tf/tf.h", with: "Tf/tfImpl.h")
       source = source.replacingOccurrences(of: "trace/trace.h", with: "Trace/traceImpl.h")
+      source = source.replacingOccurrences(of: "ar/ar.h", with: "Ar/arImpl.h")
       
       /* ----- pxr external headers. ----- */
 

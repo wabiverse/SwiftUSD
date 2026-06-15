@@ -10,7 +10,7 @@
 /// \file sdf/fileFormat.h
 
 #include "pxr/pxrns.h"
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Tf/declarePtrs.h"

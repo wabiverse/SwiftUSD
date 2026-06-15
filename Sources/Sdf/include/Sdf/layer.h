@@ -21,7 +21,7 @@
 #include "Sdf/proxyTypes.h"
 #include "Sdf/spec.h"
 #include "Sdf/types.h"
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/assetInfo.h"
 #include "Ar/resolvedPath.h"
 #include "Tf/declarePtrs.h"
