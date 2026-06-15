@@ -9,7 +9,7 @@
 #include "Exec/typeRegistry.h"
 
 #include "Tf/diagnostic.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ef/maskedSubExecutor.h"
 #include "Ef/pageCacheExecutor.h"
 #include "Ef/pageCacheStorage.h"

@@ -26,7 +26,7 @@
 #include "Work/loops.h"
 #include "Work/withScopedParallelism.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <OneTBB/tbb/concurrent_vector.h>
 

@@ -9,7 +9,7 @@
 #include "Vdf/connection.h"
 #include "Vdf/debugCodes.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/hash.h"
 #include "Tf/stl.h"

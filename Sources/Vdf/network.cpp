@@ -24,7 +24,7 @@
 #include "Tf/iterator.h"
 #include "Tf/mallocTag.h"
 #include "Tf/stl.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 #include <memory>

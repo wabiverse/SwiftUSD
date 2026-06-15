@@ -13,7 +13,7 @@
 #include "Exec/outputKey.h"
 #include "Exec/providerResolution.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Esf/attribute.h"
 #include "Esf/journal.h"
 #include "Esf/object.h"

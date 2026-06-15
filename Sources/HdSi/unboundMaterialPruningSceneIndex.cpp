@@ -12,7 +12,7 @@
 #include "Hd/sceneIndexPrimView.h"
 #include "Hd/tokens.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include "tbb/concurrent_vector.h"

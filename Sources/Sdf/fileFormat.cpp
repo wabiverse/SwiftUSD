@@ -16,7 +16,7 @@
 #include "Sdf/layerHints.h"
 
 #include "Ar/resolver.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/registryManager.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"

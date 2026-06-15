@@ -24,7 +24,7 @@
 #include "Tf/bits.h"
 #include "Tf/mallocTag.h"
 #include "Tf/span.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Work/withScopedParallelism.h"
 #include "Ef/leafNode.h"

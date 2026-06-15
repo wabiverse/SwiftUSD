@@ -18,7 +18,7 @@
 #include "Tf/typeInfoMap.h"
 #include "Tf/pxrTslRobinMap/robin_map.h"
 #include "Tf/pxrTslRobinMap/robin_set.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Work/dispatcher.h"
 #include "Work/loops.h"

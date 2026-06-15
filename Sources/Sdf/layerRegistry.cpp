@@ -15,7 +15,7 @@
 #include "Sdf/layer.h"
 //#include "Sdf/schema.h"
 #include "Ar/resolver.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/pathUtils.h"
 #include "Tf/registryManager.h"
 #include "Tf/staticData.h"

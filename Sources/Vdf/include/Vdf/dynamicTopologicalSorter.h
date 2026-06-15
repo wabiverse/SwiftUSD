@@ -14,7 +14,7 @@
 #include "Vdf/api.h"
 #include "Vdf/traits.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/hash.h"
 #include "Tf/hashmap.h"
 #include "Tf/hashset.h"

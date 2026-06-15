@@ -18,7 +18,7 @@
 #include "Sdf/primSpec.h"
 #include "Sdf/relationshipSpec.h"
 #include "Sdf/schema.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 #include <set>

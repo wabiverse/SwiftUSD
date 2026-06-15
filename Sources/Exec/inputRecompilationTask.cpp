@@ -13,7 +13,7 @@
 #include "Exec/nodeRecompilationInfo.h"
 #include "Exec/program.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ef/leafNode.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

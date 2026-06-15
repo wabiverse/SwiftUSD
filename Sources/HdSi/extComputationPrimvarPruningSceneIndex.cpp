@@ -20,7 +20,7 @@
 #include "Hd/extComputationPrimvarsSchema.h"
 #include "Hd/tokens.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 

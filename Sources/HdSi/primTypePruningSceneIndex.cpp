@@ -7,7 +7,7 @@
 
 #include "Hd/sceneIndexPrimView.h"
 #include "Hd/tokens.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 

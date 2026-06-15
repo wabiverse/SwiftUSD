@@ -10,7 +10,7 @@
 #include "Tf/debug.h"
 #include "Tf/staticTokens.h"
 #include "Tf/stringUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/array.h"
 #include "Work/loops.h"
 

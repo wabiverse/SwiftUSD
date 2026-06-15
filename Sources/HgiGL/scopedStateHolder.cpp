@@ -10,7 +10,7 @@
 #include "HgiGL/conversions.h"
 #include "HgiGL/diagnostic.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/diagnostic.h"
 #include "Tf/iterator.h"
 

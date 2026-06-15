@@ -13,7 +13,7 @@
 #include "Vdf/schedule.h"
 #include "Vdf/scheduler.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <mutex>
 #include <thread>

@@ -27,7 +27,7 @@
 #include "Ar/resolverContextBinder.h"
 #include "Sdf/layer.h"
 #include "Sdf/schema.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/dispatcher.h"
 #include "Work/loops.h"
 #include "Work/utils.h"

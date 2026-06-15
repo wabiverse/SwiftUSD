@@ -18,7 +18,7 @@
 #include "Usd/modelAPI.h"
 #include "Usd/primRange.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Work/withScopedParallelism.h"
 

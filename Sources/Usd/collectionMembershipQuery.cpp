@@ -8,7 +8,7 @@
 #include "Usd/collectionPredicateLibrary.h"
 
 #include "Tf/staticTokens.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Sdf/types.h"
 #include "Usd/primRange.h"
 #include "Usd/property.h"

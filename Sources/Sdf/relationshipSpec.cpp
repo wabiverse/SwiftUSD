@@ -19,7 +19,7 @@
 #include "Sdf/schema.h"
 
 #include "Tf/type.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <functional>
 #include <optional>

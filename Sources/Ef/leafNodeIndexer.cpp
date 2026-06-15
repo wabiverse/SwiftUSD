@@ -9,7 +9,7 @@
 #include "Ef/leafNode.h"
 #include "Vdf/connection.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <iterator>
 

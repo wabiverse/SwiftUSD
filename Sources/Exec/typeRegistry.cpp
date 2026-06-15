@@ -20,7 +20,7 @@
 #include "Tf/instantiateSingleton.h"
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/type.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/value.h"
 #include "Vt/visitValue.h"

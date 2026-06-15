@@ -38,7 +38,7 @@
 #include "Ar/resolverScopedCache.h"
 #include "Arch/fileSystem.h"
 #include "Arch/errno.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/debug.h"
 #include "Tf/envSetting.h"
 #include "Tf/fileUtils.h"

@@ -9,7 +9,7 @@
 
 #include "Hd/filteringSceneIndex.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <unordered_set>
 

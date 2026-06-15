@@ -12,7 +12,7 @@
 #include "Sdf/usdaFileFormat.h"
 #include "Sdf/layer.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/registryManager.h"
 

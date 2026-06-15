@@ -16,7 +16,7 @@
 #include "Tf/mallocTag.h"
 #include "Tf/notice.h"
 #include "Tf/scopeDescription.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Usd/attribute.h"
 #include "Usd/prim.h"

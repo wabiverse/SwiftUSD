@@ -16,7 +16,7 @@
 
 #include "Hio/types.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #ifdef PXR_PTEX_SUPPORT_ENABLED
 #include <Ptexture.h>

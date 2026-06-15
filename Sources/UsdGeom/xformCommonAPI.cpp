@@ -93,7 +93,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // --(BEGIN CUSTOM CODE)--
 
 #include "Gf/rotation.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <map>
 

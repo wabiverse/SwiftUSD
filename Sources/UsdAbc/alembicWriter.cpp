@@ -14,7 +14,7 @@
 #include "UsdGeom/xformOp.h"
 #include "Sdf/schema.h"
 #include "Usd/schemaRegistry.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/enum.h"
 #include "Tf/envSetting.h"
 #include "Tf/fileUtils.h"

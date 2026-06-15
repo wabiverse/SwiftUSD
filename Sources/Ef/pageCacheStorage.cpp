@@ -11,7 +11,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/mallocTag.h"
 #include "Tf/pyLock.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Ef/leafNodeCache.h"
 #include "Vdf/executorInterface.h"

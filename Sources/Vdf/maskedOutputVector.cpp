@@ -10,7 +10,7 @@
 #include "Vdf/node.h"
 #include "Vdf/output.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/sort.h"
 
 #include <algorithm>

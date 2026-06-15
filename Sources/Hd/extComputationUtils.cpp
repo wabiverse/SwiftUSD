@@ -12,7 +12,7 @@
 #include "Hd/perfLog.h"
 #include "Hd/sceneDelegate.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <deque>
 #include <iostream>

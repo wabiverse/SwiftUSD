@@ -8,7 +8,7 @@
 #include "Hd/dependenciesSchema.h"
 #include "Hd/retainedDataSource.h"
 #include "Hd/overlayContainerDataSource.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Work/utils.h"
 

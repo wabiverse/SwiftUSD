@@ -25,7 +25,7 @@
 #include "Tf/iterator.h"
 #include "Tf/ostreamMethods.h"
 #include "Tf/type.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <ostream>
 #include <utility>

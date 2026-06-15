@@ -22,7 +22,7 @@
 
 #include "Plug/registry.h"
 #include "Plug/plugin.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <ostream>
 

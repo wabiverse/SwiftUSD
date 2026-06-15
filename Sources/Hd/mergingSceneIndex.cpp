@@ -11,7 +11,7 @@
 #include "Hd/sceneIndexPrimView.h"
 
 #include "Tf/denseHashSet.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/dispatcher.h"
 
 #include <OneTBB/tbb/concurrent_queue.h>

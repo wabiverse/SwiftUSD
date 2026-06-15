@@ -21,7 +21,7 @@
 #include "Tf/functionRef.h"
 #include "Tf/hash.h"
 #include "Tf/span.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <iosfwd>
 #include <type_traits>

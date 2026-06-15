@@ -13,7 +13,7 @@
 #include "PxOsd/tokens.h"
 
 #include "Arch/hash.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/diagnostic.h"
 #include "Tf/debug.h"
 

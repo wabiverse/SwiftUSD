@@ -15,7 +15,7 @@
 #include "Sdf/variantSpec.h"
 #include "Tf/diagnostic.h"
 #include "Tf/type.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include <ostream>
 
 PXR_NAMESPACE_OPEN_SCOPE

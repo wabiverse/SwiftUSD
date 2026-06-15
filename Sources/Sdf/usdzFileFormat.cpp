@@ -7,7 +7,7 @@
 #include "pxr/pxrns.h"
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ar/packageUtils.h"
 #include "Ar/resolver.h"
 #include "Ar/resolverScopedCache.h"

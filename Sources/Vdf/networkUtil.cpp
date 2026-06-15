@@ -9,7 +9,7 @@
 #include "Vdf/sparseInputTraverser.h"
 #include "Vdf/sparseOutputTraverser.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <functional>
 

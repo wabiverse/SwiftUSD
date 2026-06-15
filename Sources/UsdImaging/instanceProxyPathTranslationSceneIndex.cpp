@@ -11,7 +11,7 @@
 #include "Hd/sceneIndexPrimView.h"
 #include "Hd/retainedDataSource.h"
 #include "Hd/tokens.h"
-#include "Trace/trace.h" 
+#include "Trace/traceImpl.h" 
 #include "Tf/stackTrace.h"
 
 #include <optional>

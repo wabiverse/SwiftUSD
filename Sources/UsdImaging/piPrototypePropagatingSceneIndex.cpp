@@ -17,7 +17,7 @@
 #include "Hd/retainedDataSource.h"
 #include "Hd/sceneIndexPrimView.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/envSetting.h"
 #include "Tf/stringUtils.h"
 

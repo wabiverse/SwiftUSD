@@ -16,7 +16,7 @@
 #include "Ar/packageUtils.h"
 #include "Ar/resolver.h"
 #include "Tf/pathUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 using std::string;
 

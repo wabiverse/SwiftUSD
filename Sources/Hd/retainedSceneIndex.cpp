@@ -6,7 +6,7 @@
 //
 #include "Hd/retainedSceneIndex.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Hd/retainedDataSource.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

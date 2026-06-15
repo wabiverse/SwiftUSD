@@ -8,7 +8,7 @@
 
 #include "UsdImaging/rerootingContainerDataSource.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Hd/overlayContainerDataSource.h"
 #include "Hd/systemSchema.h"
 

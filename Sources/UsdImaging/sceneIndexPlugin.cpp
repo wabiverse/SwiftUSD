@@ -9,7 +9,7 @@
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

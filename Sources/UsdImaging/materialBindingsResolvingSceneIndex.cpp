@@ -24,7 +24,7 @@
 #include "Hd/retainedDataSource.h"
 
 #include "Tf/debug.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <optional>
 

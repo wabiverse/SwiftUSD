@@ -7,7 +7,7 @@
 #include "Ef/dependencyCache.h"
 
 #include "Tf/mallocTag.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Vdf/connection.h"
 #include "Vdf/network.h"

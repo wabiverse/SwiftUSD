@@ -12,7 +12,7 @@
 #include "Tf/registryManager.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Ar/asset.h"
 #include "Ar/resolvedPath.h"

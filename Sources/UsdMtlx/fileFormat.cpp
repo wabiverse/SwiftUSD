@@ -11,7 +11,7 @@
 #include "UsdMtlx/utils.h"
 #include "Usd/stage.h"
 #include "Tf/pathUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <MaterialX/MXCoreDocument.h>
 #include <MaterialX/MXFormatXmlIo.h>

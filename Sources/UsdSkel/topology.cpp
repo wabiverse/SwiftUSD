@@ -6,7 +6,7 @@
 //
 #include "UsdSkel/topology.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <unordered_map>
 

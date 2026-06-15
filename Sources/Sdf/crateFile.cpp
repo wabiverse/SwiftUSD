@@ -51,7 +51,7 @@
 #include "Tf/type.h"
 #include "Ts/binary.h"
 #include "Ts/spline.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/arrayEdit.h"
 #include "Vt/arrayEditBuilder.h"
 #include "Vt/dictionary.h"

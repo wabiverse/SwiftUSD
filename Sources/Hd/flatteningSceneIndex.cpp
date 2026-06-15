@@ -8,7 +8,7 @@
 #include "Hd/flattenedDataSourceProvider.h"
 #include "Hd/invalidatableContainerDataSource.h"
 #include "Hd/retainedDataSource.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Work/utils.h"
 

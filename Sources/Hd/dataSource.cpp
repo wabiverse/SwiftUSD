@@ -7,7 +7,7 @@
 #include "Hd/dataSource.h"
 #include "Hd/timeSampleArray.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <iostream>
 

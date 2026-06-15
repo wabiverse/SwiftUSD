@@ -30,7 +30,7 @@
 
 #include "Tf/errorMark.h"
 #include "Tf/errorTransport.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Work/isolatingDispatcher.h"
 #include "Work/taskGraph.h"

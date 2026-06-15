@@ -7,7 +7,7 @@
 #include "Vdf/nodeProcessInvalidationInterface.h"
 #include "Vdf/node.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/hash.h"

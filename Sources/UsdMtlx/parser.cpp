@@ -21,7 +21,7 @@
 #include "Tf/staticTokens.h"
 #include "Tf/stringUtils.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 namespace mx = MaterialX;
 

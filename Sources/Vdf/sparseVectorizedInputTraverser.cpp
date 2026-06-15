@@ -11,7 +11,7 @@
 #include "Vdf/poolChainIndexer.h"
 
 #include "Tf/bits.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/hash.h"
 

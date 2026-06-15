@@ -10,7 +10,7 @@
 #include "Exec/requestImpl.h"
 
 #include "Tf/diagnostic.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

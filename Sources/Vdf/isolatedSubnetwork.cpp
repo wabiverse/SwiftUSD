@@ -9,7 +9,7 @@
 #include "Vdf/connection.h"
 #include "Vdf/network.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <stack>
 

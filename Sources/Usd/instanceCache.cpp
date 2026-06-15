@@ -11,7 +11,7 @@
 #include "Pcp/primIndex.h"
 
 #include "Tf/envSetting.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <utility>
 

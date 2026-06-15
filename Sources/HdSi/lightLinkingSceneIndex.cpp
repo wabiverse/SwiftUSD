@@ -25,7 +25,7 @@
 #include "Hd/lightSchema.h"
 
 #include "Tf/debug.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <optional>
 #include <unordered_map>

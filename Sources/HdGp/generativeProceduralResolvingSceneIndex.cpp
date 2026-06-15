@@ -11,7 +11,7 @@
 #include "Hd/systemMessages.h"
 
 #include "Tf/denseHashSet.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Work/withScopedParallelism.h"
 

@@ -9,7 +9,7 @@
 #include "Exec/program.h"
 
 #include "Tf/mallocTag.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vdf/connection.h"
 #include "Vdf/input.h"
 #include "Vdf/node.h"

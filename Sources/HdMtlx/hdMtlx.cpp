@@ -24,7 +24,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/getenv.h"
 #include "Tf/token.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "UsdMtlx/utils.h"
 

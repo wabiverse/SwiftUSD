@@ -7,7 +7,7 @@
 #include "Hd/cachingSceneIndex.h"
 
 #include "Tf/envSetting.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

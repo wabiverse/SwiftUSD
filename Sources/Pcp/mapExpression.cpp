@@ -10,7 +10,7 @@
 #include "Pcp/mapFunction.h"
 #include "Pcp/layerStack.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <OneTBB/tbb/concurrent_hash_map.h>
 

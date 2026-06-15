@@ -16,7 +16,7 @@
 #include <cctype>
 #include <map>
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 namespace mx = MaterialX;
 

@@ -18,7 +18,7 @@
 #include "Sdf/schema.h"
 #include "Arch/fileSystem.h"
 #include "Work/threadLimits.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/envSetting.h"
 #include "Tf/staticData.h"
 #include "Tf/staticTokens.h"
