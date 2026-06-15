@@ -1,3 +1,7 @@
+#include "Arch/defines.h"
+
+#if PXR_METAL_SUPPORT_ENABLED && defined(ARCH_OS_OSX)
+
 //
 // Copyright 2020 Pixar
 //
@@ -797,10 +801,10 @@ HgiInteropMetal::CompositeToInterop(
     id<MTLTexture> colorTexture = nil;
     id<MTLTexture> depthTexture = nil;
     if (color) {
-        colorTexture = id<MTLTexture>(color->GetRawResource());
+        colorTexture = (__bridge id<MTLTexture>)(void*)color->GetRawResource();
     }
     if (depth) {
-        depthTexture = id<MTLTexture>(depth->GetRawResource());
+        depthTexture = (__bridge id<MTLTexture>)(void*)depth->GetRawResource();
     }
 
     id<MTLCommandBuffer> commandBuffer = _hgiMetal->GetPrimaryCommandBuffer();
@@ -891,3 +895,5 @@ HgiInteropMetal::CompositeToInterop(
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
+
+#endif // PXR_METAL_SUPPORT_ENABLED && defined(ARCH_OS_OSX)
