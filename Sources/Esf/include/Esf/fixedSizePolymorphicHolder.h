@@ -14,7 +14,7 @@
 #include "Esf/api.h"
 
 #include "Tf/diagnosticLite.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include <cstddef>
 #include <new>

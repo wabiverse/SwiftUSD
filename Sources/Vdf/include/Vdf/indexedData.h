@@ -17,7 +17,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/hash.h"
 #include "Tf/mallocTag.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include <algorithm>
 #include <ostream>

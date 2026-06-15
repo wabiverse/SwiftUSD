@@ -11,7 +11,7 @@
 
 #include "Tf/anyUniquePtr.h"
 #include "Tf/preprocessorUtilsLite.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include "Vt/api.h"
 #include "Vt/traits.h"

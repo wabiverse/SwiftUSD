@@ -9,7 +9,7 @@
 #include "Vdf/mask.h"
 
 #include "Tf/diagnostic.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include <algorithm>
 
