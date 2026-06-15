@@ -34,7 +34,13 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((rspinToken, "In:Rspin"))                  \
     ((rotationOrderToken, "In:RotationOrder"))  \
                                                 \
-    ((outSpaceToken, "Out:Space"))
+    ((outSpaceToken, "Out:Space"))              \
+                                                \
+    ((posedSpace, "posed:space"))               \
+                                                \
+    ((guideDisplayColor, "guide:displayColor")) \
+    ((guideDisplayOpacity, "guide:displayOpacity")) \
+    ((guideLength, "guide:length"))
 
 TF_DECLARE_PUBLIC_TOKENS(ExecIrTokens, EXECIR_API, EXEC_IR_TOKENS);
 

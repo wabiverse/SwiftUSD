@@ -817,6 +817,7 @@ public enum Pxr: String, CaseIterable
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
       Patch.pythonIncludes(to: &pxrSrc)
       Patch.pythonGuards(to: &pxrSrc, fileBaseName: fileURL.deletingPathExtension().lastPathComponent, pythonOnlyBasenames: exclusions.pythonOnly)
+      Patch.addMissingTokens(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
       Patch.apply(to: &pxrSrc, fileURL: fileURL, target: target)
 
       /* 1. match includes such as:
@@ -1065,6 +1066,29 @@ public enum Pxr: String, CaseIterable
     {
       guard fileBaseName == "crateDataTypes.h" else { return }
       source = source.replacingOccurrences(of: "#include \"pxr/pxrns.h\"\n\n", with: "")
+    }
+
+    /**
+     * Some libararies (from 'dev') reference tokens that do not yet exist, such as the in-development UsdExecImaging/UsdIRImaging
+     * targets referencing nonexistent ExecIr tokens, minor modifications needed in order to pre-release these libraries with v26.05,
+     * append them to their existing `*_TOKENS` declarations here. */
+    public static func addMissingTokens(to source: inout String, fileBaseName: String, target: String)
+    {
+      guard fileBaseName == "tokens.h" else { return }
+      
+      if target == "ExecIr"
+      {
+        source = source.replacingOccurrences(
+          of: "    ((outSpaceToken, \"Out:Space\"))\n",
+          with: "    ((outSpaceToken, \"Out:Space\"))              \\\n"
+            + "                                                \\\n"
+            + "    ((posedSpace, \"posed:space\"))               \\\n"
+            + "                                                \\\n"
+            + "    ((guideDisplayColor, \"guide:displayColor\")) \\\n"
+            + "    ((guideDisplayOpacity, \"guide:displayOpacity\")) \\\n"
+            + "    ((guideLength, \"guide:length\"))\n"
+        )
+      }
     }
 
     /**
