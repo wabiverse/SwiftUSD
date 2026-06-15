@@ -21,7 +21,7 @@
 #include "Vt/array.h"
 #include "Vt/value.h"
 #include "Work/dispatcher.h"
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/asset.h"
 #include "Ar/writableAsset.h"
 #include "Sdf/assetPath.h"
