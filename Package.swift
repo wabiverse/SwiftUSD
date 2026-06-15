@@ -2052,6 +2052,7 @@ let package = Package(
         .target(name: "UsdHydra"),
         .target(name: "UsdShade"),
         .target(name: "UsdImaging"),
+        .target(name: "ExecIr"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "UsdIRImaging"),
