@@ -281,6 +281,15 @@ public enum Pxr: String, CaseIterable
 
       var sourceFile = source.lastPathComponent
 
+      // SwiftPM has no per-file compile-flag override, so give this file
+      // a ".mm" extension to get objective-c++ mode from the compiler driver
+      // on every platform (this should be fine to do on Android, Linux, and
+      // Windows).
+      if target == "HgiInterop", sourceFile == "hgiInterop.cpp"
+      {
+        sourceFile = "hgiInterop.mm"
+      }
+
       // ------ copy source files to dest (Sources/Target/*) -----
 
       if ["m", "mm", "cpp", "cc", "c", "cxx"].contains(source.pathExtension)
@@ -1063,6 +1072,7 @@ public enum Pxr: String, CaseIterable
     public static func platformGuardedSource(to source: inout String, fileBaseName: String)
     {
       let guardMacro: String
+      var prefix = ""
       switch fileBaseName
       {
       case "glPlatformContextWindows.cpp", "glPlatformDebugWindowWindows.cpp":
@@ -1071,13 +1081,19 @@ public enum Pxr: String, CaseIterable
         guardMacro = "defined(__ANDROID__) || defined(__linux__)"
       case "vulkan.cpp":
         guardMacro = "0"
+      case "metal.mm":
+        // ARCH_OS_OSX isn't a compiler-predefined macro -- pull in
+        // Arch/defines.h before checking it, matching the guard
+        // hgiInterop.mm uses around its #include "HgiInterop/metal.h".
+        guardMacro = "PXR_METAL_SUPPORT_ENABLED && defined(ARCH_OS_OSX)"
+        prefix = "#include \"Arch/defines.h\"\n\n"
       default:
         return
       }
 
       guard !source.contains("#if \(guardMacro)") else { return }
 
-      source = "#if \(guardMacro)\n\n" + source + "\n#endif // \(guardMacro)\n"
+      source = prefix + "#if \(guardMacro)\n\n" + source + "\n#endif // \(guardMacro)\n"
     }
 
     /**
@@ -1281,6 +1297,12 @@ public enum Pxr: String, CaseIterable
       // NSOpenGLPixelFormat alloc is an objc object pointer -- needs an
       // explicit __bridge cast.
       source = source.replacingOccurrences(of: "return [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];", with: "return (__bridge void*)[[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];")
+
+      // GetRawResource() returns a uint64_t, but id<MTLTexture> is an objc
+      // object pointer -- a C-style cast from integer to objc pointer is
+      // disallowed under ARC, so round-trip through void* with __bridge.
+      source = source.replacingOccurrences(of: "colorTexture = id<MTLTexture>(color->GetRawResource());", with: "colorTexture = (__bridge id<MTLTexture>)(void*)color->GetRawResource();")
+      source = source.replacingOccurrences(of: "depthTexture = id<MTLTexture>(depth->GetRawResource());", with: "depthTexture = (__bridge id<MTLTexture>)(void*)depth->GetRawResource();")
     }
 
     /**
