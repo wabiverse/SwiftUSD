@@ -122,6 +122,7 @@ private:
     template <typename T> friend class TfRefPtr;
     friend struct Tf_RefPtr_UniqueChangedCounter;
     friend struct Tf_RefPtr_Counter;
+    friend class Tf_RetainReleaseHelper;
 
     template <typename T> friend TfRefPtr<T>
     TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &);

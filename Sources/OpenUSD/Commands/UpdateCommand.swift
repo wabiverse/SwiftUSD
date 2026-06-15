@@ -1295,6 +1295,8 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "ar/ar.h", with: "Ar/arImpl.h")
       source = source.replacingOccurrences(of: "hgi/hgi.h", with: "Hgi/hgiImpl.h")
       
+      source = source.replacingOccurrences(of: "friend struct Tf_RefPtr_Counter;", with: "friend struct Tf_RefPtr_Counter;\n    friend class Tf_RetainReleaseHelper;")
+      
       /* ----- pxr external headers. ----- */
 
       source = source.replacingOccurrences(of: "pxr/external/", with: "")
