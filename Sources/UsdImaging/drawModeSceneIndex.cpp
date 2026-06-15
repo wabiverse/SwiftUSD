@@ -14,7 +14,7 @@
 #include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
-#include "tbb/concurrent_vector.h"
+#include <OneTBB/tbb/concurrent_vector.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

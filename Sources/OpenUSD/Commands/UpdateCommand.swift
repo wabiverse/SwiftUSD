@@ -1246,6 +1246,11 @@ public enum Pxr: String, CaseIterable
       // the normal <tbb/xxx.h> include paths can only be utilized once Swift on Linux is
       // fixed, possibly as soon as Swift 6, refer to the following PR:
       // https://github.com/swiftlang/swift/pull/75662
+      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_queue.h\"", with: "#include <OneTBB/tbb/concurrent_queue.h>")
+      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_unordered_map.h\"", with: "#include <OneTBB/tbb/concurrent_unordered_map.h>")
+      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_vector.h\"", with: "#include <OneTBB/tbb/concurrent_vector.h>")
+      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_hash_map.h\"", with: "#include <OneTBB/tbb/concurrent_hash_map.h>")
+      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_unordered_set.h\"", with: "#include <OneTBB/tbb/concurrent_unordered_set.h>")
       source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
       // modern versions of tbb no longer have atomic, get it from std.
       source = source.replacingOccurrences(of: "<tbb/atomic.h>", with: "<atomic>")
