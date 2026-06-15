@@ -34,7 +34,7 @@
 #include "Tf/staticTokens.h"
 #include "Tf/stringUtils.h"
 #include "Tf/token.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/visitValue.h"
 #include "UsdShade/tokens.h"

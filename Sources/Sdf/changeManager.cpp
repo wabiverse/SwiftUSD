@@ -13,7 +13,7 @@
 #include "Sdf/notice.h"
 #include "Sdf/schema.h"
 #include "Sdf/spec.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/stackTrace.h"
 

@@ -19,7 +19,7 @@
 
 #include "Tf/type.h"
 #include "Tf/ostreamMethods.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Ts/spline.h"
 

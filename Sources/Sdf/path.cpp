@@ -20,7 +20,7 @@
 #include "Tf/unicodeUtils.h"
 #include "Tf/type.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 #include <ostream>

@@ -10,7 +10,7 @@
 
 #include "Tf/mallocTag.h"
 #include "Tf/stl.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include <OneTBB/tbb/combinable.h>

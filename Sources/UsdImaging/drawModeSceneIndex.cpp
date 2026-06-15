@@ -11,7 +11,7 @@
 
 #include "Sdf/path.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include "tbb/concurrent_vector.h"

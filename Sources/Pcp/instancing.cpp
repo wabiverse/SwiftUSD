@@ -8,7 +8,7 @@
 #include "Pcp/instancing.h"
 
 #include "Tf/envSetting.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

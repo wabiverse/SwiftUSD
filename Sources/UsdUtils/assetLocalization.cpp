@@ -30,7 +30,7 @@
 #include "Tf/fileUtils.h"
 #include "Tf/pathUtils.h"
 #include "Tf/stringUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <stack>
 #include <vector>

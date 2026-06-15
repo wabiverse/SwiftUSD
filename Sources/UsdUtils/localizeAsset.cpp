@@ -24,7 +24,7 @@
 #include "UsdUtils/localizeAsset.h"
 #include "UsdUtils/debugCodes.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 

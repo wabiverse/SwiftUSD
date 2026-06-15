@@ -12,7 +12,7 @@
 #include "pxr/pxrns.h"
 
 #include "Tf/mallocTag.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vdf/dataManagerBasedExecutor.h"
 #include "Vdf/executorFactory.h"
 #include "Vdf/executorInterface.h"

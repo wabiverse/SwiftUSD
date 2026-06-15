@@ -17,7 +17,7 @@
 #include "Hio/image.h"
 
 #include "Tf/iterator.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include "Ar/resolver.h"

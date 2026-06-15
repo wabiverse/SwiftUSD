@@ -17,7 +17,7 @@
 #include "Tf/debug.h"
 #include "Tf/hash.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <iostream>
 #include <set>

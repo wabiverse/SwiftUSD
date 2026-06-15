@@ -12,7 +12,7 @@
 #include "Hd/version.h"
 #include "Hd/debugCodes.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/mallocTag.h"
 #include "Tf/singleton.h"

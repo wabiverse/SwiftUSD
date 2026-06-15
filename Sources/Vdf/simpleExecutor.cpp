@@ -17,7 +17,7 @@
 #include "Vdf/speculationExecutorEngine.h"
 
 #include "Tf/diagnostic.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <memory>
 

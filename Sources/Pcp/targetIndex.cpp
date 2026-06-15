@@ -18,7 +18,7 @@
 #include "Sdf/propertySpec.h"
 #include "Sdf/types.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <functional>
 #include <optional>

@@ -17,7 +17,7 @@
 #include "Sdf/primSpec.h"
 #include "Sdf/site.h"
 #include "Ar/resolverContextBinder.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/envSetting.h"
 #include "Tf/mallocTag.h"
 #include "Work/dispatcher.h"

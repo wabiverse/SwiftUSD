@@ -13,7 +13,7 @@
 
 #include "Tf/bits.h"
 #include "Tf/diagnostic.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <functional>
 #include <memory>

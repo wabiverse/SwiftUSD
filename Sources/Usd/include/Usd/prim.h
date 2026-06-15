@@ -17,7 +17,7 @@
 #include "Usd/schemaRegistry.h"
 
 #include "Sdf/schema.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/declarePtrs.h"
 #include "Tf/refBase.h"

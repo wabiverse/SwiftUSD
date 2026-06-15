@@ -6,7 +6,7 @@
 //
 #include "pxr/pxrns.h"
 #include "Sdf/abstractData.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <cmath>
 #include <ostream>

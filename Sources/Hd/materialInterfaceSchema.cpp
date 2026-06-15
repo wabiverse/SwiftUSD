@@ -19,7 +19,7 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 #include "Hd/materialInterfaceMappingSchema.h"

@@ -26,7 +26,7 @@
 #include "Tf/envSetting.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/unicodeUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ts/spline.h"
 #include "Vt/dictionary.h"
 

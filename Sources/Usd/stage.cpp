@@ -51,7 +51,7 @@
 #include "Sdf/usdFileFormat.h"
 #include "Sdf/variableExpression.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ar/resolver.h"
 #include "Ar/resolverContext.h"
 #include "Ar/resolverContextBinder.h"

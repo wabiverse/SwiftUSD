@@ -24,7 +24,7 @@
 #include "Gf/matrix4d.h"
 #include "Tf/refPtr.h"
 #include "Tf/staticTokens.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/array.h"
 
 #include "pxr/pxrns.h"

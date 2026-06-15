@@ -17,7 +17,7 @@
 #include "Arch/functionLite.h"
 #include "Tf/mallocTag.h"
 #include "Tf/span.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/dispatcher.h"
 #include "Work/loops.h"
 #include "Work/withScopedParallelism.h"

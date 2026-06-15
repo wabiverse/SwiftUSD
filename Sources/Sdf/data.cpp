@@ -7,7 +7,7 @@
 
 #include "pxr/pxrns.h"
 #include "Sdf/data.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/utils.h"
 
 #include <iostream>

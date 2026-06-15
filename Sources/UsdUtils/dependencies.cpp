@@ -19,7 +19,7 @@
 #include "Sdf/layerUtils.h"
 
 #include "Tf/diagnostic.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <functional>
 #include <unordered_set>

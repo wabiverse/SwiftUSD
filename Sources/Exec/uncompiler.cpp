@@ -12,7 +12,7 @@
 #include "Exec/uncompilationTable.h"
 #include "Exec/uncompilationTarget.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Esf/editReason.h"
 #include "Sdf/path.h"
 

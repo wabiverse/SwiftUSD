@@ -25,7 +25,7 @@
 #include "Tf/staticData.h"
 #include "Tf/staticTokens.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 #include <iostream>

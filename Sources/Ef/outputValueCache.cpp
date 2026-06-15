@@ -6,7 +6,7 @@
 //
 #include "Ef/outputValueCache.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vdf/output.h"
 #include "Vdf/network.h"
 #include "Vdf/node.h"

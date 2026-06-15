@@ -18,7 +18,7 @@
 #include "Tf/staticData.h"
 #include "Tf/stl.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <OneTBB/tbb/concurrent_hash_map.h>
 #include <OneTBB/tbb/spin_mutex.h>

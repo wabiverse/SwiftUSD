@@ -16,7 +16,7 @@
 #include "HgiGL/resourceBindings.h"
 #include "HgiGL/shaderProgram.h"
 #include "HgiGL/texture.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/scopeDescription.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

@@ -11,7 +11,7 @@
 #include "Usd/valueUtils.h"
 
 #include "Sdf/types.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/preprocessorUtilsLite.h"
 #include "Ts/spline.h"
 

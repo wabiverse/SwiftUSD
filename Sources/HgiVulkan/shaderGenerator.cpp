@@ -11,7 +11,7 @@
 #include "HgiVulkan/hgi.h"
 #include "Hgi/tokens.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

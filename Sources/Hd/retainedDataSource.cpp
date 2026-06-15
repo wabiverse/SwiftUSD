@@ -8,7 +8,7 @@
 
 #include "Gf/matrix4d.h"
 #include "Gf/vec2f.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/array.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/visitValue.h"

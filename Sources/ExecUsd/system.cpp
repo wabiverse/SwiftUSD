@@ -13,7 +13,7 @@
 #include "ExecUsd/valueOverride.h"
 
 #include "Tf/declarePtrs.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "EsfUsd/sceneAdapter.h"
 #include "EsfUsd/stageData.h"
 #include "Exec/systemChangeProcessor.h"

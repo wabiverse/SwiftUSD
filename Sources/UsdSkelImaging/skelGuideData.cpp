@@ -9,7 +9,7 @@
 #include "UsdSkelImaging/skelData.h"
 #include "UsdSkelImaging/utils.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -13,7 +13,7 @@
 #include "Exec/providerResolution.h"
 
 #include "Tf/delegatedCountPtr.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ef/leafNode.h"
 #include "Esf/editReason.h"
 #include "Esf/journal.h"

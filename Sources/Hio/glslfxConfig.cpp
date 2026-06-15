@@ -12,7 +12,7 @@
 #include "Tf/staticTokens.h"
 #include "Tf/stl.h"
 #include "Tf/type.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

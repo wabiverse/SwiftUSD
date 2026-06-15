@@ -1212,12 +1212,13 @@ public enum Pxr: String, CaseIterable
 
       source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
       
-      /* ----- tf includes. -------------- */
+      /* ----- umbrella collisions. ------- */
       
       // we never want to bring in the entire tf module (umbrella header),
       // we want openusd's tf.h header implementation that we renamed to
       // tf/tfImpl.h (see `collidingUmbrellaInclude(to:target:)`).
       source = source.replacingOccurrences(of: "tf/tf.h", with: "Tf/tfImpl.h")
+      source = source.replacingOccurrences(of: "trace/trace.h", with: "Trace/traceImpl.h")
       
       /* ----- pxr external headers. ----- */
 

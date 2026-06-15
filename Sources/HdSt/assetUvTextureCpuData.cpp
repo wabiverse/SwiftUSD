@@ -7,7 +7,7 @@
 #include "HdSt/assetUvTextureCpuData.h"
 #include "HdSt/textureUtils.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

@@ -7,7 +7,7 @@
 
 #include "HioOpenVDB/utils.h"
 #include "HioOpenVDB/vdbAssetInterface.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ar/asset.h"
 #include "Ar/resolver.h"
 #include "Ar/resolvedPath.h"

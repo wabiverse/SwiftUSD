@@ -6,7 +6,7 @@
 //
 #include "pxr/pxrns.h"
 #include "Tf/pathUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ar/packageUtils.h"
 #include "Ar/resolver.h"
 #include "Sdf/layerUtils.h"

@@ -15,7 +15,7 @@
 #include "Arch/functionLite.h"
 #include "Tf/mallocTag.h"
 #include "Tf/token.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Esf/editReason.h"
 #include "Esf/journal.h"
 

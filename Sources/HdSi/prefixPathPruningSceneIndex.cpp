@@ -7,7 +7,7 @@
 #include "HdSi/prefixPathPruningSceneIndex.h"
 
 #include "Hd/sceneIndexPrimView.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Sdf/path.h"
 
 #include <algorithm>

@@ -10,7 +10,7 @@
 #include "Pcp/debugCodes.h"
 #include "Pcp/dependencies.h"
 #include "Pcp/layerStack.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 #include <utility>

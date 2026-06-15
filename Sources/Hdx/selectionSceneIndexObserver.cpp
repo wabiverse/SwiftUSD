@@ -14,7 +14,7 @@
 #include "Hd/selectionsSchema.h"
 #include "Work/loops.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <mutex>
 

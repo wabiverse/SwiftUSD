@@ -16,7 +16,7 @@
 
 #include "Tf/iterator.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #if PXR_PYTHON_SUPPORT_ENABLED
 #include "boost/python/dict.hpp"

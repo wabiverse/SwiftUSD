@@ -16,7 +16,7 @@
 #include "Tf/iterator.h"
 #include "Tf/pxrTslRobinMap/robin_set.h"
 #include "Tf/stl.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include <algorithm>

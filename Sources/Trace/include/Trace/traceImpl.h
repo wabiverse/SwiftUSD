@@ -8,7 +8,7 @@
 #ifndef PXR_BASE_TRACE_TRACE_H
 #define PXR_BASE_TRACE_TRACE_H
 
-/// \file trace/trace.h
+/// \file Trace/traceImpl.h
 
 #include "pxr/pxrns.h"
 

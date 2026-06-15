@@ -12,7 +12,7 @@
 #include "Sdf/debugCodes.h"
 #include "Sdf/fileFormat.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Arch/systemInfo.h"
 #include "Ar/assetInfo.h"
 #include "Ar/packageUtils.h"

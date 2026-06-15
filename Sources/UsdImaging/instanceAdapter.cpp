@@ -6,7 +6,7 @@
 //
 #include "UsdImaging/instanceAdapter.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "UsdImaging/delegate.h"
 #include "UsdImaging/indexProxy.h"
 #include "UsdImaging/instancerContext.h"

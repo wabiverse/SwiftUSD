@@ -27,7 +27,7 @@
 
 #include "Tf/refPtr.h"
 #include "Tf/token.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/array.h"
 #include "Work/loops.h"
 

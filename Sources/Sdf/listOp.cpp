@@ -22,7 +22,7 @@
 #include "Tf/token.h"
 #include "Tf/type.h"
 #include "Tf/pxrTslRobinMap/robin_set.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/valueComposeOver.h"
 
 #include <ostream>

@@ -19,7 +19,7 @@
 
 #include "Vt/array.h"
 #include "Gf/vec2d.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/diagnostic.h"
 #include "Tf/hash.h"
 #include "Tf/mallocTag.h"

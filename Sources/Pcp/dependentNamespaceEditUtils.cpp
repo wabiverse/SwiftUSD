@@ -14,7 +14,7 @@
 #include "Pcp/mapExpression.h"
 #include "Pcp/node_Iterator.h"
 #include "Pcp/utils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

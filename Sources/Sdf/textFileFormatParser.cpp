@@ -17,7 +17,7 @@
 
 #include "Pegtl/contrib/trace.hpp"
 #include "Tf/stringUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Ts/raii.h"
 #include "Ts/spline.h"
 #include "Ts/valueTypeDispatch.h"

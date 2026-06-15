@@ -9,7 +9,7 @@
 #include "Vdf/node.h"
 
 #include "Arch/threads.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include <algorithm>

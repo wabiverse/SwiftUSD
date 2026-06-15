@@ -13,7 +13,7 @@
 
 #include "Tf/span.h"
 #include "Tf/token.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Work/withScopedParallelism.h"
 #include "Ef/leafNode.h"

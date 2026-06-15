@@ -22,7 +22,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/stringUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <utility>
 

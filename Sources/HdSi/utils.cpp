@@ -11,7 +11,7 @@
 #include "Hd/materialBindingsSchema.h"
 #include "Hd/sceneIndex.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Sdf/pathExpression.h"
 #include "Sdf/predicateLibrary.h"
 #include "UsdShade/tokens.h"

@@ -6,7 +6,7 @@
 //
 #include "Ef/inputValueBlock.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/iterator.h"
 #include "Tf/stl.h"
 #include "Vdf/executorInterface.h"

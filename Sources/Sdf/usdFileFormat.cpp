@@ -12,7 +12,7 @@
 #include "Ar/resolver.h"
 #include "Sdf/layer.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/envSetting.h"
 #include "Tf/registryManager.h"

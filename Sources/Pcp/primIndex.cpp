@@ -32,7 +32,7 @@
 #include "Ar/resolverContextBinder.h"
 #include "Sdf/fileFormat.h"
 #include "Sdf/layer.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/debug.h"
 #include "Tf/enum.h"
 #include "Tf/hash.h"

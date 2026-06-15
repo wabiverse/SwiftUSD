@@ -20,7 +20,7 @@
 #include "Hd/retainedDataSource.h"
 #include "Hd/basisCurvesSchema.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--

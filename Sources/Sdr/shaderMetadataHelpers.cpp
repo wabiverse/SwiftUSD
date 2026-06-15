@@ -11,7 +11,7 @@
 #include "Tf/staticData.h"
 #include "Tf/staticTokens.h"
 #include "Tf/stringUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Sdf/textParserUtils.h"
 #include "Sdf/types.h"
 #include "Sdr/shaderMetadataHelpers.h"

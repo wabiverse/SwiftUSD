@@ -16,7 +16,7 @@
 #include "Sdf/usdcFileFormat.h"
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Tf/iterator.h"
 #include "Tf/scopeDescription.h"
 #include "Tf/staticTokens.h"

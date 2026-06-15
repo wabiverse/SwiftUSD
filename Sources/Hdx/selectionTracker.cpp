@@ -13,7 +13,7 @@
 #include "Hd/meshUtil.h"
 #include "Hd/renderIndex.h"
 #include "Hd/rprim.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
 #include <algorithm>

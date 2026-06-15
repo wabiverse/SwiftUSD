@@ -6,7 +6,7 @@
 //
 #include "Ef/loftedOutputSet.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/loops.h"
 #include "Vdf/network.h"
 #include "Vdf/node.h"

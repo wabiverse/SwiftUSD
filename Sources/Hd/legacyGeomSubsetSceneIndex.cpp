@@ -33,7 +33,7 @@
 #include "Tf/staticTokens.h"
 #include "Tf/token.h"
 #include "Vt/types.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "pxr/pxrns.h"
 

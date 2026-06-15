@@ -14,7 +14,7 @@
 
 #include "Tf/type.h"
 #include "Tf/fileUtils.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "openvdb/openvdb.h"
 #include "openvdb/tools/Dense.h"

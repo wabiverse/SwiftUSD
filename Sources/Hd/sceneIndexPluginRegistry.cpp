@@ -23,7 +23,7 @@
 #include "Tf/refPtr.h"
 #include "Tf/token.h"
 #include "Tf/weakPtr.h"
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <iterator>
 #include <map>
