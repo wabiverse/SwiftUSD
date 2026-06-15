@@ -7,7 +7,6 @@
 #ifndef PXR_BASE_GF_NC_NANOCOLOR_H
 #define PXR_BASE_GF_NC_NANOCOLOR_H
 
-#include "Arch/export.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -26,7 +25,13 @@
 
 // NCAPI may be overridden externally to control symbol visibility.
 #ifndef NCAPI
-#define NCAPI ARCH_HIDDEN
+#  if defined(_WIN32) || defined(__CYGWIN__)
+#    define NCAPI
+#  elif defined(__GNUC__) || defined(__clang__)
+#    define NCAPI __attribute__((visibility("hidden")))
+#  else
+#    define NCAPI
+#  endif
 #endif
 
 #ifdef __cplusplus

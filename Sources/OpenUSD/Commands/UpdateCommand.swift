@@ -850,6 +850,10 @@ public enum Pxr: String, CaseIterable
       // insensitively) with this target's generated umbrella header, since
       // such headers are renamed on disk (ex. "Tf/tf.h" -> "Tf/tfImpl.h").
       Patch.collidingUmbrellaInclude(to: &pxrSrc, target: target)
+      
+      // because nanocolor is a plain-C header and bringing in Arch's entire
+      // C++ clang module is problematic.
+      Patch.nanocolorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
 
       try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
     }
@@ -1061,6 +1065,30 @@ public enum Pxr: String, CaseIterable
     {
       guard fileBaseName == "crateDataTypes.h" else { return }
       source = source.replacingOccurrences(of: "#include \"pxr/pxrns.h\"\n\n", with: "")
+    }
+
+    /**
+     * give NCAPI a self-contained fallback instead, so nanocolor.h (a plain-C header) never needs to import
+     * the entire Arch C++ Clang module. */
+    public static func nanocolorHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "nanocolor.h" else { return }
+
+      source = source.replacingOccurrences(of: "#include \"Arch/export.h\"\n", with: "")
+      source = source.replacingOccurrences(
+        of: "#ifndef NCAPI\n#define NCAPI ARCH_HIDDEN\n#endif",
+        with: """
+        #ifndef NCAPI
+        #  if defined(_WIN32) || defined(__CYGWIN__)
+        #    define NCAPI
+        #  elif defined(__GNUC__) || defined(__clang__)
+        #    define NCAPI __attribute__((visibility("hidden")))
+        #  else
+        #    define NCAPI
+        #  endif
+        #endif
+        """
+      )
     }
 
     /**
