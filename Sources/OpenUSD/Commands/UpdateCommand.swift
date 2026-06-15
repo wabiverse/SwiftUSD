@@ -1293,6 +1293,7 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "tf/tf.h", with: "Tf/tfImpl.h")
       source = source.replacingOccurrences(of: "trace/trace.h", with: "Trace/traceImpl.h")
       source = source.replacingOccurrences(of: "ar/ar.h", with: "Ar/arImpl.h")
+      source = source.replacingOccurrences(of: "hgi/hgi.h", with: "Hgi/hgiImpl.h")
       
       /* ----- pxr external headers. ----- */
 
