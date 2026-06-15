@@ -661,7 +661,7 @@ public enum Pxr: String, CaseIterable
    */
   private func restoreResourceOnlyFiles(packagePath: String) throws
   {
-    guard let resourceRoot = Bundle.module.resourceURL?.appendingPathComponent("Resources")
+    guard let resourceRoot = Bundle.module.resourceURL
     else { return }
 
     for target in targets(packagePath: packagePath)
