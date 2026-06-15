@@ -15,7 +15,7 @@
 #include "UsdExecImaging/valueKey.h"
 #include "UsdExecImaging/valueKeyMap.h"
 
-#include "pxr/exec/execUsd/valueKey.h"
+#include "ExecUsd/valueKey.h"
 
 #include <vector>
 

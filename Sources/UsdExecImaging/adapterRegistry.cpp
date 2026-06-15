@@ -11,7 +11,7 @@
 #include "UsdExecImaging/primAdapterInterface.h"
 
 #include "Tf/envSetting.h"
-#include "pxr/exec/execIr/xformable.h"
+#include "ExecIr/xformable.h"
 #include "UsdGeom/xformable.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

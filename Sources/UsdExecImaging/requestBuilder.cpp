@@ -6,7 +6,7 @@
 //
 #include "UsdExecImaging/requestBuilder.h"
 
-#include "pxr/exec/exec/builtinComputations.h"
+#include "Exec/builtinComputations.h"
 #include "Usd/attribute.h"
 #include "Usd/prim.h"
 

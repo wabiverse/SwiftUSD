@@ -14,7 +14,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
-#include "pxr/exec/execIr/tokens.h"
+#include "ExecIr/tokens.h"
 #include "Hd/dataSourceLocator.h"
 #include "Hd/retainedDataSource.h"
 #include "Hd/coneSchema.h"
