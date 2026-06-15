@@ -6,37 +6,48 @@
 //
 #include "Hd/flattenedPurposeDataSourceProvider.h"
 
-#include "Hd/purposeSchema.h"
 #include "Hd/retainedDataSource.h"
+#include "Hd/purposeSchema.h"
 #include "Hd/tokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle HdFlattenedPurposeDataSourceProvider::GetFlattenedDataSource(
+HdContainerDataSourceHandle
+HdFlattenedPurposeDataSourceProvider::GetFlattenedDataSource(
     const Context &ctx) const
 {
-  HdPurposeSchema inputPurpose(ctx.GetInputDataSource());
-  if (inputPurpose.GetPurpose()) {
+    // If there is a purpose on this prim, use it.
+    HdPurposeSchema inputPurpose(ctx.GetInputDataSource());
+    if (inputPurpose.GetPurpose()) {
+        return inputPurpose.GetContainer();
+    }
+
+    // If there is a parent purpose we can inherit, use that.
+    HdPurposeSchema parentPurpose(ctx.GetFlattenedDataSourceFromParentPrim());
+    if (HdBoolDataSourceHandle inheritableDs = parentPurpose.GetInheritable()) {
+        if (inheritableDs->GetTypedValue(0.0f)) {
+            // Parent purpose is inheritable.
+            return parentPurpose.GetContainer();
+        }
+    }
+
+    // If there is a fallback purpose, use that.
+    if (HdTokenDataSourceHandle fallbackDs = inputPurpose.GetFallback()) {
+        // Fallback purposes are not inheritable.
+        return HdPurposeSchema::Builder()
+            .SetPurpose(fallbackDs)
+            .Build();
+    }
+
+    // Pass through the existing data untouched.
     return inputPurpose.GetContainer();
-  }
-
-  HdPurposeSchema parentPurpose(ctx.GetFlattenedDataSourceFromParentPrim());
-  if (parentPurpose.GetPurpose()) {
-    return parentPurpose.GetContainer();
-  }
-
-  static const HdContainerDataSourceHandle identityPurpose =
-      HdPurposeSchema::Builder()
-          .SetPurpose(HdRetainedTypedSampledDataSource<TfToken>::New(HdRenderTagTokens->geometry))
-          .Build();
-
-  return identityPurpose;
 }
 
-void HdFlattenedPurposeDataSourceProvider::ComputeDirtyLocatorsForDescendants(
-    HdDataSourceLocatorSet *const locators) const
+void
+HdFlattenedPurposeDataSourceProvider::ComputeDirtyLocatorsForDescendants(
+    HdDataSourceLocatorSet * const locators) const
 {
-  *locators = HdDataSourceLocatorSet::UniversalSet();
+    *locators = HdDataSourceLocatorSet::UniversalSet();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

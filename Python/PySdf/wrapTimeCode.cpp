@@ -4,95 +4,105 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
 #include "Sdf/timeCode.h"
+#include "Vt/valueFromPython.h"
 #include "Tf/hash.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/stringUtils.h"
-#include "Vt/valueFromPython.h"
 #include "Vt/wrapArray.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/implicit.hpp>
-#include <boost/python/operators.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/implicit.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <sstream>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 TF_REGISTRY_FUNCTION(VtValue)
 {
-  VtRegisterValueCastsFromPythonSequencesToArray<SdfTimeCode>();
+    VtRegisterValueCastsFromPythonSequencesToArray<SdfTimeCode>();
 }
 
 namespace {
 
 static std::string _Str(SdfTimeCode const &self)
 {
-  return TfStringify(self);
+    return TfStringify(self);
 }
 
-static std::string _Repr(SdfTimeCode const &self)
+static std::string
+_Repr(SdfTimeCode const &self)
 {
-  std::ostringstream repr;
-  repr << TF_PY_REPR_PREFIX << "TimeCode(" << self << ")";
-  return repr.str();
+    std::ostringstream repr;
+    repr << TF_PY_REPR_PREFIX << "TimeCode(" << self << ")";
+    return repr.str();
 }
 
 static bool _HasNonZeroTimeCode(SdfTimeCode const &self)
 {
-  return self != SdfTimeCode(0.0);
+    return self != SdfTimeCode(0.0);
 }
 
 static double _Float(SdfTimeCode const &self)
 {
-  return double(self);
+    return double(self);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapTimeCode()
 {
-  typedef SdfTimeCode This;
+    typedef SdfTimeCode This;
 
-  auto selfCls = class_<This>("TimeCode", init<>())
-                     .def(init<double>())
+    auto selfCls = class_<This>("TimeCode", init<>())
+        .def(init<double>())
 
-                     .def("GetValue", &This::GetValue)
+        .def("GetValue", &This::GetValue)
 
-                     .def("__repr__", _Repr)
-                     .def("__str__", _Str)
-                     .def("__bool__", _HasNonZeroTimeCode)
-                     .def("__hash__", &This::GetHash)
-                     .def("__float__", _Float)
+        .def("__repr__", _Repr)
+        .def("__str__", _Str)
+        .def("__bool__", _HasNonZeroTimeCode)
+        .def("__hash__", &This::GetHash)
+        .def("__float__", _Float)
 
-                     .def(self == self)
-                     .def(double() == self)
-                     .def(self != self)
-                     .def(double() != self)
-                     .def(self < self)
-                     .def(double() < self)
-                     .def(self > self)
-                     .def(double() > self)
-                     .def(self <= self)
-                     .def(double() <= self)
-                     .def(self >= self)
-                     .def(double() >= self)
+        .def( self == self )
+        .def( double() == self )
+        .def( self != self )
+        .def( double() != self )
+        .def( self < self )
+        .def( double() < self )
+        .def( self > self )
+        .def( double() > self )
+        .def( self <= self )
+        .def( double() <= self )
+        .def( self >= self )
+        .def( double() >= self )
 
-                     .def(self * self)
-                     .def(double() * self)
-                     .def(self / self)
-                     .def(double() / self)
-                     .def(self + self)
-                     .def(double() + self)
-                     .def(self - self)
-                     .def(double() - self);
+        .def( self * self )
+        .def( double() * self )
+        .def( self / self )
+        .def( double() / self )
+        .def( self + self )
+        .def( double() + self )
+        .def( self - self )
+        .def( double() - self )
+        ;
 
-  implicitly_convertible<double, This>();
+    implicitly_convertible<double, This>();
 
-  // Let python know about us, to enable assignment from python back to C++
-  VtValueFromPython<SdfTimeCode>();
+    // Let python know about us, to enable assignment from python back to C++
+    VtValueFromPython<SdfTimeCode>();
 }

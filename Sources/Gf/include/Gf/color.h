@@ -10,12 +10,12 @@
 /// \file gf/color.h
 /// \ingroup group_gf_Color
 
-#include "Gf/api.h"
+#include "pxr/pxrns.h"
 #include "Gf/colorSpace.h"
-#include "Gf/matrix3f.h"
 #include "Gf/vec2f.h"
 #include "Gf/vec3f.h"
-#include "pxr/pxrns.h"
+#include "Gf/matrix3f.h"
+#include "Gf/api.h"
 
 #include <iosfwd>
 
@@ -24,7 +24,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \class GfColor
 /// \brief Represents a color in a specific color space.
 /// \ingroup group_gf_Color
-///
+/// 
 /// Basic type: Color
 ///
 /// The GfColor class represents a color in a specific color space. It provides
@@ -39,89 +39,81 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// between color spaces, normalizing luminance, and comparing colors.
 
 class GfColor {
- public:
-  /// The default constructor creates black, in the "lin_rec709" color space.
-  GF_API GfColor();
+public:
+    /// The default constructor creates black, in the "lin_rec709" color space.
+    GF_API GfColor();
 
-  /// Construct a black color in the given color space.
-  /// \param colorSpace The color space.
-  GF_API
-  explicit GfColor(const GfColorSpace &colorSpace);
+    /// Construct a black color in the given color space.
+    /// \param colorSpace The color space.
+    GF_API
+    explicit GfColor(const GfColorSpace& colorSpace);
 
-  /// Construct a color from an RGB tuple and color space.
-  /// \param rgb The RGB tuple (red, green, blue), in the color space
-  /// provided.
-  /// \param colorSpace The color space.
-  GF_API
-  GfColor(const GfVec3f &rgb, const GfColorSpace &colorSpace);
+    /// Construct a color from an RGB tuple and color space.
+    /// \param rgb The RGB tuple (red, green, blue), in the color space
+    /// provided.
+    /// \param colorSpace The color space.
+    GF_API
+    GfColor(const GfVec3f &rgb, const GfColorSpace& colorSpace);
 
-  /// Construct a color by converting the source color into the specified color space.
-  /// \param color The color to convert, in its color space.
-  /// \param colorSpace The desired color space.
-  GF_API
-  GfColor(const GfColor &color, const GfColorSpace &colorSpace);
+    /// Construct a color by converting the source color into the specified color space.
+    /// \param color The color to convert, in its color space.
+    /// \param colorSpace The desired color space.
+    GF_API
+    GfColor(const GfColor &color, const GfColorSpace& colorSpace);
 
-  /// Set the color from the Planckian locus (blackbody radiation) temperature
-  /// in Kelvin, in the existing color space.
-  /// Values are computed for temperatures between 1000K and 15000K.
-  /// Note that temperatures below 1900K are out of gamut for Rec709.
-  /// \param kelvin The temperature in Kelvin.
-  /// \param luminance The desired luminance.
-  GF_API
-  void SetFromPlanckianLocus(float kelvin, float luminance);
+    /// Set the color from the Planckian locus (blackbody radiation) temperature
+    /// in Kelvin, in the existing color space.
+    /// Values are computed for temperatures between 1000K and 15000K.
+    /// Note that temperatures below 1900K are out of gamut for Rec709.
+    /// \param kelvin The temperature in Kelvin.
+    /// \param luminance The desired luminance.
+    GF_API
+    void SetFromPlanckianLocus(float kelvin, float luminance);
 
-  /// Get the RGB tuple.
-  /// \return The RGB tuple.
-  GfVec3f GetRGB() const
-  {
-    return _rgb;
-  }
+    /// Get the RGB tuple.
+    /// \return The RGB tuple.
+    GfVec3f GetRGB() const { return _rgb; }
 
-  /// Get the color space.
-  /// \return The color space.
-  GfColorSpace GetColorSpace() const
-  {
-    return _colorSpace;
-  }
+    /// Get the color space.
+    /// \return The color space.
+    GfColorSpace GetColorSpace() const { return _colorSpace; }
 
-  /// Equality operator.
-  /// \param rh The right-hand side color.
-  /// \return True if the colors are equal, false otherwise.
-  bool operator==(const GfColor &rh) const
-  {
-    return _rgb == rh._rgb && _colorSpace == rh._colorSpace;
-  }
+    /// Equality operator.
+    /// \param rh The right-hand side color.
+    /// \return True if the colors are equal, false otherwise.
+    bool operator ==(const GfColor &rh) const {
+        return _rgb == rh._rgb && _colorSpace == rh._colorSpace;
+    }
 
-  /// Inequality operator.
-  /// \param r The right-hand side color.
-  /// \return True if the colors are not equal, false otherwise.
-  bool operator!=(const GfColor &rh) const
-  {
-    return !(*this == rh);
-  }
+    /// Inequality operator.
+    /// \param r The right-hand side color.
+    /// \return True if the colors are not equal, false otherwise.
+    bool operator !=(const GfColor &rh) const { return !(*this == rh); }
 
- protected:
-  GfColorSpace _colorSpace;  ///< The color space.
-  GfVec3f _rgb;              ///< The RGB tuple.
+protected:
+    GfColorSpace _colorSpace; ///< The color space.
+    GfVec3f      _rgb;        ///< The RGB tuple.
 
-  // Get the CIEXY coordinate of the color in the chromaticity chart,
-  // For use in testing.
-  GF_API
-  GfVec2f _GetChromaticity() const;
+    // Get the CIEXY coordinate of the color in the chromaticity chart,
+    // For use in testing.
+    GF_API
+    GfVec2f _GetChromaticity() const;
 
-  // Set the color from a CIEXY coordinate in the chromaticity chart.
-  // For use in testing.
-  GF_API
-  void _SetFromChromaticity(const GfVec2f &xy);
+    // Set the color from a CIEXY coordinate in the chromaticity chart.
+    // For use in testing.
+    GF_API
+    void _SetFromChromaticity(const GfVec2f& xy);
 };
 
-/// Tests for equality of the RGB tuple in a color with a given tolerance,
-/// returning \c true if the length of the difference vector is less than or
+
+/// Tests for equality of the RGB tuple in a color with a given tolerance, 
+/// returning \c true if the length of the difference vector is less than or 
 /// equal to \p tolerance. This comparison does not adapt the colors to the
 /// same color space before comparing, and is not a perceptual comparison.
-inline bool GfIsClose(GfColor const &c1, GfColor const &c2, double tolerance)
+inline bool
+GfIsClose(GfColor const &c1, GfColor const &c2, double tolerance)
 {
-  return GfIsClose(c1.GetRGB(), c2.GetRGB(), tolerance);
+    return GfIsClose(c1.GetRGB(), c2.GetRGB(), tolerance);
 }
 
 /// Output a GfColor.
@@ -133,8 +125,8 @@ inline bool GfIsClose(GfColor const &c1, GfColor const &c2, double tolerance)
 /// @param os The output stream to write to.
 /// @param color The GfColor object to be outputted.
 /// @return The output stream after writing the GfColor object.
-std::ostream &operator<<(std::ostream &, GfColor const &);
+std::ostream& operator<<(std::ostream &, GfColor const &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_GF_COLOR_H
+#endif // PXR_BASE_GF_COLOR_H

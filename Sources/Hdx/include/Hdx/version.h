@@ -20,7 +20,11 @@
 // 10 -> 11 : New signature for HdxFullscreenShader::BindTextures.
 // 11 -> 12 : change HdxPickHit::worldSpaceHitPoint from GfVec3f to GfVec3d.
 // 12 -> 13 : Add HdxPickTask "resolveDeep" mode.
+// 13 -> 14 : Changed HdxTaskControllerSceneIndex contruction to use a struct
+// 14 -> 15 : Remove enableSceneMaterial param from HdxRenderTaskParams,
+//            HdxShadowTaskParams, and HdxPickTaskParams.
+// 15 -> 16 : GetFreeCameraPath() added to HdxTaskController & scene index
 //
-#define HDX_API_VERSION 13
+#define HDX_API_VERSION 16
 
-#endif  // PXR_IMAGING_HDX_VERSION_H
+#endif // PXR_IMAGING_HDX_VERSION_H

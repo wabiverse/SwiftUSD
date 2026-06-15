@@ -55,6 +55,10 @@ let package = Package(
       name: "Plug",
       targets: ["Plug"]
     ),
+    .library(
+      name: "Ts",
+      targets: ["Ts"]
+    ),
     // ------------ Pixar.Usd -----
     .library(
       name: "Ar",
@@ -75,10 +79,6 @@ let package = Package(
     .library(
       name: "Usd",
       targets: ["Usd"]
-    ),
-    .library(
-      name: "Ndr",
-      targets: ["Ndr"]
     ),
     .library(
       name: "Sdr",
@@ -104,10 +104,10 @@ let package = Package(
       name: "SdrGlslfx",
       targets: ["SdrGlslfx"]
     ),
-    .library(
-      name: "SdrOsl",
-      targets: ["SdrOsl"]
-    ),
+    // .library(
+    //   name: "SdrOsl",
+    //   targets: ["SdrOsl"]
+    // ),
     .library(
       name: "UsdAbc",
       targets: ["UsdAbc"]
@@ -155,6 +155,10 @@ let package = Package(
     .library(
       name: "UsdVol",
       targets: ["UsdVol"]
+    ),
+    .library(
+      name: "UsdProfiles",
+      targets: ["UsdProfiles"]
     ),
     // -------- Pixar.Imaging -----
     .library(
@@ -245,6 +249,14 @@ let package = Package(
     .library(
       name: "UsdImagingGL",
       targets: ["UsdImagingGL"]
+    ),
+    .library(
+      name: "UsdExecImaging",
+      targets: ["UsdExecImaging"]
+    ),
+    .library(
+      name: "UsdIRImaging",
+      targets: ["UsdIRImaging"]
     ),
     .library(
       name: "USDOverlays",
@@ -369,6 +381,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Tf"),
         .define("TF_EXPORTS", to: "1"),
         .headerSearchPath("include/Tf"),
+        .headerSearchPath("include/Tf/pxrDoubleConversion"),
+        .headerSearchPath("include/Tf/pxrLZ4"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -400,7 +414,6 @@ let package = Package(
         .target(name: "Tf"),
       ],
       cxxSettings: [
-        .headerSearchPath("include/Gf"),
         .headerSearchPath("include/Gf/nc"),
         .define("MFB_PACKAGE_NAME", to: "Gf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
@@ -506,6 +519,27 @@ let package = Package(
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
+    
+    .target(
+      name: "Ts",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Trace"),
+        .target(name: "Plug"),
+        .target(name: "Vt"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ts"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ts"),
+        .define("MFB_PACKAGE_MODULE", to: "Ts"),
+        .define("TS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
 
     .target(
       name: "Ar",
@@ -555,6 +589,7 @@ let package = Package(
         .target(name: "Tf"),
         .target(name: "Gf"),
         .target(name: "Plug"),
+        .target(name: "Ts"),
         .target(name: "Trace"),
         .target(name: "Work"),
         .target(name: "Vt"),
@@ -569,6 +604,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
         .define("MFB_PACKAGE_MODULE", to: "Sdf"),
         .define("SDF_EXPORTS", to: "1"),
+        .headerSearchPath("include/Sdf"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -583,6 +619,7 @@ let package = Package(
         .target(name: "Tf"),
         .target(name: "Trace"),
         .target(name: "Work"),
+        .target(name: "Ts"),
         .target(name: "Vt"),
         .target(name: "Ar"),
         .target(name: "Sdf"),
@@ -607,6 +644,7 @@ let package = Package(
         .target(name: "Work"),
         .target(name: "Vt"),
         .target(name: "Plug"),
+        .target(name: "Ts"),
         .target(name: "Gf"),
         .target(name: "Kind"),
         .target(name: "Ar"),
@@ -629,31 +667,6 @@ let package = Package(
     ),
 
     .target(
-      name: "Ndr",
-      dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Trace"),
-        .target(name: "Vt"),
-        .target(name: "Plug"),
-        .target(name: "Ar"),
-        .target(name: "Sdf")
-      ],
-      resources: [
-        .process("Resources")
-      ],
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Ndr"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Ndr"),
-        .define("MFB_PACKAGE_MODULE", to: "Ndr"),
-        .define("NDR_EXPORTS", to: "1"),
-        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
-        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-      ]
-    ),
-
-    .target(
       name: "Sdr",
       dependencies: [
         .target(name: "Arch"),
@@ -661,7 +674,6 @@ let package = Package(
         .target(name: "Trace"),
         .target(name: "Vt"),
         .target(name: "Sdf"),
-        .target(name: "Ndr"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Sdr"),
@@ -713,7 +725,6 @@ let package = Package(
         .target(name: "Sdf"),
         .target(name: "Usd"),
         .target(name: "UsdGeom"),
-        .target(name: "Ndr"),
         .target(name: "Sdr"),
       ],
       resources: [
@@ -736,7 +747,6 @@ let package = Package(
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Ar"),
-        .target(name: "Ndr"),
         .target(name: "Sdr"),
         .target(name: "UsdShade"),
       ],
@@ -765,7 +775,6 @@ let package = Package(
         .target(name: "Plug"),
         .target(name: "Sdf"),
         .target(name: "Usd"),
-        .target(name: "Ndr"),
         .target(name: "Sdr"),
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
@@ -791,7 +800,6 @@ let package = Package(
         .target(name: "Ar"),
         .target(name: "Tf"),
         .target(name: "Plug"),
-        .target(name: "Ndr"),
         .target(name: "Usd"),
         .target(name: "UsdShade"),
       ],
@@ -819,7 +827,6 @@ let package = Package(
         .target(name: "Gf"),
         .target(name: "Hio"),
         .target(name: "Sdr"),
-        .target(name: "Ndr"),
         .target(name: "Vt"),
       ],
       cxxSettings: [
@@ -832,31 +839,30 @@ let package = Package(
       ]
     ),
     
-    .target(
-      name: "SdrOsl",
-      dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Gf"),
-        .target(name: "Ar"),
-        .target(name: "Ndr"),
-        .target(name: "Sdr"),
-        .target(name: "Vt"),
-      ],
-      resources: [
-        .process("Resources")
-      ],
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
-        .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
-        .define("SDROSL_EXPORTS", to: "1"),
-        .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
-        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
-        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-      ]
-    ),
+    // .target(
+    //   name: "SdrOsl",
+    //   dependencies: [
+    //     .target(name: "Arch"),
+    //     .target(name: "Tf"),
+    //     .target(name: "Gf"),
+    //     .target(name: "Ar"),
+    //     .target(name: "Sdr"),
+    //     .target(name: "Vt"),
+    //   ],
+    //   resources: [
+    //     .process("Resources")
+    //   ],
+    //   cxxSettings: [
+    //     .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
+    //     .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
+    //     .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
+    //     .define("SDROSL_EXPORTS", to: "1"),
+    //     .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
+    //     .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+    //     .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+    //     .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+    //   ]
+    // ),
 
     .target(
       name: "UsdAbc",
@@ -900,6 +906,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        .headerSearchPath("include/UsdDraco"),
         .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
         .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
@@ -943,7 +950,6 @@ let package = Package(
         .target(name: "Vt"),
         .target(name: "Trace"),
         .target(name: "Ar"),
-        .target(name: "Ndr"),
         .target(name: "Sdf"),
         .target(name: "Sdr"),
         .target(name: "Usd"),
@@ -1172,6 +1178,30 @@ let package = Package(
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
+    
+    .target(
+      name: "UsdProfiles",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Plug"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdProfiles"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdProfiles"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdProfiles"),
+        .define("USDPROFILES_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
 
     .target(
       name: "CameraUtil",
@@ -1324,6 +1354,7 @@ let package = Package(
         .target(name: "Trace"),
         .target(name: "Hgi"),
         .target(name: "Vt"),
+        .target(name: "Hf")
       ],
       resources: [
         .process("Resources")
@@ -1379,6 +1410,7 @@ let package = Package(
         .target(name: "Garch"),
         .target(name: "Hgi"),
         .target(name: "Vt"),
+        .target(name: "Hf")
       ],
       resources: [
         .process("Resources")
@@ -1681,6 +1713,7 @@ let package = Package(
         .target(name: "GeomUtil"),
         .target(name: "Hd"),
         .target(name: "HdAr"),
+        .target(name: "HdSi"),
         .target(name: "Hio"),
         .target(name: "PxOsd"),
         .target(name: "Ar"),
@@ -1747,6 +1780,82 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "UsdExecImaging",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Hio"),
+        .target(name: "Garch"),
+        .target(name: "Glf"),
+        .target(name: "Hd"),
+        .target(name: "HdSi"),
+        .target(name: "Hdx"),
+        .target(name: "Hgi"),
+        .target(name: "PxOsd"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Sdr"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdHydra"),
+        .target(name: "UsdShade"),
+        .target(name: "UsdImaging"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdExecImaging"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdExecImaging"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdExecImaging"),
+        .define("USDEXECIMAGING_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+    
+    .target(
+      name: "UsdIRImaging",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Hio"),
+        .target(name: "Garch"),
+        .target(name: "Glf"),
+        .target(name: "Hd"),
+        .target(name: "HdSi"),
+        .target(name: "Hdx"),
+        .target(name: "Hgi"),
+        .target(name: "PxOsd"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Sdr"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdHydra"),
+        .target(name: "UsdShade"),
+        .target(name: "UsdImaging"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdIRImaging"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdIRImaging"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdIRImaging"),
+        .define("USDIRIMAGING_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+    
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -1784,7 +1893,7 @@ let package = Package(
          // target/filename(.h|.cpp) patterns within any of these resource directories, the contents
          // of each of the matching upstream pixar files will have their contents replaced with each
          // of the respective source code files found in any of these directories.
-         .copy("Resources/Work")
+         .copy("Resources")
        ],
        cxxSettings: [
          .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
@@ -1909,16 +2018,16 @@ let package = Package(
         .target(name: "Work"),
         .target(name: "Pegtl"),
         .target(name: "Plug"),
+        .target(name: "Ts"),
         // ----------- usd. ------
         .target(name: "Ar"),
         .target(name: "Kind"),
         .target(name: "Sdf"),
         .target(name: "Pcp"),
         .target(name: "Usd"),
-        .target(name: "Ndr"),
         .target(name: "Sdr"),
         .target(name: "SdrGlslfx"),
-        .target(name: "SdrOsl"),
+        // .target(name: "SdrOsl"),
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
@@ -1929,6 +2038,7 @@ let package = Package(
         .target(name: "UsdMtlx"),
         .target(name: "UsdPhysics"),
         .target(name: "UsdProc"),
+        .target(name: "UsdProfiles"),
         .target(name: "UsdRender"),
         .target(name: "UsdRi"),
         .target(name: "UsdSkel"),
@@ -1959,6 +2069,8 @@ let package = Package(
         .target(name: "UsdShaders"),
         .target(name: "UsdImaging"),
         .target(name: "UsdImagingGL"),
+        .target(name: "UsdIRImaging"),
+        .target(name: "UsdExecImaging"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------

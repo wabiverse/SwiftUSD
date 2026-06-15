@@ -1,21 +1,23 @@
 {
-  "Plugins": [
-    {
-      "Info": {
-        "Types": {
-          "ArResolver": {},
-          "ArDefaultResolver": {
-            "bases": ["ArResolver"],
-            "implementsContexts": true
-          },
-          "ArPackageResolver": {}
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "ArResolver": {},
+                    "ArDefaultResolver": {
+                        "bases": [
+                            "ArResolver"
+                        ],
+                        "implementsContexts": true
+                    },
+                    "ArPackageResolver": {}
+                }
+            },
+            "LibraryPath": "", 
+            "Name": "ar", 
+            "ResourcePath": ".", 
+            "Root": ".", 
+            "Type": "library"
         }
-      },
-      "LibraryPath": "",
-      "Name": "Ar",
-      "ResourcePath": ".",
-      "Root": ".",
-      "Type": "library"
-    }
-  ]
+    ]
 }

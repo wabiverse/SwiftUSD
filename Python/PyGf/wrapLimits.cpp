@@ -4,17 +4,19 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include <boost/python/scope.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/scope.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Gf/gfLimits.h"
 #include "pxr/pxrns.h"
-
-using namespace boost::python;
+#include "Gf/limits.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 void wrapLimits()
 {
-  scope().attr("MIN_VECTOR_LENGTH") = GF_MIN_VECTOR_LENGTH;
-  scope().attr("MIN_ORTHO_TOLERANCE") = GF_MIN_ORTHO_TOLERANCE;
+    scope().attr("MIN_VECTOR_LENGTH") = GF_MIN_VECTOR_LENGTH;
+    scope().attr("MIN_ORTHO_TOLERANCE") = GF_MIN_ORTHO_TOLERANCE;
 }

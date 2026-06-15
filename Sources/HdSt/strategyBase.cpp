@@ -8,6 +8,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdStAggregationStrategy::~HdStAggregationStrategy() {}
+
+HdStAggregationStrategy::~HdStAggregationStrategy()
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

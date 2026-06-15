@@ -2,14 +2,14 @@
 (
     "This file describes the USD Shader schemata for code generation."
     subLayers = [
-        @Usd/schema.usda@
+        @usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName      = "UsdShade"
-        string libraryPath      = "UsdShade"
+        string libraryName      = "usdShade"
+        string libraryPath      = "pxr/usd/usdShade"
         dictionary libraryTokens = {
             dictionary materialBind = {
                 string doc = """The name of the GeomSubset family used to 
@@ -75,12 +75,12 @@ class NodeGraph "NodeGraph" (
         }
         string extraIncludes = '''
 #include <utility>
-#include "Usd/editTarget.h"
-#include "Usd/relationship.h"
-#include "UsdShade/input.h"
-#include "UsdShade/output.h"
-#include "UsdShade/shader.h"
-#include "UsdShade/connectableAPIBehavior.h"'''
+#include "pxr/usd/usd/editTarget.h"
+#include "pxr/usd/usd/relationship.h"
+#include "pxr/usd/usdShade/input.h"
+#include "pxr/usd/usdShade/output.h"
+#include "pxr/usd/usdShade/shader.h"
+#include "pxr/usd/usdShade/connectableAPIBehavior.h"'''
     }
 ) {
 
@@ -89,13 +89,14 @@ class NodeGraph "NodeGraph" (
 
 class Material "Material" (
     inherits = </NodeGraph>
-    doc = """A Material provides a container into which multiple "render targets"
-    can add data that defines a "shading material" for a renderer.  Typically
-    this consists of one or more UsdRelationship properties that target
-    other prims of type \\em Shader - though a target/client is free to add
-    any data that is suitable.  We <b>strongly advise</b> that all targets
+    doc = """A Material provides a container into which multiple "render contexts"
+    can add data that defines a "shading material" for a renderer. Typically 
+    this consists of one or more UsdShadeOutput properties connected to outputs 
+    of nested Shader prims - though a context/client is free to add
+    any data that is suitable. We <b>strongly advise</b> that all contexts
     adopt the convention that all properties be prefixed with a namespace
-    that identifies the target, e.g. "rel ri:surface = </Shaders/mySurf>".
+    that identifies the context e.g. "token outputs:ri:surface.connect = 
+    </MyselfMaterial/previewSurface.outputs:surface". 
     
     ## Binding Materials
     
@@ -133,16 +134,24 @@ class Material "Material" (
     Finally, Material encapsulation also allows us to 
     \\ref UsdShadeMaterial_BaseMaterial "specialize" child materials from 
     parent materials.
-    
+
+    For UsdShade schema domain any connectable child prim of UsdShadeMaterial 
+    must be either UsdShadeShader derived or UsdShadeNodeGraph derived but not 
+    UsdShadeMaterial, that is, UsdShadeMaterial can not be nested. It also must
+    not contain any imageable prims as its descendants (UsdGeomScope,
+    UsdGeomCamera, UsdGeomMesh etc).
+
+    Other derived classes of UsdShadeNodeGraph from other schema domains may 
+    define their own stricter rules.
     """
     customData = {
         dictionary extraPlugInfo = {
             bool providesUsdShadeConnectableAPIBehavior = 1
         }
         string extraIncludes = '''
-#include "Usd/variantSets.h"
-#include "UsdGeom/subset.h"
-#include "UsdShade/connectableAPI.h"'''
+#include "pxr/usd/usd/variantSets.h"
+#include "pxr/usd/usdGeom/subset.h"
+#include "pxr/usd/usdShade/connectableAPI.h"'''
         dictionary schemaTokens = {
             dictionary materialVariant = {
                 string doc = """The variant name of material variation
@@ -240,11 +249,11 @@ class Shader "Shader" (
             bool providesUsdShadeConnectableAPIBehavior = 1
         }
         string extraIncludes = '''
-#include "UsdShade/input.h"
-#include "UsdShade/output.h"
-#include "UsdShade/tokens.h"
-#include "Ndr/declare.h"
-#include "Sdr/shaderNode.h"'''
+#include "pxr/usd/usdShade/input.h"
+#include "pxr/usd/usdShade/output.h"
+#include "pxr/usd/usdShade/tokens.h"
+#include "pxr/usd/sdr/declare.h"
+#include "pxr/usd/sdr/shaderNode.h"'''
     }
 ) {
 }
@@ -266,7 +275,7 @@ class "NodeDefAPI"
 
     This schema provides properties that allow a prim to identify an external
     node definition, either by a direct identifier key into the SdrRegistry
-    (info:id), an asset to be parsed by a suitable NdrParserPlugin
+    (info:id), an asset to be parsed by a suitable SdrParserPlugin
     (info:sourceAsset), or an inline source code that must also be parsed
     (info:sourceCode); as well as a selector attribute to determine which
     specifier is active (info:implementationSource).
@@ -274,8 +283,8 @@ class "NodeDefAPI"
     customData = {
         token apiSchemaType = "singleApply"
         string extraIncludes = """
-#include "Ndr/declare.h"
-#include "Sdr/shaderNode.h"
+#include "pxr/usd/sdr/declare.h"
+#include "pxr/usd/sdr/shaderNode.h"
     """
         dictionary schemaTokens = {
             dictionary universalSourceType = {
@@ -329,7 +338,7 @@ class "NodeDefAPI"
     uniform token info:id (
         doc = """The id is an identifier for the type or purpose of the 
         shader. E.g.: Texture or FractalFloat.
-        The use of this id will depend on the render target: some will turn it
+        The use of this id will depend on the render context: some will turn it
         into an actual shader path, some will use it to generate shader source 
         code dynamically.
         
@@ -367,11 +376,11 @@ class "ConnectableAPI"
     customData = {
         token apiSchemaType = "nonApplied"
         string extraIncludes = '''
-#include "Usd/typed.h"
-#include "UsdShade/input.h"
-#include "UsdShade/output.h"
-#include "UsdShade/tokens.h"
-#include "UsdShade/types.h"'''
+#include "pxr/usd/usd/typed.h"
+#include "pxr/usd/usdShade/input.h"
+#include "pxr/usd/usdShade/output.h"
+#include "pxr/usd/usdShade/tokens.h"
+#include "pxr/usd/usdShade/types.h"'''
     }
 )
 {
@@ -419,19 +428,19 @@ class "MaterialBindingAPI"
     binding relationship. 
     <ul><li>
     In the case of a direct binding, the <i>allPurpose</i> binding is 
-    represented by the relationship named <b>"material:binding"</b>. 
+    represented by the relationship named <b>material:binding</b>. 
     Special-purpose direct bindings are represented by relationships named
-    <b>"material:binding:<i>purpose</i></b>. A direct binding relationship 
+    <b>material:binding:<i>purpose</i></b>. A direct binding relationship 
     must have a single target path that points to a <b>UsdShadeMaterial</b>.</li>
     <li>
     In the case of a collection-based binding, the <i>allPurpose</i> binding is 
     represented by a relationship named 
-    "material:binding:collection:<i>bindingName</i>", where 
+    <b>material:binding:collection:<i>bindingName</i></b>, where 
     <b>bindingName</b> establishes an identity for the binding that is unique 
     on the prim. Attempting to establish two collection bindings of the same 
     name on the same prim will result in the first binding simply being 
     overridden. A special-purpose collection-based binding is represented by a 
-    relationship named "material:binding:collection:<i>purpose:bindingName</i>".
+    relationship named <b>material:binding:collection:<i>purpose:bindingName</i></b>.
     A collection-based binding relationship must have exacly two targets, one of 
     which should be a collection-path (see 
     \ref UsdCollectionAPI::GetCollectionPath()) and the other should point to a
@@ -472,10 +481,10 @@ class "MaterialBindingAPI"
     """ 
     customData = {
         string extraIncludes = """
-#include "Usd/collectionAPI.h"
-#include "UsdGeom/subset.h"
-#include "UsdShade/material.h"
-#include <OneTBB/tbb/concurrent_unordered_map.h>"""
+#include "pxr/usd/usd/collectionAPI.h"
+#include "pxr/usd/usdGeom/subset.h"
+#include "pxr/usd/usdShade/material.h"
+#include <tbb/concurrent_unordered_map.h>"""
          dictionary schemaTokens = {
             dictionary materialBinding = {
                 string value = "material:binding"
@@ -583,7 +592,7 @@ class "CoordSysAPI"
         token apiSchemaType = "multipleApply"
         token propertyNamespacePrefix  = "coordSys"
         string extraIncludes = '''
-#include "UsdGeom/xformable.h"'''
+#include "pxr/usd/usdGeom/xformable.h"'''
     }
 )
 {

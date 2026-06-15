@@ -1,40 +1,133 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_WORK_LOOPS_H
 #define PXR_BASE_WORK_LOOPS_H
 
 /// \file work/loops.h
+#include "pxr/pxrns.h"
 #include "Work/api.h"
+#include "Work/dispatcher.h"
+#include "Work/impl.h"
 #include "Work/threadLimits.h"
-#include <pxr/pxrns.h>
 
-#include <OneTBB/tbb/blocked_range.h>
-#include <OneTBB/tbb/parallel_for.h>
-#include <OneTBB/tbb/parallel_for_each.h>
-#include <OneTBB/tbb/task.h>
+#include "Tf/errorTransport.h"
+#include "Tf/mallocTag.h"
+
+#include <algorithm>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+using Work_ErrorTransports = tbb::concurrent_vector<TfErrorTransport>;
+
+template <class Fn>
+class Work_LoopsTaskWrapper
+{
+public:
+    Work_LoopsTaskWrapper(
+        Fn &&callback,
+        Work_ErrorTransports *errors)
+    : _callback(callback)
+    , _errors(errors) {}
+
+    template <typename ... Args>
+    void operator()(Args&&... args) const {
+        TfErrorMark m;
+        _callback(std::forward<Args>(args)...);
+        if (!m.IsClean()) {
+            TfErrorTransport transport = m.Transport();
+            _errors->grow_by(1)->swap(transport);
+        }
+    }
+
+private:
+    Fn & _callback;
+    Work_ErrorTransports *_errors;
+};
+
+template <class Fn>
+class Work_MallocTagsLoopsTaskWrapper
+{
+public:
+    Work_MallocTagsLoopsTaskWrapper(
+        Fn &&callback,
+        Work_ErrorTransports *errors)
+    : _callback(callback)
+    , _errors(errors)
+    , _mallocTagStack(TfMallocTag::GetCurrentStackState()) {}
+
+    template <typename ... Args>
+    void operator()(Args&&... args) const {
+        TfErrorMark m;
+        TfMallocTag::StackOverride ovr(_mallocTagStack);
+        _callback(std::forward<Args>(args)...);
+        if (!m.IsClean()) {
+            TfErrorTransport transport = m.Transport();
+            _errors->grow_by(1)->swap(transport);
+        }
+    }
+
+private:
+    Fn & _callback;
+    Work_ErrorTransports *_errors;
+    TfMallocTag::StackState _mallocTagStack;
+};
+
+template <class Fn>
+class Work_LoopsForEachTaskWrapper
+{
+public:
+    Work_LoopsForEachTaskWrapper(
+        Fn &&callback,
+        Work_ErrorTransports *errors)
+    : _callback(callback)
+    , _errors(errors) {}
+
+    template <typename Arg>
+    void operator()(Arg &&arg) const {
+        TfErrorMark m;
+        _callback(std::forward<Arg>(arg));
+        if (!m.IsClean()) {
+            TfErrorTransport transport = m.Transport();
+            _errors->grow_by(1)->swap(transport);
+        }
+    }
+
+private:
+    Fn & _callback;
+    Work_ErrorTransports *_errors;
+};
+
+template <class Fn>
+class Work_MallocTagsLoopsForEachTaskWrapper
+{
+public:
+    Work_MallocTagsLoopsForEachTaskWrapper(
+        Fn &&callback,
+        Work_ErrorTransports *errors)
+    : _callback(callback)
+    , _errors(errors)
+    , _mallocTagStack(TfMallocTag::GetCurrentStackState()) {}
+
+    template <typename Arg>
+    void operator()(Arg &&arg) const {
+        TfErrorMark m;
+        TfMallocTag::StackOverride ovr(_mallocTagStack);
+        _callback(std::forward<Arg>(arg));
+        if (!m.IsClean()) {
+            TfErrorTransport transport = m.Transport();
+            _errors->grow_by(1)->swap(transport);
+        }
+    }
+
+private:
+    Fn & _callback;
+    Work_ErrorTransports *_errors;
+    TfMallocTag::StackState _mallocTagStack;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
@@ -48,9 +141,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 ///     void LoopCallback(size_t begin, size_t end);
 ///
-template<typename Fn> void WorkSerialForN(size_t n, Fn &&fn)
+template<typename Fn>
+void
+WorkSerialForN(size_t n, Fn &&fn)
 {
-  std::forward<Fn>(fn)(0, n);
+    std::forward<Fn>(fn)(0, n);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,43 +163,35 @@ template<typename Fn> void WorkSerialForN(size_t n, Fn &&fn)
 /// you want to have at least 10,000 instructions to count for the overhead of
 /// launching a thread.
 ///
-template<typename Fn> void WorkParallelForN(size_t n, Fn &&callback, size_t grainSize)
+template <typename Fn>
+void
+WorkParallelForN(size_t n, Fn &&callback, size_t grainSize)
 {
-  if (n == 0)
-    return;
+    if (n == 0)
+        return;
 
-  // Don't bother with parallel_for, if concurrency is limited to 1.
-  if (WorkHasConcurrency()) {
+    // Don't bother with parallel_for, if concurrency is limited to 1.
+    if (WorkHasConcurrency()) {
+        PXR_WORK_IMPL_NAMESPACE_USING_DIRECTIVE;
+        Work_ErrorTransports errorTransports;
+        if (TfMallocTag::IsInitialized()) {
+            Work_MallocTagsLoopsTaskWrapper<Fn>
+                task(std::forward<Fn>(callback), &errorTransports);
+            WorkImpl_ParallelForN(n, task, grainSize);
+        }
+        else {
+            Work_LoopsTaskWrapper<Fn>
+                task(std::forward<Fn>(callback), &errorTransports);
+            WorkImpl_ParallelForN(n, task, grainSize);
+        }
 
-    class Work_ParallelForN_TBB {
-     public:
-      Work_ParallelForN_TBB(Fn &fn) : _fn(fn) {}
-
-      void operator()(const tbb::blocked_range<size_t> &r) const
-      {
-        // Note that we std::forward _fn using Fn in order get the
-        // right operator().
-        // We maintain the right type in this way:
-        //  If Fn is T&, then reference collapsing gives us T& for _fn
-        //  If Fn is T, then std::forward correctly gives us T&& for _fn
-        std::forward<Fn>(_fn)(r.begin(), r.end());
-      }
-
-     private:
-      Fn &_fn;
-    };
-
-    // In most cases we do not want to inherit cancellation state from the
-    // parent context, so we create an isolated task group context.
-    tbb::task_group_context ctx(tbb::task_group_context::isolated);
-    tbb::parallel_for(
-        tbb::blocked_range<size_t>(0, n, grainSize), Work_ParallelForN_TBB(callback), ctx);
-  }
-  else {
-
-    // If concurrency is limited to 1, execute serially.
-    WorkSerialForN(n, std::forward<Fn>(callback));
-  }
+        for (auto &et: errorTransports) {
+            et.Post();
+        }
+    } else {
+        // If concurrency is limited to 1, execute serially.
+        WorkSerialForN(n, std::forward<Fn>(callback));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,9 +205,97 @@ template<typename Fn> void WorkParallelForN(size_t n, Fn &&callback, size_t grai
 ///     void LoopCallback(size_t begin, size_t end);
 ///
 ///
-template<typename Fn> void WorkParallelForN(size_t n, Fn &&callback)
+template <typename Fn>
+void
+WorkParallelForN(size_t n, Fn &&callback)
 {
-  WorkParallelForN(n, std::forward<Fn>(callback), 1);
+    WorkParallelForN(n, std::forward<Fn>(callback), 1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///
+/// WorkParallelForTBBRange(const RangeType &r, Fn &&callback)
+///
+/// Runs \p callback in parallel over a RangeType that adheres to TBB's
+/// splittable range requirements: 
+/// https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onetbb/source/named_requirements/algorithms/range
+///
+/// Callback must be of the form:
+///
+///     void LoopCallback(RangeType range);
+///
+///
+template <typename RangeType, typename Fn>
+void
+WorkParallelForTBBRange(const RangeType &range, Fn &&callback)
+{
+    // Don't bother with parallel_for, if concurrency is limited to 1.
+    if (WorkHasConcurrency()) {
+        PXR_WORK_IMPL_NAMESPACE_USING_DIRECTIVE;
+        // Use the work backend's ParallelForTBBRange if one exists
+        // otherwise use the default implementation below that builds off of the 
+        // dispatcher.
+#if defined WORK_IMPL_HAS_PARALLEL_FOR_TBB_RANGE
+        Work_ErrorTransports errorTransports;
+        if (TfMallocTag::IsInitialized()) {
+            Work_MallocTagsLoopsTaskWrapper<Fn>
+                task(std::forward<Fn>(callback), &errorTransports);
+            WorkImpl_ParallelForTBBRange(range, task);
+        }
+        else {
+            Work_LoopsTaskWrapper<Fn>
+                task(std::forward<Fn>(callback), &errorTransports);
+            WorkImpl_ParallelForTBBRange(range, task);
+        }
+        for (auto &et: errorTransports) {
+            et.Post();
+        }
+#else
+        // The parallel task responsible for recursively sub-dividing the range
+        // and invoking the callback on the sub-ranges.
+        class _RangeTask
+        {
+        public:
+            _RangeTask(
+                WorkDispatcher &dispatcher,
+                RangeType &&range,
+                const Fn &callback)
+            : _dispatcher(dispatcher)
+            , _range(std::move(range))
+            , _callback(callback) {}
+
+            void operator()() const {
+                // Subdivide the given range until it is no longer divisible, and
+                // recursively spawn _RangeTasks for the right side of the split.
+                RangeType &leftRange = _range;
+                while (leftRange.is_divisible()) {
+                    RangeType rightRange(leftRange, tbb::split());
+                    _dispatcher.Run(_RangeTask(
+                        _dispatcher, std::move(rightRange), _callback));
+                }
+
+                // If there are any more entries remaining in the left-most side
+                // of the given range, invoke the callback on the left-most range.
+                if (!leftRange.empty()) {
+                    std::invoke(_callback, leftRange);
+                }
+            }
+
+        private:
+            WorkDispatcher &_dispatcher;
+            mutable RangeType _range;
+            const Fn &_callback;
+        };
+
+        WorkDispatcher dispatcher;
+        RangeType range = range;
+        dispatcher.Run(_RangeTask(
+            dispatcher, range, std::forward<Fn>(callback)));
+#endif
+    } else {
+        // If concurrency is limited to 1, execute serially.
+        std::forward<Fn>(callback)(range);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,15 +309,33 @@ template<typename Fn> void WorkParallelForN(size_t n, Fn &&callback)
 /// where the type T is deduced from the type of the InputIterator template
 /// argument.
 ///
-///
-///
-template<typename InputIterator, typename Fn>
-inline void WorkParallelForEach(InputIterator first, InputIterator last, Fn &&fn)
+/// 
+template <typename InputIterator, typename Fn>
+inline void
+WorkParallelForEach(
+    InputIterator first, InputIterator last, Fn &&fn)
 {
-  tbb::task_group_context ctx(tbb::task_group_context::isolated);
-  tbb::parallel_for_each(first, last, std::forward<Fn>(fn), ctx);
+    if (WorkHasConcurrency()) {
+        PXR_WORK_IMPL_NAMESPACE_USING_DIRECTIVE;
+        Work_ErrorTransports errorTransports;
+        if (TfMallocTag::IsInitialized()) {
+            Work_MallocTagsLoopsForEachTaskWrapper<Fn>
+                task(std::forward<Fn>(fn), &errorTransports);
+            WorkImpl_ParallelForEach(first, last, task);
+        }
+        else {
+            Work_LoopsForEachTaskWrapper<Fn>
+                task(std::forward<Fn>(fn), &errorTransports);
+            WorkImpl_ParallelForEach(first, last, task);
+        }
+        for (auto &et: errorTransports) {
+            et.Post();
+        }
+    } else {
+        std::for_each(first, last, std::forward<Fn>(fn));
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_WORK_LOOPS_H
+#endif // PXR_BASE_WORK_LOOPS_H

@@ -10,27 +10,34 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static HdContainerDataSourceHandle _Get(HdContainerDataSourceHandle const &primDataSource,
-                                        const TfToken &name)
+static
+HdContainerDataSourceHandle _Get(
+    HdContainerDataSourceHandle const &primDataSource,
+    const TfToken &name)
 {
-  if (!primDataSource) {
-    return nullptr;
-  }
-  return HdContainerDataSource::Cast(primDataSource->Get(name));
+    if (!primDataSource) {
+        return nullptr;
+    }
+    return HdContainerDataSource::Cast(primDataSource->Get(name));
 }
 
-HdContainerDataSourceHandle HdFlattenedDataSourceProvider::Context::GetInputDataSource() const
+HdContainerDataSourceHandle
+HdFlattenedDataSourceProvider::Context::
+GetInputDataSource() const
 {
-  return _Get(_inputPrimDataSource, _name);
+    return _Get(_inputPrim.dataSource, _name);
 }
 
-HdContainerDataSourceHandle HdFlattenedDataSourceProvider::Context::
-    GetFlattenedDataSourceFromParentPrim() const
+HdContainerDataSourceHandle
+HdFlattenedDataSourceProvider::Context::
+GetFlattenedDataSourceFromParentPrim() const
 {
-  if (_primPath.IsAbsoluteRootPath()) {
-    return nullptr;
-  }
-  return _Get(_flatteningSceneIndex.GetPrim(_primPath.GetParentPath()).dataSource, _name);
+    if (_primPath.IsAbsoluteRootPath()) {
+        return nullptr;
+    }
+    return _Get(
+        _flatteningSceneIndex.GetPrim(_primPath.GetParentPath()).dataSource,
+        _name);
 }
 
 HdFlattenedDataSourceProvider::~HdFlattenedDataSourceProvider() = default;

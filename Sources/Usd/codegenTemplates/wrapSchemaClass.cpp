@@ -43,7 +43,9 @@
 
 #include <string>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 using namespace boost::python;
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 {
   % if useExportAPI %

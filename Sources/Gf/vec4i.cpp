@@ -10,10 +10,10 @@
 
 #include "Gf/vec4i.h"
 
-#include "Gf/gfMath.h"
+#include "pxr/pxrns.h"
+#include "Gf/math.h"
 #include "Gf/ostreamHelpers.h"
 #include "Tf/type.h"
-#include "pxr/pxrns.h"
 
 // Include headers for other vec types to support wrapping conversions and
 // operators.
@@ -21,36 +21,50 @@
 #include "Gf/vec4f.h"
 #include "Gf/vec4h.h"
 
-#include <ostream>
 #include <vector>
+#include <ostream>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-  TfType::Define<GfVec4i>();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<GfVec4i>();
 }
 
-std::ostream &operator<<(std::ostream &out, GfVec4i const &v)
+std::ostream& 
+operator<<(std::ostream &out, GfVec4i const &v)
 {
-  return out << '(' << Gf_OstreamHelperP(v[0]) << ", " << Gf_OstreamHelperP(v[1]) << ", "
-             << Gf_OstreamHelperP(v[2]) << ", " << Gf_OstreamHelperP(v[3]) << ')';
+    return out << '(' 
+        << Gf_OstreamHelperP(v[0]) << ", " 
+        << Gf_OstreamHelperP(v[1]) << ", " 
+        << Gf_OstreamHelperP(v[2]) << ", " 
+        << Gf_OstreamHelperP(v[3]) << ')';
 }
 
-bool GfVec4i::operator==(GfVec4d const &other) const
+
+bool
+GfVec4i::operator==(GfVec4d const &other) const
 {
-  return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] &&
-         _data[3] == other[3];
+    return _data[0] == other[0] &&
+           _data[1] == other[1] &&
+           _data[2] == other[2] &&
+           _data[3] == other[3];
 }
-bool GfVec4i::operator==(GfVec4f const &other) const
+bool
+GfVec4i::operator==(GfVec4f const &other) const
 {
-  return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] &&
-         _data[3] == other[3];
+    return _data[0] == other[0] &&
+           _data[1] == other[1] &&
+           _data[2] == other[2] &&
+           _data[3] == other[3];
 }
-bool GfVec4i::operator==(GfVec4h const &other) const
+bool
+GfVec4i::operator==(GfVec4h const &other) const
 {
-  return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] &&
-         _data[3] == other[3];
+    return _data[0] == other[0] &&
+           _data[1] == other[1] &&
+           _data[2] == other[2] &&
+           _data[3] == other[3];
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

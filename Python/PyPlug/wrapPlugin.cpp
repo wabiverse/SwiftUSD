@@ -5,80 +5,95 @@
 // https://openusd.org/license.
 //
 
-#include "Js/converter.h"
+#include "pxr/pxrns.h"
 #include "Plug/plugin.h"
-#include "Tf/iterator.h"
+#include "Js/converter.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyPtrHelpers.h"
 #include "Tf/pyResultConversions.h"
-#include "pxr/pxrns.h"
+#include "Tf/iterator.h"
 
-#include <boost/noncopyable.hpp>
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <string>
 
-using namespace boost::python;
 using std::string;
 using std::vector;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static dict _ConvertDict(const JsObject &dictionary)
+static dict
+_ConvertDict( const JsObject & dictionary )
 {
-  dict result;
-  TF_FOR_ALL(i, dictionary)
-  {
-    const string &key = i->first;
-    const JsValue &val = i->second;
+    dict result;
+    TF_FOR_ALL(i, dictionary) {
+        const string & key = i->first;
+        const JsValue & val = i->second;
 
-    result[key] = JsConvertToContainerType<object, dict>(val);
-  }
-  return result;
+        result[key] = JsConvertToContainerType<object, dict>(val);
+    }
+    return result;
 }
 
-static dict _GetMetadata(PlugPluginPtr plugin)
+static dict
+_GetMetadata(PlugPluginPtr plugin)
 {
-  return _ConvertDict(plugin->GetMetadata());
+    return _ConvertDict(plugin->GetMetadata());
 }
 
-static dict _GetMetadataForType(PlugPluginPtr plugin, const TfType &type)
+static dict
+_GetMetadataForType(PlugPluginPtr plugin, const TfType &type)
 {
-  return _ConvertDict(plugin->GetMetadataForType(type));
+    return _ConvertDict(plugin->GetMetadataForType(type));
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapPlugin()
 {
-  typedef PlugPlugin This;
-  typedef PlugPluginPtr ThisPtr;
+    typedef PlugPlugin This;
+    typedef PlugPluginPtr ThisPtr;
 
-  class_<This, ThisPtr, boost::noncopyable>("Plugin", no_init)
-      .def(TfPyWeakPtr())
-      .def("Load", &This::Load)
+    class_<This, ThisPtr, noncopyable> ( "Plugin", no_init )
+        .def(TfPyWeakPtr())
+        .def("Load", &This::Load)
 
-      .add_property("isLoaded", &This::IsLoaded)
-      .add_property("isPythonModule", &This::IsPythonModule)
-      .add_property("isResource", &This::IsResource)
+        .add_property("isLoaded", &This::IsLoaded)
+        .add_property("isPythonModule", &This::IsPythonModule)
+        .add_property("isResource", &This::IsResource)
 
-      .add_property("metadata", _GetMetadata)
+        .add_property("metadata", _GetMetadata)
 
-      .add_property("name", make_function(&This::GetName, return_value_policy<return_by_value>()))
-      .add_property("path", make_function(&This::GetPath, return_value_policy<return_by_value>()))
-      .add_property("resourcePath",
-                    make_function(&This::GetResourcePath, return_value_policy<return_by_value>()))
+        .add_property("name",
+                      make_function(&This::GetName,
+                                    return_value_policy<return_by_value>()))
+        .add_property("path",
+                      make_function(&This::GetPath,
+                                    return_value_policy<return_by_value>()))
+        .add_property("resourcePath",
+                      make_function(&This::GetResourcePath,
+                                    return_value_policy<return_by_value>()))
 
-      .def("GetMetadataForType", _GetMetadataForType)
-      .def("DeclaresType", &This::DeclaresType, (arg("type"), arg("includeSubclasses") = false))
+        .def("GetMetadataForType", _GetMetadataForType)
+        .def("DeclaresType", &This::DeclaresType,
+             (arg("type"), 
+              arg("includeSubclasses") = false))
 
-      .def("MakeResourcePath", &This::MakeResourcePath)
-      .def("FindPluginResource", &This::FindPluginResource, (arg("path"), arg("verify") = true));
+        .def("MakeResourcePath", &This::MakeResourcePath)
+        .def("FindPluginResource", &This::FindPluginResource,
+             (arg("path"), 
+              arg("verify") = true))
+        ;
+        TfPyRegisterStlSequencesFromPython<PlugPluginPtr>();
 
-  // The call to JsConvertToContainerType in _ConvertDict creates
-  // vectors of boost::python::objects for array values, so register
-  // a converter that turns that vector into a Python list.
-  boost::python::to_python_converter<std::vector<object>,
-                                     TfPySequenceToPython<std::vector<object>>>();
+    // The call to JsConvertToContainerType in _ConvertDict creates
+    // vectors of pxr_boost::python::objects for array values, so register
+    // a converter that turns that vector into a Python list.
+    pxr_boost::python::to_python_converter<std::vector<object>,
+        TfPySequenceToPython<std::vector<object> > >();
 }

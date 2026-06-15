@@ -34,11 +34,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// usdImaging/materialParamUtils.cpp and HdStUdimTextureObject.
 ///
 USDIMAGING_API
-std::vector<std::tuple<int, TfToken>> UsdImaging_GetUdimTiles(
-    std::string const &basePath,
+std::vector<std::tuple<int, TfToken>>
+UsdImaging_GetUdimTiles(
+    std::string const& basePath,
     int tileLimit,
-    SdfLayerHandle const &layerHandle = SdfLayerHandle());
+    SdfLayerHandle const& layerHandle = SdfLayerHandle());
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_TEXTURE_UTILS_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_TEXTURE_UTILS_H

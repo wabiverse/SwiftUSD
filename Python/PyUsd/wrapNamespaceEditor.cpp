@@ -4,83 +4,99 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
 #include "Usd/namespaceEditor.h"
 #include "Usd/prim.h"
 #include "Usd/property.h"
-#include "pxr/pxrns.h"
 
-#include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyResultConversions.h"
+#include "Tf/pyContainerConversions.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/enum.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/scope.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/enum.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/scope.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-struct Usd_UsdNamespaceEditorCanEditResult : public TfPyAnnotatedBoolResult<std::string> {
-  Usd_UsdNamespaceEditorCanEditResult(bool val, const std::string &msg)
-      : TfPyAnnotatedBoolResult<std::string>(val, std::move(msg))
-  {
-  }
-};
+using namespace pxr_boost::python;
 
-template<typename Fn> Usd_UsdNamespaceEditorCanEditResult _CallWithAnnotatedResult(const Fn &func)
+static
+UsdNamespaceEditor::CanApplyResult
+_CanApplyEdits(const UsdNamespaceEditor &editor)
 {
-  std::string whyNot;
-  bool result = func(&whyNot);
-  return Usd_UsdNamespaceEditorCanEditResult(result, whyNot);
+    return editor.CanApplyEdits();
 }
-
-static Usd_UsdNamespaceEditorCanEditResult _CanApplyEdits(const UsdNamespaceEditor &editor)
-{
-  return _CallWithAnnotatedResult(
-      [&](std::string *whyNot) { return editor.CanApplyEdits(whyNot); });
+static
+std::string 
+_FormatWhyNot(const UsdNamespaceEditor::CanApplyResult &result) {
+    return TfStringJoin(result.errors, "; ");
 }
 
 void wrapUsdNamespaceEditor()
 {
-  using This = UsdNamespaceEditor;
+    using This = UsdNamespaceEditor;
 
-  Usd_UsdNamespaceEditorCanEditResult::Wrap<Usd_UsdNamespaceEditorCanEditResult>(
-      "_UsdNamespaceEditorCanEditResult", "whyNot");
+    scope s = class_<This>("NamespaceEditor", no_init)
+        .def(init<const UsdStagePtr &>())
+        .def(init<const UsdStagePtr &, const This::EditOptions &>())
 
-  scope s = class_<This>("NamespaceEditor", no_init)
-                .def(init<const UsdStagePtr &>())
-                .def(init<const UsdStagePtr &, const This::EditOptions &>())
+        .def("AddDependentStage", &This::AddDependentStage)
+        .def("RemoveDependentStage", &This::RemoveDependentStage)
+        .def("SetDependentStages", &This::SetDependentStages)
 
-                .def("DeletePrimAtPath", &This::DeletePrimAtPath)
-                .def("MovePrimAtPath", &This::MovePrimAtPath)
+        .def("DeletePrimAtPath", &This::DeletePrimAtPath)
+        .def("MovePrimAtPath", &This::MovePrimAtPath)
 
-                .def("DeletePrim", &This::DeletePrim)
-                .def("RenamePrim", &This::RenamePrim)
-                .def("ReparentPrim",
-                     (bool(This::*)(const UsdPrim &, const UsdPrim &)) & This::ReparentPrim)
-                .def("ReparentPrim",
-                     (bool(This::*)(const UsdPrim &, const UsdPrim &, const TfToken &)) &
-                         This::ReparentPrim)
+        .def("DeletePrim", &This::DeletePrim)
+        .def("RenamePrim", &This::RenamePrim)
+        .def("ReparentPrim", 
+            (bool (This::*) (const UsdPrim &, const UsdPrim &))
+               &This::ReparentPrim)
+        .def("ReparentPrim", 
+            (bool (This::*) (const UsdPrim &, const UsdPrim &, 
+                const TfToken &)) &This::ReparentPrim)
 
-                .def("DeletePropertyAtPath", &This::DeletePropertyAtPath)
-                .def("MovePropertyAtPath", &This::MovePropertyAtPath)
+        .def("DeletePropertyAtPath", &This::DeletePropertyAtPath)
+        .def("MovePropertyAtPath", &This::MovePropertyAtPath)
 
-                .def("DeleteProperty", &This::DeleteProperty)
-                .def("RenameProperty", &This::RenameProperty)
-                .def("ReparentProperty",
-                     (bool(This::*)(const UsdProperty &, const UsdPrim &)) &
-                         This::ReparentProperty)
-                .def("ReparentProperty",
-                     (bool(This::*)(const UsdProperty &, const UsdPrim &, const TfToken &)) &
-                         This::ReparentProperty)
+        .def("DeleteProperty", &This::DeleteProperty)
+        .def("RenameProperty", &This::RenameProperty)
+        .def("ReparentProperty", 
+            (bool (This::*) (const UsdProperty &, const UsdPrim &))
+               &This::ReparentProperty)
+        .def("ReparentProperty", 
+            (bool (This::*) (const UsdProperty &, const UsdPrim &, 
+                const TfToken &)) &This::ReparentProperty)
 
-                .def("ApplyEdits", &This::ApplyEdits)
-                .def("CanApplyEdits", &_CanApplyEdits);
+        .def("ApplyEdits", &This::ApplyEdits)
+        .def("CanApplyEdits", &_CanApplyEdits)
+        .def("GetLayersToEdit", &This::GetLayersToEdit,
+            return_value_policy<TfPySequenceToList>())
+    ;
 
-  class_<This::EditOptions>("EditOptions")
-      .def(init<>())
-      .add_property("allowRelocatesAuthoring",
-                    &This::EditOptions::allowRelocatesAuthoring,
-                    &This::EditOptions::allowRelocatesAuthoring);
+    class_<This::EditOptions>("EditOptions")
+        .def(init<>())
+        .add_property("allowRelocatesAuthoring", 
+            &This::EditOptions::allowRelocatesAuthoring, 
+            &This::EditOptions::allowRelocatesAuthoring)
+    ;
+
+    class_<This::CanApplyResult>("CanApplyResult")
+        .def(init<>())
+        .def("__bool__", &This::CanApplyResult::operator bool)
+        .add_property("whyNot", &_FormatWhyNot)
+        .add_property("errors", make_getter(&This::CanApplyResult::errors, 
+            return_value_policy<TfPySequenceToList>()))
+        .add_property("warnings", make_getter(&This::CanApplyResult::warnings, 
+            return_value_policy<TfPySequenceToList>()))
+    ;
 }

@@ -7,13 +7,14 @@
 #ifndef PXR_IMAGING_HD_ST_TRIANGULATE_H
 #define PXR_IMAGING_HD_ST_TRIANGULATE_H
 
-#include "Hd/bufferSource.h"
-#include "Hd/version.h"
 #include "pxr/pxrns.h"
+#include "Hd/version.h"
+#include "Hd/bufferSource.h"
 
 #include "Sdf/path.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 class HdSt_MeshTopology;
 
@@ -37,22 +38,23 @@ class HdSt_MeshTopology;
 // ----+--------+--------+------
 
 class HdSt_TriangleIndexBuilderComputation : public HdComputedBufferSource {
- public:
-  HdSt_TriangleIndexBuilderComputation(HdSt_MeshTopology *topology, SdfPath const &id);
-  virtual void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  virtual bool Resolve() override;
+public:
+    HdSt_TriangleIndexBuilderComputation(HdSt_MeshTopology *topology,
+                                         SdfPath const &id);
+    virtual void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    virtual bool Resolve() override;
 
-  virtual bool HasChainedBuffer() const override;
-  virtual HdBufferSourceSharedPtrVector GetChainedBuffers() const override;
+    virtual bool HasChainedBuffer() const override;
+    virtual HdBufferSourceSharedPtrVector GetChainedBuffers() const override;
 
- protected:
-  virtual bool _CheckValid() const override;
+protected:
+    virtual bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  HdBufferSourceSharedPtr _primitiveParam;
-  HdBufferSourceSharedPtr _trianglesEdgeIndices;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    HdBufferSourceSharedPtr _primitiveParam;
+    HdBufferSourceSharedPtr _trianglesEdgeIndices;
 };
 
 //
@@ -62,22 +64,23 @@ class HdSt_TriangleIndexBuilderComputation : public HdComputedBufferSource {
 /// CPU face-varying triangulation.
 ///
 class HdSt_TriangulateFaceVaryingComputation : public HdComputedBufferSource {
- public:
-  HdSt_TriangulateFaceVaryingComputation(HdSt_MeshTopology *topolgoy,
+public:
+    HdSt_TriangulateFaceVaryingComputation(HdSt_MeshTopology *topolgoy,
                                          HdBufferSourceSharedPtr const &source,
                                          SdfPath const &id);
 
-  virtual void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  virtual bool Resolve() override;
+    virtual void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    virtual bool Resolve() override;
 
- protected:
-  virtual bool _CheckValid() const override;
+protected:
+    virtual bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  HdBufferSourceSharedPtr _source;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    HdBufferSourceSharedPtr _source;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

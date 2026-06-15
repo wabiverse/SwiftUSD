@@ -18,35 +18,46 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdMaterialConnectionSchema;
 
 // Vectors of numeric types
-using HdIntArrayVectorSchema = HdTypedVectorSchema<HdIntArrayDataSource>;
+using HdIntArrayVectorSchema = 
+    HdVectorOfTypedSampledDataSourcesSchema<HdIntArrayDataSource>;
 
 // Vectors of Schemas
-using HdRenderProductVectorSchema = HdSchemaBasedVectorSchema<class HdRenderProductSchema>;
-using HdRenderVarVectorSchema = HdSchemaBasedVectorSchema<class HdRenderVarSchema>;
-using HdInstanceIndicesVectorSchema = HdSchemaBasedVectorSchema<class HdInstanceIndicesSchema>;
+using HdRenderProductVectorSchema =
+    HdVectorOfSchemasSchema<class HdRenderProductSchema>;
+using HdRenderVarVectorSchema =
+    HdVectorOfSchemasSchema<class HdRenderVarSchema>;
+using HdInstanceIndicesVectorSchema =
+    HdVectorOfSchemasSchema<class HdInstanceIndicesSchema>;
 using HdMaterialInterfaceMappingVectorSchema =
-    HdSchemaBasedVectorSchema<class HdMaterialInterfaceMappingSchema>;
-using HdMaterialConnectionVectorSchema = HdSchemaBasedVectorSchema<HdMaterialConnectionSchema>;
+    HdVectorOfSchemasSchema<class HdMaterialInterfaceMappingSchema>;
+using HdMaterialConnectionVectorSchema =
+    HdVectorOfSchemasSchema<HdMaterialConnectionSchema>;
 
 // Containers of sampled data sources
-using HdSampledDataSourceContainerSchema = HdTypedContainerSchema<HdSampledDataSource>;
+using HdSampledDataSourceContainerSchema =
+    HdContainerOfTypedSampledDataSourcesSchema<HdSampledDataSource>;
 
 // Containers of schemas
-using HdMaterialNodeContainerSchema = HdSchemaBasedContainerSchema<class HdMaterialNodeSchema>;
+using HdMaterialNodeContainerSchema =
+    HdContainerOfSchemasSchema<class HdMaterialNodeSchema>;
 using HdMaterialNodeParameterContainerSchema =
-    HdSchemaBasedContainerSchema<class HdMaterialNodeParameterSchema>;
+    HdContainerOfSchemasSchema<class HdMaterialNodeParameterSchema>;
 using HdMaterialNetworkContainerSchema =
-    HdSchemaBasedContainerSchema<class HdMaterialNetworkSchema>;
+    HdContainerOfSchemasSchema<class HdMaterialNetworkSchema>;
 using HdMaterialConnectionContainerSchema =
     HdSchemaBasedContainerSchema<HdMaterialConnectionSchema>;
+using HdMaterialInterfaceParameterContainerSchema =
+    HdContainerOfSchemasSchema<class HdMaterialInterfaceParameterSchema>;
+using HdExtComputationInputComputationContainerSchema =
+    HdContainerOfSchemasSchema<class HdExtComputationInputComputationSchema>;
+using HdExtComputationOutputContainerSchema =
+    HdContainerOfSchemasSchema<class HdExtComputationOutputSchema>;
 using HdSampledDataSourceContainerContainerSchema =
-    HdSchemaBasedContainerSchema<HdSampledDataSourceContainerSchema>;
+    HdContainerOfSchemasSchema<HdSampledDataSourceContainerSchema>;
 
 // Containers of vectors of schemas
 using HdMaterialConnectionVectorContainerSchema =
-    HdSchemaBasedContainerSchema<HdMaterialConnectionVectorSchema>;
-using HdMaterialInterfaceMappingsContainerSchema =
-    HdSchemaBasedContainerSchema<HdMaterialInterfaceMappingVectorSchema>;
+    HdContainerOfSchemasSchema<HdMaterialConnectionVectorSchema>;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

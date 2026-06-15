@@ -7,18 +7,19 @@
 #ifndef PXR_IMAGING_HD_ST_QUADRANGULATE_H
 #define PXR_IMAGING_HD_ST_QUADRANGULATE_H
 
-#include "HdSt/computation.h"
 #include "pxr/pxrns.h"
+#include "HdSt/computation.h"
 
 #include "Hd/bufferSource.h"
 
-#include "Sdf/path.h"
-#include "Tf/token.h"
 #include "Vt/array.h"
+#include "Tf/token.h"
+#include "Sdf/path.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-using HdSt_QuadInfoBuilderComputationSharedPtr =
+
+using HdSt_QuadInfoBuilderComputationSharedPtr = 
     std::shared_ptr<class HdSt_QuadInfoBuilderComputation>;
 
 class HdSt_MeshTopology;
@@ -90,16 +91,16 @@ class HdSt_MeshTopology;
 /// Quad info computation.
 ///
 class HdSt_QuadInfoBuilderComputation : public HdNullBufferSource {
- public:
-  HdSt_QuadInfoBuilderComputation(HdSt_MeshTopology *topology, SdfPath const &id);
-  bool Resolve() override;
+public:
+    HdSt_QuadInfoBuilderComputation(HdSt_MeshTopology *topology, SdfPath const &id);
+    bool Resolve() override;
 
- protected:
-  bool _CheckValid() const override;
+protected:
+    bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
 };
 
 /// \class HdSt_QuadIndexBuilderComputation
@@ -122,25 +123,26 @@ class HdSt_QuadInfoBuilderComputation : public HdNullBufferSource {
 // ----+-----------+-----------+------
 
 class HdSt_QuadIndexBuilderComputation : public HdComputedBufferSource {
- public:
-  HdSt_QuadIndexBuilderComputation(HdSt_MeshTopology *topology,
-                                   HdSt_QuadInfoBuilderComputationSharedPtr const &quadInfoBuilder,
-                                   SdfPath const &id);
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  bool Resolve() override;
+public:
+    HdSt_QuadIndexBuilderComputation(
+        HdSt_MeshTopology *topology,
+        HdSt_QuadInfoBuilderComputationSharedPtr const &quadInfoBuilder,
+        SdfPath const &id);
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    bool Resolve() override;
 
-  bool HasChainedBuffer() const override;
-  HdBufferSourceSharedPtrVector GetChainedBuffers() const override;
+    bool HasChainedBuffer() const override;
+    HdBufferSourceSharedPtrVector GetChainedBuffers() const override;
 
- protected:
-  bool _CheckValid() const override;
+protected:
+    bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  HdSt_QuadInfoBuilderComputationSharedPtr _quadInfoBuilder;
-  HdBufferSourceSharedPtr _primitiveParam;
-  HdBufferSourceSharedPtr _quadsEdgeIndices;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    HdSt_QuadInfoBuilderComputationSharedPtr _quadInfoBuilder;
+    HdBufferSourceSharedPtr _primitiveParam;
+    HdBufferSourceSharedPtr _quadsEdgeIndices;
 };
 
 /// \class HdSt_QuadrangulateTableComputation
@@ -148,19 +150,20 @@ class HdSt_QuadIndexBuilderComputation : public HdComputedBufferSource {
 /// Quadrangulate table computation (for GPU quadrangulation).
 ///
 class HdSt_QuadrangulateTableComputation : public HdComputedBufferSource {
- public:
-  HdSt_QuadrangulateTableComputation(HdSt_MeshTopology *topology,
-                                     HdBufferSourceSharedPtr const &quadInfoBuilder);
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  bool Resolve() override;
+public:
+    HdSt_QuadrangulateTableComputation(
+        HdSt_MeshTopology *topology,
+        HdBufferSourceSharedPtr const &quadInfoBuilder);
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    bool Resolve() override;
 
- protected:
-  bool _CheckValid() const override;
+protected:
+    bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  HdBufferSourceSharedPtr _quadInfoBuilder;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    HdBufferSourceSharedPtr _quadInfoBuilder;
 };
 
 /// \class HdSt_QuadrangulateComputation
@@ -168,26 +171,27 @@ class HdSt_QuadrangulateTableComputation : public HdComputedBufferSource {
 /// CPU quadrangulation.
 ///
 class HdSt_QuadrangulateComputation : public HdComputedBufferSource {
- public:
-  HdSt_QuadrangulateComputation(HdSt_MeshTopology *topology,
+public:
+    HdSt_QuadrangulateComputation(HdSt_MeshTopology *topology,
                                 HdBufferSourceSharedPtr const &source,
                                 HdBufferSourceSharedPtr const &quadInfoBuilder,
                                 SdfPath const &id);
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  bool Resolve() override;
-  HdTupleType GetTupleType() const override;
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    bool Resolve() override;
+    HdTupleType GetTupleType() const override;
 
-  bool HasPreChainedBuffer() const override;
-  HdBufferSourceSharedPtr GetPreChainedBuffer() const override;
+    bool HasPreChainedBuffer() const override;
+    HdBufferSourceSharedPtr GetPreChainedBuffer() const override;
 
- protected:
-  bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  HdBufferSourceSharedPtr _source;
-  HdBufferSourceSharedPtr _quadInfoBuilder;
+protected:
+    bool _CheckValid() const override;
+
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    HdBufferSourceSharedPtr _source;
+    HdBufferSourceSharedPtr _quadInfoBuilder;
 };
 
 /// \class HdSt_QuadrangulateFaceVaryingComputation
@@ -195,21 +199,21 @@ class HdSt_QuadrangulateComputation : public HdComputedBufferSource {
 /// CPU face-varying quadrangulation.
 ///
 class HdSt_QuadrangulateFaceVaryingComputation : public HdComputedBufferSource {
- public:
-  HdSt_QuadrangulateFaceVaryingComputation(HdSt_MeshTopology *topolgoy,
+public:
+    HdSt_QuadrangulateFaceVaryingComputation(HdSt_MeshTopology *topolgoy,
                                            HdBufferSourceSharedPtr const &source,
                                            SdfPath const &id);
 
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  bool Resolve() override;
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    bool Resolve() override;
 
- protected:
-  bool _CheckValid() const override;
+protected:
+    bool _CheckValid() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  HdBufferSourceSharedPtr _source;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    HdBufferSourceSharedPtr _source;
 };
 
 /// \class HdSt_QuadrangulateComputationGPU
@@ -217,23 +221,25 @@ class HdSt_QuadrangulateFaceVaryingComputation : public HdComputedBufferSource {
 /// GPU quadrangulation.
 ///
 class HdSt_QuadrangulateComputationGPU : public HdStComputation {
- public:
-  /// This computaion doesn't generate buffer source (i.e. 2nd phase)
-  HdSt_QuadrangulateComputationGPU(HdSt_MeshTopology *topology,
-                                   TfToken const &sourceName,
-                                   HdType dataType,
-                                   SdfPath const &id);
-  void Execute(HdBufferArrayRangeSharedPtr const &range,
-               HdResourceRegistry *resourceRegistry) override;
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override;
-  int GetNumOutputElements() const override;
+public:
+    /// This computaion doesn't generate buffer source (i.e. 2nd phase)
+    HdSt_QuadrangulateComputationGPU(HdSt_MeshTopology *topology,
+                               TfToken const &sourceName,
+                               HdType dataType,
+                               SdfPath const &id);
+    void Execute(HdBufferArrayRangeSharedPtr const &range,
+                 HdResourceRegistry *resourceRegistry) override;
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    int GetNumOutputElements() const override;
 
- private:
-  SdfPath const _id;
-  HdSt_MeshTopology *_topology;
-  TfToken _name;
-  HdType _dataType;
+private:
+    SdfPath const _id;
+    HdSt_MeshTopology *_topology;
+    TfToken _name;
+    HdType _dataType;
 };
+
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

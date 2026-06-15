@@ -9,16 +9,22 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 HdSt_ExtCompInputSource::HdSt_ExtCompInputSource(const TfToken &inputName)
-    : HdNullBufferSource(), _inputName(inputName)
+    : HdNullBufferSource()
+    , _inputName(inputName)
 {
+
 }
 
 HdSt_ExtCompInputSource::~HdSt_ExtCompInputSource() = default;
 
-TfToken const &HdSt_ExtCompInputSource::GetName() const
+TfToken const &
+HdSt_ExtCompInputSource::GetName() const
 {
-  return _inputName;
+    return _inputName;
 }
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
+

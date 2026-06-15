@@ -5,5 +5,5 @@
 // https://openusd.org/license.
 //
 
-#include "Ar/pyResolverContext.h"
 #include "pxr/pxrns.h"
+#include "Ar/pyResolverContext.h"

@@ -19,81 +19,95 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdDisplayFilterSchemaTokens, HD_DISPLAY_FILTER_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdDisplayFilterSchemaTokens,
+    HD_DISPLAY_FILTER_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdMaterialNodeSchema HdDisplayFilterSchema::GetResource() const
+HdMaterialNodeSchema
+HdDisplayFilterSchema::GetResource() const
 {
-  return HdMaterialNodeSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdDisplayFilterSchemaTokens->resource));
+    return HdMaterialNodeSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdDisplayFilterSchemaTokens->resource));
 }
 
 /*static*/
-HdContainerDataSourceHandle HdDisplayFilterSchema::BuildRetained(
+HdContainerDataSourceHandle
+HdDisplayFilterSchema::BuildRetained(
+        const HdContainerDataSourceHandle &resource
+)
+{
+    TfToken _names[1];
+    HdDataSourceBaseHandle _values[1];
+
+    size_t _count = 0;
+
+    if (resource) {
+        _names[_count] = HdDisplayFilterSchemaTokens->resource;
+        _values[_count++] = resource;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdDisplayFilterSchema::Builder &
+HdDisplayFilterSchema::Builder::SetResource(
     const HdContainerDataSourceHandle &resource)
 {
-  TfToken _names[1];
-  HdDataSourceBaseHandle _values[1];
-
-  size_t _count = 0;
-
-  if (resource) {
-    _names[_count] = HdDisplayFilterSchemaTokens->resource;
-    _values[_count++] = resource;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    _resource = resource;
+    return *this;
 }
 
-HdDisplayFilterSchema::Builder &HdDisplayFilterSchema::Builder::SetResource(
-    const HdContainerDataSourceHandle &resource)
+HdContainerDataSourceHandle
+HdDisplayFilterSchema::Builder::Build()
 {
-  _resource = resource;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdDisplayFilterSchema::Builder::Build()
-{
-  return HdDisplayFilterSchema::BuildRetained(_resource);
+    return HdDisplayFilterSchema::BuildRetained(
+        _resource
+    );
 }
 
 /*static*/
-HdDisplayFilterSchema HdDisplayFilterSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdDisplayFilterSchema
+HdDisplayFilterSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdDisplayFilterSchema(fromParentContainer ?
-                                   HdContainerDataSource::Cast(fromParentContainer->Get(
-                                       HdDisplayFilterSchemaTokens->displayFilter)) :
-                                   nullptr);
+    return HdDisplayFilterSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdDisplayFilterSchemaTokens->displayFilter))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdDisplayFilterSchema::GetSchemaToken()
+const TfToken &
+HdDisplayFilterSchema::GetSchemaToken()
 {
-  return HdDisplayFilterSchemaTokens->displayFilter;
+    return HdDisplayFilterSchemaTokens->displayFilter;
 }
 
 /*static*/
-const HdDataSourceLocator &HdDisplayFilterSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdDisplayFilterSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdDisplayFilterSchema::GetResourceLocator()
+const HdDataSourceLocator &
+HdDisplayFilterSchema::GetResourceLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdDisplayFilterSchemaTokens->resource);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdDisplayFilterSchemaTokens->resource);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

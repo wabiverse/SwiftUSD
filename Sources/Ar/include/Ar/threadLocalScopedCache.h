@@ -7,11 +7,11 @@
 #ifndef PXR_USD_AR_THREAD_LOCAL_SCOPED_CACHE_H
 #define PXR_USD_AR_THREAD_LOCAL_SCOPED_CACHE_H
 
-#include "Ar/api.h"
 #include "pxr/pxrns.h"
+#include "Ar/api.h"
 
-#include "Tf/diagnostic.h"
 #include "Vt/value.h"
+#include "Tf/diagnostic.h"
 
 #include <OneTBB/tbb/enumerable_thread_specific.h>
 #include <memory>
@@ -29,7 +29,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// class MyResolver : public ArResolver {
 ///     using ResolveCache = ArThreadLocalScopedCache<...>;
 ///     ResolveCache _cache;
-///
+///     
 ///     void BeginCacheScope(VtValue* data) { _cache.BeginCacheScope(data); }
 ///     void EndCacheScope(VtValue* data) { _cache.EndCacheScope(data); }
 ///     void Resolve(...) {
@@ -45,56 +45,60 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// \see \ref ArResolver_scopedCache "Scoped Resolution Cache"
-template<class CachedType> class ArThreadLocalScopedCache {
- public:
-  using CachePtr = std::shared_ptr<CachedType>;
+template <class CachedType>
+class ArThreadLocalScopedCache
+{
+public:
+    using CachePtr = std::shared_ptr<CachedType>;
 
-  void BeginCacheScope(VtValue *cacheScopeData)
-  {
-    // Since this is intended to be used by ArResolver implementations,
-    // we expect cacheScopeData to never be NULL and to either be empty
-    // or holding a cache pointer that we've filled in previously.
-    if (!cacheScopeData || (!cacheScopeData->IsEmpty() && !cacheScopeData->IsHolding<CachePtr>()))
+    void BeginCacheScope(VtValue* cacheScopeData)
     {
-      TF_CODING_ERROR("Unexpected cache scope data");
-      return;
+        // Since this is intended to be used by ArResolver implementations,
+        // we expect cacheScopeData to never be NULL and to either be empty
+        // or holding a cache pointer that we've filled in previously.
+        if (!cacheScopeData ||
+            (!cacheScopeData->IsEmpty() &&
+             !cacheScopeData->IsHolding<CachePtr>())) {
+            TF_CODING_ERROR("Unexpected cache scope data");
+            return;
+        }
+
+        _CachePtrStack& cacheStack = _threadCacheStack.local();
+        if (cacheScopeData->IsHolding<CachePtr>()) {
+            cacheStack.push_back(cacheScopeData->UncheckedGet<CachePtr>());
+        }
+        else {
+            if (cacheStack.empty()) {
+                cacheStack.push_back(std::make_shared<CachedType>());
+            }
+            else {
+                cacheStack.push_back(cacheStack.back());
+            }
+        }
+        *cacheScopeData = cacheStack.back();
     }
 
-    _CachePtrStack &cacheStack = _threadCacheStack.local();
-    if (cacheScopeData->IsHolding<CachePtr>()) {
-      cacheStack.push_back(cacheScopeData->UncheckedGet<CachePtr>());
+    void EndCacheScope(VtValue* cacheScopeData)
+    {
+        _CachePtrStack& cacheStack = _threadCacheStack.local();
+        if (TF_VERIFY(!cacheStack.empty())) {
+            cacheStack.pop_back();
+        }
     }
-    else {
-      if (cacheStack.empty()) {
-        cacheStack.push_back(std::make_shared<CachedType>());
-      }
-      else {
-        cacheStack.push_back(cacheStack.back());
-      }
+
+    CachePtr GetCurrentCache()
+    {
+        _CachePtrStack& cacheStack = _threadCacheStack.local();
+        return (cacheStack.empty() ? CachePtr() : cacheStack.back());
     }
-    *cacheScopeData = cacheStack.back();
-  }
 
-  void EndCacheScope(VtValue *cacheScopeData)
-  {
-    _CachePtrStack &cacheStack = _threadCacheStack.local();
-    if (TF_VERIFY(!cacheStack.empty())) {
-      cacheStack.pop_back();
-    }
-  }
-
-  CachePtr GetCurrentCache()
-  {
-    _CachePtrStack &cacheStack = _threadCacheStack.local();
-    return (cacheStack.empty() ? CachePtr() : cacheStack.back());
-  }
-
- private:
-  using _CachePtrStack = std::vector<CachePtr>;
-  using _ThreadLocalCachePtrStack = tbb::enumerable_thread_specific<_CachePtrStack>;
-  _ThreadLocalCachePtrStack _threadCacheStack;
+private:
+    using _CachePtrStack = std::vector<CachePtr>;
+    using _ThreadLocalCachePtrStack = 
+        tbb::enumerable_thread_specific<_CachePtrStack>;
+    _ThreadLocalCachePtrStack _threadCacheStack;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_THREAD_LOCAL_SCOPED_CACHE_H
+#endif // PXR_USD_AR_THREAD_LOCAL_SCOPED_CACHE_H

@@ -10,9 +10,9 @@
 /// \file tf/staticData.h
 /// \ingroup group_tf_Initialization
 
+#include "pxr/pxrns.h"
 #include "Arch/hints.h"
 #include "Tf/preprocessorUtilsLite.h"
-#include "pxr/pxrns.h"
 
 #include <atomic>
 #include <type_traits>
@@ -29,7 +29,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// either a variable defined at file-scope (outside of a function) or a
 /// static member of a class.  This is because the initialization order of
 /// globals is undefined across translation units.
-///
+/// 
 /// The only exceptions are constexpr constructors and "plain old data" types
 /// such as integral or float/double type and pointers.  In contrast, \c
 /// std::string requires construction, as do most \c STL types, and most
@@ -75,7 +75,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// One can either call member functions using the "->" operator, or use the
 /// dereference "*" operator:
-///
+/// 
 /// \code
 /// TfStaticData<string> Xyz_curName;
 ///
@@ -87,65 +87,53 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// }
 /// \endcode
 ///
-template<class T> struct Tf_StaticDataDefaultFactory {
-  static T *New()
-  {
-    return new T;
-  }
+template <class T>
+struct Tf_StaticDataDefaultFactory {
+    static T *New() { return new T; }
 };
 
-template<class T, class Factory = Tf_StaticDataDefaultFactory<T>> class TfStaticData {
- public:
-  /// Return a pointer to the underlying data object. It is created and
-  /// initialized if necessary.
-  inline T *operator->() const
-  {
-    return Get();
-  }
+template <class T, class Factory = Tf_StaticDataDefaultFactory<T> >
+class TfStaticData {
+public:
+    /// Return a pointer to the underlying data object. It is created and
+    /// initialized if necessary.
+    inline T* operator-> () const { return Get(); }
 
-  /// Member lookup. The underlying data object is created and initialized
-  /// if necessary.
-  inline T &operator*() const
-  {
-    return *Get();
-  }
+    /// Member lookup. The underlying data object is created and initialized
+    /// if necessary.
+    inline T& operator* () const { return *Get(); }
 
-  /// Return a pointer to the underlying object, creating and initializing
-  /// it if necessary.
-  inline T *Get() const
-  {
-    T *p = _data;
-    return ARCH_LIKELY(p) ? p : _TryToCreateData();
-  }
+    /// Return a pointer to the underlying object, creating and initializing
+    /// it if necessary.
+    inline T* Get() const {
+        T *p = _data;
+        return ARCH_LIKELY(p) ? p : _TryToCreateData();
+    }
+    
+    /// Return true if the underlying data object is created and initialized.
+    /// Return false otherwise.
+    inline bool IsInitialized() const { return _data.load() != nullptr; }
 
-  /// Return true if the underlying data object is created and initialized.
-  /// Return false otherwise.
-  inline bool IsInitialized() const
-  {
-    return _data.load() != nullptr;
-  }
+private:
+    T *_TryToCreateData() const {
+        // Allocate an instance.
+        T *tmp = Factory::New();
 
- private:
-  T *_TryToCreateData() const
-  {
-    // Allocate an instance.
-    T *tmp = Factory::New();
+        // Try to atomically set the pointer from null to tmp.
+        T *n = nullptr;
+        if (ARCH_LIKELY(_data.compare_exchange_strong(n, tmp)))
+            return tmp;
 
-    // Try to atomically set the pointer from null to tmp.
-    T *n = nullptr;
-    if (ARCH_LIKELY(_data.compare_exchange_strong(n, tmp)))
-      return tmp;
+        // Another thread won the initialization race.
+        delete tmp;
+        return _data;
+    }
 
-    // Another thread won the initialization race.
-    delete tmp;
-    return _data;
-  }
-
-  mutable std::atomic<T *> _data;
+    mutable std::atomic<T *> _data;
 };
 
 /// Create a static data object, initializing it with code.
-///
+/// 
 /// The macro takes two arguments. The first is the type of static data, the
 /// second is the name of the variable. The block of code following the macro
 /// will be invoked to initialize the static data when it is first used. See
@@ -153,7 +141,7 @@ template<class T, class Factory = Tf_StaticDataDefaultFactory<T>> class TfStatic
 ///
 /// \code
 /// TF_MAKE_STATIC_DATA(string, myString) { *myString = "hello!"; }
-///
+/// 
 /// TF_MAKE_STATIC_DATA(vector<string>, someNames) {
 ///     someNames->push_back("hello");
 ///     someNames->push_back("static");
@@ -190,22 +178,22 @@ template<class T, class Factory = Tf_StaticDataDefaultFactory<T>> class TfStatic
 /// not have side-effects, but you should be aware of it.
 ///
 /// \hideinitializer
-#define TF_MAKE_STATIC_DATA(Type, Name) \
-  static void TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)( \
-      std::remove_const_t<TF_PP_EAT_PARENS(Type)> *); \
-  namespace { \
-  struct TF_PP_CAT(Name, _Tf_StaticDataFactory) { \
-    static TF_PP_EAT_PARENS(Type) * New() \
-    { \
-      auto *p = new std::remove_const_t<TF_PP_EAT_PARENS(Type)>; \
-      TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)(p); \
-      return p; \
-    } \
-  }; \
-  } \
-  static TfStaticData<TF_PP_EAT_PARENS(Type), TF_PP_CAT(Name, _Tf_StaticDataFactory)> Name; \
-  static void TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)( \
-      std::remove_const_t<TF_PP_EAT_PARENS(Type)> * Name)
+#define TF_MAKE_STATIC_DATA(Type, Name)                                        \
+    static void TF_PP_CAT(Name,_Tf_StaticDataFactoryImpl)(                     \
+        std::remove_const_t<TF_PP_EAT_PARENS(Type)> *);                        \
+    namespace {                                                                \
+    struct TF_PP_CAT(Name,_Tf_StaticDataFactory) {                             \
+        static TF_PP_EAT_PARENS(Type) *New() {                                 \
+            auto *p = new std::remove_const_t<TF_PP_EAT_PARENS(Type)>;         \
+            TF_PP_CAT(Name,_Tf_StaticDataFactoryImpl)(p);                      \
+            return p;                                                          \
+        }                                                                      \
+    };                                                                         \
+    }                                                                          \
+    static TfStaticData<                                                       \
+        TF_PP_EAT_PARENS(Type), TF_PP_CAT(Name,_Tf_StaticDataFactory)> Name;   \
+    static void TF_PP_CAT(Name,_Tf_StaticDataFactoryImpl)(                     \
+        std::remove_const_t<TF_PP_EAT_PARENS(Type)> *Name)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

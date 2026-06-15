@@ -7,9 +7,9 @@
 #ifndef PXR_USD_IMAGING_USD_IMAGING_IMPLICIT_SURFACE_MESH_UTILS_H
 #define PXR_USD_IMAGING_USD_IMAGING_IMPLICIT_SURFACE_MESH_UTILS_H
 
+#include "pxr/pxrns.h"
 #include "UsdImaging/api.h"
 #include "Vt/types.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -22,7 +22,8 @@ class TfToken;
 /// constructed once and is identical for all spheres.  The indices refer to the
 /// points array returned by UsdImagingGetUnitSphereMeshPoints().
 USDIMAGING_API
-const PxOsdMeshTopology &UsdImagingGetUnitSphereMeshTopology();
+const PxOsdMeshTopology&
+UsdImagingGetUnitSphereMeshTopology();
 
 /// Return an array of points for the canonical "unit sphere" mesh.  This is a
 /// mesh describing a sphere that fits in a unit-sized bounding box, centered on
@@ -33,7 +34,8 @@ const PxOsdMeshTopology &UsdImagingGetUnitSphereMeshTopology();
 /// spheres of a different size, use with the transform produced by the
 /// companion function UsdImagingGenerateSphereOrCubeTransform().
 USDIMAGING_API
-const VtVec3fArray &UsdImagingGetUnitSphereMeshPoints();
+const VtVec3fArray&
+UsdImagingGetUnitSphereMeshPoints();
 
 // Cube
 
@@ -41,7 +43,8 @@ const VtVec3fArray &UsdImagingGetUnitSphereMeshPoints();
 /// constructed once and is identical for all cubes.  The indices refer to the
 /// points array returned by UsdImagingGetUnitCubeMeshPoints().
 USDIMAGING_API
-const PxOsdMeshTopology &UsdImagingGetUnitCubeMeshTopology();
+const PxOsdMeshTopology&
+UsdImagingGetUnitCubeMeshTopology();
 
 /// Return an array of points for the canonical "unit cube" mesh.  This is a
 /// mesh describing a cube with unit-length edges, centered on the origin.
@@ -51,7 +54,8 @@ const PxOsdMeshTopology &UsdImagingGetUnitCubeMeshTopology();
 /// cubes of a different size, use with the transform produced by the
 /// companion function UsdImagingGenerateSphereOrCubeTransform().
 USDIMAGING_API
-const VtVec3fArray &UsdImagingGetUnitCubeMeshPoints();
+const VtVec3fArray&
+UsdImagingGetUnitCubeMeshPoints();
 
 // Cone
 
@@ -59,7 +63,8 @@ const VtVec3fArray &UsdImagingGetUnitCubeMeshPoints();
 /// constructed once and is identical for all cones.  The indices refer to the
 /// points array returned by UsdImagingGetUnitConeMeshPoints().
 USDIMAGING_API
-const PxOsdMeshTopology &UsdImagingGetUnitConeMeshTopology();
+const PxOsdMeshTopology&
+UsdImagingGetUnitConeMeshTopology();
 
 /// Return an array of points for the canonical "unit cone" mesh.  This is a
 /// mesh describing a cone that fits in a unit-sized bounding box, centered on
@@ -73,7 +78,8 @@ const PxOsdMeshTopology &UsdImagingGetUnitConeMeshTopology();
 /// transform produced by the companion function
 /// UsdImagingGenerateConeOrCylinderTransform().
 USDIMAGING_API
-const VtVec3fArray &UsdImagingGetUnitConeMeshPoints();
+const VtVec3fArray&
+UsdImagingGetUnitConeMeshPoints();
 
 // Cylinder
 
@@ -81,7 +87,8 @@ const VtVec3fArray &UsdImagingGetUnitConeMeshPoints();
 /// constructed once and is identical for all cylinders.  The indices refer to
 /// the points array returned by UsdImagingGetUnitCylinderMeshPoints().
 USDIMAGING_API
-const PxOsdMeshTopology &UsdImagingGetUnitCylinderMeshTopology();
+const PxOsdMeshTopology&
+UsdImagingGetUnitCylinderMeshTopology();
 
 /// Return an array of points for the canonical "unit cylinder" mesh.  This is a
 /// mesh describing a cylinder that fits in a unit-sized bounding box, centered
@@ -95,7 +102,8 @@ const PxOsdMeshTopology &UsdImagingGetUnitCylinderMeshTopology();
 /// transform produced by the companion function
 /// UsdImagingGenerateConeOrCylinderTransform().
 USDIMAGING_API
-const VtVec3fArray &UsdImagingGetUnitCylinderMeshPoints();
+const VtVec3fArray&
+UsdImagingGetUnitCylinderMeshPoints();
 
 // Capsule
 
@@ -103,7 +111,8 @@ const VtVec3fArray &UsdImagingGetUnitCylinderMeshPoints();
 /// is constructed once and is identical for all capsules.  The indices refer to
 /// the points array returned by UsdImagingGenerateCapsuleMeshPoints().
 USDIMAGING_API
-const PxOsdMeshTopology &UsdImagingGetCapsuleMeshTopology();
+const PxOsdMeshTopology&
+UsdImagingGetCapsuleMeshTopology();
 
 /// Generate an array of points describing a "capsule": a cylinder with
 /// hemispherical caps on each end.  The given height is the length of the
@@ -118,9 +127,11 @@ const PxOsdMeshTopology &UsdImagingGetCapsuleMeshTopology();
 /// points are for use with the topology provided by
 /// UsdImagingGetCapsuleMeshTopology().
 USDIMAGING_API
-VtVec3fArray UsdImagingGenerateCapsuleMeshPoints(const double height,
-                                                 const double radius,
-                                                 const TfToken &axis);
+VtVec3fArray
+UsdImagingGenerateCapsuleMeshPoints(
+    const double height,
+    const double radius,
+    const TfToken& axis);
 
 // Plane
 
@@ -128,7 +139,8 @@ VtVec3fArray UsdImagingGenerateCapsuleMeshPoints(const double height,
 /// is constructed once and is identical for all planes.  The indices refer to
 /// the points array returned by UsdImagingGeneratePlaneMeshPoints().
 USDIMAGING_API
-const PxOsdMeshTopology &UsdImagingGetPlaneTopology();
+const PxOsdMeshTopology&
+UsdImagingGetPlaneTopology();
 
 /// Generate an array of points describing a "plane". This is a mesh describing
 /// a double-sided plane aligned to an axis, with a width and length along the
@@ -141,9 +153,12 @@ const PxOsdMeshTopology &UsdImagingGetPlaneTopology();
 /// points are for use with the topology provided by
 /// UsdImagingGetPlaneTopology().
 USDIMAGING_API
-VtVec3fArray UsdImagingGeneratePlaneMeshPoints(const double width,
-                                               const double length,
-                                               const TfToken &axis);
+VtVec3fArray
+UsdImagingGeneratePlaneMeshPoints(
+    const double width,
+    const double length,
+    const TfToken& axis);
+
 
 // Transforms
 
@@ -152,7 +167,9 @@ VtVec3fArray UsdImagingGeneratePlaneMeshPoints(const double width,
 /// the net scale, so when using with the "unit sphere" mesh be sure to pass the
 /// desired diameter (not radius)!
 USDIMAGING_API
-GfMatrix4d UsdImagingGenerateSphereOrCubeTransform(const double size);
+GfMatrix4d
+UsdImagingGenerateSphereOrCubeTransform(
+    const double size);
 
 /// Generate a transform for use with the "unit cone" or "unit cylinder" meshes,
 /// which transforms the mesh to have the specified height and radius, while
@@ -161,10 +178,12 @@ GfMatrix4d UsdImagingGenerateSphereOrCubeTransform(const double size);
 /// primitives, hence its parameterization by radius; the net scale for the
 /// radial axes will be twice the given value.
 USDIMAGING_API
-GfMatrix4d UsdImagingGenerateConeOrCylinderTransform(const double height,
-                                                     const double radius,
-                                                     const TfToken &axis);
+GfMatrix4d
+UsdImagingGenerateConeOrCylinderTransform(
+    const double height,
+    const double radius,
+    const TfToken& axis);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_IMPLICIT_SURFACE_MESH_UTILS_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_IMPLICIT_SURFACE_MESH_UTILS_H

@@ -19,105 +19,127 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderPassSchemaTokens, HD_RENDER_PASS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderPassSchemaTokens,
+    HD_RENDER_PASS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdTokenDataSourceHandle HdRenderPassSchema::GetPassType() const
+HdTokenDataSourceHandle
+HdRenderPassSchema::GetPassType() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdRenderPassSchemaTokens->passType);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdRenderPassSchemaTokens->passType);
 }
 
-HdPathDataSourceHandle HdRenderPassSchema::GetRenderSource() const
+HdPathDataSourceHandle
+HdRenderPassSchema::GetRenderSource() const
 {
-  return _GetTypedDataSource<HdPathDataSource>(HdRenderPassSchemaTokens->renderSource);
+    return _GetTypedDataSource<HdPathDataSource>(
+        HdRenderPassSchemaTokens->renderSource);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdRenderPassSchema::BuildRetained(
-    const HdTokenDataSourceHandle &passType, const HdPathDataSourceHandle &renderSource)
+HdContainerDataSourceHandle
+HdRenderPassSchema::BuildRetained(
+        const HdTokenDataSourceHandle &passType,
+        const HdPathDataSourceHandle &renderSource
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (passType) {
-    _names[_count] = HdRenderPassSchemaTokens->passType;
-    _values[_count++] = passType;
-  }
+    if (passType) {
+        _names[_count] = HdRenderPassSchemaTokens->passType;
+        _values[_count++] = passType;
+    }
 
-  if (renderSource) {
-    _names[_count] = HdRenderPassSchemaTokens->renderSource;
-    _values[_count++] = renderSource;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (renderSource) {
+        _names[_count] = HdRenderPassSchemaTokens->renderSource;
+        _values[_count++] = renderSource;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdRenderPassSchema::Builder &HdRenderPassSchema::Builder::SetPassType(
+HdRenderPassSchema::Builder &
+HdRenderPassSchema::Builder::SetPassType(
     const HdTokenDataSourceHandle &passType)
 {
-  _passType = passType;
-  return *this;
+    _passType = passType;
+    return *this;
 }
 
-HdRenderPassSchema::Builder &HdRenderPassSchema::Builder::SetRenderSource(
+HdRenderPassSchema::Builder &
+HdRenderPassSchema::Builder::SetRenderSource(
     const HdPathDataSourceHandle &renderSource)
 {
-  _renderSource = renderSource;
-  return *this;
+    _renderSource = renderSource;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdRenderPassSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdRenderPassSchema::Builder::Build()
 {
-  return HdRenderPassSchema::BuildRetained(_passType, _renderSource);
-}
-
-/*static*/
-HdRenderPassSchema HdRenderPassSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdRenderPassSchema(fromParentContainer ?
-                                HdContainerDataSource::Cast(fromParentContainer->Get(
-                                    HdRenderPassSchemaTokens->renderPass)) :
-                                nullptr);
+    return HdRenderPassSchema::BuildRetained(
+        _passType,
+        _renderSource
+    );
 }
 
 /*static*/
-const TfToken &HdRenderPassSchema::GetSchemaToken()
+HdRenderPassSchema
+HdRenderPassSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdRenderPassSchemaTokens->renderPass;
+    return HdRenderPassSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdRenderPassSchemaTokens->renderPass))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdRenderPassSchema::GetDefaultLocator()
+const TfToken &
+HdRenderPassSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdRenderPassSchemaTokens->renderPass;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdRenderPassSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdRenderPassSchema::GetPassTypeLocator()
+const HdDataSourceLocator &
+HdRenderPassSchema::GetPassTypeLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdRenderPassSchemaTokens->passType);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdRenderPassSchemaTokens->passType);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdRenderPassSchema::GetRenderSourceLocator()
+const HdDataSourceLocator &
+HdRenderPassSchema::GetRenderSourceLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdRenderPassSchemaTokens->renderSource);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdRenderPassSchemaTokens->renderSource);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

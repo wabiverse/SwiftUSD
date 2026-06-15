@@ -8,150 +8,165 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsRevoluteJoint, TfType::Bases<UsdPhysicsJoint>>();
-
-  // Register the usd prim typename as an alias under UsdSchemaBase. This
-  // enables one to call
-  // TfType::Find<UsdSchemaBase>().FindDerivedByName("PhysicsRevoluteJoint")
-  // to find TfType<UsdPhysicsRevoluteJoint>, which is how IsA queries are
-  // answered.
-  TfType::AddAlias<UsdSchemaBase, UsdPhysicsRevoluteJoint>("PhysicsRevoluteJoint");
+    TfType::Define<UsdPhysicsRevoluteJoint,
+        TfType::Bases< UsdPhysicsJoint > >();
+    
+    // Register the usd prim typename as an alias under UsdSchemaBase. This
+    // enables one to call
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("PhysicsRevoluteJoint")
+    // to find TfType<UsdPhysicsRevoluteJoint>, which is how IsA queries are
+    // answered.
+    TfType::AddAlias<UsdSchemaBase, UsdPhysicsRevoluteJoint>("PhysicsRevoluteJoint");
 }
 
 /* virtual */
-UsdPhysicsRevoluteJoint::~UsdPhysicsRevoluteJoint() {}
-
-/* static */
-UsdPhysicsRevoluteJoint UsdPhysicsRevoluteJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsRevoluteJoint::~UsdPhysicsRevoluteJoint()
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdPhysicsRevoluteJoint();
-  }
-  return UsdPhysicsRevoluteJoint(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdPhysicsRevoluteJoint UsdPhysicsRevoluteJoint::Define(const UsdStagePtr &stage,
-                                                        const SdfPath &path)
+UsdPhysicsRevoluteJoint
+UsdPhysicsRevoluteJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  static TfToken usdPrimTypeName("PhysicsRevoluteJoint");
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdPhysicsRevoluteJoint();
-  }
-  return UsdPhysicsRevoluteJoint(stage->DefinePrim(path, usdPrimTypeName));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdPhysicsRevoluteJoint();
+    }
+    return UsdPhysicsRevoluteJoint(stage->GetPrimAtPath(path));
+}
+
+/* static */
+UsdPhysicsRevoluteJoint
+UsdPhysicsRevoluteJoint::Define(
+    const UsdStagePtr &stage, const SdfPath &path)
+{
+    static TfToken usdPrimTypeName("PhysicsRevoluteJoint");
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdPhysicsRevoluteJoint();
+    }
+    return UsdPhysicsRevoluteJoint(
+        stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdPhysicsRevoluteJoint::_GetSchemaKind() const
 {
-  return UsdPhysicsRevoluteJoint::schemaKind;
+    return UsdPhysicsRevoluteJoint::schemaKind;
 }
 
 /* static */
-const TfType &UsdPhysicsRevoluteJoint::_GetStaticTfType()
+const TfType &
+UsdPhysicsRevoluteJoint::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdPhysicsRevoluteJoint>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdPhysicsRevoluteJoint>();
+    return tfType;
 }
 
 /* static */
-bool UsdPhysicsRevoluteJoint::_IsTypedSchema()
+bool 
+UsdPhysicsRevoluteJoint::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdPhysicsRevoluteJoint::_GetTfType() const
+const TfType &
+UsdPhysicsRevoluteJoint::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
-UsdAttribute UsdPhysicsRevoluteJoint::GetAxisAttr() const
+UsdAttribute
+UsdPhysicsRevoluteJoint::GetAxisAttr() const
 {
-  return GetPrim().GetAttribute(UsdPhysicsTokens->physicsAxis);
+    return GetPrim().GetAttribute(UsdPhysicsTokens->physicsAxis);
 }
 
-UsdAttribute UsdPhysicsRevoluteJoint::CreateAxisAttr(VtValue const &defaultValue,
-                                                     bool writeSparsely) const
+UsdAttribute
+UsdPhysicsRevoluteJoint::CreateAxisAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsAxis,
-                                    SdfValueTypeNames->Token,
-                                    /* custom = */ false,
-                                    SdfVariabilityUniform,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsAxis,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
 }
 
-UsdAttribute UsdPhysicsRevoluteJoint::GetLowerLimitAttr() const
+UsdAttribute
+UsdPhysicsRevoluteJoint::GetLowerLimitAttr() const
 {
-  return GetPrim().GetAttribute(UsdPhysicsTokens->physicsLowerLimit);
+    return GetPrim().GetAttribute(UsdPhysicsTokens->physicsLowerLimit);
 }
 
-UsdAttribute UsdPhysicsRevoluteJoint::CreateLowerLimitAttr(VtValue const &defaultValue,
-                                                           bool writeSparsely) const
+UsdAttribute
+UsdPhysicsRevoluteJoint::CreateLowerLimitAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsLowerLimit,
-                                    SdfValueTypeNames->Float,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsLowerLimit,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
-UsdAttribute UsdPhysicsRevoluteJoint::GetUpperLimitAttr() const
+UsdAttribute
+UsdPhysicsRevoluteJoint::GetUpperLimitAttr() const
 {
-  return GetPrim().GetAttribute(UsdPhysicsTokens->physicsUpperLimit);
+    return GetPrim().GetAttribute(UsdPhysicsTokens->physicsUpperLimit);
 }
 
-UsdAttribute UsdPhysicsRevoluteJoint::CreateUpperLimitAttr(VtValue const &defaultValue,
-                                                           bool writeSparsely) const
+UsdAttribute
+UsdPhysicsRevoluteJoint::CreateUpperLimitAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsUpperLimit,
-                                    SdfValueTypeNames->Float,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsUpperLimit,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
-                                                       const TfTokenVector &right)
+static inline TfTokenVector
+_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 {
-  TfTokenVector result;
-  result.reserve(left.size() + right.size());
-  result.insert(result.end(), left.begin(), left.end());
-  result.insert(result.end(), right.begin(), right.end());
-  return result;
+    TfTokenVector result;
+    result.reserve(left.size() + right.size());
+    result.insert(result.end(), left.begin(), left.end());
+    result.insert(result.end(), right.begin(), right.end());
+    return result;
 }
-}  // namespace
+}
 
 /*static*/
-const TfTokenVector &UsdPhysicsRevoluteJoint::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector&
+UsdPhysicsRevoluteJoint::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames = {
-      UsdPhysicsTokens->physicsAxis,
-      UsdPhysicsTokens->physicsLowerLimit,
-      UsdPhysicsTokens->physicsUpperLimit,
-  };
-  static TfTokenVector allNames = _ConcatenateAttributeNames(
-      UsdPhysicsJoint::GetSchemaAttributeNames(true), localNames);
+    static TfTokenVector localNames = {
+        UsdPhysicsTokens->physicsAxis,
+        UsdPhysicsTokens->physicsLowerLimit,
+        UsdPhysicsTokens->physicsUpperLimit,
+    };
+    static TfTokenVector allNames =
+        _ConcatenateAttributeNames(
+            UsdPhysicsJoint::GetSchemaAttributeNames(true),
+            localNames);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

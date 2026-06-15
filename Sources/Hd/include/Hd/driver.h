@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HD_DRIVER_H
 #define PXR_IMAGING_HD_DRIVER_H
 
-#include "Hd/api.h"
 #include "pxr/pxrns.h"
+#include "Hd/api.h"
 
 #include "Tf/token.h"
 #include "Vt/value.h"
@@ -18,12 +18,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// HdDriver represents a device object, commonly a render device, that is owned
 /// by the application and passed to HdRenderIndex. The RenderIndex passes it to
 /// the render delegate and rendering tasks.
-/// The application manages the lifetime (destruction) of HdDriver and must
+/// The application manages the lifetime (destruction) of HdDriver and must 
 /// ensure it remains valid while Hydra is running.
 class HdDriver {
- public:
-  TfToken name;
-  VtValue driver;
+public:
+    TfToken name;
+    VtValue driver;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

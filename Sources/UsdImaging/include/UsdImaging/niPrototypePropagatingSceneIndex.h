@@ -81,7 +81,7 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///
 ///     * HdMergingSceneIndex
 ///         * UsdImagingDrawModeSceneIndex (through SceneIndexAppendCallback)
-///              * HdFlatteningSceneIndex
+///              * HdFlatteningSceneIndex 
 ///                inputArgs = UsdImagingFlattenedDataSourceProviders()
 ///                [So model:drawMode is also flattened]
 ///                  * UsdImaging_NiPrototypeSceneIndex
@@ -89,9 +89,8 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///                      prototypeRootOverlayDs = null
 ///                      * UsdImaging_NiPrototypePruningSceneIndex
 ///                        forPrototype = false
-///                          * inputSceneIndex (typically a
-///                          UsdImagingPiPrototypePropagatingSceneIndex)
-///         * UsdImaging_NiInstanceAggregationSceneIndex
+///                          * inputSceneIndex (typically a UsdImagingPiPrototypePropagatingSceneIndex)
+///         * UsdImaging_NiInstanceAggregationSceneIndex 
 ///           forPrototype = false
 ///           instanceDataSourceNames = ['materialBindings', 'purpose', 'model']
 ///              * UsdImagingDrawModeSceneIndex
@@ -105,7 +104,7 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///               prototypeName = __Prototype_1
 ///                 * HdMergingSceneIndex
 ///                     * UsdImagingDrawModeSceneIndex (through SceneIndexAppendCallback)
-///                         * HdFlatteningSceneIndex
+///                         * HdFlatteningSceneIndex 
 ///                           inputArgs = UsdImagingFlattenedDataSourceProviders()
 ///                           [So model:drawMode is also flattened]
 ///                             * UsdImaging_NiPrototypeSceneIndex
@@ -127,12 +126,11 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///         instance: # Useful for translating Usd proxy paths for selection.
 ///                   # See corresponding example in niInstanceAggregationIndex
 ///                   # for more details.
-///             instancer:
-///             /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer
+///             instancer: /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer
 ///             prototypeId: 0
 ///             instanceId: 0
 ///         purpose: # From flattening scene index
-///             purpose: geometry
+///             purpose: geometry 
 ///         xform: # From flattening scene index
 ///             matrix: [ identity matrix]
 ///         primOrigin:
@@ -160,8 +158,7 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///         instancerTopology:
 ///             instanceIndices:
 ///                 i0: [ 0 ]
-///             prototypes: [
-///             /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer/UsdNiPrototype
+///             prototypes: [ /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer/UsdNiPrototype
 ///             instanceLocations: [ /Cube_1 ] # for picking
 ///         primvars:
 ///             hydra:instanceTransforms:
@@ -171,11 +168,9 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///     primType: ""
 ///     dataSource:
 ///         instancedBy:
-///             paths: [ /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer
-///             ] prototypeRoot: /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1
-///             /UsdNiInstancer/UsdNiPrototype
-///         purpose: # Added by prototype scene index, copied from
-///         /UsdNiPropagatedPrototypes/Bindings_423...234
+///             paths: [ /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer ]
+///             prototypeRoot: /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1 /UsdNiInstancer/UsdNiPrototype
+///         purpose: # Added by prototype scene index, copied from /UsdNiPropagatedPrototypes/Bindings_423...234
 ///                  # Flattened scene index did not touch it.
 ///             purpose: geometry
 ///         xform: # From flattening scene index
@@ -187,9 +182,8 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///     primType: cube
 ///     dataSource:
 ///         instancedBy:
-///             paths: [ /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer
-///             ] prototypeRoot: /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1
-///             /UsdNiInstancer/UsdNiPrototype
+///             paths: [ /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1/UsdNiInstancer ]
+///             prototypeRoot: /UsdNiPropagatedPrototypes/Bindings_423...234/__Prototype_1 /UsdNiInstancer/UsdNiPrototype
 ///         purpose: # From flattening scene index
 ///             purpose: geometry
 ///         xform: # From flattening scene index
@@ -215,14 +209,14 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///     {
 ///     }
 /// }
-///
+/// 
 /// def Xform "MyInstance"  (
 ///     instanceable = true
 ///     references = </MyPrototype>)
 /// {
-///
+/// 
 /// }
-///
+/// 
 /// UsdImagingNiPrototypePropagatingSceneIndex
 ///
 /// ...
@@ -246,16 +240,14 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///    primType: instancer
 ///    dataSource:
 ///        instanerTopology:
-///            prototypes: [
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype ]
+///            prototypes: [ /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype ]
 ///        ...
 /// /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/_Prototype_2
 ///    primType: ""
 /// /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/_Prototype_2/MyNestedInstance
 ///    primType: ""
 ///    dataSource:
-///             instancer:
-///             /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer
+///             instancer: /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer
 ///             prototypeId: 0
 ///             instanceId: 0
 ///        ...
@@ -270,134 +262,168 @@ TF_DECLARE_REF_PTRS(UsdImagingNiPrototypePropagatingSceneIndex);
 ///    primType: instancer
 ///    dataSource:
 ///        instanerTopology:
-///            prototypes: [
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype
-///            ]
+///            prototypes: [ /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype ]
 ///        ...
 ///        instancedBy:
 ///            paths: [ /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer ]
-///            prototypeRoot:
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype
+///            prototypeRoot: /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype
 /// /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype
 ///    primType: ""
 ///    dataSource:
 ///        instancedBy:
-///            paths: [
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer
-///            ] prototypeRoot:
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype
+///            paths: [ /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer ]
+///            prototypeRoot: /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype
 ///        ...
 /// /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype/MyCube
 ///    primType: "cube"
 ///    dataSource:
 ///        instancedBy:
-///            paths: [
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/UsdPiPrototype/UsdNiInstancer
-///            ] prototypeRoot:
-///            /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype
+///            paths: [ /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/UsdPiPrototype/UsdNiInstancer ]
+///            prototypeRoot: /UsdNiPropagatedPrototypes/NoBindings/__Prototype_2/UsdNiInstancer/UsdPiPrototype/UsdNiPropagatedPrototypes/NoBindings/__Prototype_1/UsdNiInstancer/UsdPiPrototype
 ///        ...
 ///
 ///
-class UsdImagingNiPrototypePropagatingSceneIndex final : public HdFilteringSceneIndexBase,
-                                                         public HdEncapsulatingSceneIndexBase {
- public:
-  using SceneIndexAppendCallback =
-      std::function<HdSceneIndexBaseRefPtr(const HdSceneIndexBaseRefPtr &inputScene)>;
+class UsdImagingNiPrototypePropagatingSceneIndex final
+                                : public HdFilteringSceneIndexBase
+                                , public HdEncapsulatingSceneIndexBase
+{
+public:
+    using SceneIndexAppendCallback =
+        std::function<
+            HdSceneIndexBaseRefPtr(const HdSceneIndexBaseRefPtr &inputScene)>;
 
-  // instanceDataSourceNames are the names of the data sources of a native
-  // instance prim that need to have the same values for the instances to
-  // be aggregated. A copy of these data sources is bundled into the
-  // prim data source for the binding scope.
-  //
-  // When propagating a prototype by inserting the scene index isolating
-  // that prototype into the merging scene index implementing this scene
-  // index, we also call sceneIndexAppendCallback.
-  //
-  // The use case is for the UsdImagingDrawModeSceneIndex.
-  //
-  USDIMAGING_API
-  static UsdImagingNiPrototypePropagatingSceneIndexRefPtr New(
-      HdSceneIndexBaseRefPtr const &inputSceneIndex,
-      const TfTokenVector &instanceDataSourceNames,
-      const SceneIndexAppendCallback &sceneIndexAppendCallback);
+    // instanceDataSourceNames are the names of the data sources of a native
+    // instance prim that need to have the same values for the instances to
+    // be aggregated. A copy of these data sources is bundled into the
+    // prim data source for the binding scope.
+    //
+    // When propagating a prototype by inserting the scene index isolating
+    // that prototype into the merging scene index implementing this scene
+    // index, we also call sceneIndexAppendCallback.
+    //
+    // The use case is for the UsdImagingDrawModeSceneIndex.
+    //
+    USDIMAGING_API
+    static UsdImagingNiPrototypePropagatingSceneIndexRefPtr New(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        const TfTokenVector &instanceDataSourceNames,
+        const SceneIndexAppendCallback &sceneIndexAppendCallback);
 
-  USDIMAGING_API
-  ~UsdImagingNiPrototypePropagatingSceneIndex() override;
+    USDIMAGING_API
+    ~UsdImagingNiPrototypePropagatingSceneIndex() override;
 
-  USDIMAGING_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  USDIMAGING_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
-  USDIMAGING_API
-  std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const override;
+    USDIMAGING_API
+    std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const override;
 
-  USDIMAGING_API
-  std::vector<HdSceneIndexBaseRefPtr> GetEncapsulatedScenes() const override;
+    USDIMAGING_API
+    std::vector<HdSceneIndexBaseRefPtr> GetEncapsulatedScenes() const override;
 
- private:
-  class _SceneIndexCache;
-  using _SceneIndexCacheSharedPtr = std::shared_ptr<_SceneIndexCache>;
+private:
+    class _SceneIndexCache;
+    using _SceneIndexCacheSharedPtr =
+        std::shared_ptr<_SceneIndexCache>;
 
-  class _MergingSceneIndexEntry;
-  using _MergingSceneIndexEntryUniquePtr = std::unique_ptr<_MergingSceneIndexEntry>;
+    class _MergingSceneIndexOperations;
+    
+    friend class _InstanceAggregationSceneIndexObserver;
+    class _InstanceAggregationSceneIndexObserver : public HdSceneIndexObserver
+    {
+    public:
+        _InstanceAggregationSceneIndexObserver(
+            UsdImagingNiPrototypePropagatingSceneIndex * owner);
 
-  friend class _InstanceAggregationSceneIndexObserver;
-  class _InstanceAggregationSceneIndexObserver : public HdSceneIndexObserver {
-   public:
-    _InstanceAggregationSceneIndexObserver(UsdImagingNiPrototypePropagatingSceneIndex *owner);
+        void PrimsAdded(
+            const HdSceneIndexBase &sender,
+            const AddedPrimEntries &entries) override;
+        void PrimsDirtied(
+            const HdSceneIndexBase &sender,
+            const DirtiedPrimEntries &entries) override;
+        void PrimsRemoved(
+            const HdSceneIndexBase &sender,
+            const RemovedPrimEntries &entries) override;
+        void PrimsRenamed(
+            const HdSceneIndexBase &sender,
+            const RenamedPrimEntries &entries) override;
 
-    void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
-    void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
-    void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
-    void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
+    private:
+        UsdImagingNiPrototypePropagatingSceneIndex * const _owner;
+    };
 
-   private:
-    UsdImagingNiPrototypePropagatingSceneIndex *const _owner;
-  };
+    friend class _MergingSceneIndexObserver;
+    class _MergingSceneIndexObserver : public HdSceneIndexObserver
+    {
+    public:
+        _MergingSceneIndexObserver(
+            UsdImagingNiPrototypePropagatingSceneIndex * owner);
 
-  friend class _MergingSceneIndexObserver;
-  class _MergingSceneIndexObserver : public HdSceneIndexObserver {
-   public:
-    _MergingSceneIndexObserver(UsdImagingNiPrototypePropagatingSceneIndex *owner);
+        void PrimsAdded(
+            const HdSceneIndexBase &sender,
+            const AddedPrimEntries &entries) override;
+        void PrimsDirtied(
+            const HdSceneIndexBase &sender,
+            const DirtiedPrimEntries &entries) override;
+        void PrimsRemoved(
+            const HdSceneIndexBase &sender,
+            const RemovedPrimEntries &entries) override;
+        void PrimsRenamed(
+            const HdSceneIndexBase &sender,
+            const RenamedPrimEntries &entries) override;
+        
+    private:
+        UsdImagingNiPrototypePropagatingSceneIndex * const _owner;
+    };
 
-    void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
-    void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
-    void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
-    void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
+    // Use prototypeName to instantiate for "scene root".
+    static UsdImagingNiPrototypePropagatingSceneIndexRefPtr _New(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        const TfToken &prototypeName,
+        HdContainerDataSourceHandle const &prototypeRootOverlayDs,
+        _SceneIndexCacheSharedPtr const &cache);
 
-   private:
-    UsdImagingNiPrototypePropagatingSceneIndex *const _owner;
-  };
+    UsdImagingNiPrototypePropagatingSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex,
+        const TfToken &prototypeName,
+        HdContainerDataSourceHandle const &prototypeRootOverlayDs,
+        _SceneIndexCacheSharedPtr const &cache);
 
-  // Use prototypeName to instantiate for "scene root".
-  static UsdImagingNiPrototypePropagatingSceneIndexRefPtr _New(
-      const TfToken &prototypeName,
-      HdContainerDataSourceHandle const &prototypeRootOverlayDs,
-      _SceneIndexCacheSharedPtr const &cache);
+    void _Populate(HdSceneIndexBaseRefPtr const &instanceAggregationSceneIndex);
+    void _PrimsAdded(
+        const HdSceneIndexObserver::AddedPrimEntries &entries);
+    void _AddPrim(
+        const SdfPath &primPath,
+        _MergingSceneIndexOperations * mergingSceneIndexOperations);
+    void _PrimsRemoved(
+        const HdSceneIndexObserver::RemovedPrimEntries &entries);
+    void _RemovePrim(const SdfPath &primPath,
+        _MergingSceneIndexOperations * mergingSceneIndexOperations);
 
-  UsdImagingNiPrototypePropagatingSceneIndex(
-      const TfToken &prototypeName,
-      HdContainerDataSourceHandle const &prototypeRootOverlayDs,
-      _SceneIndexCacheSharedPtr const &cache);
+private: // data
 
-  void _Populate(HdSceneIndexBaseRefPtr const &instanceAggregationSceneIndex);
-  void _AddPrim(const SdfPath &primPath);
-  void _RemovePrim(const SdfPath &primPath);
+    const HdSceneIndexBaseRefPtr _inputSceneIndex;
+    const TfToken _prototypeName;
+    const HdDataSourceHashType _prototypeRootOverlayDsHash;
+    const _SceneIndexCacheSharedPtr _cache;
 
-  const TfToken _prototypeName;
-  const HdDataSourceHashType _prototypeRootOverlayDsHash;
-  _SceneIndexCacheSharedPtr const _cache;
+    HdMergingSceneIndexRefPtr _mergingSceneIndex;
 
-  HdMergingSceneIndexRefPtr _mergingSceneIndex;
+    // Propagated prototypes in the _mergingSceneIndex.
+    //
+    // This map needs to be kept in sync with the HdMergingSceneIndex.
+    // There might be a way to avoid the redundant representation.
+    std::map<SdfPath, HdSceneIndexBaseRefPtr>
+        _instancersToPropagatedPrototypeSceneIndex;
 
-  std::map<SdfPath, _MergingSceneIndexEntryUniquePtr> _instancersToMergingSceneIndexEntry;
+    HdSceneIndexBaseRefPtr _instanceAggregationSceneIndex;
 
-  HdSceneIndexBaseRefPtr _instanceAggregationSceneIndex;
-
-  _InstanceAggregationSceneIndexObserver _instanceAggregationSceneIndexObserver;
-  _MergingSceneIndexObserver _mergingSceneIndexObserver;
+    _InstanceAggregationSceneIndexObserver
+        _instanceAggregationSceneIndexObserver;
+    _MergingSceneIndexObserver _mergingSceneIndexObserver;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HD_ST_FIELD_H
 #define PXR_IMAGING_HD_ST_FIELD_H
 
-#include "Hd/field.h"
-#include "Hd/version.h"
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "Hd/version.h"
+#include "Hd/field.h"
+#include "HdSt/api.h"
 
 #include "HdSt/textureIdentifier.h"
 
@@ -20,52 +20,46 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Represents a Field Buffer Prim.
 ///
 class HdStField : public HdField {
- public:
-  /// For now, only fieldType HdStTokens->openvdbAsset is supported.
-  HDST_API
-  HdStField(SdfPath const &id, TfToken const &fieldType);
-  HDST_API
-  ~HdStField() override;
+public:
+    /// For now, only fieldType HdStTokens->openvdbAsset is supported.
+    HDST_API
+    HdStField(SdfPath const & id, TfToken const & fieldType);
+    HDST_API
+    ~HdStField() override;
 
-  /// Loads field as 3d texture to generate GetFieldResource.
-  HDST_API
-  void Sync(HdSceneDelegate *sceneDelegate,
-            HdRenderParam *renderParam,
-            HdDirtyBits *dirtyBits) override;
+    /// Loads field as 3d texture to generate GetFieldResource.
+    HDST_API
+    void Sync(HdSceneDelegate *sceneDelegate,
+              HdRenderParam   *renderParam,
+              HdDirtyBits     *dirtyBits) override;
 
-  HDST_API
-  HdDirtyBits GetInitialDirtyBitsMask() const override;
+    HDST_API
+    HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-  /// Initialized by Sync.
-  HDST_API
-  HdStTextureIdentifier const &GetTextureIdentifier() const
-  {
-    return _textureId;
-  }
+    /// Initialized by Sync.
+    HDST_API
+    HdStTextureIdentifier const &GetTextureIdentifier() const {
+        return _textureId;
+    }
 
-  /// Get memory request for this field
-  size_t GetTextureMemory() const
-  {
-    return _textureMemory;
-  }
+    /// Get memory request for this field
+    size_t GetTextureMemory() const { return _textureMemory; }
 
-  /// Bprim types handled by this class
-  HDST_API
-  static const TfTokenVector &GetSupportedBprimTypes();
+    /// Bprim types handled by this class
+    HDST_API
+    static const TfTokenVector &GetSupportedBprimTypes();
 
-  /// Can bprim type be handled by this class
-  HDST_API
-  static bool IsSupportedBprimType(const TfToken &bprimType);
+    /// Can bprim type be handled by this class
+    HDST_API
+    static bool IsSupportedBprimType(const TfToken &bprimType);
 
- private:
-  const TfToken _fieldType;
+private:
+    const TfToken _fieldType;
 
-  HdStTextureIdentifier _textureId;
-  size_t _textureMemory;
-
-  bool _isInitialized : 1;
+    HdStTextureIdentifier _textureId;
+    size_t _textureMemory;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_FIELD_H
+#endif //PXR_IMAGING_HD_ST_FIELD_H

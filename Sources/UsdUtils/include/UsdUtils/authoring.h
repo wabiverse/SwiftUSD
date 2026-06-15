@@ -16,10 +16,10 @@
 
 #include "Tf/hashset.h"
 
-#include "Sdf/declareHandles.h"
 #include "Usd/collectionAPI.h"
 #include "Usd/stage.h"
 #include "UsdUtils/api.h"
+#include "Sdf/declareHandles.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -55,127 +55,129 @@ using UsdUtilsPathHashSet = TfHashSet<SdfPath, SdfPath::Hash>;
 
 /// Computes the optimal set of paths to include and the set of paths to
 /// exclude below includes paths, in order to encode an "expandPrims"
-/// collection that contains the subtrees of prims rooted at
-/// \p includedRootPaths.
-///
+/// collection that contains the subtrees of prims rooted at 
+/// \p includedRootPaths. 
+/// 
 /// The algorithm used to determine a compact representation is driven
-/// by the following three parameters: \p minInclusionRatio,
+/// by the following three parameters: \p minInclusionRatio, 
 /// \p maxNumExcludesBelowInclude and \p minIncludeExcludeCollectionSize.
 /// See below for their descriptions.
-///
+/// 
 /// \p usdStage is the USD stage to which the paths in \p includedRootPaths
-/// belong.
-/// \p pathsToInclude is populated with the set of paths to include. Any
+/// belong. 
+/// \p pathsToInclude is populated with the set of paths to include. Any 
 /// existing paths in the set are cleared before adding paths to it.
-/// \p pathsToExclude is populated with the set of paths to exclude. Any
+/// \p pathsToExclude is populated with the set of paths to exclude. Any 
 /// existing paths in the set are cleared before adding paths to it.
-/// \p minInclusionRatio is the minimum value of the ratio between the number
-/// of included paths and the sum of the number of included and excluded paths
-/// below an ancestor path, at or above which the ancestor path is included in
-/// the collection. For example, if an ancestor prim has four children and
-/// three out of the four are included in the collection, the inclusion ratio
-/// at the ancestor is 0.75. This value should be in the range (0,1), if not,
+/// \p minInclusionRatio is the minimum value of the ratio between the number 
+/// of included paths and the sum of the number of included and excluded paths 
+/// below an ancestor path, at or above which the ancestor path is included in 
+/// the collection. For example, if an ancestor prim has four children and 
+/// three out of the four are included in the collection, the inclusion ratio 
+/// at the ancestor is 0.75. This value should be in the range (0,1), if not, 
 /// it's clamped to the range.
 /// \p maxNumExcludesBelowInclude is the maximum number of paths that we exclude
-/// below any ancestor path that we include in a collection. This parameter only
-/// affects paths that have already passed the min-inclusion-ratio test.
-/// Setting this to 0 will cause all collections to have includes only (and no
-/// excludes). Setting it to a higher number will cause ancestor paths that are
+/// below any ancestor path that we include in a collection. This parameter only 
+/// affects paths that have already passed the min-inclusion-ratio test. 
+/// Setting this to 0 will cause all collections to have includes only (and no 
+/// excludes). Setting it to a higher number will cause ancestor paths that are 
 /// higher up in the namespace hierarchy to be included in collections.
-/// \p minIncludeExcludeCollectionSize is the minimum size of a collection
+/// \p minIncludeExcludeCollectionSize is the minimum size of a collection 
 /// (i.e. the number of subtree-root paths included in it), at or
-/// above which the algorithm chooses to make a collection with both included
+/// above which the algorithm chooses to make a collection with both included 
 /// and excluded paths, instead of creating a collection with only includes
 /// (containing the specified set of paths). \ref UsdCollectionAPI
-/// \p pathsToIgnore is the list of paths to be ignored by the algorithm used
-/// to determine the included and excluded paths for each collection. If
-/// non-empty, the paths in the hash set don't contribute towards the counts and
+/// \p pathsToIgnore is the list of paths to be ignored by the algorithm used 
+/// to determine the included and excluded paths for each collection. If 
+/// non-empty, the paths in the hash set don't contribute towards the counts and 
 /// ratios computed by the algorithm.
-///
+/// 
 /// Returns false if paths in \p includedRootPaths (or their common ancestor)
 /// can't be found on the given \p usdStage.
 /// parameters has an invalid value.
-///
-/// The python version of this function returns a tuple containing the
+/// 
+/// The python version of this function returns a tuple containing the 
 /// two lists (pathsToInclude, pathsToExclude).
 USDUTILS_API
 bool UsdUtilsComputeCollectionIncludesAndExcludes(
-    const SdfPathSet &includedRootPaths,
+    const SdfPathSet &includedRootPaths, 
     const UsdStageWeakPtr &usdStage,
-    SdfPathVector *pathsToInclude,
+    SdfPathVector *pathsToInclude, 
     SdfPathVector *pathsToExclude,
-    double minInclusionRatio = 0.75,
-    const unsigned int maxNumExcludesBelowInclude = 5u,
-    const unsigned int minIncludeExcludeCollectionSize = 3u,
-    const UsdUtilsPathHashSet &pathsToIgnore = UsdUtilsPathHashSet());
+    double minInclusionRatio=0.75,
+    const unsigned int maxNumExcludesBelowInclude=5u,
+    const unsigned int minIncludeExcludeCollectionSize=3u,
+    const UsdUtilsPathHashSet &pathsToIgnore=UsdUtilsPathHashSet());
 
-/// Authors a collection named \p collectionName on the given prim,
+/// Authors a collection named \p collectionName on the given prim, 
 /// \p usdPrim with the given set of included paths (\p pathsToInclude)
 /// and excluded paths (\p pathsToExclude).
-///
-/// If a collection with the specified name already exists on \p usdPrim,
-/// its data is appended to. The resulting collection will contain
+/// 
+/// If a collection with the specified name already exists on \p usdPrim, 
+/// its data is appended to. The resulting collection will contain 
 /// both the old paths and the newly included paths.
 USDUTILS_API
-UsdCollectionAPI UsdUtilsAuthorCollection(const TfToken &collectionName,
-                                          const UsdPrim &usdPrim,
-                                          const SdfPathVector &pathsToInclude,
-                                          const SdfPathVector &pathsToExclude = SdfPathVector());
+UsdCollectionAPI UsdUtilsAuthorCollection(
+    const TfToken &collectionName, 
+    const UsdPrim &usdPrim, 
+    const SdfPathVector &pathsToInclude,
+    const SdfPathVector &pathsToExclude=SdfPathVector());
 
 /// Given a vector of (collection-name, path-set) pairs, \p assignments,
-/// creates and returns a vector of collections that include subtrees of prims
-/// rooted at the included paths. The collections are created on the given prim,
-/// \p usdPrim.
-///
-/// Based on the paths included in the various collections, this function
-/// computes a compact representation for each collection in parallel
-/// using UsdUtilsGetCollectionIncludesExcludes(). So, it takes the
-/// same set of parameters as that function: \p minInclusionRatio,
-/// \p maxNumExcludesBelowInclude and \p minIncludeExcludeCollectionSize.
-///
+/// creates and returns a vector of collections that include subtrees of prims 
+/// rooted at the included paths. The collections are created on the given prim, 
+/// \p usdPrim. 
+/// 
+/// Based on the paths included in the various collections, this function 
+/// computes a compact representation for each collection in parallel 
+/// using UsdUtilsGetCollectionIncludesExcludes(). So, it takes the 
+/// same set of parameters as that function: \p minInclusionRatio, 
+/// \p maxNumExcludesBelowInclude and \p minIncludeExcludeCollectionSize. 
+/// 
 /// \note It is valid for the paths or subtrees specified in \p assignments
-/// to have overlapping subtrees. In this case the overlapping bits will belong
-/// to multiple collections.
-///
-/// \p assignments is a vector of pairs representing collection names and paths
+/// to have overlapping subtrees. In this case the overlapping bits will belong 
+/// to multiple collections. 
+/// 
+/// \p assignments is a vector of pairs representing collection names and paths 
 /// to be included in the collection in each collection.
 /// \p usdPrim is the prim on which the collections are created.
-/// \p minInclusionRatio is the minimum value of the ratio between the number
-/// of included paths and the sum of the number of included and excluded paths
-/// below an ancestor path, at or above which the ancestor path is included in
-/// the collection. For example, if an ancestor prim has four children and
-/// three out of the four are included in the collection, the inclusion ratio
-/// at the ancestor is 0.75. This value should be in the range (0,1), if not,
+/// \p minInclusionRatio is the minimum value of the ratio between the number 
+/// of included paths and the sum of the number of included and excluded paths 
+/// below an ancestor path, at or above which the ancestor path is included in 
+/// the collection. For example, if an ancestor prim has four children and 
+/// three out of the four are included in the collection, the inclusion ratio 
+/// at the ancestor is 0.75. This value should be in the range (0,1), if not, 
 /// it's clamped to the range.
 /// \p maxNumExcludesBelowInclude is the maximum number of paths that we exclude
-/// below any ancestor path that we include in a collection. This parameter only
-/// affects paths that have already passed the min-inclusion-ratio test.
-/// Setting this to 0 will cause all collections to have includes only (and no
-/// excludes). Setting it to a higher number will cause ancestor paths that are
+/// below any ancestor path that we include in a collection. This parameter only 
+/// affects paths that have already passed the min-inclusion-ratio test. 
+/// Setting this to 0 will cause all collections to have includes only (and no 
+/// excludes). Setting it to a higher number will cause ancestor paths that are 
 /// higher up in the namespace hierarchy to be included in collections.
-/// \p minIncludeExcludeCollectionSize is the minimum size of a collection
+/// \p minIncludeExcludeCollectionSize is the minimum size of a collection 
 /// (i.e. the number of subtree-root paths included in it), at or
-/// above which the algorithm chooses to make a collection with both included
+/// above which the algorithm chooses to make a collection with both included 
 /// and excluded paths, instead of creating a collection with only includes
 /// (containing the specified set of paths). \ref UsdCollectionAPI
-///
-/// Returns the vector of UsdCollectionAPI objects that were created.
+/// 
+/// Returns the vector of UsdCollectionAPI objects that were created. 
 /// If a collection is empty (i.e. includes no paths), then an empty collection
-/// is created for it with the default expansionRule. Hence, the size of the
+/// is created for it with the default expansionRule. Hence, the size of the 
 /// returned vector should match the size of \p assignments.
 USDUTILS_API
 std::vector<UsdCollectionAPI> UsdUtilsCreateCollections(
     const std::vector<std::pair<TfToken, SdfPathSet>> &assignments,
     const UsdPrim &usdPrim,
-    const double minInclusionRatio = 0.75,
-    const unsigned int maxNumExcludesBelowInclude = 5u,
-    const unsigned int minIncludeExcludeCollectionSize = 3u);
+    const double minInclusionRatio=0.75,
+    const unsigned int maxNumExcludesBelowInclude=5u,
+    const unsigned int minIncludeExcludeCollectionSize=3u);
 
 /// @}
 
 /// Retrieve a list of all dirty layers from the stage's UsedLayers.
 USDUTILS_API
-SdfLayerHandleVector UsdUtilsGetDirtyLayers(UsdStagePtr stage, bool includeClipLayers = true);
+SdfLayerHandleVector UsdUtilsGetDirtyLayers(UsdStagePtr stage,
+                                            bool includeClipLayers = true);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

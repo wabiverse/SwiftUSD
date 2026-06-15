@@ -1,9 +1,9 @@
 #ifndef __PXR_USD_USDPROC_H__
 #define __PXR_USD_USDPROC_H__
 
-// usdProc.
+// UsdProc
+#include <UsdProc/generatedSchema.module.h>
+#include <UsdProc/tokens.h>
 #include <UsdProc/api.h>
 #include <UsdProc/generativeProcedural.h>
-#include <UsdProc/tokens.h>
-
 #endif  // __PXR_USD_USDPROC_H__

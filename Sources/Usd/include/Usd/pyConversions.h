@@ -7,12 +7,11 @@
 #ifndef PXR_USD_USD_PY_CONVERSIONS_H
 #define PXR_USD_USD_PY_CONVERSIONS_H
 
-#include "Tf/pyObjWrapper.h"
-#include "Usd/api.h"
 #include "pxr/pxrns.h"
+#include "Usd/api.h"
+#include "Tf/pyObjWrapper.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 class VtValue;
@@ -31,7 +30,8 @@ TfPyObjWrapper UsdVtValueToPython(const VtValue &value);
 /// returns a VtValue extracted from the pyVal, which may produce a VtValue
 /// holding a python object.
 USD_API
-VtValue UsdPythonToSdfType(TfPyObjWrapper pyVal, SdfValueTypeName const &targetType);
+VtValue UsdPythonToSdfType(TfPyObjWrapper pyVal,
+                           SdfValueTypeName const &targetType);
 
 /// Helper for converting a python value to a metadata value for metadata
 /// known to the SdfSchema.  Generates a coding error if \p key is unknown
@@ -45,13 +45,11 @@ VtValue UsdPythonToSdfType(TfPyObjWrapper pyVal, SdfValueTypeName const &targetT
 /// \return \c true on successful conversion, which can happen even if
 /// the converted \p result is an empty VtValue
 USD_API
-bool UsdPythonToMetadataValue(const TfToken &key,
-                              const TfToken &keyPath,
-                              TfPyObjWrapper pyVal,
-                              VtValue *result);
+bool UsdPythonToMetadataValue(const TfToken &key, const TfToken &keyPath, 
+                              TfPyObjWrapper pyVal, VtValue *result);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#endif  // PXR_USD_USD_PY_CONVERSIONS_H
+#endif // PXR_USD_USD_PY_CONVERSIONS_H

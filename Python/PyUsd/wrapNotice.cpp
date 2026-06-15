@@ -4,76 +4,121 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#include "pxr/pxrns.h"
+#include "Usd/notice.h"
+#include "Tf/pyEnum.h"
+#include "Tf/pyContainerConversions.h"
 #include "Tf/pyNoticeWrapper.h"
 #include "Tf/pyResultConversions.h"
-#include "Usd/notice.h"
-#include "pxr/pxrns.h"
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::StageNotice, TfNotice);
+TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::StageNotice, 
+                                TfNotice);
 
-TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::StageContentsChanged, UsdNotice::StageNotice);
-TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::ObjectsChanged, UsdNotice::StageNotice);
-TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::StageEditTargetChanged, UsdNotice::StageNotice);
-TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::LayerMutingChanged, UsdNotice::StageNotice);
+TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::StageContentsChanged,
+                                UsdNotice::StageNotice);
+TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::ObjectsChanged,
+                                UsdNotice::StageNotice);
+TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::StageEditTargetChanged,
+                                UsdNotice::StageNotice);
+TF_INSTANTIATE_NOTICE_WRAPPER(UsdNotice::LayerMutingChanged,
+                                UsdNotice::StageNotice);
 
-}  // anonymous namespace
+} // anonymous namespace 
+
+static object _ObjectsChangedGetResyncNotice(
+    const UsdNotice::ObjectsChanged &self, const SdfPath &path)
+{
+    SdfPath associatedPath;
+    UsdNotice::ObjectsChanged::PrimResyncType result =
+        self.GetPrimResyncType(path, &associatedPath);
+    return make_tuple(result, associatedPath);
+}
 
 void wrapUsdNotice()
 {
-  scope s = class_<UsdNotice>("Notice", no_init);
+    scope s = class_<UsdNotice>("Notice", no_init);
 
-  TfPyNoticeWrapper<UsdNotice::StageNotice, TfNotice>::Wrap().def(
-      "GetStage", &UsdNotice::StageNotice::GetStage, return_value_policy<return_by_value>());
+    TfPyNoticeWrapper<UsdNotice::StageNotice, TfNotice>::Wrap()
+        .def("GetStage", &UsdNotice::StageNotice::GetStage,
+             return_value_policy<return_by_value>())
+        ;
 
-  TfPyNoticeWrapper<UsdNotice::StageContentsChanged, UsdNotice::StageNotice>::Wrap();
+    TfPyNoticeWrapper<
+        UsdNotice::StageContentsChanged, UsdNotice::StageNotice>::Wrap()
+        ;
 
-  TfPyNoticeWrapper<UsdNotice::ObjectsChanged, UsdNotice::StageNotice>::Wrap()
-      .def("AffectedObject", &UsdNotice::ObjectsChanged::AffectedObject)
-      .def("ResyncedObject", &UsdNotice::ObjectsChanged::ResyncedObject)
-      .def("ResolvedAssetPathsResynced", &UsdNotice::ObjectsChanged::ResolvedAssetPathsResynced)
-      .def("ChangedInfoOnly", &UsdNotice::ObjectsChanged::ChangedInfoOnly)
-      .def(
-          "GetResyncedPaths",
-          +[](const UsdNotice::ObjectsChanged &n) { return SdfPathVector(n.GetResyncedPaths()); })
-      .def(
-          "GetChangedInfoOnlyPaths",
-          +[](const UsdNotice::ObjectsChanged &n) {
-            return SdfPathVector(n.GetChangedInfoOnlyPaths());
-          })
-      .def(
-          "GetResolvedAssetPathsResyncedPaths",
-          +[](const UsdNotice::ObjectsChanged &n) {
-            return SdfPathVector(n.GetResolvedAssetPathsResyncedPaths());
-          })
-      .def("GetChangedFields",
-           (TfTokenVector(UsdNotice::ObjectsChanged::*)(const UsdObject &) const) &
-               UsdNotice::ObjectsChanged::GetChangedFields,
-           return_value_policy<return_by_value>())
-      .def("GetChangedFields",
-           (TfTokenVector(UsdNotice::ObjectsChanged::*)(const SdfPath &) const) &
-               UsdNotice::ObjectsChanged::GetChangedFields,
-           return_value_policy<return_by_value>())
-      .def("HasChangedFields",
-           (bool(UsdNotice::ObjectsChanged::*)(const UsdObject &) const) &
-               UsdNotice::ObjectsChanged::HasChangedFields)
-      .def("HasChangedFields",
-           (bool(UsdNotice::ObjectsChanged::*)(const SdfPath &) const) &
-               UsdNotice::ObjectsChanged::HasChangedFields);
+    {
+        scope s = TfPyNoticeWrapper<
+            UsdNotice::ObjectsChanged, UsdNotice::StageNotice>::Wrap()
+            .def("AffectedObject", &UsdNotice::ObjectsChanged::AffectedObject)
+            .def("ResyncedObject", &UsdNotice::ObjectsChanged::ResyncedObject)
+            .def("ResolvedAssetPathsResynced",
+                 &UsdNotice::ObjectsChanged::ResolvedAssetPathsResynced)
+            .def("ChangedInfoOnly", &UsdNotice::ObjectsChanged::ChangedInfoOnly)
+            .def("GetResyncedPaths",
+                +[](const UsdNotice::ObjectsChanged& n) {
+                    return SdfPathVector(n.GetResyncedPaths());
+                })
+            .def("GetChangedInfoOnlyPaths",
+                +[](const UsdNotice::ObjectsChanged& n) {
+                    return SdfPathVector(n.GetChangedInfoOnlyPaths());
+                })
+            .def("GetResolvedAssetPathsResyncedPaths", 
+                +[](const UsdNotice::ObjectsChanged& n) {
+                    return SdfPathVector(
+                        n.GetResolvedAssetPathsResyncedPaths());
+                })
+            .def("GetChangedFields", 
+                 (TfTokenVector (UsdNotice::ObjectsChanged::*)
+                     (const UsdObject&) const)
+                 &UsdNotice::ObjectsChanged::GetChangedFields,
+                 return_value_policy<return_by_value>())
+            .def("GetChangedFields", 
+                 (TfTokenVector (UsdNotice::ObjectsChanged::*)
+                     (const SdfPath&) const)
+                 &UsdNotice::ObjectsChanged::GetChangedFields,
+                 return_value_policy<return_by_value>())
+            .def("HasChangedFields",
+                 (bool (UsdNotice::ObjectsChanged::*)(const UsdObject&) const)
+                 &UsdNotice::ObjectsChanged::HasChangedFields)
+            .def("HasChangedFields",
+                 (bool (UsdNotice::ObjectsChanged::*)(const SdfPath&) const)
+                 &UsdNotice::ObjectsChanged::HasChangedFields)
+            .def("GetPrimResyncType", &_ObjectsChangedGetResyncNotice)
+            .def("GetRenamedProperties", 
+                &UsdNotice::ObjectsChanged::GetRenamedProperties,
+                return_value_policy<TfPySequenceToList>())
+            ;
+            
+        TfPyWrapEnum<UsdNotice::ObjectsChanged::PrimResyncType>();
 
-  TfPyNoticeWrapper<UsdNotice::StageEditTargetChanged, UsdNotice::StageNotice>::Wrap();
+        // We need a to python converter for the value type of RenamedProperties
+        using ValueType = 
+            UsdNotice::ObjectsChanged::RenamedProperties::value_type;
+        to_python_converter<
+            ValueType, TfPyContainerConversions::to_tuple<ValueType>>();    
+    }
+    TfPyNoticeWrapper<
+        UsdNotice::StageEditTargetChanged, UsdNotice::StageNotice>::Wrap()
+        ;
 
-  TfPyNoticeWrapper<UsdNotice::LayerMutingChanged, UsdNotice::StageNotice>::Wrap()
-      .def("GetMutedLayers",
-           &UsdNotice::LayerMutingChanged::GetMutedLayers,
-           return_value_policy<TfPySequenceToList>())
-      .def("GetUnmutedLayers",
-           &UsdNotice::LayerMutingChanged::GetUnmutedLayers,
-           return_value_policy<TfPySequenceToList>());
+    TfPyNoticeWrapper<
+        UsdNotice::LayerMutingChanged, UsdNotice::StageNotice>::Wrap()
+        .def("GetMutedLayers", 
+             &UsdNotice::LayerMutingChanged::GetMutedLayers,
+             return_value_policy<TfPySequenceToList>())
+        .def("GetUnmutedLayers", 
+             &UsdNotice::LayerMutingChanged::GetUnmutedLayers,
+             return_value_policy<TfPySequenceToList>())
+        ;
 }
+

@@ -7,13 +7,14 @@
 #ifndef PXR_IMAGING_GLF_GL_CONTEXT_H
 #define PXR_IMAGING_GLF_GL_CONTEXT_H
 
-#include "Arch/threads.h"
-#include "Glf/api.h"
 #include "pxr/pxrns.h"
+#include "Glf/api.h"
+#include "Arch/threads.h"
 
 #include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 typedef std::shared_ptr<class GlfGLContext> GlfGLContextSharedPtr;
 
@@ -31,86 +32,84 @@ typedef std::shared_ptr<class GlfGLContext> GlfGLContextSharedPtr;
 /// This mechanism depends on the application code registering callbacks to
 /// provide access to its GL contexts.
 ///
-class GlfGLContext {
- public:
-  GLF_API
-  virtual ~GlfGLContext();
+class GlfGLContext
+{
+public:
+    GLF_API
+    virtual ~GlfGLContext();
 
-  // Disallow copies
-  GlfGLContext(const GlfGLContext &) = delete;
-  GlfGLContext &operator=(const GlfGLContext &) = delete;
+    // Disallow copies
+    GlfGLContext(const GlfGLContext&) = delete;
+    GlfGLContext& operator=(const GlfGLContext&) = delete;
 
-  /// Returns an instance for the current GL context.
-  GLF_API
-  static GlfGLContextSharedPtr GetCurrentGLContext();
+    /// Returns an instance for the current GL context.
+    GLF_API
+    static GlfGLContextSharedPtr GetCurrentGLContext();
 
-  /// Returns an instance for the shared GL context.
-  GLF_API
-  static GlfGLContextSharedPtr GetSharedGLContext();
+    /// Returns an instance for the shared GL context.
+    GLF_API
+    static GlfGLContextSharedPtr GetSharedGLContext();
 
-  /// Makes \p context current if valid, otherwise makes no context current.
-  GLF_API
-  static void MakeCurrent(const GlfGLContextSharedPtr &context);
+    /// Makes \p context current if valid, otherwise makes no context current.
+    GLF_API
+    static void MakeCurrent(const GlfGLContextSharedPtr& context);
 
-  /// Returns \c true if \a context1 and \a context2 are sharing.
-  GLF_API
-  static bool AreSharing(GlfGLContextSharedPtr const &context1,
-                         GlfGLContextSharedPtr const &context2);
+    /// Returns \c true if \a context1 and \a context2 are sharing.
+    GLF_API
+    static bool AreSharing(GlfGLContextSharedPtr const & context1,
+                           GlfGLContextSharedPtr const & context2);
 
-  /// Returns whether this interface has been initialized.
-  GLF_API
-  static bool IsInitialized();
+    /// Returns whether this interface has been initialized.
+    GLF_API
+    static bool IsInitialized();
 
-  /// Returns \c true if this context is current.
-  GLF_API
-  bool IsCurrent() const;
+    /// Returns \c true if this context is current.
+    GLF_API
+    bool IsCurrent() const;
 
- private:
-  /// Makes this context current.
-  ///
-  /// If the context is not valid this does nothing.
-  void MakeCurrent();
+private:
+    /// Makes this context current.
+    ///
+    /// If the context is not valid this does nothing.
+    void MakeCurrent();
 
- public:
-  /// Makes no context current.
-  GLF_API
-  static void DoneCurrent();
+public:
+    /// Makes no context current.
+    GLF_API
+    static void DoneCurrent();
 
-  /// Returns \c true if this context is sharing with \a otherContext.
-  GLF_API
-  bool IsSharing(GlfGLContextSharedPtr const &otherContext);
+    /// Returns \c true if this context is sharing with \a otherContext.
+    GLF_API
+    bool IsSharing(GlfGLContextSharedPtr const & otherContext);
 
-  /// Returns \c true if this context is valid.
-  virtual bool IsValid() const = 0;
+    /// Returns \c true if this context is valid.
+    virtual bool IsValid() const = 0;
 
-  /// Creates a new GlfContext that shares GL resources with this context.
-  /// The purpose of this function is to be able to create a new GL context
-  /// on a second thread that shares with the context on the main-thread.
-  /// If the GlfContext implementation does not support sharing contexts
-  /// null is returned. Example usage:
-  /// Main-thread:
-  ///     RegisterGLContextCallbacks();
-  ///     GlfGLContext::MakeCurrent(...);
-  /// Second-thread:
-  ///     s = GetCurrentGLContext();
-  ///     c = s->CreateSharingContext();
-  virtual GlfGLContextSharedPtr CreateSharingContext()
-  {
-    return nullptr;
-  }
+    /// Creates a new GlfContext that shares GL resources with this context.
+    /// The purpose of this function is to be able to create a new GL context
+    /// on a second thread that shares with the context on the main-thread.
+    /// If the GlfContext implementation does not support sharing contexts
+    /// null is returned. Example usage:
+    /// Main-thread:
+    ///     RegisterGLContextCallbacks();
+    ///     GlfGLContext::MakeCurrent(...);
+    /// Second-thread:
+    ///     s = GetCurrentGLContext();
+    ///     c = s->CreateSharingContext();
+    virtual GlfGLContextSharedPtr CreateSharingContext() {return nullptr;}
 
- protected:
-  GLF_API
-  GlfGLContext();
+protected:
+    GLF_API
+    GlfGLContext();
 
-  /// Makes this context current.
-  virtual void _MakeCurrent() = 0;
+    /// Makes this context current.
+    virtual void _MakeCurrent() = 0;
 
-  /// Returns \c true if this context is sharing with \a rhs.
-  virtual bool _IsSharing(const GlfGLContextSharedPtr &rhs) const = 0;
+    /// Returns \c true if this context is sharing with \a rhs.
+    virtual bool _IsSharing(const GlfGLContextSharedPtr& rhs) const = 0;
 
-  /// Returns \c true if this context is equal to \p rhs.
-  virtual bool _IsEqual(const GlfGLContextSharedPtr &rhs) const = 0;
+    /// Returns \c true if this context is equal to \p rhs.
+    virtual bool _IsEqual(const GlfGLContextSharedPtr& rhs) const = 0;
 };
 
 /// \class GlfGLContextScopeHolder
@@ -151,28 +150,29 @@ class GlfGLContext {
 /// The underlying calls to make GL contexts current can be moderately
 /// expensive.  So, this mechanism should be used carefully.
 ///
-class GlfGLContextScopeHolder {
- public:
-  /// Make the given context current and restore the current context
-  /// when this object is destroyed.
-  GLF_API
-  explicit GlfGLContextScopeHolder(const GlfGLContextSharedPtr &newContext);
+class GlfGLContextScopeHolder
+{
+public:
+    /// Make the given context current and restore the current context
+    /// when this object is destroyed.
+    GLF_API
+    explicit GlfGLContextScopeHolder(const GlfGLContextSharedPtr& newContext);
 
-  GLF_API
-  ~GlfGLContextScopeHolder();
+    GLF_API
+    ~GlfGLContextScopeHolder();
 
-  GlfGLContextScopeHolder(const GlfGLContextScopeHolder &) = delete;
-  GlfGLContextScopeHolder &operator=(const GlfGLContextScopeHolder) = delete;
+    GlfGLContextScopeHolder(const GlfGLContextScopeHolder&) = delete;
+    GlfGLContextScopeHolder& operator=(const GlfGLContextScopeHolder) = delete;
 
- protected:
-  GLF_API
-  void _MakeNewContextCurrent();
-  GLF_API
-  void _RestoreOldContext();
+protected:
+    GLF_API
+    void _MakeNewContextCurrent();
+    GLF_API
+    void _RestoreOldContext();
 
- private:
-  GlfGLContextSharedPtr _newContext;
-  GlfGLContextSharedPtr _oldContext;
+private:
+    GlfGLContextSharedPtr _newContext;
+    GlfGLContextSharedPtr _oldContext;
 };
 
 /// \class GlfSharedGLContextScopeHolder
@@ -216,21 +216,23 @@ class GlfGLContextScopeHolder {
 ///     };
 /// \endcode
 ///
-class GlfSharedGLContextScopeHolder final : private GlfGLContextScopeHolder {
- public:
-  GlfSharedGLContextScopeHolder() : GlfGLContextScopeHolder(_GetSharedContext())
-  {
-    // Do nothing
-  }
-
- private:
-  static GlfGLContextSharedPtr _GetSharedContext()
-  {
-    if (GlfGLContext::IsInitialized() && ArchIsMainThread()) {
-      return GlfGLContext::GetSharedGLContext();
+class GlfSharedGLContextScopeHolder final : private GlfGLContextScopeHolder
+{
+public:
+    GlfSharedGLContextScopeHolder() :
+        GlfGLContextScopeHolder(_GetSharedContext())
+    {
+        // Do nothing
     }
-    return GlfGLContextSharedPtr();
-  }
+
+private:
+    static GlfGLContextSharedPtr _GetSharedContext()
+    {
+        if (GlfGLContext::IsInitialized() && ArchIsMainThread()) {
+            return GlfGLContext::GetSharedGLContext();
+        }
+        return GlfGLContextSharedPtr();
+    }
 };
 
 #define API_GLF_HAS_ANY_GL_CONTEXT_SCOPE_HOLDER 1
@@ -281,26 +283,29 @@ class GlfSharedGLContextScopeHolder final : private GlfGLContextScopeHolder {
 ///     };
 /// \endcode
 ///
-class GlfAnyGLContextScopeHolder final : private GlfGLContextScopeHolder {
- public:
-  GlfAnyGLContextScopeHolder() : GlfGLContextScopeHolder(_GetAnyContext())
-  {
-    // Do nothing
-  }
-
- private:
-  static GlfGLContextSharedPtr _GetAnyContext()
-  {
-    if (GlfGLContext::IsInitialized() && ArchIsMainThread()) {
-      GlfGLContextSharedPtr const current = GlfGLContext::GetCurrentGLContext();
-      if (!(current && current->IsValid() &&
-            current->IsSharing(GlfGLContext::GetSharedGLContext())))
-      {
-        return GlfGLContext::GetSharedGLContext();
-      }
+class GlfAnyGLContextScopeHolder final : private GlfGLContextScopeHolder
+{
+public:
+    GlfAnyGLContextScopeHolder() :
+        GlfGLContextScopeHolder(_GetAnyContext())
+    {
+        // Do nothing
     }
-    return GlfGLContextSharedPtr();
-  }
+
+private:
+    static GlfGLContextSharedPtr _GetAnyContext()
+    {
+        if (GlfGLContext::IsInitialized() && ArchIsMainThread()) {
+            GlfGLContextSharedPtr const current =
+                GlfGLContext::GetCurrentGLContext();
+            if (!(current &&
+                  current->IsValid() &&
+                  current->IsSharing(GlfGLContext::GetSharedGLContext()))) {
+                return GlfGLContext::GetSharedGLContext();
+            }
+        }
+        return GlfGLContextSharedPtr();
+    }
 };
 
 /// \class GlfGLContextRegistrationInterface
@@ -310,30 +315,34 @@ class GlfAnyGLContextScopeHolder final : private GlfGLContextScopeHolder {
 /// If you subclass GlfGLContext you should subclass this type and
 /// instantiate an instance on the heap.  It will be cleaned up
 /// automatically.
-class GlfGLContextRegistrationInterface {
- public:
-  GLF_API
-  virtual ~GlfGLContextRegistrationInterface();
+class GlfGLContextRegistrationInterface
+{
+public:
+    GLF_API
+    virtual ~GlfGLContextRegistrationInterface();
 
-  // Disallow copies
-  GlfGLContextRegistrationInterface(const GlfGLContextRegistrationInterface &) = delete;
-  GlfGLContextRegistrationInterface &operator=(const GlfGLContextRegistrationInterface &) = delete;
+    // Disallow copies
+    GlfGLContextRegistrationInterface(
+        const GlfGLContextRegistrationInterface&) = delete;
+    GlfGLContextRegistrationInterface& operator=(
+        const GlfGLContextRegistrationInterface&) = delete;
 
-  /// If this GLContext system supports a shared context this should
-  /// return it.  This will be called at most once.
-  virtual GlfGLContextSharedPtr GetShared() = 0;
+    /// If this GLContext system supports a shared context this should
+    /// return it.  This will be called at most once.
+    virtual GlfGLContextSharedPtr GetShared() = 0;
 
-  /// Whatever your GLContext system thinks is the current GL context
-  /// may not really be the current context if another system has since
-  /// changed the context.  This method should return what it thinks is
-  /// the current context.  If it thinks there is no current context it
-  /// should return \c NULL.
-  virtual GlfGLContextSharedPtr GetCurrent() = 0;
+    /// Whatever your GLContext system thinks is the current GL context
+    /// may not really be the current context if another system has since
+    /// changed the context.  This method should return what it thinks is
+    /// the current context.  If it thinks there is no current context it
+    /// should return \c NULL.
+    virtual GlfGLContextSharedPtr GetCurrent() = 0;
 
- protected:
-  GLF_API
-  GlfGLContextRegistrationInterface();
+protected:
+    GLF_API
+    GlfGLContextRegistrationInterface();
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -17,10 +17,10 @@
 
 #include "Hd/nurbsPatchTrimCurveSchema.h"
 
-#include "Hd/nurbsPatchSchema.h"
 #include "Hd/retainedDataSource.h"
+#include "Hd/nurbsPatchSchema.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
@@ -28,158 +28,188 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdNurbsPatchTrimCurveSchemaTokens,
-                        HD_NURBS_PATCH_TRIM_CURVE_SCHEMA_TOKENS);
+    HD_NURBS_PATCH_TRIM_CURVE_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdIntArrayDataSourceHandle HdNurbsPatchTrimCurveSchema::GetCounts() const
+HdIntArrayDataSourceHandle
+HdNurbsPatchTrimCurveSchema::GetCounts() const
 {
-  return _GetTypedDataSource<HdIntArrayDataSource>(HdNurbsPatchTrimCurveSchemaTokens->counts);
+    return _GetTypedDataSource<HdIntArrayDataSource>(
+        HdNurbsPatchTrimCurveSchemaTokens->counts);
 }
 
-HdIntArrayDataSourceHandle HdNurbsPatchTrimCurveSchema::GetOrders() const
+HdIntArrayDataSourceHandle
+HdNurbsPatchTrimCurveSchema::GetOrders() const
 {
-  return _GetTypedDataSource<HdIntArrayDataSource>(HdNurbsPatchTrimCurveSchemaTokens->orders);
+    return _GetTypedDataSource<HdIntArrayDataSource>(
+        HdNurbsPatchTrimCurveSchemaTokens->orders);
 }
 
-HdIntArrayDataSourceHandle HdNurbsPatchTrimCurveSchema::GetVertexCounts() const
+HdIntArrayDataSourceHandle
+HdNurbsPatchTrimCurveSchema::GetVertexCounts() const
 {
-  return _GetTypedDataSource<HdIntArrayDataSource>(
-      HdNurbsPatchTrimCurveSchemaTokens->vertexCounts);
+    return _GetTypedDataSource<HdIntArrayDataSource>(
+        HdNurbsPatchTrimCurveSchemaTokens->vertexCounts);
 }
 
-HdDoubleArrayDataSourceHandle HdNurbsPatchTrimCurveSchema::GetKnots() const
+HdDoubleArrayDataSourceHandle
+HdNurbsPatchTrimCurveSchema::GetKnots() const
 {
-  return _GetTypedDataSource<HdDoubleArrayDataSource>(HdNurbsPatchTrimCurveSchemaTokens->knots);
+    return _GetTypedDataSource<HdDoubleArrayDataSource>(
+        HdNurbsPatchTrimCurveSchemaTokens->knots);
 }
 
-HdVec2dArrayDataSourceHandle HdNurbsPatchTrimCurveSchema::GetRanges() const
+HdVec2dArrayDataSourceHandle
+HdNurbsPatchTrimCurveSchema::GetRanges() const
 {
-  return _GetTypedDataSource<HdVec2dArrayDataSource>(HdNurbsPatchTrimCurveSchemaTokens->ranges);
+    return _GetTypedDataSource<HdVec2dArrayDataSource>(
+        HdNurbsPatchTrimCurveSchemaTokens->ranges);
 }
 
-HdVec3dArrayDataSourceHandle HdNurbsPatchTrimCurveSchema::GetPoints() const
+HdVec3dArrayDataSourceHandle
+HdNurbsPatchTrimCurveSchema::GetPoints() const
 {
-  return _GetTypedDataSource<HdVec3dArrayDataSource>(HdNurbsPatchTrimCurveSchemaTokens->points);
+    return _GetTypedDataSource<HdVec3dArrayDataSource>(
+        HdNurbsPatchTrimCurveSchemaTokens->points);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdNurbsPatchTrimCurveSchema::BuildRetained(
-    const HdIntArrayDataSourceHandle &counts,
-    const HdIntArrayDataSourceHandle &orders,
-    const HdIntArrayDataSourceHandle &vertexCounts,
-    const HdDoubleArrayDataSourceHandle &knots,
-    const HdVec2dArrayDataSourceHandle &ranges,
-    const HdVec3dArrayDataSourceHandle &points)
+HdContainerDataSourceHandle
+HdNurbsPatchTrimCurveSchema::BuildRetained(
+        const HdIntArrayDataSourceHandle &counts,
+        const HdIntArrayDataSourceHandle &orders,
+        const HdIntArrayDataSourceHandle &vertexCounts,
+        const HdDoubleArrayDataSourceHandle &knots,
+        const HdVec2dArrayDataSourceHandle &ranges,
+        const HdVec3dArrayDataSourceHandle &points
+)
 {
-  TfToken _names[6];
-  HdDataSourceBaseHandle _values[6];
+    TfToken _names[6];
+    HdDataSourceBaseHandle _values[6];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (counts) {
-    _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->counts;
-    _values[_count++] = counts;
-  }
+    if (counts) {
+        _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->counts;
+        _values[_count++] = counts;
+    }
 
-  if (orders) {
-    _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->orders;
-    _values[_count++] = orders;
-  }
+    if (orders) {
+        _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->orders;
+        _values[_count++] = orders;
+    }
 
-  if (vertexCounts) {
-    _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->vertexCounts;
-    _values[_count++] = vertexCounts;
-  }
+    if (vertexCounts) {
+        _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->vertexCounts;
+        _values[_count++] = vertexCounts;
+    }
 
-  if (knots) {
-    _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->knots;
-    _values[_count++] = knots;
-  }
+    if (knots) {
+        _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->knots;
+        _values[_count++] = knots;
+    }
 
-  if (ranges) {
-    _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->ranges;
-    _values[_count++] = ranges;
-  }
+    if (ranges) {
+        _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->ranges;
+        _values[_count++] = ranges;
+    }
 
-  if (points) {
-    _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->points;
-    _values[_count++] = points;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (points) {
+        _names[_count] = HdNurbsPatchTrimCurveSchemaTokens->points;
+        _values[_count++] = points;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdNurbsPatchTrimCurveSchema::Builder &HdNurbsPatchTrimCurveSchema::Builder::SetCounts(
+HdNurbsPatchTrimCurveSchema::Builder &
+HdNurbsPatchTrimCurveSchema::Builder::SetCounts(
     const HdIntArrayDataSourceHandle &counts)
 {
-  _counts = counts;
-  return *this;
+    _counts = counts;
+    return *this;
 }
 
-HdNurbsPatchTrimCurveSchema::Builder &HdNurbsPatchTrimCurveSchema::Builder::SetOrders(
+HdNurbsPatchTrimCurveSchema::Builder &
+HdNurbsPatchTrimCurveSchema::Builder::SetOrders(
     const HdIntArrayDataSourceHandle &orders)
 {
-  _orders = orders;
-  return *this;
+    _orders = orders;
+    return *this;
 }
 
-HdNurbsPatchTrimCurveSchema::Builder &HdNurbsPatchTrimCurveSchema::Builder::SetVertexCounts(
+HdNurbsPatchTrimCurveSchema::Builder &
+HdNurbsPatchTrimCurveSchema::Builder::SetVertexCounts(
     const HdIntArrayDataSourceHandle &vertexCounts)
 {
-  _vertexCounts = vertexCounts;
-  return *this;
+    _vertexCounts = vertexCounts;
+    return *this;
 }
 
-HdNurbsPatchTrimCurveSchema::Builder &HdNurbsPatchTrimCurveSchema::Builder::SetKnots(
+HdNurbsPatchTrimCurveSchema::Builder &
+HdNurbsPatchTrimCurveSchema::Builder::SetKnots(
     const HdDoubleArrayDataSourceHandle &knots)
 {
-  _knots = knots;
-  return *this;
+    _knots = knots;
+    return *this;
 }
 
-HdNurbsPatchTrimCurveSchema::Builder &HdNurbsPatchTrimCurveSchema::Builder::SetRanges(
+HdNurbsPatchTrimCurveSchema::Builder &
+HdNurbsPatchTrimCurveSchema::Builder::SetRanges(
     const HdVec2dArrayDataSourceHandle &ranges)
 {
-  _ranges = ranges;
-  return *this;
+    _ranges = ranges;
+    return *this;
 }
 
-HdNurbsPatchTrimCurveSchema::Builder &HdNurbsPatchTrimCurveSchema::Builder::SetPoints(
+HdNurbsPatchTrimCurveSchema::Builder &
+HdNurbsPatchTrimCurveSchema::Builder::SetPoints(
     const HdVec3dArrayDataSourceHandle &points)
 {
-  _points = points;
-  return *this;
+    _points = points;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdNurbsPatchTrimCurveSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdNurbsPatchTrimCurveSchema::Builder::Build()
 {
-  return HdNurbsPatchTrimCurveSchema::BuildRetained(
-      _counts, _orders, _vertexCounts, _knots, _ranges, _points);
-}
-
-/*static*/
-HdNurbsPatchTrimCurveSchema HdNurbsPatchTrimCurveSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdNurbsPatchTrimCurveSchema(fromParentContainer ?
-                                         HdContainerDataSource::Cast(fromParentContainer->Get(
-                                             HdNurbsPatchTrimCurveSchemaTokens->trimCurve)) :
-                                         nullptr);
+    return HdNurbsPatchTrimCurveSchema::BuildRetained(
+        _counts,
+        _orders,
+        _vertexCounts,
+        _knots,
+        _ranges,
+        _points
+    );
 }
 
 /*static*/
-const TfToken &HdNurbsPatchTrimCurveSchema::GetSchemaToken()
+HdNurbsPatchTrimCurveSchema
+HdNurbsPatchTrimCurveSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdNurbsPatchTrimCurveSchemaTokens->trimCurve;
+    return HdNurbsPatchTrimCurveSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdNurbsPatchTrimCurveSchemaTokens->trimCurve))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdNurbsPatchTrimCurveSchema::GetDefaultLocator()
+const TfToken &
+HdNurbsPatchTrimCurveSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator = HdNurbsPatchSchema::GetDefaultLocator().Append(
-      GetSchemaToken());
-  return locator;
+    return HdNurbsPatchTrimCurveSchemaTokens->trimCurve;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdNurbsPatchTrimCurveSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator =
+        HdNurbsPatchSchema::GetDefaultLocator().Append(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

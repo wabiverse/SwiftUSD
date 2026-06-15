@@ -7,10 +7,10 @@
 #ifndef PXR_USD_USD_INHERITS_H
 #define PXR_USD_USD_INHERITS_H
 
+#include "pxr/pxrns.h"
 #include "Usd/api.h"
 #include "Usd/common.h"
 #include "Usd/prim.h"
-#include "pxr/pxrns.h"
 
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
@@ -24,74 +24,66 @@ SDF_DECLARE_HANDLES(SdfPrimSpec);
 /// A proxy class for applying listOp edits to the inherit paths list for a
 /// prim.
 ///
-/// All paths passed to the UsdInherits API are expected to be in the
+/// All paths passed to the UsdInherits API are expected to be in the 
 /// namespace of the owning prim's stage. Subroot prim inherit paths
 /// will be translated from this namespace to the  namespace of the current
-/// edit target, if necessary. If a path cannot be translated, a coding error
-/// will be issued and no changes will be made. Root prim inherit paths will
+/// edit target, if necessary. If a path cannot be translated, a coding error 
+/// will be issued and no changes will be made. Root prim inherit paths will 
 /// not be translated.
 ///
 class UsdInherits {
-  friend class UsdPrim;
+    friend class UsdPrim;
 
-  explicit UsdInherits(const UsdPrim &prim) : _prim(prim) {}
+    explicit UsdInherits(const UsdPrim& prim) : _prim(prim) {}
 
- public:
-  /// Adds a path to the inheritPaths listOp at the current EditTarget,
-  /// in the position specified by \p position.
-  USD_API
-  bool AddInherit(const SdfPath &primPath,
-                  UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
+public:
+    /// Adds a path to the inheritPaths listOp at the current EditTarget,
+    /// in the position specified by \p position.
+    USD_API
+    bool AddInherit(const SdfPath &primPath,
+                    UsdListPosition position=UsdListPositionBackOfPrependList);
 
-  /// Removes the specified path from the inheritPaths listOp at the
-  /// current EditTarget.
-  USD_API
-  bool RemoveInherit(const SdfPath &primPath);
+    /// Removes the specified path from the inheritPaths listOp at the
+    /// current EditTarget.
+    USD_API
+    bool RemoveInherit(const SdfPath &primPath);
 
-  /// Removes the authored inheritPaths listOp edits at the current edit
-  /// target.
-  USD_API
-  bool ClearInherits();
+    /// Removes the authored inheritPaths listOp edits at the current edit
+    /// target.
+    USD_API
+    bool ClearInherits();
 
-  /// Explicitly set the inherited paths, potentially blocking weaker opinions
-  /// that add or remove items, returning true on success, false if the edit
-  /// could not be performed.
-  USD_API
-  bool SetInherits(const SdfPathVector &items);
+    /// Explicitly set the inherited paths, potentially blocking weaker opinions
+    /// that add or remove items, returning true on success, false if the edit
+    /// could not be performed.
+    USD_API
+    bool SetInherits(const SdfPathVector& items);
 
-  /// Return all the paths in this prim's stage's local layer stack that would
-  /// compose into this prim via direct inherits (excluding prim specs that
-  /// would be composed into this prim due to inherits authored on ancestral
-  /// prims) in strong-to-weak order.
-  ///
-  /// Note that there currently may not be any scene description at these
-  /// paths on the stage.  This returns all the potential places that such
-  /// opinions could appear.
-  USD_API
-  SdfPathVector GetAllDirectInherits() const;
+    /// Return all the paths in this prim's stage's local layer stack that would
+    /// compose into this prim via direct inherits (excluding prim specs that
+    /// would be composed into this prim due to inherits authored on ancestral
+    /// prims) in strong-to-weak order.
+    ///
+    /// Note that there currently may not be any scene description at these
+    /// paths on the stage.  This returns all the potential places that such
+    /// opinions could appear.
+    USD_API
+    SdfPathVector GetAllDirectInherits() const;
+    
+    /// Return the prim this object is bound to.
+    const UsdPrim &GetPrim() const { return _prim; }
+    UsdPrim GetPrim() { return _prim; }
 
-  /// Return the prim this object is bound to.
-  const UsdPrim &GetPrim() const
-  {
-    return _prim;
-  }
-  UsdPrim GetPrim()
-  {
-    return _prim;
-  }
+    explicit operator bool() { return bool(_prim); }
 
-  explicit operator bool()
-  {
-    return bool(_prim);
-  }
+    // ---------------------------------------------------------------------- //
+    // Private Methods and Members
+    // ---------------------------------------------------------------------- //
+private:
 
-  // ---------------------------------------------------------------------- //
-  // Private Methods and Members
-  // ---------------------------------------------------------------------- //
- private:
-  UsdPrim _prim;
+    UsdPrim _prim;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_INHERITS_H
+#endif // PXR_USD_USD_INHERITS_H

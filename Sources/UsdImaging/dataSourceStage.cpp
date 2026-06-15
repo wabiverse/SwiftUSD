@@ -18,39 +18,52 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfTokenVector UsdImagingDataSourceStage::GetNames()
+TfTokenVector
+UsdImagingDataSourceStage::GetNames()
 {
-  return {HdSystemSchema::GetSchemaToken(), HdSceneGlobalsSchema::GetSchemaToken()};
+    return {
+        HdSystemSchema::GetSchemaToken(),
+        HdSceneGlobalsSchema::GetSchemaToken()
+    };
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourceStage::Get(const TfToken &name)
+HdDataSourceBaseHandle
+UsdImagingDataSourceStage::Get(const TfToken& name)
 {
-  if (name == HdSystemSchema::GetSchemaToken()) {
-    return HdRetainedContainerDataSource::New(
-        HdarSystemSchemaTokens->assetResolution,
-        HdarSystemSchema::Builder()
-            .SetResolverContext(HdRetainedTypedSampledDataSource<ArResolverContext>::New(
-                _stage->GetPathResolverContext()))
-            .Build());
-  }
-  if (name == HdSceneGlobalsSchema::GetSchemaToken()) {
-    // Update the sceneGlobals locator if we have stage metadata for the
-    // the render settings prim to use for rendering.
-    std::string pathStr;
-    if (_stage->HasAuthoredMetadata(UsdRenderTokens->renderSettingsPrimPath)) {
-      _stage->GetMetadata(UsdRenderTokens->renderSettingsPrimPath, &pathStr);
+    if (name == HdSystemSchema::GetSchemaToken()) {
+        return HdRetainedContainerDataSource::New(
+            HdarSystemSchemaTokens->assetResolution,
+            HdarSystemSchema::Builder()
+                .SetResolverContext(
+                    HdRetainedTypedSampledDataSource<ArResolverContext>::New(
+                        _stage->GetPathResolverContext()))
+                .Build());
     }
+    if (name == HdSceneGlobalsSchema::GetSchemaToken()) {
+        // Update the sceneGlobals locator if we have stage metadata for the
+        // the render settings prim to use for rendering.
+        std::string pathStr;
+        if (_stage->HasAuthoredMetadata(
+                UsdRenderTokens->renderSettingsPrimPath)) {
+            _stage->GetMetadata(
+                UsdRenderTokens->renderSettingsPrimPath, &pathStr);
+        }
 
-    return HdSceneGlobalsSchema::Builder()
-        .SetActiveRenderSettingsPrim(
-            pathStr.empty() ? nullptr :
-                              HdRetainedTypedSampledDataSource<SdfPath>::New(SdfPath(pathStr)))
-        .SetStartTimeCode(
-            HdRetainedTypedSampledDataSource<double>::New(_stage->GetStartTimeCode()))
-        .SetEndTimeCode(HdRetainedTypedSampledDataSource<double>::New(_stage->GetEndTimeCode()))
-        .Build();
-  }
-  return nullptr;
+        return HdSceneGlobalsSchema::Builder()
+               .SetActiveRenderSettingsPrim(
+                   pathStr.empty()
+                       ? nullptr
+                       : HdRetainedTypedSampledDataSource<SdfPath>::New(
+                           SdfPath(pathStr)))
+               .SetStartTimeCode(
+                   HdRetainedTypedSampledDataSource<double>::New(
+                       _stage->GetStartTimeCode()))
+               .SetEndTimeCode(
+                   HdRetainedTypedSampledDataSource<double>::New(
+                       _stage->GetEndTimeCode()))
+               .Build();
+    }
+    return nullptr;
 }
 
 UsdImagingDataSourceStage::UsdImagingDataSourceStage(UsdStageRefPtr stage)

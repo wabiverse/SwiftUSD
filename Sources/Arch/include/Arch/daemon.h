@@ -11,8 +11,8 @@
 /// \ingroup group_arch_Multithreading
 /// Create background or daemon processes.
 
-#include "Arch/api.h"
 #include "pxr/pxrns.h"
+#include "Arch/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -43,9 +43,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// value.  Returns 0 on success.
 ///
 /// \ingroup group_arch_Multithreading
-ARCH_API
-int ArchCloseAllFiles(int nExcept, const int *exceptFds);
+ARCH_API 
+int ArchCloseAllFiles(int nExcept, const int* exceptFds);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_DAEMON_H
+#endif // PXR_BASE_ARCH_DAEMON_H 

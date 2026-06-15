@@ -7,11 +7,11 @@
 #ifndef PXR_IMAGING_HGI_GL_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGI_GL_COMPUTE_CMDS_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
 #include "HgiGL/api.h"
 #include "HgiGL/hgi.h"
-#include "pxr/pxrns.h"
 #include <cstdint>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -22,58 +22,66 @@ struct HgiComputeCmdsDesc;
 ///
 /// OpenGL implementation of HgiComputeCmds.
 ///
-class HgiGLComputeCmds final : public HgiComputeCmds {
- public:
-  HGIGL_API
-  ~HgiGLComputeCmds() override;
+class HgiGLComputeCmds final : public HgiComputeCmds
+{
+public:
+    HGIGL_API
+    ~HgiGLComputeCmds() override;
 
-  HGIGL_API
-  void PushDebugGroup(const char *label) override;
+    HGIGL_API
+    void PushDebugGroup(const char* label,
+        const GfVec4f& color = s_computeDebugColor) override;
 
-  HGIGL_API
-  void PopDebugGroup() override;
+    HGIGL_API
+    void PopDebugGroup() override;
 
-  HGIGL_API
-  void BindPipeline(HgiComputePipelineHandle pipeline) override;
+    HGIGL_API
+    void InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color = s_markerDebugColor) override;
 
-  HGIGL_API
-  void BindResources(HgiResourceBindingsHandle resources) override;
+    HGIGL_API
+    void BindPipeline(HgiComputePipelineHandle pipeline) override;
 
-  HGIGL_API
-  void SetConstantValues(HgiComputePipelineHandle pipeline,
-                         uint32_t bindIndex,
-                         uint32_t byteSize,
-                         const void *data) override;
+    HGIGL_API
+    void BindResources(HgiResourceBindingsHandle resources) override;
 
-  HGIGL_API
-  void Dispatch(int dimX, int dimY) override;
+    HGIGL_API
+    void SetConstantValues(
+        HgiComputePipelineHandle pipeline,
+        uint32_t bindIndex,
+        uint32_t byteSize,
+        const void* data) override;
+    
+    HGIGL_API
+    void Dispatch(int dimX, int dimY) override;
 
-  HGIGL_API
-  void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
+    HGIGL_API
+    void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
 
-  HGIGL_API
-  HgiComputeDispatch GetDispatchMethod() const override;
+    HGIGL_API
+    HgiComputeDispatch GetDispatchMethod() const override;
 
- protected:
-  friend class HgiGL;
+protected:
+    friend class HgiGL;
 
-  HGIGL_API
-  HgiGLComputeCmds(HgiGLDevice *device, HgiComputeCmdsDesc const &desc);
+    HGIGL_API
+    HgiGLComputeCmds(HgiGLDevice* device, HgiComputeCmdsDesc const& desc);
 
-  HGIGL_API
-  bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
+    HGIGL_API
+    bool _Submit(Hgi* hgi, HgiSubmitWaitType wait) override;
 
- private:
-  HgiGLComputeCmds() = delete;
-  HgiGLComputeCmds &operator=(const HgiGLComputeCmds &) = delete;
-  HgiGLComputeCmds(const HgiGLComputeCmds &) = delete;
+private:
+    HgiGLComputeCmds() = delete;
+    HgiGLComputeCmds & operator=(const HgiGLComputeCmds&) = delete;
+    HgiGLComputeCmds(const HgiGLComputeCmds&) = delete;
 
-  HgiGLOpsVector _ops;
-  int _pushStack;
-  GfVec3i _localWorkGroupSize;
+    HgiGLOpsVector _ops;
+    int _pushStack;
+    GfVec3i _localWorkGroupSize;
 
-  // Cmds is used only one frame so storing multi-frame state on will not
-  // survive.
+    // Cmds is used only one frame so storing multi-frame state on will not
+    // survive.
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

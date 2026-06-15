@@ -5,24 +5,26 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Tf/pyCallContext.h"
 #include "Tf/callContext.h"
 #include "Tf/stringUtils.h"
-#include "pxr/pxrns.h"
 
 #include <OneTBB/tbb/spin_mutex.h>
 
 #include <set>
 #include <string>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 using namespace std;
 
 namespace {
-struct _Cache {
-  tbb::spin_mutex lock;
-  set<string> data;
-};
-}  // namespace
+    struct _Cache {
+        tbb::spin_mutex lock;
+        set<string> data;
+    };
+}
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -30,20 +32,34 @@ PXR_NAMESPACE_OPEN_SCOPE
  * TfCallContext's contain const char*'s which are assumed to be program literals.
  * That assumption fails badly when it comes to python.
  */
-TfCallContext Tf_PythonCallContext(char const *fileName,
-                                   char const *moduleName,
-                                   char const *functionName,
-                                   size_t line)
+TfCallContext
+Tf_PythonCallContext(std::string fileName,
+                     std::string moduleName,
+                     std::string functionName,
+                     size_t line)
 {
-  static _Cache cache;
+    static _Cache cache;
 
-  string const &fullName = TfStringPrintf("%s.%s", moduleName, functionName);
+    string fullName;
+    if (moduleName.empty()) {
+        fullName = functionName;
+    } else if (functionName.empty()) {
+        fullName = moduleName;
+    } else {
+        fullName = TfStringPrintf("%s.%s", moduleName.c_str(),
+                                  functionName.c_str());
+    }
 
-  tbb::spin_mutex::scoped_lock lock(cache.lock);
-  char const *prettyFunctionPtr = cache.data.insert(fullName).first->c_str();
-  char const *fileNamePtr = cache.data.insert(fileName).first->c_str();
+    if (fullName.empty()) {
+        return TfCallContext{};
+    }
 
-  return TfCallContext(fileNamePtr, prettyFunctionPtr, line, prettyFunctionPtr);
+    tbb::spin_mutex::scoped_lock lock(cache.lock);
+    char const* prettyFunctionPtr = cache.data.insert(fullName).first->c_str();
+    char const* fileNamePtr = cache.data.insert(fileName).first->c_str();
+
+    return TfCallContext(fileNamePtr, prettyFunctionPtr, line, prettyFunctionPtr);
 }
 
-PXR_NAMESPACE_CLOSE_SCOPE
+PXR_NAMESPACE_CLOSE_SCOPE 
+#endif // PXR_PYTHON_SUPPORT_ENABLED

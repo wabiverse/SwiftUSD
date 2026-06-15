@@ -7,11 +7,10 @@
 #ifndef PXR_IMAGING_HGI_METAL_CAPABILITIES_H
 #define PXR_IMAGING_HGI_METAL_CAPABILITIES_H
 
-#include "Hgi/capabilities.h"
-#include "HgiMetal/api.h"
-#include "pxr/pxrns.h"
-
 #include <Metal/Metal.h>
+#include "pxr/pxrns.h"
+#include "HgiMetal/api.h"
+#include "Hgi/capabilities.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -20,31 +19,32 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Reports the capabilities of the Metal device.
 ///
-class HgiMetalCapabilities final : public HgiCapabilities {
- public:
-  HGIMETAL_API
-  ~HgiMetalCapabilities() override;
+class HgiMetalCapabilities final : public HgiCapabilities
+{
+public:
+    HGIMETAL_API
+    ~HgiMetalCapabilities() override;
+    
+    HGIMETAL_API
+    int GetAPIVersion() const override;
+    
+    HGIMETAL_API
+    int GetShaderVersion() const override;
 
-  HGIMETAL_API
-  int GetAPIVersion() const override;
+    MTLResourceOptions defaultStorageMode;
+    bool hasVertexMemoryBarrier;
+    bool useParallelEncoder;
+    bool requiresIndirectDrawFix;
+    bool requiresReturnAfterDiscard;
 
-  HGIMETAL_API
-  int GetShaderVersion() const override;
+protected:
+    friend class HgiMetal;
 
-  MTLResourceOptions defaultStorageMode;
-  MTLResourceOptions preferredStorageMode;
-  bool hasVertexMemoryBarrier;
-  bool useParallelEncoder;
-  bool requiresIndirectDrawFix;
-  bool requiresReturnAfterDiscard;
-
- protected:
-  friend class HgiMetal;
-
-  HGIMETAL_API
-  HgiMetalCapabilities(id<MTLDevice> device);
+    HGIMETAL_API
+    HgiMetalCapabilities(id<MTLDevice> device);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif
+

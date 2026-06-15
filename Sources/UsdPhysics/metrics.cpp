@@ -5,9 +5,9 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "UsdPhysics/metrics.h"
 #include "UsdPhysics/tokens.h"
-#include "pxr/pxrns.h"
 
 #include "Usd/stage.h"
 
@@ -22,46 +22,53 @@ constexpr double UsdPhysicsMassUnits::grams;
 constexpr double UsdPhysicsMassUnits::kilograms;
 constexpr double UsdPhysicsMassUnits::slugs;
 
-double UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
+double
+UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
 {
-  double units = UsdPhysicsMassUnits::kilograms;
-  if (!stage) {
-    TF_CODING_ERROR("Invalid UsdStage");
+    double units = UsdPhysicsMassUnits::kilograms;
+    if (!stage) {
+        TF_CODING_ERROR("Invalid UsdStage");
+        return units;
+    }
+
+    stage->GetMetadata(UsdPhysicsTokens->kilogramsPerUnit, &units);
     return units;
-  }
-
-  stage->GetMetadata(UsdPhysicsTokens->kilogramsPerUnit, &units);
-  return units;
 }
 
-bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage)
+bool
+UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage)
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid UsdStage");
-    return false;
-  }
+    if (!stage) {
+        TF_CODING_ERROR("Invalid UsdStage");
+        return false;
+    }
 
-  return stage->HasAuthoredMetadata(UsdPhysicsTokens->kilogramsPerUnit);
+    return stage->HasAuthoredMetadata(UsdPhysicsTokens->kilogramsPerUnit);
 }
 
-bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage, double kilogramsPerUnit)
+bool
+UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
+                                  double kilogramsPerUnit)
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid UsdStage");
-    return false;
-  }
+    if (!stage) {
+        TF_CODING_ERROR("Invalid UsdStage");
+        return false;
+    }
 
-  return stage->SetMetadata(UsdPhysicsTokens->kilogramsPerUnit, kilogramsPerUnit);
+    return stage->SetMetadata(UsdPhysicsTokens->kilogramsPerUnit, 
+            kilogramsPerUnit);
 }
 
-bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits, double epsilon)
+bool
+UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits,
+                         double epsilon)
 {
-  if (authoredUnits <= 0 || standardUnits <= 0) {
-    return false;
-  }
+    if (authoredUnits <= 0 || standardUnits <= 0) {
+        return false;
+    }
 
-  const double diff = GfAbs(authoredUnits - standardUnits);
-  return (diff / authoredUnits < epsilon) && (diff / standardUnits < epsilon);
+    const double diff = GfAbs(authoredUnits - standardUnits);
+    return (diff / authoredUnits < epsilon) && (diff / standardUnits < epsilon);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

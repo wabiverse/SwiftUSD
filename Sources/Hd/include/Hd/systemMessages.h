@@ -7,25 +7,29 @@
 #ifndef PXR_IMAGING_HD_SYSTEM_MESSAGES_H
 #define PXR_IMAGING_HD_SYSTEM_MESSAGES_H
 
+#include "pxr/pxrns.h"
 #include "Hd/api.h"
 #include "Tf/staticTokens.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HD_SYSTEM_MESSAGE_TOKENS \
-  /* Indicates that asynchronous processing is allowed and to expect to \
-   * receive "asyncPoll" messages to follow. This message provides no \
-   * arguments. \
-   */ \
-  (asyncAllow) /* Following a "asyncAllow" message, this will be called periodically on the \
-                * application main (or rendering) thread to give scene indices an \
-                * opportunity to send notices for completed asynchronous or incremental \
-                * work. \
-                */ \
-      (asyncPoll)
 
-TF_DECLARE_PUBLIC_TOKENS(HdSystemMessageTokens, HD_API, HD_SYSTEM_MESSAGE_TOKENS);
+#define HD_SYSTEM_MESSAGE_TOKENS                                               \
+    /* Indicates that asynchronous processing is allowed and to expect to
+     * receive "asyncPoll" messages to follow. This message provides no
+     * arguments.
+     */                                                                        \
+   (asyncAllow)                                                                \
+   /* Following a "asyncAllow" message, this will be called periodically on the
+     * application main (or rendering) thread to give scene indices an
+     * opportunity to send notices for completed asynchronous or incremental
+     * work.
+     */                                                                        \
+   (asyncPoll)                                                                 \
+
+TF_DECLARE_PUBLIC_TOKENS(HdSystemMessageTokens, HD_API,
+    HD_SYSTEM_MESSAGE_TOKENS);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

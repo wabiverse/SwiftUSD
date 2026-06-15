@@ -19,88 +19,124 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialNetworkSchemaTokens, HD_MATERIAL_NETWORK_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialNetworkSchemaTokens,
+    HD_MATERIAL_NETWORK_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdMaterialNodeContainerSchema HdMaterialNetworkSchema::GetNodes() const
+HdMaterialNodeContainerSchema
+HdMaterialNetworkSchema::GetNodes() const
 {
-  return HdMaterialNodeContainerSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMaterialNetworkSchemaTokens->nodes));
+    return HdMaterialNodeContainerSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNetworkSchemaTokens->nodes));
 }
 
-HdMaterialConnectionContainerSchema HdMaterialNetworkSchema::GetTerminals() const
+HdMaterialConnectionContainerSchema
+HdMaterialNetworkSchema::GetTerminals() const
 {
-  return HdMaterialConnectionContainerSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMaterialNetworkSchemaTokens->terminals));
+    return HdMaterialConnectionContainerSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNetworkSchemaTokens->terminals));
 }
 
-HdMaterialInterfaceMappingsContainerSchema HdMaterialNetworkSchema::GetInterfaceMappings() const
+HdMaterialInterfaceSchema
+HdMaterialNetworkSchema::GetInterface() const
 {
-  return HdMaterialInterfaceMappingsContainerSchema(_GetTypedDataSource<HdContainerDataSource>(
-      HdMaterialNetworkSchemaTokens->interfaceMappings));
+    return HdMaterialInterfaceSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNetworkSchemaTokens->interface));
+}
+
+HdSampledDataSourceContainerSchema
+HdMaterialNetworkSchema::GetConfig() const
+{
+    return HdSampledDataSourceContainerSchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdMaterialNetworkSchemaTokens->config));
 }
 
 /*static*/
-HdContainerDataSourceHandle HdMaterialNetworkSchema::BuildRetained(
-    const HdContainerDataSourceHandle &nodes,
-    const HdContainerDataSourceHandle &terminals,
-    const HdContainerDataSourceHandle &interfaceMappings)
+HdContainerDataSourceHandle
+HdMaterialNetworkSchema::BuildRetained(
+        const HdContainerDataSourceHandle &nodes,
+        const HdContainerDataSourceHandle &terminals,
+        const HdContainerDataSourceHandle &interface,
+        const HdContainerDataSourceHandle &config
+)
 {
-  TfToken _names[3];
-  HdDataSourceBaseHandle _values[3];
+    TfToken _names[4];
+    HdDataSourceBaseHandle _values[4];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (nodes) {
-    _names[_count] = HdMaterialNetworkSchemaTokens->nodes;
-    _values[_count++] = nodes;
-  }
+    if (nodes) {
+        _names[_count] = HdMaterialNetworkSchemaTokens->nodes;
+        _values[_count++] = nodes;
+    }
 
-  if (terminals) {
-    _names[_count] = HdMaterialNetworkSchemaTokens->terminals;
-    _values[_count++] = terminals;
-  }
+    if (terminals) {
+        _names[_count] = HdMaterialNetworkSchemaTokens->terminals;
+        _values[_count++] = terminals;
+    }
 
-  if (interfaceMappings) {
-    _names[_count] = HdMaterialNetworkSchemaTokens->interfaceMappings;
-    _values[_count++] = interfaceMappings;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (interface) {
+        _names[_count] = HdMaterialNetworkSchemaTokens->interface;
+        _values[_count++] = interface;
+    }
+
+    if (config) {
+        _names[_count] = HdMaterialNetworkSchemaTokens->config;
+        _values[_count++] = config;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdMaterialNetworkSchema::Builder &HdMaterialNetworkSchema::Builder::SetNodes(
+HdMaterialNetworkSchema::Builder &
+HdMaterialNetworkSchema::Builder::SetNodes(
     const HdContainerDataSourceHandle &nodes)
 {
-  _nodes = nodes;
-  return *this;
+    _nodes = nodes;
+    return *this;
 }
 
-HdMaterialNetworkSchema::Builder &HdMaterialNetworkSchema::Builder::SetTerminals(
+HdMaterialNetworkSchema::Builder &
+HdMaterialNetworkSchema::Builder::SetTerminals(
     const HdContainerDataSourceHandle &terminals)
 {
-  _terminals = terminals;
-  return *this;
+    _terminals = terminals;
+    return *this;
 }
 
-HdMaterialNetworkSchema::Builder &HdMaterialNetworkSchema::Builder::SetInterfaceMappings(
-    const HdContainerDataSourceHandle &interfaceMappings)
+HdMaterialNetworkSchema::Builder &
+HdMaterialNetworkSchema::Builder::SetInterface(
+    const HdContainerDataSourceHandle &interface)
 {
-  _interfaceMappings = interfaceMappings;
-  return *this;
+    _interface = interface;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdMaterialNetworkSchema::Builder::Build()
+HdMaterialNetworkSchema::Builder &
+HdMaterialNetworkSchema::Builder::SetConfig(
+    const HdContainerDataSourceHandle &config)
 {
-  return HdMaterialNetworkSchema::BuildRetained(_nodes, _terminals, _interfaceMappings);
+    _config = config;
+    return *this;
 }
+
+HdContainerDataSourceHandle
+HdMaterialNetworkSchema::Builder::Build()
+{
+    return HdMaterialNetworkSchema::BuildRetained(
+        _nodes,
+        _terminals,
+        _interface,
+        _config
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

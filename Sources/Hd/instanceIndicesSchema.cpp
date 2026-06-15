@@ -19,85 +19,102 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdInstanceIndicesSchemaTokens, HD_INSTANCE_INDICES_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdInstanceIndicesSchemaTokens,
+    HD_INSTANCE_INDICES_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathDataSourceHandle HdInstanceIndicesSchema::GetInstancer() const
+HdPathDataSourceHandle
+HdInstanceIndicesSchema::GetInstancer() const
 {
-  return _GetTypedDataSource<HdPathDataSource>(HdInstanceIndicesSchemaTokens->instancer);
+    return _GetTypedDataSource<HdPathDataSource>(
+        HdInstanceIndicesSchemaTokens->instancer);
 }
 
-HdIntDataSourceHandle HdInstanceIndicesSchema::GetPrototypeIndex() const
+HdIntDataSourceHandle
+HdInstanceIndicesSchema::GetPrototypeIndex() const
 {
-  return _GetTypedDataSource<HdIntDataSource>(HdInstanceIndicesSchemaTokens->prototypeIndex);
+    return _GetTypedDataSource<HdIntDataSource>(
+        HdInstanceIndicesSchemaTokens->prototypeIndex);
 }
 
-HdIntArrayDataSourceHandle HdInstanceIndicesSchema::GetInstanceIndices() const
+HdIntArrayDataSourceHandle
+HdInstanceIndicesSchema::GetInstanceIndices() const
 {
-  return _GetTypedDataSource<HdIntArrayDataSource>(HdInstanceIndicesSchemaTokens->instanceIndices);
+    return _GetTypedDataSource<HdIntArrayDataSource>(
+        HdInstanceIndicesSchemaTokens->instanceIndices);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdInstanceIndicesSchema::BuildRetained(
-    const HdPathDataSourceHandle &instancer,
-    const HdIntDataSourceHandle &prototypeIndex,
-    const HdIntArrayDataSourceHandle &instanceIndices)
+HdContainerDataSourceHandle
+HdInstanceIndicesSchema::BuildRetained(
+        const HdPathDataSourceHandle &instancer,
+        const HdIntDataSourceHandle &prototypeIndex,
+        const HdIntArrayDataSourceHandle &instanceIndices
+)
 {
-  TfToken _names[3];
-  HdDataSourceBaseHandle _values[3];
+    TfToken _names[3];
+    HdDataSourceBaseHandle _values[3];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (instancer) {
-    _names[_count] = HdInstanceIndicesSchemaTokens->instancer;
-    _values[_count++] = instancer;
-  }
+    if (instancer) {
+        _names[_count] = HdInstanceIndicesSchemaTokens->instancer;
+        _values[_count++] = instancer;
+    }
 
-  if (prototypeIndex) {
-    _names[_count] = HdInstanceIndicesSchemaTokens->prototypeIndex;
-    _values[_count++] = prototypeIndex;
-  }
+    if (prototypeIndex) {
+        _names[_count] = HdInstanceIndicesSchemaTokens->prototypeIndex;
+        _values[_count++] = prototypeIndex;
+    }
 
-  if (instanceIndices) {
-    _names[_count] = HdInstanceIndicesSchemaTokens->instanceIndices;
-    _values[_count++] = instanceIndices;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (instanceIndices) {
+        _names[_count] = HdInstanceIndicesSchemaTokens->instanceIndices;
+        _values[_count++] = instanceIndices;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdInstanceIndicesSchema::Builder &HdInstanceIndicesSchema::Builder::SetInstancer(
+HdInstanceIndicesSchema::Builder &
+HdInstanceIndicesSchema::Builder::SetInstancer(
     const HdPathDataSourceHandle &instancer)
 {
-  _instancer = instancer;
-  return *this;
+    _instancer = instancer;
+    return *this;
 }
 
-HdInstanceIndicesSchema::Builder &HdInstanceIndicesSchema::Builder::SetPrototypeIndex(
+HdInstanceIndicesSchema::Builder &
+HdInstanceIndicesSchema::Builder::SetPrototypeIndex(
     const HdIntDataSourceHandle &prototypeIndex)
 {
-  _prototypeIndex = prototypeIndex;
-  return *this;
+    _prototypeIndex = prototypeIndex;
+    return *this;
 }
 
-HdInstanceIndicesSchema::Builder &HdInstanceIndicesSchema::Builder::SetInstanceIndices(
+HdInstanceIndicesSchema::Builder &
+HdInstanceIndicesSchema::Builder::SetInstanceIndices(
     const HdIntArrayDataSourceHandle &instanceIndices)
 {
-  _instanceIndices = instanceIndices;
-  return *this;
+    _instanceIndices = instanceIndices;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdInstanceIndicesSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdInstanceIndicesSchema::Builder::Build()
 {
-  return HdInstanceIndicesSchema::BuildRetained(_instancer, _prototypeIndex, _instanceIndices);
-}
+    return HdInstanceIndicesSchema::BuildRetained(
+        _instancer,
+        _prototypeIndex,
+        _instanceIndices
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

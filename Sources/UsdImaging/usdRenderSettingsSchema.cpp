@@ -19,7 +19,7 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
@@ -27,381 +27,439 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(UsdImagingUsdRenderSettingsSchemaTokens,
-                        USD_IMAGING_USD_RENDER_SETTINGS_SCHEMA_TOKENS);
+    USD_IMAGING_USD_RENDER_SETTINGS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdVec2iDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetResolution() const
+HdVec2iDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetResolution() const
 {
-  return _GetTypedDataSource<HdVec2iDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->resolution);
+    return _GetTypedDataSource<HdVec2iDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->resolution);
 }
 
-HdFloatDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetPixelAspectRatio() const
+HdFloatDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetPixelAspectRatio() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->pixelAspectRatio);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->pixelAspectRatio);
 }
 
-HdTokenDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetAspectRatioConformPolicy() const
+HdTokenDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetAspectRatioConformPolicy() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->aspectRatioConformPolicy);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->aspectRatioConformPolicy);
 }
 
-HdVec4fDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetDataWindowNDC() const
+HdVec4fDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetDataWindowNDC() const
 {
-  return _GetTypedDataSource<HdVec4fDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->dataWindowNDC);
+    return _GetTypedDataSource<HdVec4fDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->dataWindowNDC);
 }
 
-HdBoolDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetDisableMotionBlur() const
+HdBoolDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetDisableMotionBlur() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->disableMotionBlur);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->disableMotionBlur);
 }
 
-HdBoolDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetDisableDepthOfField() const
+HdBoolDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetDisableDepthOfField() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->disableDepthOfField);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->disableDepthOfField);
 }
 
-HdPathDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetCamera() const
+HdPathDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetCamera() const
 {
-  return _GetTypedDataSource<HdPathDataSource>(UsdImagingUsdRenderSettingsSchemaTokens->camera);
+    return _GetTypedDataSource<HdPathDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->camera);
 }
 
-HdTokenArrayDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetIncludedPurposes() const
+HdTokenArrayDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetIncludedPurposes() const
 {
-  return _GetTypedDataSource<HdTokenArrayDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->includedPurposes);
+    return _GetTypedDataSource<HdTokenArrayDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->includedPurposes);
 }
 
-HdTokenArrayDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetMaterialBindingPurposes() const
+HdTokenArrayDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetMaterialBindingPurposes() const
 {
-  return _GetTypedDataSource<HdTokenArrayDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->materialBindingPurposes);
+    return _GetTypedDataSource<HdTokenArrayDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->materialBindingPurposes);
 }
 
-HdTokenDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetRenderingColorSpace() const
+HdTokenDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetRenderingColorSpace() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->renderingColorSpace);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->renderingColorSpace);
 }
 
-HdPathArrayDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetProducts() const
+HdPathArrayDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetProducts() const
 {
-  return _GetTypedDataSource<HdPathArrayDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->products);
+    return _GetTypedDataSource<HdPathArrayDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->products);
 }
 
-HdContainerDataSourceHandle UsdImagingUsdRenderSettingsSchema::GetNamespacedSettings() const
+HdContainerDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::GetNamespacedSettings() const
 {
-  return _GetTypedDataSource<HdContainerDataSource>(
-      UsdImagingUsdRenderSettingsSchemaTokens->namespacedSettings);
+    return _GetTypedDataSource<HdContainerDataSource>(
+        UsdImagingUsdRenderSettingsSchemaTokens->namespacedSettings);
 }
 
 /*static*/
-HdContainerDataSourceHandle UsdImagingUsdRenderSettingsSchema::BuildRetained(
-    const HdVec2iDataSourceHandle &resolution,
-    const HdFloatDataSourceHandle &pixelAspectRatio,
-    const HdTokenDataSourceHandle &aspectRatioConformPolicy,
-    const HdVec4fDataSourceHandle &dataWindowNDC,
-    const HdBoolDataSourceHandle &disableMotionBlur,
-    const HdBoolDataSourceHandle &disableDepthOfField,
-    const HdPathDataSourceHandle &camera,
-    const HdTokenArrayDataSourceHandle &includedPurposes,
-    const HdTokenArrayDataSourceHandle &materialBindingPurposes,
-    const HdTokenDataSourceHandle &renderingColorSpace,
-    const HdPathArrayDataSourceHandle &products,
-    const HdContainerDataSourceHandle &namespacedSettings)
+HdContainerDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::BuildRetained(
+        const HdVec2iDataSourceHandle &resolution,
+        const HdFloatDataSourceHandle &pixelAspectRatio,
+        const HdTokenDataSourceHandle &aspectRatioConformPolicy,
+        const HdVec4fDataSourceHandle &dataWindowNDC,
+        const HdBoolDataSourceHandle &disableMotionBlur,
+        const HdBoolDataSourceHandle &disableDepthOfField,
+        const HdPathDataSourceHandle &camera,
+        const HdTokenArrayDataSourceHandle &includedPurposes,
+        const HdTokenArrayDataSourceHandle &materialBindingPurposes,
+        const HdTokenDataSourceHandle &renderingColorSpace,
+        const HdPathArrayDataSourceHandle &products,
+        const HdContainerDataSourceHandle &namespacedSettings
+)
 {
-  TfToken _names[12];
-  HdDataSourceBaseHandle _values[12];
+    TfToken _names[12];
+    HdDataSourceBaseHandle _values[12];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (resolution) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->resolution;
-    _values[_count++] = resolution;
-  }
+    if (resolution) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->resolution;
+        _values[_count++] = resolution;
+    }
 
-  if (pixelAspectRatio) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->pixelAspectRatio;
-    _values[_count++] = pixelAspectRatio;
-  }
+    if (pixelAspectRatio) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->pixelAspectRatio;
+        _values[_count++] = pixelAspectRatio;
+    }
 
-  if (aspectRatioConformPolicy) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->aspectRatioConformPolicy;
-    _values[_count++] = aspectRatioConformPolicy;
-  }
+    if (aspectRatioConformPolicy) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->aspectRatioConformPolicy;
+        _values[_count++] = aspectRatioConformPolicy;
+    }
 
-  if (dataWindowNDC) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->dataWindowNDC;
-    _values[_count++] = dataWindowNDC;
-  }
+    if (dataWindowNDC) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->dataWindowNDC;
+        _values[_count++] = dataWindowNDC;
+    }
 
-  if (disableMotionBlur) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->disableMotionBlur;
-    _values[_count++] = disableMotionBlur;
-  }
+    if (disableMotionBlur) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->disableMotionBlur;
+        _values[_count++] = disableMotionBlur;
+    }
 
-  if (disableDepthOfField) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->disableDepthOfField;
-    _values[_count++] = disableDepthOfField;
-  }
+    if (disableDepthOfField) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->disableDepthOfField;
+        _values[_count++] = disableDepthOfField;
+    }
 
-  if (camera) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->camera;
-    _values[_count++] = camera;
-  }
+    if (camera) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->camera;
+        _values[_count++] = camera;
+    }
 
-  if (includedPurposes) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->includedPurposes;
-    _values[_count++] = includedPurposes;
-  }
+    if (includedPurposes) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->includedPurposes;
+        _values[_count++] = includedPurposes;
+    }
 
-  if (materialBindingPurposes) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->materialBindingPurposes;
-    _values[_count++] = materialBindingPurposes;
-  }
+    if (materialBindingPurposes) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->materialBindingPurposes;
+        _values[_count++] = materialBindingPurposes;
+    }
 
-  if (renderingColorSpace) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->renderingColorSpace;
-    _values[_count++] = renderingColorSpace;
-  }
+    if (renderingColorSpace) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->renderingColorSpace;
+        _values[_count++] = renderingColorSpace;
+    }
 
-  if (products) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->products;
-    _values[_count++] = products;
-  }
+    if (products) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->products;
+        _values[_count++] = products;
+    }
 
-  if (namespacedSettings) {
-    _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->namespacedSettings;
-    _values[_count++] = namespacedSettings;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (namespacedSettings) {
+        _names[_count] = UsdImagingUsdRenderSettingsSchemaTokens->namespacedSettings;
+        _values[_count++] = namespacedSettings;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetResolution(const HdVec2iDataSourceHandle &resolution)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetResolution(
+    const HdVec2iDataSourceHandle &resolution)
 {
-  _resolution = resolution;
-  return *this;
+    _resolution = resolution;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetPixelAspectRatio(const HdFloatDataSourceHandle &pixelAspectRatio)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetPixelAspectRatio(
+    const HdFloatDataSourceHandle &pixelAspectRatio)
 {
-  _pixelAspectRatio = pixelAspectRatio;
-  return *this;
+    _pixelAspectRatio = pixelAspectRatio;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetAspectRatioConformPolicy(const HdTokenDataSourceHandle &aspectRatioConformPolicy)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetAspectRatioConformPolicy(
+    const HdTokenDataSourceHandle &aspectRatioConformPolicy)
 {
-  _aspectRatioConformPolicy = aspectRatioConformPolicy;
-  return *this;
+    _aspectRatioConformPolicy = aspectRatioConformPolicy;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetDataWindowNDC(const HdVec4fDataSourceHandle &dataWindowNDC)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetDataWindowNDC(
+    const HdVec4fDataSourceHandle &dataWindowNDC)
 {
-  _dataWindowNDC = dataWindowNDC;
-  return *this;
+    _dataWindowNDC = dataWindowNDC;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetDisableMotionBlur(const HdBoolDataSourceHandle &disableMotionBlur)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetDisableMotionBlur(
+    const HdBoolDataSourceHandle &disableMotionBlur)
 {
-  _disableMotionBlur = disableMotionBlur;
-  return *this;
+    _disableMotionBlur = disableMotionBlur;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetDisableDepthOfField(const HdBoolDataSourceHandle &disableDepthOfField)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetDisableDepthOfField(
+    const HdBoolDataSourceHandle &disableDepthOfField)
 {
-  _disableDepthOfField = disableDepthOfField;
-  return *this;
+    _disableDepthOfField = disableDepthOfField;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::SetCamera(
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetCamera(
     const HdPathDataSourceHandle &camera)
 {
-  _camera = camera;
-  return *this;
+    _camera = camera;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetIncludedPurposes(const HdTokenArrayDataSourceHandle &includedPurposes)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetIncludedPurposes(
+    const HdTokenArrayDataSourceHandle &includedPurposes)
 {
-  _includedPurposes = includedPurposes;
-  return *this;
+    _includedPurposes = includedPurposes;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetMaterialBindingPurposes(const HdTokenArrayDataSourceHandle &materialBindingPurposes)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetMaterialBindingPurposes(
+    const HdTokenArrayDataSourceHandle &materialBindingPurposes)
 {
-  _materialBindingPurposes = materialBindingPurposes;
-  return *this;
+    _materialBindingPurposes = materialBindingPurposes;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetRenderingColorSpace(const HdTokenDataSourceHandle &renderingColorSpace)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetRenderingColorSpace(
+    const HdTokenDataSourceHandle &renderingColorSpace)
 {
-  _renderingColorSpace = renderingColorSpace;
-  return *this;
+    _renderingColorSpace = renderingColorSpace;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetProducts(const HdPathArrayDataSourceHandle &products)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetProducts(
+    const HdPathArrayDataSourceHandle &products)
 {
-  _products = products;
-  return *this;
+    _products = products;
+    return *this;
 }
 
-UsdImagingUsdRenderSettingsSchema::Builder &UsdImagingUsdRenderSettingsSchema::Builder::
-    SetNamespacedSettings(const HdContainerDataSourceHandle &namespacedSettings)
+UsdImagingUsdRenderSettingsSchema::Builder &
+UsdImagingUsdRenderSettingsSchema::Builder::SetNamespacedSettings(
+    const HdContainerDataSourceHandle &namespacedSettings)
 {
-  _namespacedSettings = namespacedSettings;
-  return *this;
+    _namespacedSettings = namespacedSettings;
+    return *this;
 }
 
-HdContainerDataSourceHandle UsdImagingUsdRenderSettingsSchema::Builder::Build()
+HdContainerDataSourceHandle
+UsdImagingUsdRenderSettingsSchema::Builder::Build()
 {
-  return UsdImagingUsdRenderSettingsSchema::BuildRetained(_resolution,
-                                                          _pixelAspectRatio,
-                                                          _aspectRatioConformPolicy,
-                                                          _dataWindowNDC,
-                                                          _disableMotionBlur,
-                                                          _disableDepthOfField,
-                                                          _camera,
-                                                          _includedPurposes,
-                                                          _materialBindingPurposes,
-                                                          _renderingColorSpace,
-                                                          _products,
-                                                          _namespacedSettings);
-}
-
-/*static*/
-UsdImagingUsdRenderSettingsSchema UsdImagingUsdRenderSettingsSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return UsdImagingUsdRenderSettingsSchema(
-      fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                UsdImagingUsdRenderSettingsSchemaTokens->__usdRenderSettings)) :
-                            nullptr);
+    return UsdImagingUsdRenderSettingsSchema::BuildRetained(
+        _resolution,
+        _pixelAspectRatio,
+        _aspectRatioConformPolicy,
+        _dataWindowNDC,
+        _disableMotionBlur,
+        _disableDepthOfField,
+        _camera,
+        _includedPurposes,
+        _materialBindingPurposes,
+        _renderingColorSpace,
+        _products,
+        _namespacedSettings
+    );
 }
 
 /*static*/
-const TfToken &UsdImagingUsdRenderSettingsSchema::GetSchemaToken()
+UsdImagingUsdRenderSettingsSchema
+UsdImagingUsdRenderSettingsSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return UsdImagingUsdRenderSettingsSchemaTokens->__usdRenderSettings;
+    return UsdImagingUsdRenderSettingsSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                UsdImagingUsdRenderSettingsSchemaTokens->__usdRenderSettings))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetDefaultLocator()
+const TfToken &
+UsdImagingUsdRenderSettingsSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return UsdImagingUsdRenderSettingsSchemaTokens->__usdRenderSettings;
+}
+
+/*static*/
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetResolutionLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetResolutionLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->resolution);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->resolution);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetPixelAspectRatioLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetPixelAspectRatioLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->pixelAspectRatio);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->pixelAspectRatio);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetAspectRatioConformPolicyLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetAspectRatioConformPolicyLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->aspectRatioConformPolicy);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->aspectRatioConformPolicy);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetDataWindowNDCLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetDataWindowNDCLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->dataWindowNDC);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->dataWindowNDC);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetDisableMotionBlurLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetDisableMotionBlurLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->disableMotionBlur);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->disableMotionBlur);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetDisableDepthOfFieldLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetDisableDepthOfFieldLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->disableDepthOfField);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->disableDepthOfField);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetCameraLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetCameraLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->camera);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->camera);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetIncludedPurposesLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetIncludedPurposesLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->includedPurposes);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->includedPurposes);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetMaterialBindingPurposesLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetMaterialBindingPurposesLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->materialBindingPurposes);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->materialBindingPurposes);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetRenderingColorSpaceLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetRenderingColorSpaceLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->renderingColorSpace);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->renderingColorSpace);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetProductsLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetProductsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->products);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->products);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &UsdImagingUsdRenderSettingsSchema::GetNamespacedSettingsLocator()
+const HdDataSourceLocator &
+UsdImagingUsdRenderSettingsSchema::GetNamespacedSettingsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      UsdImagingUsdRenderSettingsSchemaTokens->namespacedSettings);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            UsdImagingUsdRenderSettingsSchemaTokens->namespacedSettings);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

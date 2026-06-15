@@ -7,17 +7,18 @@
 #ifndef PXR_IMAGING_HGI_BLIT_CMDS_OPS_H
 #define PXR_IMAGING_HGI_BLIT_CMDS_OPS_H
 
+#include "pxr/pxrns.h"
 #include "Gf/vec3i.h"
 #include "Hgi/api.h"
 #include "Hgi/buffer.h"
 #include "Hgi/enums.h"
 #include "Hgi/texture.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
 
 #include <stddef.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 //// \struct HgiTextureGpuToCpuOp
 ///
@@ -46,23 +47,23 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   Size of the destination buffer (in bytes)</li>
 /// </ul>
 ///
-struct HgiTextureGpuToCpuOp {
-  HgiTextureGpuToCpuOp()
-      : gpuSourceTexture(),
-        sourceTexelOffset(GfVec3i(0)),
-        mipLevel(0),
-        cpuDestinationBuffer(nullptr),
-        destinationByteOffset(0),
-        destinationBufferByteSize(0)
-  {
-  }
+struct HgiTextureGpuToCpuOp
+{
+    HgiTextureGpuToCpuOp()
+    : gpuSourceTexture()
+    , sourceTexelOffset(GfVec3i(0))
+    , mipLevel(0)
+    , cpuDestinationBuffer(nullptr)
+    , destinationByteOffset(0)
+    , destinationBufferByteSize(0)
+    {}
 
-  HgiTextureHandle gpuSourceTexture;
-  GfVec3i sourceTexelOffset;
-  uint32_t mipLevel;
-  void *cpuDestinationBuffer;
-  size_t destinationByteOffset;
-  size_t destinationBufferByteSize;
+    HgiTextureHandle gpuSourceTexture;
+    GfVec3i sourceTexelOffset;
+    uint32_t mipLevel;
+    void* cpuDestinationBuffer;
+    size_t destinationByteOffset;
+    size_t destinationBufferByteSize;
 };
 
 //// \struct HgiTextureCpuToGpuOp
@@ -89,21 +90,21 @@ struct HgiTextureGpuToCpuOp {
 ///   The GPU texture to upload the data into.</li>
 /// </ul>
 ///
-struct HgiTextureCpuToGpuOp {
-  HgiTextureCpuToGpuOp()
-      : cpuSourceBuffer(nullptr),
-        bufferByteSize(0),
-        destinationTexelOffset(GfVec3i(0)),
-        mipLevel(0),
-        gpuDestinationTexture()
-  {
-  }
+struct HgiTextureCpuToGpuOp
+{
+    HgiTextureCpuToGpuOp()
+    : cpuSourceBuffer(nullptr)
+    , bufferByteSize(0)
+    , destinationTexelOffset(GfVec3i(0))
+    , mipLevel(0)
+    , gpuDestinationTexture()
+    {}
 
-  void const *cpuSourceBuffer;
-  size_t bufferByteSize;
-  GfVec3i destinationTexelOffset;
-  uint32_t mipLevel;
-  HgiTextureHandle gpuDestinationTexture;
+    void const* cpuSourceBuffer;
+    size_t bufferByteSize;
+    GfVec3i destinationTexelOffset;
+    uint32_t mipLevel;
+    HgiTextureHandle gpuDestinationTexture;
 };
 
 //// \struct HgiBufferGpuToGpuOp
@@ -129,22 +130,23 @@ struct HgiTextureCpuToGpuOp {
 ///   The byte offset in destination buffer where to start copying the data to.</li>
 /// </ul>
 ///
-struct HgiBufferGpuToGpuOp {
-  HgiBufferGpuToGpuOp()
-      : gpuSourceBuffer(),
-        sourceByteOffset(0),
-        byteSize(0),
-        gpuDestinationBuffer(),
-        destinationByteOffset(0)
-  {
-  }
+struct HgiBufferGpuToGpuOp
+{
+    HgiBufferGpuToGpuOp()
+    : gpuSourceBuffer()
+    , sourceByteOffset(0)
+    , byteSize(0)
+    , gpuDestinationBuffer()
+    , destinationByteOffset(0)
+    {}
 
-  HgiBufferHandle gpuSourceBuffer;
-  size_t sourceByteOffset;
-  size_t byteSize;
-  HgiBufferHandle gpuDestinationBuffer;
-  size_t destinationByteOffset;
+    HgiBufferHandle gpuSourceBuffer;
+    size_t sourceByteOffset;
+    size_t byteSize;
+    HgiBufferHandle gpuDestinationBuffer;
+    size_t destinationByteOffset;
 };
+
 
 //// \struct HgiBufferCpuToGpuOp
 ///
@@ -168,21 +170,21 @@ struct HgiBufferGpuToGpuOp {
 ///   The size in bytes to copy.</li>
 /// </ul>
 ///
-struct HgiBufferCpuToGpuOp {
-  HgiBufferCpuToGpuOp()
-      : cpuSourceBuffer(nullptr),
-        sourceByteOffset(0),
-        gpuDestinationBuffer(),
-        destinationByteOffset(0),
-        byteSize(0)
-  {
-  }
+struct HgiBufferCpuToGpuOp
+{
+    HgiBufferCpuToGpuOp()
+    : cpuSourceBuffer(nullptr)
+    , sourceByteOffset(0)
+    , gpuDestinationBuffer()
+    , destinationByteOffset(0)
+    , byteSize(0)
+    {}
 
-  void const *cpuSourceBuffer;
-  size_t sourceByteOffset;
-  HgiBufferHandle gpuDestinationBuffer;
-  size_t destinationByteOffset;
-  size_t byteSize;
+    void const* cpuSourceBuffer;
+    size_t sourceByteOffset;
+    HgiBufferHandle gpuDestinationBuffer;
+    size_t destinationByteOffset;
+    size_t byteSize;
 };
 
 //// \struct HgiBufferGpuToCpuOp
@@ -208,21 +210,21 @@ struct HgiBufferCpuToGpuOp {
 ///   The byte offset in destination buffer where to start copying the data to.</li>
 /// </ul>
 ///
-struct HgiBufferGpuToCpuOp {
-  HgiBufferGpuToCpuOp()
-      : gpuSourceBuffer(),
-        sourceByteOffset(0),
-        byteSize(0),
-        cpuDestinationBuffer(),
-        destinationByteOffset(0)
-  {
-  }
+struct HgiBufferGpuToCpuOp
+{
+    HgiBufferGpuToCpuOp()
+    : gpuSourceBuffer()
+    , sourceByteOffset(0)
+    , byteSize(0)
+    , cpuDestinationBuffer()
+    , destinationByteOffset(0)
+    {}
 
-  HgiBufferHandle gpuSourceBuffer;
-  size_t sourceByteOffset;
-  size_t byteSize;
-  void *cpuDestinationBuffer;
-  size_t destinationByteOffset;
+    HgiBufferHandle gpuSourceBuffer;
+    size_t sourceByteOffset;
+    size_t byteSize;
+    void* cpuDestinationBuffer;
+    size_t destinationByteOffset;
 };
 
 //// \struct HgiTextureToBufferOp
@@ -248,23 +250,23 @@ struct HgiBufferGpuToCpuOp {
 ///   Size of the data (in bytes) to copy</li>
 /// </ul>
 ///
-struct HgiTextureToBufferOp {
-  HgiTextureToBufferOp()
-      : gpuSourceTexture(),
-        sourceTexelOffset(GfVec3i(0)),
-        mipLevel(0),
-        gpuDestinationBuffer(),
-        destinationByteOffset(0),
-        byteSize(0)
-  {
-  }
+struct HgiTextureToBufferOp
+{
+    HgiTextureToBufferOp()
+    : gpuSourceTexture()
+    , sourceTexelOffset(GfVec3i(0))
+    , mipLevel(0)
+    , gpuDestinationBuffer()
+    , destinationByteOffset(0)
+    , byteSize(0)
+    {}
 
-  HgiTextureHandle gpuSourceTexture;
-  GfVec3i sourceTexelOffset;
-  uint32_t mipLevel;
-  HgiBufferHandle gpuDestinationBuffer;
-  size_t destinationByteOffset;
-  size_t byteSize;
+    HgiTextureHandle gpuSourceTexture;
+    GfVec3i sourceTexelOffset;
+    uint32_t mipLevel;
+    HgiBufferHandle gpuDestinationBuffer;
+    size_t destinationByteOffset;
+    size_t byteSize;
 };
 
 //// \struct HgiBufferToTextureOp
@@ -292,23 +294,24 @@ struct HgiTextureToBufferOp {
 ///   Size of the data (in bytes) to copy</li>
 /// </ul>
 ///
-struct HgiBufferToTextureOp {
-  HgiBufferToTextureOp()
-      : gpuSourceBuffer(),
-        sourceByteOffset(0),
-        gpuDestinationTexture(),
-        destinationTexelOffset(GfVec3i(0)),
-        mipLevel(0),
-        byteSize(0)
-  {
-  }
+struct HgiBufferToTextureOp
+{
+    HgiBufferToTextureOp()
+    : gpuSourceBuffer()
+    , sourceByteOffset(0)
+    , gpuDestinationTexture()
+    , destinationTexelOffset(GfVec3i(0))
+    , mipLevel(0)
+    , byteSize(0)
+    {}
 
-  HgiBufferHandle gpuSourceBuffer;
-  size_t sourceByteOffset;
-  HgiTextureHandle gpuDestinationTexture;
-  GfVec3i destinationTexelOffset;
-  uint32_t mipLevel;
-  size_t byteSize;
+    HgiBufferHandle gpuSourceBuffer;
+    size_t sourceByteOffset;
+    HgiTextureHandle gpuDestinationTexture;
+    GfVec3i destinationTexelOffset;
+    uint32_t mipLevel;
+    size_t byteSize;
+    
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

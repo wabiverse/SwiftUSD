@@ -17,62 +17,74 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Base class for all prim adapters which only want to indicate that an
 /// ancestor prim is responsible for them.
-///
+/// 
 /// Because Hydra 1.0 prim adapter methods are still present, their pure
 /// virtuals must be implemented here (even if they will won't be called).
-///
-class UsdImagingRepresentedByAncestorPrimAdapter : public UsdImagingPrimAdapter {
- public:
-  using BaseAdapter = UsdImagingPrimAdapter;
+/// 
+class UsdImagingRepresentedByAncestorPrimAdapter : public UsdImagingPrimAdapter
+{
+public:
 
-  UsdImagingRepresentedByAncestorPrimAdapter() : UsdImagingPrimAdapter() {}
+    using BaseAdapter = UsdImagingPrimAdapter;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Scene Index Support
-  // ---------------------------------------------------------------------- //
+    UsdImagingRepresentedByAncestorPrimAdapter()
+    : UsdImagingPrimAdapter()
+    {}
 
-  TfTokenVector GetImagingSubprims(UsdPrim const &prim) override;
-  PopulationMode GetPopulationMode() override;
+    // ---------------------------------------------------------------------- //
+    /// \name Scene Index Support
+    // ---------------------------------------------------------------------- //
 
-  // ---------------------------------------------------------------------- //
-  /// \name Overrides for Pure Virtual Legacy Methods
-  // ---------------------------------------------------------------------- //
+    TfTokenVector GetImagingSubprims(UsdPrim const& prim) override;
+    PopulationMode GetPopulationMode() override;
 
-  SdfPath Populate(UsdPrim const &prim,
-                   UsdImagingIndexProxy *index,
-                   UsdImagingInstancerContext const *instancerContext = nullptr) override;
+    // ---------------------------------------------------------------------- //
+    /// \name Overrides for Pure Virtual Legacy Methods
+    // ---------------------------------------------------------------------- //
 
-  void TrackVariability(
-      UsdPrim const &prim,
-      SdfPath const &cachePath,
-      HdDirtyBits *timeVaryingBits,
-      UsdImagingInstancerContext const *instancerContext = nullptr) const override
-  {
-  }
+    SdfPath Populate(
+        UsdPrim const& prim,
+        UsdImagingIndexProxy* index,
+        UsdImagingInstancerContext const*
+            instancerContext = nullptr) override;
 
-  void UpdateForTime(UsdPrim const &prim,
-                     SdfPath const &cachePath,
-                     UsdTimeCode time,
-                     HdDirtyBits requestedBits,
-                     UsdImagingInstancerContext const *instancerContext = nullptr) const override
-  {
-  }
+    void TrackVariability(
+        UsdPrim const& prim,
+        SdfPath const& cachePath,
+        HdDirtyBits* timeVaryingBits,
+        UsdImagingInstancerContext const* instancerContext = nullptr)
+            const override
+    {}
 
-  HdDirtyBits ProcessPropertyChange(UsdPrim const &prim,
-                                    SdfPath const &cachePath,
-                                    TfToken const &propertyName) override;
+    void UpdateForTime(
+        UsdPrim const& prim,
+        SdfPath const& cachePath, 
+        UsdTimeCode time,
+        HdDirtyBits requestedBits,
+        UsdImagingInstancerContext const* instancerContext = nullptr)
+            const override
+    {}
 
-  void MarkDirty(UsdPrim const &prim,
-                 SdfPath const &cachePath,
-                 HdDirtyBits dirty,
-                 UsdImagingIndexProxy *index) override
-  {
-  }
+    HdDirtyBits ProcessPropertyChange(
+        UsdPrim const& prim,
+        SdfPath const& cachePath,
+        TfToken const& propertyName) override;
 
- protected:
-  void _RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index) override {}
+    void MarkDirty(
+        UsdPrim const& prim,
+        SdfPath const& cachePath,
+        HdDirtyBits dirty,
+        UsdImagingIndexProxy* index) override
+    {}
+
+protected:
+    void _RemovePrim(
+        SdfPath const& cachePath,
+        UsdImagingIndexProxy* index) override
+    {}
+
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_REPRESENTED_BY_ANCESTOR_PRIM_ADAPTER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_REPRESENTED_BY_ANCESTOR_PRIM_ADAPTER_H

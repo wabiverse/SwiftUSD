@@ -14,9 +14,9 @@
 /// This file needs to be public but shouldn't be included directly by
 /// anything outside of \c lib/tf.
 
+#include "pxr/pxrns.h"
 #include "Arch/api.h"
 #include "Arch/functionLite.h"
-#include "pxr/pxrns.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -34,4 +34,4 @@ std::string ArchGetPrettierFunctionName(const std::string &function,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_FUNCTION_H
+#endif // PXR_BASE_ARCH_FUNCTION_H 

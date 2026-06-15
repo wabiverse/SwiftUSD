@@ -23,66 +23,74 @@ TF_DECLARE_REF_PTRS(HdRetainedSceneIndex);
 ///
 /// Concrete scene container which can be externally populated and dirtied.
 ///
-class HdRetainedSceneIndex : public HdSceneIndexBase {
- public:
-  /// Creates a new retained scene index.
-  HD_API
-  static HdRetainedSceneIndexRefPtr New()
-  {
-    return TfCreateRefPtr(new HdRetainedSceneIndex);
-  }
+class HdRetainedSceneIndex : public HdSceneIndexBase
+{
+public:
 
-  // ------------------------------------------------------------------------
+    /// Creates a new retained scene index.
+    HD_API
+    static HdRetainedSceneIndexRefPtr New() {
+        return TfCreateRefPtr(new HdRetainedSceneIndex);
+    }
 
-  struct AddedPrimEntry {
-    SdfPath primPath;
-    TfToken primType;
-    HdContainerDataSourceHandle dataSource;
-  };
+    // ------------------------------------------------------------------------
 
-  using AddedPrimEntries = std::vector<AddedPrimEntry>;
+    struct AddedPrimEntry
+    {
+        SdfPath primPath;
+        TfToken primType;
+        HdContainerDataSourceHandle dataSource;
+    };
 
-  /// Add a prim to the retained scene index. Each added entry has a path,
-  /// type, and datasource; the retained scene index assumes ownership of
-  /// these and uses them to answer scene queries. This will also generate
-  /// a PrimsAdded notification, if applicable.
-  HD_API
-  virtual void AddPrims(const AddedPrimEntries &entries);
+    using AddedPrimEntries = std::vector<AddedPrimEntry>;
 
-  /// Removes a prim subtree from the retained scene index. This will also
-  /// generate a PrimsRemoved notification, if applicable.
-  HD_API
-  virtual void RemovePrims(const HdSceneIndexObserver::RemovedPrimEntries &entries);
+    /// Add a prim to the retained scene index. Each added entry has a path,
+    /// type, and datasource; the retained scene index assumes ownership of
+    /// these and uses them to answer scene queries. This will also generate
+    /// a PrimsAdded notification, if applicable.
+    HD_API
+    virtual void AddPrims(const AddedPrimEntries &entries);
 
-  /// Invalidates prim data in the retained scene index. This scene index
-  /// doesn't have any internal invalidation mechanisms, but it generates
-  /// a PrimsDirtied notification, if applicable. Subclasses can use it for
-  /// invalidation of caches or retained data.
-  HD_API
-  virtual void DirtyPrims(const HdSceneIndexObserver::DirtiedPrimEntries &entries);
+    /// Removes a prim subtree from the retained scene index. This will also
+    /// generate a PrimsRemoved notification, if applicable.
+    HD_API
+    virtual void RemovePrims(
+        const HdSceneIndexObserver::RemovedPrimEntries &entries);
 
-  // ------------------------------------------------------------------------
-  // HdSceneIndexBase implementations.
+    /// Invalidates prim data in the retained scene index. This scene index
+    /// doesn't have any internal invalidation mechanisms, but it generates
+    /// a PrimsDirtied notification, if applicable. Subclasses can use it for
+    /// invalidation of caches or retained data.
+    HD_API
+    virtual void DirtyPrims(
+            const HdSceneIndexObserver::DirtiedPrimEntries &entries);
 
-  HD_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    // ------------------------------------------------------------------------
+    // HdSceneIndexBase implementations.
 
-  HD_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    HD_API
+    HdSceneIndexPrim GetPrim(const SdfPath & primPath) const override;
 
- protected:
-  HD_API
-  HdRetainedSceneIndex();
+    HD_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
- private:
-  struct _PrimEntry {
-    HdSceneIndexPrim prim;
-  };
+protected:
 
-  using _PrimEntryTable = SdfPathTable<_PrimEntry>;
-  _PrimEntryTable _entries;
+    HD_API
+    HdRetainedSceneIndex();
+
+private:
+
+    struct _PrimEntry
+    {
+        HdSceneIndexPrim prim;
+    };
+
+    using _PrimEntryTable = SdfPathTable<_PrimEntry>;
+    _PrimEntryTable _entries;
+
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_RETAINED_SCENE_INDEX_H
+#endif // PXR_IMAGING_HD_RETAINED_SCENE_INDEX_H

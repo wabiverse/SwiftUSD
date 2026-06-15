@@ -5,20 +5,22 @@
 // https://openusd.org/license.
 //
 
-#include "Sdf/pool.h"
-#include "Arch/virtualMemory.h"
 #include "pxr/pxrns.h"
+#include "Arch/virtualMemory.h"
+#include "Sdf/pool.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-char *Sdf_PoolReserveRegion(size_t numBytes)
+char *
+Sdf_PoolReserveRegion(size_t numBytes)
 {
-  return static_cast<char *>(ArchReserveVirtualMemory(numBytes));
+    return static_cast<char *>(ArchReserveVirtualMemory(numBytes));
 }
 
-bool Sdf_PoolCommitRange(char *start, char *end)
+bool
+Sdf_PoolCommitRange(char *start, char *end)
 {
-  return ArchCommitVirtualMemoryRange(start, end - start);
+    return ArchCommitVirtualMemoryRange(start, end-start);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

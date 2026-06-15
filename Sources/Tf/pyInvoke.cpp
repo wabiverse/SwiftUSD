@@ -14,79 +14,84 @@
 #include "Tf/pyInterpreter.h"
 #include "Tf/stringUtils.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <vector>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Convert nullptr to None.
-boost::python::object Tf_ArgToPy(const std::nullptr_t &value)
+pxr_boost::python::object Tf_ArgToPy(const std::nullptr_t &value)
 {
-  return boost::python::object();
+    return pxr_boost::python::object();
 }
 
-void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut)
+void Tf_BuildPyInvokeKwArgs(
+    pxr_boost::python::dict *kwArgsOut)
 {
-  // Variadic template recursion base case: all args already processed, do
-  // nothing.
+    // Variadic template recursion base case: all args already processed, do
+    // nothing.
 }
 
-void Tf_BuildPyInvokeArgs(boost::python::list *posArgsOut, boost::python::dict *kwArgsOut)
+void Tf_BuildPyInvokeArgs(
+    pxr_boost::python::list *posArgsOut,
+    pxr_boost::python::dict *kwArgsOut)
 {
-  // Variadic template recursion base case: all args already processed, do
-  // nothing.
+    // Variadic template recursion base case: all args already processed, do
+    // nothing.
 }
 
-bool Tf_PyInvokeImpl(const std::string &moduleName,
-                     const std::string &callableExpr,
-                     const boost::python::list &posArgs,
-                     const boost::python::dict &kwArgs,
-                     boost::python::object *resultObjOut)
+bool Tf_PyInvokeImpl(
+    const std::string &moduleName,
+    const std::string &callableExpr,
+    const pxr_boost::python::list &posArgs,
+    const pxr_boost::python::dict &kwArgs,
+    pxr_boost::python::object *resultObjOut)
 {
-  static const char *const listVarName = "_Tf_invokeList_";
-  static const char *const dictVarName = "_Tf_invokeDict_";
-  static const char *const resultVarName = "_Tf_invokeResult_";
+    static const char* const listVarName = "_Tf_invokeList_";
+    static const char* const dictVarName = "_Tf_invokeDict_";
+    static const char* const resultVarName = "_Tf_invokeResult_";
 
-  // Build globals dict, containing builtins and args.
-  // No need for TfScriptModuleLoader; our python code performs import.
-  boost::python::dict globals;
-  boost::python::handle<> modHandle(PyImport_ImportModule("builtins"));
-  globals["__builtins__"] = boost::python::object(modHandle);
-  globals[listVarName] = posArgs;
-  globals[dictVarName] = kwArgs;
+    // Build globals dict, containing builtins and args.
+    // No need for TfScriptModuleLoader; our python code performs import.
+    pxr_boost::python::dict globals;
+    pxr_boost::python::handle<> modHandle(
+        PyImport_ImportModule("builtins"));
+    globals["__builtins__"] = pxr_boost::python::object(modHandle);
+    globals[listVarName] = posArgs;
+    globals[dictVarName] = kwArgs;
 
-  // Build python code for interpreter.
-  // Import, look up callable, perform call, store result.
-  const std::string pyStr = TfStringPrintf(
-      "import %s\n"
-      "%s = %s.%s(*%s, **%s)\n",
-      moduleName.c_str(),
-      resultVarName,
-      moduleName.c_str(),
-      callableExpr.c_str(),
-      listVarName,
-      dictVarName);
+    // Build python code for interpreter.
+    // Import, look up callable, perform call, store result.
+    const std::string pyStr = TfStringPrintf(
+        "import %s\n"
+        "%s = %s.%s(*%s, **%s)\n",
+        moduleName.c_str(),
+        resultVarName,
+        moduleName.c_str(),
+        callableExpr.c_str(),
+        listVarName,
+        dictVarName);
 
-  TfErrorMark errorMark;
+    TfErrorMark errorMark;
 
-  // Execute code.
-  TfPyRunString(pyStr, Py_file_input, globals);
+    // Execute code.
+    TfPyRunString(pyStr, Py_file_input, globals);
 
-  // Bail if python code raised any TfErrors.
-  if (!errorMark.IsClean())
-    return false;
+    // Bail if python code raised any TfErrors.
+    if (!errorMark.IsClean())
+        return false;
 
-  // Look up result.  If we got this far, it should be there.
-  if (!TF_VERIFY(globals.has_key(resultVarName)))
-    return false;
-  *resultObjOut = globals.get(resultVarName);
+    // Look up result.  If we got this far, it should be there.
+    if (!TF_VERIFY(globals.has_key(resultVarName)))
+        return false;
+    *resultObjOut = globals.get(resultVarName);
 
-  return true;
+    return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED

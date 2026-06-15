@@ -8,6 +8,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 HdStComputation::~HdStComputation() = default;
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
+

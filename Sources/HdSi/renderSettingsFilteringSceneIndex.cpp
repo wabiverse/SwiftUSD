@@ -7,24 +7,42 @@
 #include "HdSi/renderSettingsFilteringSceneIndex.h"
 
 #include "Hd/cameraSchema.h"
+#include "Hd/dataSource.h"
+#include "Hd/dataSourceLocator.h"
+#include "Hd/dataSourceTypeDefs.h"
 #include "Hd/dependenciesSchema.h"
+#include "Hd/dependencySchema.h"
 #include "Hd/overlayContainerDataSource.h"
 #include "Hd/renderProductSchema.h"
 #include "Hd/renderSettingsSchema.h"
 #include "Hd/retainedDataSource.h"
 #include "Hd/sceneGlobalsSchema.h"
+#include "Hd/schemaTypeDefs.h"
 #include "Hd/tokens.h"
 #include "Hd/utils.h"
+
+#include "Sdf/path.h"
+
+#include "Vt/array.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <string>
+#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdsiRenderSettingsFilteringSceneIndexTokens,
-                        HDSI_RENDER_SETTINGS_FILTERING_SCENE_INDEX_TOKENS);
+    HDSI_RENDER_SETTINGS_FILTERING_SCENE_INDEX_TOKENS);
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens,
-                         (active_depOn_sceneGlobals_arsp)(active_depOn_sceneGlobals_frame));
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
+    (active_depOn_sceneGlobals_arsp)
+    (active_depOn_sceneGlobals_frame)
+);
 
-namespace {
+namespace
+{
 
 static const SdfPath s_renderScope("/Render");
 static const SdfPath s_fallbackPath(
@@ -33,531 +51,674 @@ static const SdfPath s_fallbackPath(
 // Builds and returns a data source to invalidate the renderSettings.active
 // locator when the sceneGlobals.activeRenderSettingsPrim locator is dirtied.
 //
-HdContainerDataSourceHandle _BuildDependencyForActiveLocator()
+HdContainerDataSourceHandle
+_BuildDependencyForActiveLocator()
 {
-  static const HdRetainedContainerDataSourceHandle renderSettingsDepDS =
-      HdRetainedContainerDataSource::New(
-          _tokens->active_depOn_sceneGlobals_arsp,
-          HdDependencySchema::Builder()
-              .SetDependedOnPrimPath(HdRetainedTypedSampledDataSource<SdfPath>::New(
-                  HdSceneGlobalsSchema::GetDefaultPrimPath()))
-              .SetDependedOnDataSourceLocator(
-                  HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-                      HdSceneGlobalsSchema::GetActiveRenderSettingsPrimLocator()))
-              .SetAffectedDataSourceLocator(
-                  HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-                      HdRenderSettingsSchema::GetActiveLocator()))
-              .Build());
+    static const HdRetainedContainerDataSourceHandle renderSettingsDepDS =
+        HdRetainedContainerDataSource::New(
+            _tokens->active_depOn_sceneGlobals_arsp,
+            HdDependencySchema::Builder()
+            .SetDependedOnPrimPath(
+                HdRetainedTypedSampledDataSource<SdfPath>::New(
+                    HdSceneGlobalsSchema::GetDefaultPrimPath()))
+            .SetDependedOnDataSourceLocator(
+                HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+                    HdSceneGlobalsSchema::GetActiveRenderSettingsPrimLocator()))
+            .SetAffectedDataSourceLocator(
+                HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+                    HdRenderSettingsSchema::GetActiveLocator()))
+            .Build()
+        );
 
-  return renderSettingsDepDS;
+    return renderSettingsDepDS;
 }
 
 // Builds and returns a data source to invalidate the renderSettings.frame
 // locator when the sceneGlobals.currentFrame locator is dirtied.
 //
-HdContainerDataSourceHandle _BuildDependencyForFrameLocator()
+HdContainerDataSourceHandle
+_BuildDependencyForFrameLocator()
 {
-  static const HdRetainedContainerDataSourceHandle rsFrameDepDS =
-      HdRetainedContainerDataSource::New(
-          _tokens->active_depOn_sceneGlobals_frame,
-          HdDependencySchema::Builder()
-              .SetDependedOnPrimPath(HdRetainedTypedSampledDataSource<SdfPath>::New(
-                  HdSceneGlobalsSchema::GetDefaultPrimPath()))
-              .SetDependedOnDataSourceLocator(
-                  HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-                      HdSceneGlobalsSchema::GetCurrentFrameLocator()))
-              .SetAffectedDataSourceLocator(
-                  HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-                      HdRenderSettingsSchema::GetFrameLocator()))
-              .Build());
-  return rsFrameDepDS;
+    static const HdRetainedContainerDataSourceHandle rsFrameDepDS =
+        HdRetainedContainerDataSource::New(
+            _tokens->active_depOn_sceneGlobals_frame,
+            HdDependencySchema::Builder()
+            .SetDependedOnPrimPath(
+                HdRetainedTypedSampledDataSource<SdfPath>::New(
+                    HdSceneGlobalsSchema::GetDefaultPrimPath()))
+            .SetDependedOnDataSourceLocator(
+                HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+                    HdSceneGlobalsSchema::GetCurrentFrameLocator()))
+            .SetAffectedDataSourceLocator(
+                HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+                    HdRenderSettingsSchema::GetFrameLocator()))
+            .Build()
+        );
+    return rsFrameDepDS;
+}
+
+bool
+_Contains(
+    const SdfPathVector &paths,
+    const SdfPath &path)
+{
+    return std::find(paths.begin(), paths.end(), path) != paths.end();
+}
+
+// Return unique camera paths used by products generated by the render settings
+// prim.
+SdfPathVector
+_GetTargetedCameras(const HdRenderProductVectorSchema& productsSchema)
+{
+    const size_t n = productsSchema.GetNumElements();
+    SdfPathVector cameraPaths;
+    for (size_t i = 0; i < n; ++i) {
+        HdRenderProductSchema productSchema = productsSchema.GetElement(i);
+        const HdPathDataSourceHandle camPathDs =  productSchema.GetCameraPrim();
+        if (camPathDs) {
+            const SdfPath camPath = camPathDs->GetTypedValue(0.0);
+            if (!camPath.IsEmpty() && !_Contains(cameraPaths, camPath)) {
+                cameraPaths.push_back(camPath);
+            }
+        }
+    }
+
+    return cameraPaths;
+}
+
+void
+_AppendCameraDependencies(
+    const SdfPathVector& camPaths,
+    std::vector<TfToken>& names,
+    std::vector<HdDataSourceBaseHandle>& sources)
+{
+    static const HdLocatorDataSourceHandle& shutterOpenLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdCameraSchema::GetShutterOpenLocator());
+    static const HdLocatorDataSourceHandle& shutterCloseLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdCameraSchema::GetShutterCloseLocator());
+    static const HdLocatorDataSourceHandle& unionedSamplingIntervalLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdRenderSettingsSchema::GetUnionedSamplingIntervalLocator());
+
+    static const std::string shutterOpenDepPrefix(
+        "renderSettings_unionedSamplingInterval_depOn_camera_shutterOpen_");
+    static const std::string shutterCloseDepPrefix(
+        "renderSettings_unionedSamplingInterval_depOn_camera_shutterClose_");
+
+    for (size_t i = 0; i < camPaths.size(); ++i) {
+        // shutterOpen
+        names.emplace_back(shutterOpenDepPrefix + std::to_string(i));
+        sources.push_back(
+            HdDependencySchema::Builder()
+            .SetDependedOnPrimPath(
+                HdRetainedTypedSampledDataSource<SdfPath>::New(
+                    camPaths[i]))
+            .SetDependedOnDataSourceLocator(shutterOpenLocatorDs)
+            .SetAffectedDataSourceLocator(unionedSamplingIntervalLocatorDs)
+            .Build());
+
+        // shutterClose
+        names.emplace_back(shutterCloseDepPrefix + std::to_string(i));
+        sources.push_back(
+            HdDependencySchema::Builder()
+            .SetDependedOnPrimPath(
+                HdRetainedTypedSampledDataSource<SdfPath>::New(camPaths[i]))
+            .SetDependedOnDataSourceLocator(shutterCloseLocatorDs)
+            .SetAffectedDataSourceLocator(unionedSamplingIntervalLocatorDs)
+            .Build());
+    }
 }
 
 // Builds and returns a data source to:
-// (a) invalidate the renderSettings.shutterInterval locator when a targeted
-//     camera's shutterOpen or shutterClose locator is dirtied.
-// (b) invalidate the renderSettings.shutterInterval locator when the
+// (a) invalidate the renderSettings.unionedSamplingInterval locator when a
+//     targeted camera's shutterOpen or shutterClose locator is dirtied. When
+//     there are no render products, use the camera targeted by the render
+//     settings prim itself.
+// (b) invalidate the renderSettings.unionedSamplingInterval locator when the
 //     renderProducts locator is dirtied. Due to flattening, we can't limit
-//     this to just the cameraPrim
-// (c) invalidate the prim's dependencies when the render products locator
-//     is dirtied.
+//     this to just the cameraPrim.
+// (c) invalidate the renderSettings.unionedSamplingInterval locator when the
+//     renderSettings.camera or .disableMotionBlur changes (only when there are
+//     no render products onto which these opinions would have been flattened).
+// (d) invalidate the prim's dependencies when the render products locator
+//     is dirtied and, when there are no render products, when
+//     renderSettings.camera is dirtied.
 //
-HdContainerDataSourceHandle _BuildDependenciesForShutterInterval(const SdfPathVector &cameraPaths)
+HdContainerDataSourceHandle
+_BuildDependenciesForSamplingInterval(
+    const HdRenderSettingsSchema& settingsSchema)
 {
-  const size_t numCameras = cameraPaths.size();
-  const size_t numDependencies = numCameras * 2 /* (a) */ + 2 /* (b),(c) */;
+    static const HdLocatorDataSourceHandle& unionedSamplingIntervalLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdRenderSettingsSchema::GetUnionedSamplingIntervalLocator());
+    static const HdLocatorDataSourceHandle& productsLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdRenderSettingsSchema::GetRenderProductsLocator());
+    static const HdLocatorDataSourceHandle& settingsCameraLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdRenderSettingsSchema::GetCameraLocator());
+    static const HdLocatorDataSourceHandle& settingsDisableMotionBlurLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+            HdRenderSettingsSchema::GetDisableMotionBlurLocator());
+    static const HdLocatorDataSourceHandle& dependenciesLocatorDs =
+        HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
+                HdDependenciesSchema::GetDefaultLocator());
 
-  TfTokenVector names;
-  names.reserve(numDependencies);
-  std::vector<HdDataSourceBaseHandle> values;
-  values.reserve(numDependencies);
+    static const HdPathDataSourceHandle& emptyPathDs =
+        HdRetainedTypedSampledDataSource<SdfPath>::New(SdfPath::EmptyPath());
 
-  static const HdDataSourceLocator shutterOpenLocator = HdCameraSchema::GetDefaultLocator().Append(
-      HdCameraSchemaTokens->shutterOpen);
-  static const HdDataSourceLocator shutterCloseLocator =
-      HdCameraSchema::GetDefaultLocator().Append(HdCameraSchemaTokens->shutterClose);
-  static const HdLocatorDataSourceHandle &shutterOpenLocatorDs =
-      HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(shutterOpenLocator);
-  static const HdLocatorDataSourceHandle &shutterCloseLocatorDs =
-      HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(shutterCloseLocator);
-  static const HdLocatorDataSourceHandle &shutterIntervalLocatorDs =
-      HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-          HdRenderSettingsSchema::GetShutterIntervalLocator());
-  static const HdLocatorDataSourceHandle &productsLocatorDs =
-      HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-          HdRenderSettingsSchema::GetRenderProductsLocator());
+    std::vector<TfToken> names;
+    std::vector<HdDataSourceBaseHandle> sources;
 
-  static const std::string shutterOpenDepPrefix("renderSettings_depOn_cameraShutterOpen_");
-  static const std::string shutterCloseDepPrefix("renderSettings_depOn_cameraShutterClose_");
-
-  // (a)
-  for (size_t ii = 0; ii < numCameras; ++ii) {
-    // shutterOpen
-    names.push_back(TfToken(shutterOpenDepPrefix + std::to_string(ii)));
-    values.push_back(
-        HdDependencySchema::Builder()
-            .SetDependedOnPrimPath(HdRetainedTypedSampledDataSource<SdfPath>::New(cameraPaths[ii]))
-            .SetDependedOnDataSourceLocator(shutterOpenLocatorDs)
-            .SetAffectedDataSourceLocator(shutterIntervalLocatorDs)
-            .Build());
-
+    // (a) - unioned shutter depends on contributing cameras' shutterOpen and
     // shutterClose
-    names.push_back(TfToken(shutterCloseDepPrefix + std::to_string(ii)));
-    values.push_back(
+    const HdRenderProductVectorSchema productsSchema =
+        settingsSchema.GetRenderProducts();
+    const size_t numProducts = productsSchema.GetNumElements();
+    if (numProducts > 0) {
+        _AppendCameraDependencies(
+            _GetTargetedCameras(productsSchema), names, sources);
+    } else if (const HdPathDataSourceHandle& camPathDs =
+        settingsSchema.GetCamera()) {
+        const SdfPath& camPath = camPathDs->GetTypedValue(0.f);
+        if (!camPath.IsEmpty()) {
+            _AppendCameraDependencies({ camPath }, names, sources);
+        }
+    }
+
+    // (b) - unioned shutter depends on contributing products (covers product
+    // addition and removal and camera and disableMotionBlur changes on the
+    // individual products)
+    names.emplace_back("renderSettings_unionedSamplingInterval_depOn_renderSettings_renderProducts");
+    sources.push_back(
         HdDependencySchema::Builder()
-            .SetDependedOnPrimPath(HdRetainedTypedSampledDataSource<SdfPath>::New(cameraPaths[ii]))
-            .SetDependedOnDataSourceLocator(shutterCloseLocatorDs)
-            .SetAffectedDataSourceLocator(shutterIntervalLocatorDs)
+            .SetDependedOnPrimPath(emptyPathDs)
+            .SetDependedOnDataSourceLocator(productsLocatorDs)
+            .SetAffectedDataSourceLocator(unionedSamplingIntervalLocatorDs)
             .Build());
-  }
 
-  // (b)
-  names.push_back(TfToken("shutterInterval_depOn_renderProducts"));
-  values.push_back(HdDependencySchema::Builder()
-                       .SetDependedOnPrimPath(
-                           HdRetainedTypedSampledDataSource<SdfPath>::New(SdfPath::EmptyPath()))
-                       .SetDependedOnDataSourceLocator(productsLocatorDs)
-                       .SetAffectedDataSourceLocator(shutterIntervalLocatorDs)
-                       .Build());
+    // (c) - unioned shutter depends on RenderSettings' own camera and
+    // disableMotionBlur (only needed when there are no render products)
+    if (numProducts == 0) {
+        names.emplace_back("renderSettings_unionedSamplingInterval_depOn_renderSettings_camera");
+        sources.push_back(
+            HdDependencySchema::Builder()
+                .SetDependedOnPrimPath(emptyPathDs)
+                .SetDependedOnDataSourceLocator(settingsCameraLocatorDs)
+                .SetAffectedDataSourceLocator(unionedSamplingIntervalLocatorDs)
+                .Build());
+        names.emplace_back("renderSettings_unionedSamplingInterval_depOn_renderSettings_disableMotionBlur");
+        sources.push_back(
+            HdDependencySchema::Builder()
+                .SetDependedOnPrimPath(emptyPathDs)
+                .SetDependedOnDataSourceLocator(
+                    settingsDisableMotionBlurLocatorDs)
+                .SetAffectedDataSourceLocator(unionedSamplingIntervalLocatorDs)
+                .Build());
+    }
 
-  // (c)
-  names.push_back(TfToken("__dependencies_depOn_renderProducts"));
-  values.push_back(
-      HdDependencySchema::Builder()
-          .SetDependedOnPrimPath(
-              HdRetainedTypedSampledDataSource<SdfPath>::New(SdfPath::EmptyPath()))
-          .SetDependedOnDataSourceLocator(productsLocatorDs)
-          .SetAffectedDataSourceLocator(HdRetainedTypedSampledDataSource<HdDataSourceLocator>::New(
-              HdDependenciesSchema::GetDefaultLocator()))
-          .Build());
+    // (d) - dependencies themselves depend on render products (and on
+    // renderSettings.camera if there are no products)
+    names.emplace_back("__dependencies_depOn_renderSettings_renderProducts");
+    sources.push_back(
+        HdDependencySchema::Builder()
+            .SetDependedOnPrimPath(emptyPathDs)
+            .SetDependedOnDataSourceLocator(productsLocatorDs)
+            .SetAffectedDataSourceLocator(dependenciesLocatorDs)
+            .Build());
 
-  return HdRetainedContainerDataSource::New(names.size(), names.data(), values.data());
+    if (numProducts == 0) {
+        names.emplace_back("__dependencies_depOn_renderSettings_camera");
+        sources.push_back(
+            HdDependencySchema::Builder()
+                .SetDependedOnPrimPath(emptyPathDs)
+                .SetDependedOnDataSourceLocator(settingsCameraLocatorDs)
+                .SetAffectedDataSourceLocator(dependenciesLocatorDs)
+                .Build());
+    }
+
+    return HdRetainedContainerDataSource::New(
+        names.size(), names.data(), sources.data());
 }
 
 // Build and return a container with only the names that begin with the
 // requested prefixes.
 //
-HdContainerDataSourceHandle _GetFilteredNamespacedSettings(const HdContainerDataSourceHandle &c,
-                                                           const VtArray<TfToken> &prefixes)
+HdContainerDataSourceHandle
+_GetFilteredNamespacedSettings(
+    const HdContainerDataSourceHandle &c,
+    const VtArray<TfToken> &prefixes)
 {
-  if (prefixes.empty() || !c) {
-    return c;
-  }
-
-  TfTokenVector names = c->GetNames();
-  names.erase(std::remove_if(names.begin(),
-                             names.end(),
-                             [&](const TfToken &name) {
-                               const std::string &nameStr = name.GetString();
-                               for (const TfToken &prefix : prefixes) {
-                                 if (TfStringStartsWith(nameStr, prefix.GetString())) {
-                                   return false;
-                                 }
-                               }
-                               return true;
-                             }),
-              names.end());
-
-  std::vector<HdDataSourceBaseHandle> valuesDs;
-  valuesDs.reserve(names.size());
-  for (const TfToken &name : names) {
-    valuesDs.push_back(c->Get(name));
-  }
-
-  return HdRetainedContainerDataSource::New(names.size(), names.data(), valuesDs.data());
-}
-
-bool _Contains(const SdfPathVector &paths, const SdfPath &path)
-{
-  return std::find(paths.begin(), paths.end(), path) != paths.end();
-}
-
-// Return unique camera paths used by products generated by the render settings
-// prim.
-SdfPathVector _GetTargetedCameras(HdRenderProductVectorSchema productsSchema)
-{
-  const size_t n = productsSchema.GetNumElements();
-
-  SdfPathVector cameraPaths;
-  for (size_t i = 0; i < n; ++i) {
-    HdRenderProductSchema productSchema = productsSchema.GetElement(i);
-    const HdPathDataSourceHandle camPathDs = productSchema.GetCameraPrim();
-    if (camPathDs) {
-      const SdfPath camPath = camPathDs->GetTypedValue(0.0);
-      if (!camPath.IsEmpty() && !_Contains(cameraPaths, camPath)) {
-        cameraPaths.push_back(camPath);
-      }
+    if (prefixes.empty() || !c) {
+        return c;
     }
-  }
 
-  return cameraPaths;
+    TfTokenVector names = c->GetNames();
+    names.erase(
+        std::remove_if(names.begin(), names.end(),
+            [&](const TfToken &name) {
+                const std::string &nameStr = name.GetString();
+                for (const TfToken &prefix : prefixes) {
+                    if (TfStringStartsWith(nameStr, prefix.GetString())) {
+                        return false;
+                    }
+                }
+                return true;
+            }),
+        names.end());
+
+    std::vector<HdDataSourceBaseHandle> valuesDs;
+    valuesDs.reserve(names.size());
+    for (const TfToken &name : names) {
+        valuesDs.push_back(c->Get(name));
+    }
+
+    return HdRetainedContainerDataSource::New(
+        names.size(), names.data(), valuesDs.data());
 }
 
-bool _GetCameraShutterOpenAndClose(const HdSceneIndexBaseRefPtr &si,
-                                   const SdfPath cameraPath,
-                                   GfVec2d *shutter)
+bool
+_GetCameraShutterOpenAndClose(
+    const HdSceneIndexBasePtr &si,
+    const SdfPath cameraPath,
+    GfVec2d *shutter)
 {
-  HdCameraSchema camSchema = HdCameraSchema::GetFromParent(si->GetPrim(cameraPath).dataSource);
+    HdCameraSchema camSchema =
+        HdCameraSchema::GetFromParent(si->GetPrim(cameraPath).dataSource);
 
-  if (!camSchema) {
+    if (!camSchema) {
+        return false;
+    }
+
+    // Note: The times below are frame relative and refer to the times the
+    //       shutter begins to open and is fully closed respectively.
+    const HdDoubleDataSourceHandle shutterOpenDs = camSchema.GetShutterOpen();
+    const HdDoubleDataSourceHandle shutterCloseDs = camSchema.GetShutterClose();
+
+    if (shutterOpenDs && shutterCloseDs) {
+        if (shutter) {
+            (*shutter)[0] = shutterOpenDs->GetTypedValue(0.0);
+            (*shutter)[1] = shutterCloseDs->GetTypedValue(0.0);
+        }
+
+        return true;
+    }
+
     return false;
-  }
-
-  // Note: The times below are frame relative and refer to the times the
-  //       shutter begins to open and is fully closed respectively.
-  const HdDoubleDataSourceHandle shutterOpenDs = camSchema.GetShutterOpen();
-  const HdDoubleDataSourceHandle shutterCloseDs = camSchema.GetShutterClose();
-
-  if (shutterOpenDs && shutterCloseDs) {
-    if (shutter) {
-      (*shutter)[0] = shutterOpenDs->GetTypedValue(0.0);
-      (*shutter)[1] = shutterCloseDs->GetTypedValue(0.0);
-    }
-
-    return true;
-  }
-
-  return false;
 }
 
-struct _ProductShutterInfo {
-  SdfPath cameraPath;
-  bool disableMotionBlur;
+struct _ProductShutterInfo
+{
+    SdfPath cameraPath;
+    bool disableMotionBlur;
 };
 using _ProductShutterInfoVec = std::vector<_ProductShutterInfo>;
 
-_ProductShutterInfoVec _GetShutterInfoFromProducts(HdRenderProductVectorSchema productsSchema)
+_ProductShutterInfoVec
+_GetShutterInfoFromProducts(
+    HdRenderProductVectorSchema productsSchema)
 {
-  const size_t n = productsSchema.GetNumElements();
+    const size_t n = productsSchema.GetNumElements();
 
-  _ProductShutterInfoVec result;
-  for (size_t i = 0; i < n; ++i) {
-    HdRenderProductSchema productSchema = productsSchema.GetElement(i);
-    const HdPathDataSourceHandle camPathDs = productSchema.GetCameraPrim();
-    if (camPathDs) {
-      const SdfPath camPath = camPathDs->GetTypedValue(0.0);
-      if (!camPath.IsEmpty()) {
-        const HdBoolDataSourceHandle disableMotionBlurDs = productSchema.GetDisableMotionBlur();
-        const bool disableMotionBlur = disableMotionBlurDs ?
-                                           disableMotionBlurDs->GetTypedValue(0.0) :
-                                           false;
+    _ProductShutterInfoVec result;
+    for (size_t i = 0; i < n; ++i) {
+        HdRenderProductSchema productSchema = productsSchema.GetElement(i);
+        const HdPathDataSourceHandle camPathDs =  productSchema.GetCameraPrim();
+        if (camPathDs) {
+            const SdfPath camPath = camPathDs->GetTypedValue(0.0);
+            if (!camPath.IsEmpty()) {
+                const HdBoolDataSourceHandle disableMotionBlurDs =
+                    productSchema.GetDisableMotionBlur();
+                const bool disableMotionBlur
+                    = disableMotionBlurDs
+                    ? disableMotionBlurDs->GetTypedValue(0.0)
+                    : false;
 
-        result.push_back({camPath, disableMotionBlur});
-      }
+                result.push_back({camPath, disableMotionBlur});
+            }
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
-HdVec2dDataSourceHandle _ComputeUnionedCameraShutterInterval(
-    const HdSceneIndexBaseRefPtr &si, const _ProductShutterInfoVec &shutterInfoVec)
+HdVec2dDataSourceHandle
+_ComputeUnionedSamplingInterval(
+    const HdSceneIndexBasePtr &si,
+    const _ProductShutterInfoVec &shutterInfoVec)
 {
-  GfVec2d result;
-  bool initialized = false;
+    GfVec2d result;
+    bool initialized = false;
 
-  for (const auto &shutterInfo : shutterInfoVec) {
-    const SdfPath &camPath = shutterInfo.cameraPath;
-    const bool &disableMotionBlur = shutterInfo.disableMotionBlur;
+    for (const auto &shutterInfo : shutterInfoVec) {
+        const SdfPath &camPath = shutterInfo.cameraPath;
+        const bool &disableMotionBlur = shutterInfo.disableMotionBlur;
 
-    GfVec2d camShutter;
-    if (_GetCameraShutterOpenAndClose(si, camPath, &camShutter)) {
-      if (disableMotionBlur) {
-        camShutter[0] = camShutter[1] = 0.0;
-      }
+        GfVec2d camShutter;
+        if (_GetCameraShutterOpenAndClose(si, camPath, &camShutter)) {
+            if (disableMotionBlur) {
+                camShutter[0] = camShutter[1] = 0.0;
+            }
 
-      if (!initialized) {
-        result = camShutter;
-        initialized = true;
-      }
-      else {
-        result[0] = (std::min)(result[0], camShutter[0]);
-        result[1] = (std::max)(result[1], camShutter[1]);
-      }
+            if (!initialized) {
+                result = camShutter;
+                initialized = true;
+            } else {
+                result[0] = std::min(result[0], camShutter[0]);
+                result[1] = std::max(result[1], camShutter[1]);
+            }
+        }
     }
-  }
 
-  if (initialized) {
-    return HdRetainedTypedSampledDataSource<GfVec2d>::New(result);
-  }
+    if (initialized) {
+        return HdRetainedTypedSampledDataSource<GfVec2d>::New(result);
+    }
 
-  return nullptr;
+    return nullptr;
 }
 
-HdContainerDataSourceHandle _BuildOverlayContainerDataSource(
+HdContainerDataSourceHandle
+_BuildOverlayContainerDataSource(
     const HdContainerDataSourceHandle &src1,
     const HdContainerDataSourceHandle &src2,
     const HdContainerDataSourceHandle &src3,
     const HdContainerDataSourceHandle &src4)
 {
-  return HdOverlayContainerDataSource::OverlayedContainerDataSources(
-      src1,
-      HdOverlayContainerDataSource::OverlayedContainerDataSources(
-          src2, HdOverlayContainerDataSource::OverlayedContainerDataSources(src3, src4)));
+    return
+        HdOverlayContainerDataSource::OverlayedContainerDataSources(
+            src1,
+            HdOverlayContainerDataSource::OverlayedContainerDataSources(
+                src2,
+                HdOverlayContainerDataSource::OverlayedContainerDataSources(
+                    src3, src4)));
 }
 
 // Data source override for the 'renderSettings' locator.
-// Adds support for the 'active' and 'shutterInterval' fields and filtered
+// Adds support for the 'active' and 'unionedSamplingInterval' fields and filtered
 // entries in the 'namespacedSettings' container.
 //
-class _RenderSettingsDataSource final : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(_RenderSettingsDataSource);
-
-  _RenderSettingsDataSource(const HdContainerDataSourceHandle &renderSettingsContainer,
-                            const HdSceneIndexBaseRefPtr &si,
-                            const SdfPath &settingsPrimPath,
-                            const VtArray<TfToken> &namespacePrefixes)
-      : _input(renderSettingsContainer),
-        _si(si),
-        _primPath(settingsPrimPath),
-        _namespacePrefixes(namespacePrefixes)
-  {
-  }
-
-  TfTokenVector GetNames() override
-  {
-    TfTokenVector names = _input->GetNames();
-    names.push_back(HdRenderSettingsSchemaTokens->active);
-    names.push_back(HdRenderSettingsSchemaTokens->shutterInterval);
-    return names;
-  }
-
-  HdDataSourceBaseHandle Get(const TfToken &name) override
-  {
-    if (name == HdRenderSettingsSchemaTokens->active) {
-      bool isActive = false;
-      SdfPath activePath;
-      if (HdUtils::HasActiveRenderSettingsPrim(_si, &activePath)) {
-        isActive = (activePath == _primPath);
-      }
-      return HdRetainedTypedSampledDataSource<bool>::New(isActive);
-    }
-
-    if (name == HdRenderSettingsSchemaTokens->shutterInterval) {
-      const _ProductShutterInfoVec shutterInfoVec = _GetShutterInfoFromProducts(
-          HdRenderSettingsSchema(_input).GetRenderProducts());
-
-      return _ComputeUnionedCameraShutterInterval(_si, shutterInfoVec);
-    }
-
-    HdDataSourceBaseHandle result = _input->Get(name);
-
-    if (name == HdRenderSettingsSchemaTokens->namespacedSettings && !_namespacePrefixes.empty()) {
-
-      return _GetFilteredNamespacedSettings(HdContainerDataSource::Cast(result),
-                                            _namespacePrefixes);
-    }
-
-    return result;
-  }
-
- private:
-  const HdContainerDataSourceHandle _input;
-  const HdSceneIndexBaseRefPtr _si;
-  const SdfPath _primPath;
-  const VtArray<TfToken> _namespacePrefixes;
-};
-
-class _RenderSettingsPrimDataSource : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(_RenderSettingsPrimDataSource);
-
-  _RenderSettingsPrimDataSource(const HdContainerDataSourceHandle &primDataSource,
-                                const HdSceneIndexBaseRefPtr &si,
-                                const SdfPath &primPath,
-                                const VtArray<TfToken> namespacePrefixes)
-      : _input(primDataSource), _si(si), _primPath(primPath), _namespacePrefixes(namespacePrefixes)
-  {
-  }
-
-  TfTokenVector GetNames() override
-  {
-    TfTokenVector names = _input->GetNames();
-    names.push_back(HdDependenciesSchemaTokens->__dependencies);
-    return names;
-  }
-
-  HdDataSourceBaseHandle Get(const TfToken &name) override
-  {
-    HdDataSourceBaseHandle result = _input->Get(name);
-
-    if (name == HdRenderSettingsSchemaTokens->renderSettings) {
-      if (HdContainerDataSourceHandle renderSettingsContainer = HdContainerDataSource::Cast(
-              result))
-      {
-
-        return _RenderSettingsDataSource::New(
-            renderSettingsContainer, _si, _primPath, _namespacePrefixes);
-      }
-    }
-
-    if (name == HdDependenciesSchemaTokens->__dependencies) {
-      const SdfPathVector cameraPaths = _GetTargetedCameras(
-          HdRenderSettingsSchema::GetFromParent(_input).GetRenderProducts());
-      return _BuildOverlayContainerDataSource(_BuildDependencyForActiveLocator(),
-                                              _BuildDependenciesForShutterInterval(cameraPaths),
-                                              _BuildDependencyForFrameLocator(),
-                                              HdContainerDataSource::Cast(result));
-    }
-
-    return result;
-  }
-
- private:
-  const HdContainerDataSourceHandle _input;
-  const HdSceneIndexBaseRefPtr _si;
-  const SdfPath _primPath;
-  const VtArray<TfToken> _namespacePrefixes;
-};
-
-VtArray<TfToken> _GetNamespacePrefixes(const HdContainerDataSourceHandle &inputArgs)
+class _RenderSettingsDataSource final : public HdContainerDataSource
 {
-  if (!inputArgs) {
+public:
+    HD_DECLARE_DATASOURCE(_RenderSettingsDataSource);
+
+    _RenderSettingsDataSource(
+        const HdContainerDataSourceHandle &renderSettingsContainer,
+        const HdSceneIndexBasePtr &si,
+        const SdfPath &settingsPrimPath,
+        const VtArray<TfToken> &namespacePrefixes)
+    : _input(renderSettingsContainer)
+    , _si(si)
+    , _primPath(settingsPrimPath)
+    , _namespacePrefixes(namespacePrefixes)
+    {
+    }
+
+    TfTokenVector
+    GetNames() override
+    {
+        TfTokenVector names = _input->GetNames();
+        names.push_back(HdRenderSettingsSchemaTokens->active);
+        names.push_back(HdRenderSettingsSchemaTokens->unionedSamplingInterval);
+        return names;
+    }
+
+    HdDataSourceBaseHandle
+    Get(const TfToken &name) override
+    {
+        if (name == HdRenderSettingsSchemaTokens->active) {
+            bool isActive = false;
+            SdfPath activePath;
+            if (HdUtils::HasActiveRenderSettingsPrim(_si, &activePath)) {
+                isActive = (activePath == _primPath);
+            }
+            return HdRetainedTypedSampledDataSource<bool>::New(isActive);
+        }
+
+        if (name == HdRenderSettingsSchemaTokens->unionedSamplingInterval) {
+            _ProductShutterInfoVec shutterInfoVec;
+            const HdRenderSettingsSchema& settingsSchema(_input);
+            const HdRenderProductVectorSchema& productsSchema =
+                settingsSchema.GetRenderProducts();
+            if (productsSchema.GetNumElements() > 0) {
+                shutterInfoVec = _GetShutterInfoFromProducts(productsSchema);
+            } else if (const HdPathDataSourceHandle& camPathDs =
+                settingsSchema.GetCamera()) {
+                const SdfPath& camPath = camPathDs->GetTypedValue(0.f);
+                if (!camPath.IsEmpty()) {
+                    const HdBoolDataSourceHandle& disableMotionBlurDs =
+                        settingsSchema.GetDisableMotionBlur();
+                    const bool disableMotionBlur
+                      = disableMotionBlurDs
+                      ? disableMotionBlurDs->GetTypedValue(0.f)
+                      : false;
+                    shutterInfoVec.push_back({ camPath, disableMotionBlur });
+                }
+            }
+
+            return _ComputeUnionedSamplingInterval(_si, shutterInfoVec);
+        }
+
+        HdDataSourceBaseHandle result = _input->Get(name);
+
+        if (name == HdRenderSettingsSchemaTokens->namespacedSettings &&
+            !_namespacePrefixes.empty()) {
+
+            return _GetFilteredNamespacedSettings(
+                    HdContainerDataSource::Cast(result), _namespacePrefixes);
+        }
+
+        return result;
+    }
+
+private:
+    const HdContainerDataSourceHandle _input;
+    const HdSceneIndexBasePtr _si;
+    const SdfPath _primPath;
+    const VtArray<TfToken> _namespacePrefixes;
+};
+
+class _RenderSettingsPrimDataSource : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(_RenderSettingsPrimDataSource);
+
+    _RenderSettingsPrimDataSource(
+        const HdContainerDataSourceHandle &primDataSource,
+        const HdSceneIndexBasePtr &si,
+        const SdfPath &primPath,
+        const VtArray<TfToken> namespacePrefixes)
+    : _input(primDataSource)
+    , _si(si)
+    , _primPath(primPath)
+    , _namespacePrefixes(namespacePrefixes)
+    {
+    }
+
+    TfTokenVector
+    GetNames() override
+    {
+        TfTokenVector names = _input->GetNames();
+        names.push_back(HdDependenciesSchemaTokens->__dependencies);
+        return names;
+    }
+
+    HdDataSourceBaseHandle
+    Get(const TfToken &name) override
+    {
+        HdDataSourceBaseHandle result = _input->Get(name);
+
+        if (name == HdRenderSettingsSchemaTokens->renderSettings) {
+            if (HdContainerDataSourceHandle renderSettingsContainer =
+                    HdContainerDataSource::Cast(result)) {
+
+                return _RenderSettingsDataSource::New(
+                    renderSettingsContainer,
+                    _si,
+                    _primPath,
+                    _namespacePrefixes);
+            }
+        }
+
+        if (name == HdDependenciesSchemaTokens->__dependencies) {
+            return
+                _BuildOverlayContainerDataSource(
+                    _BuildDependencyForActiveLocator(),
+                    _BuildDependenciesForSamplingInterval(
+                        HdRenderSettingsSchema::GetFromParent(_input)),
+                    _BuildDependencyForFrameLocator(),
+                    HdContainerDataSource::Cast(result));
+        }
+
+        return result;
+    }
+
+private:
+    const HdContainerDataSourceHandle _input;
+    const HdSceneIndexBasePtr _si;
+    const SdfPath _primPath;
+    const VtArray<TfToken> _namespacePrefixes;
+};
+
+VtArray<TfToken>
+_GetNamespacePrefixes(const HdContainerDataSourceHandle &inputArgs)
+{
+    if (!inputArgs) {
+        return {};
+    }
+
+    HdTokenArrayDataSourceHandle tokenArrayHandle =
+        HdTokenArrayDataSource::Cast(inputArgs->Get(
+            HdsiRenderSettingsFilteringSceneIndexTokens->namespacePrefixes));
+
+    if (tokenArrayHandle) {
+        return tokenArrayHandle->GetTypedValue(0);
+    }
+
     return {};
-  }
-
-  HdTokenArrayDataSourceHandle tokenArrayHandle = HdTokenArrayDataSource::Cast(
-      inputArgs->Get(HdsiRenderSettingsFilteringSceneIndexTokens->namespacePrefixes));
-
-  if (tokenArrayHandle) {
-    return tokenArrayHandle->GetTypedValue(0);
-  }
-
-  return {};
 }
 
-HdContainerDataSourceHandle _GetFallbackPrimDataSource(
-    const HdContainerDataSourceHandle &inputArgs)
+HdContainerDataSourceHandle
+_GetFallbackPrimDataSource(const HdContainerDataSourceHandle &inputArgs)
 {
-  if (!inputArgs) {
-    return nullptr;
-  }
+    if (!inputArgs) {
+        return nullptr;
+    }
 
-  return HdContainerDataSource::Cast(
-      inputArgs->Get(HdsiRenderSettingsFilteringSceneIndexTokens->fallbackPrimDs));
+    return HdContainerDataSource::Cast(inputArgs->Get(
+            HdsiRenderSettingsFilteringSceneIndexTokens->fallbackPrimDs));
 }
 
-}  // namespace
+} // namespace anonymous
 
 ////////////////////////////////////////////////////////////////////////////////
 
 /* static */
-HdsiRenderSettingsFilteringSceneIndexRefPtr HdsiRenderSettingsFilteringSceneIndex::New(
-    const HdSceneIndexBaseRefPtr &inputSceneIndex, const HdContainerDataSourceHandle &inputArgs)
+HdsiRenderSettingsFilteringSceneIndexRefPtr
+HdsiRenderSettingsFilteringSceneIndex::New(
+    const HdSceneIndexBaseRefPtr &inputSceneIndex,
+    const HdContainerDataSourceHandle &inputArgs)
 {
-  return TfCreateRefPtr(new HdsiRenderSettingsFilteringSceneIndex(inputSceneIndex, inputArgs));
+    return TfCreateRefPtr(
+        new HdsiRenderSettingsFilteringSceneIndex(inputSceneIndex, inputArgs));
 }
+
 
 HdsiRenderSettingsFilteringSceneIndex::HdsiRenderSettingsFilteringSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputSceneIndex, const HdContainerDataSourceHandle &inputArgs)
-    : HdSingleInputFilteringSceneIndexBase(inputSceneIndex),
-      _namespacePrefixes(_GetNamespacePrefixes(inputArgs)),
-      _fallbackPrimDs(_GetFallbackPrimDataSource(inputArgs)),
-      _addedFallbackPrim(false)
+    const HdSceneIndexBaseRefPtr &inputSceneIndex,
+    const HdContainerDataSourceHandle &inputArgs)
+: HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
+, _namespacePrefixes(_GetNamespacePrefixes(inputArgs))
+, _fallbackPrimDs(_GetFallbackPrimDataSource(inputArgs))
 {
 }
 
-HdSceneIndexPrim HdsiRenderSettingsFilteringSceneIndex::GetPrim(const SdfPath &primPath) const
+HdSceneIndexPrim
+HdsiRenderSettingsFilteringSceneIndex::GetPrim(const SdfPath &primPath) const
 {
-  HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
+    HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
 
-  if (prim.primType == HdPrimTypeTokens->renderSettings && prim.dataSource) {
-    // existing render settings prim
-    prim.dataSource = _RenderSettingsPrimDataSource::New(
-        prim.dataSource, _GetInputSceneIndex(), primPath, _namespacePrefixes);
-  }
-  else if (_addedFallbackPrim && primPath == GetFallbackPrimPath()) {
+    if (prim.primType == HdPrimTypeTokens->renderSettings && prim.dataSource) {
+        // existing render settings prim
+        prim.dataSource = _RenderSettingsPrimDataSource::New(
+            prim.dataSource, _GetInputSceneIndex(), primPath,
+            _namespacePrefixes);
 
-    prim.primType = HdPrimTypeTokens->renderSettings;
-    prim.dataSource = _fallbackPrimDs;
-  }
+    } else if (primPath == GetFallbackPrimPath()) {
 
-  return prim;
+        prim.primType = HdPrimTypeTokens->renderSettings;
+        prim.dataSource = _fallbackPrimDs;
+    }
+
+    return prim;
 }
 
-SdfPathVector HdsiRenderSettingsFilteringSceneIndex::GetChildPrimPaths(
+SdfPathVector
+HdsiRenderSettingsFilteringSceneIndex::GetChildPrimPaths(
     const SdfPath &primPath) const
 {
-  // Avoid a copy if possible in the generic case.
-  if (ARCH_UNLIKELY(primPath.IsAbsoluteRootPath() && _addedFallbackPrim)) {
+    // Avoid a copy if possible in the generic case.
+    if (ARCH_UNLIKELY(
+            primPath.IsAbsoluteRootPath())) {
 
-    SdfPathVector paths = _GetInputSceneIndex()->GetChildPrimPaths(primPath);
-    if (!_Contains(paths, GetRenderScope())) {
-      paths.push_back(GetRenderScope());
+        SdfPathVector paths =
+            _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+        if (!_Contains(paths, GetRenderScope())) {
+            paths.push_back(GetRenderScope());
+        }
+        return paths;
     }
-    return paths;
-  }
 
-  if (ARCH_UNLIKELY(primPath == GetRenderScope() && _addedFallbackPrim)) {
+    if (ARCH_UNLIKELY(
+            primPath == GetRenderScope())) {
 
-    SdfPathVector paths = _GetInputSceneIndex()->GetChildPrimPaths(primPath);
-    paths.push_back(GetFallbackPrimPath());
-    return paths;
-  }
+        SdfPathVector paths =
+            _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+        paths.push_back(GetFallbackPrimPath());
+        return paths;
+    }
 
-  return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+    return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
 }
 
 /* static */
-const SdfPath &HdsiRenderSettingsFilteringSceneIndex::GetFallbackPrimPath()
+const SdfPath&
+HdsiRenderSettingsFilteringSceneIndex::GetFallbackPrimPath()
 {
-  return s_fallbackPath;
+    return s_fallbackPath;
 }
 
 /* static */
-const SdfPath &HdsiRenderSettingsFilteringSceneIndex::GetRenderScope()
+const SdfPath&
+HdsiRenderSettingsFilteringSceneIndex::GetRenderScope()
 {
-  return s_renderScope;
+    return s_renderScope;
 }
 
-void HdsiRenderSettingsFilteringSceneIndex::_PrimsAdded(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::AddedPrimEntries &entries)
+void
+HdsiRenderSettingsFilteringSceneIndex::_PrimsAdded(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::AddedPrimEntries &entries)
 {
-  if (ARCH_UNLIKELY(_fallbackPrimDs && !_addedFallbackPrim)) {
-
-    HdSceneIndexObserver::AddedPrimEntries addedEntries = entries;
-
-    addedEntries.emplace_back(GetFallbackPrimPath(), HdPrimTypeTokens->renderSettings);
-
-    _addedFallbackPrim = true;
-    _SendPrimsAdded(addedEntries);
-  }
-  else {
     _SendPrimsAdded(entries);
-  }
 }
 
-void HdsiRenderSettingsFilteringSceneIndex::_PrimsRemoved(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::RemovedPrimEntries &entries)
+void
+HdsiRenderSettingsFilteringSceneIndex::_PrimsRemoved(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::RemovedPrimEntries &entries)
 {
-  _SendPrimsRemoved(entries);
+    _SendPrimsRemoved(entries);
 }
 
-void HdsiRenderSettingsFilteringSceneIndex::_PrimsDirtied(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+void
+HdsiRenderSettingsFilteringSceneIndex::_PrimsDirtied(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::DirtiedPrimEntries &entries)
 {
-  _SendPrimsDirtied(entries);
+    _SendPrimsDirtied(entries);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

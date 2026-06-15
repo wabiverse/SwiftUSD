@@ -13,18 +13,24 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdImagingFlattenedGeomModelDataSourceProvider : public HdFlattenedDataSourceProvider {
-  USDIMAGING_API
-  HdContainerDataSourceHandle GetFlattenedDataSource(const Context &) const override;
+class UsdImagingFlattenedGeomModelDataSourceProvider
+                        : public HdFlattenedDataSourceProvider
+{
+    USDIMAGING_API
+    HdContainerDataSourceHandle GetFlattenedDataSource(
+        const Context&) const override;
 
-  USDIMAGING_API
-  void ComputeDirtyLocatorsForDescendants(HdDataSourceLocatorSet *locators) const override;
+    USDIMAGING_API
+    void ComputeDirtyLocatorsForDescendants(
+        HdDataSourceLocatorSet * locators) const override;
 
- public:
-  USDIMAGING_API
-  virtual ~UsdImagingFlattenedGeomModelDataSourceProvider();
+public:
+
+    USDIMAGING_API
+    virtual ~UsdImagingFlattenedGeomModelDataSourceProvider();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_FLATTENED_GEOM_MODEL_DATA_SOURCE_PROVIDER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_FLATTENED_GEOM_MODEL_DATA_SOURCE_PROVIDER_H
+

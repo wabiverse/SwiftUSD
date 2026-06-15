@@ -8,131 +8,146 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdHydraGenerativeProceduralAPI, TfType::Bases<UsdAPISchemaBase>>();
+    TfType::Define<UsdHydraGenerativeProceduralAPI,
+        TfType::Bases< UsdAPISchemaBase > >();
+    
 }
 
 /* virtual */
-UsdHydraGenerativeProceduralAPI::~UsdHydraGenerativeProceduralAPI() {}
+UsdHydraGenerativeProceduralAPI::~UsdHydraGenerativeProceduralAPI()
+{
+}
 
 /* static */
-UsdHydraGenerativeProceduralAPI UsdHydraGenerativeProceduralAPI::Get(const UsdStagePtr &stage,
-                                                                     const SdfPath &path)
+UsdHydraGenerativeProceduralAPI
+UsdHydraGenerativeProceduralAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdHydraGenerativeProceduralAPI();
-  }
-  return UsdHydraGenerativeProceduralAPI(stage->GetPrimAtPath(path));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdHydraGenerativeProceduralAPI();
+    }
+    return UsdHydraGenerativeProceduralAPI(stage->GetPrimAtPath(path));
 }
+
 
 /* virtual */
 UsdSchemaKind UsdHydraGenerativeProceduralAPI::_GetSchemaKind() const
 {
-  return UsdHydraGenerativeProceduralAPI::schemaKind;
+    return UsdHydraGenerativeProceduralAPI::schemaKind;
 }
 
 /* static */
-bool UsdHydraGenerativeProceduralAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
+bool
+UsdHydraGenerativeProceduralAPI::CanApply(
+    const UsdPrim &prim, std::string *whyNot)
 {
-  return prim.CanApplyAPI<UsdHydraGenerativeProceduralAPI>(whyNot);
+    return prim.CanApplyAPI<UsdHydraGenerativeProceduralAPI>(whyNot);
 }
 
 /* static */
-UsdHydraGenerativeProceduralAPI UsdHydraGenerativeProceduralAPI::Apply(const UsdPrim &prim)
+UsdHydraGenerativeProceduralAPI
+UsdHydraGenerativeProceduralAPI::Apply(const UsdPrim &prim)
 {
-  if (prim.ApplyAPI<UsdHydraGenerativeProceduralAPI>()) {
-    return UsdHydraGenerativeProceduralAPI(prim);
-  }
-  return UsdHydraGenerativeProceduralAPI();
+    if (prim.ApplyAPI<UsdHydraGenerativeProceduralAPI>()) {
+        return UsdHydraGenerativeProceduralAPI(prim);
+    }
+    return UsdHydraGenerativeProceduralAPI();
 }
 
 /* static */
-const TfType &UsdHydraGenerativeProceduralAPI::_GetStaticTfType()
+const TfType &
+UsdHydraGenerativeProceduralAPI::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdHydraGenerativeProceduralAPI>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdHydraGenerativeProceduralAPI>();
+    return tfType;
 }
 
 /* static */
-bool UsdHydraGenerativeProceduralAPI::_IsTypedSchema()
+bool 
+UsdHydraGenerativeProceduralAPI::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdHydraGenerativeProceduralAPI::_GetTfType() const
+const TfType &
+UsdHydraGenerativeProceduralAPI::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
-UsdAttribute UsdHydraGenerativeProceduralAPI::GetProceduralTypeAttr() const
+UsdAttribute
+UsdHydraGenerativeProceduralAPI::GetProceduralTypeAttr() const
 {
-  return GetPrim().GetAttribute(UsdHydraTokens->primvarsHdGpProceduralType);
+    return GetPrim().GetAttribute(UsdHydraTokens->primvarsHdGpProceduralType);
 }
 
-UsdAttribute UsdHydraGenerativeProceduralAPI::CreateProceduralTypeAttr(VtValue const &defaultValue,
-                                                                       bool writeSparsely) const
+UsdAttribute
+UsdHydraGenerativeProceduralAPI::CreateProceduralTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdHydraTokens->primvarsHdGpProceduralType,
-                                    SdfValueTypeNames->Token,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdHydraTokens->primvarsHdGpProceduralType,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
-UsdAttribute UsdHydraGenerativeProceduralAPI::GetProceduralSystemAttr() const
+UsdAttribute
+UsdHydraGenerativeProceduralAPI::GetProceduralSystemAttr() const
 {
-  return GetPrim().GetAttribute(UsdHydraTokens->proceduralSystem);
+    return GetPrim().GetAttribute(UsdHydraTokens->proceduralSystem);
 }
 
-UsdAttribute UsdHydraGenerativeProceduralAPI::CreateProceduralSystemAttr(
-    VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute
+UsdHydraGenerativeProceduralAPI::CreateProceduralSystemAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdHydraTokens->proceduralSystem,
-                                    SdfValueTypeNames->Token,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdHydraTokens->proceduralSystem,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
-                                                       const TfTokenVector &right)
+static inline TfTokenVector
+_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 {
-  TfTokenVector result;
-  result.reserve(left.size() + right.size());
-  result.insert(result.end(), left.begin(), left.end());
-  result.insert(result.end(), right.begin(), right.end());
-  return result;
+    TfTokenVector result;
+    result.reserve(left.size() + right.size());
+    result.insert(result.end(), left.begin(), left.end());
+    result.insert(result.end(), right.begin(), right.end());
+    return result;
 }
-}  // namespace
+}
 
 /*static*/
-const TfTokenVector &UsdHydraGenerativeProceduralAPI::GetSchemaAttributeNames(
-    bool includeInherited)
+const TfTokenVector&
+UsdHydraGenerativeProceduralAPI::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames = {
-      UsdHydraTokens->primvarsHdGpProceduralType,
-      UsdHydraTokens->proceduralSystem,
-  };
-  static TfTokenVector allNames = _ConcatenateAttributeNames(
-      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
+    static TfTokenVector localNames = {
+        UsdHydraTokens->primvarsHdGpProceduralType,
+        UsdHydraTokens->proceduralSystem,
+    };
+    static TfTokenVector allNames =
+        _ConcatenateAttributeNames(
+            UsdAPISchemaBase::GetSchemaAttributeNames(true),
+            localNames);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

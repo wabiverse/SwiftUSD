@@ -23,10 +23,6 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const & desc)
     MTLResourceOptions resourceOptions = MTLResourceStorageModePrivate;
     MTLTextureUsage usage = MTLTextureUsageShaderRead;
 
-    if (desc.initialData && desc.pixelsByteSize > 0) {
-        resourceOptions = hgi->GetCapabilities()->preferredStorageMode;
-    }
-
     MTLPixelFormat mtlFormat = HgiMetalConversions::GetPixelFormat(
         desc.format, desc.usage);
 
@@ -82,6 +78,9 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const & desc)
         texDesc.textureType = MTLTextureType1D;
     } else if (desc.type == HgiTextureType1DArray) {
         texDesc.textureType = MTLTextureType1DArray;
+    } else if (desc.type == HgiTextureTypeCubemap) {
+        texDesc.textureType = MTLTextureTypeCube;
+        texDesc.arrayLength = 1;
     }
 
     if (desc.sampleCount > 1) {
@@ -101,9 +100,9 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const & desc)
         // Modify texture descriptor to describe the temp texture.
 #if defined(ARCH_OS_OSX)
         texDesc.resourceOptions = MTLResourceStorageModeManaged;
-#else // !defined(ARCH_OS_OSX)
+#else
         texDesc.resourceOptions = MTLResourceStorageModeShared;
-#endif // defined(ARCH_OS_OSX)
+#endif
         texDesc.sampleCount = 1;
         if (desc.type == HgiTextureType3D) {
             texDesc.textureType = MTLTextureType3D;
@@ -112,11 +111,11 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const & desc)
         } else if (desc.type == HgiTextureType1D) {
             texDesc.textureType = MTLTextureType1D;
         } else if (desc.type == HgiTextureType1DArray) {
-            texDesc.textureType = MTLTextureType1DArray;        
+            texDesc.textureType = MTLTextureType1DArray;
         }
         texDesc.usage = MTLTextureUsageShaderRead;
         texDesc.pixelFormat = HgiMetalConversions::GetPixelFormat(
-            desc.format, HgiTextureUsageBitsShaderRead);    
+            desc.format, HgiTextureUsageBitsShaderRead);
 
         // Create temp texture and fill with initial data.
         id<MTLTexture> tempTextureId =
@@ -289,10 +288,10 @@ HgiMetalTexture::GetTextureId() const
     return _textureId;
 }
 
-void 
+HgiTextureUsage
 HgiMetalTexture::SubmitLayoutChange(HgiTextureUsage newLayout)
 {
-    return;
+    return 0;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

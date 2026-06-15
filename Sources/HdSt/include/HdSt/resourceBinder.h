@@ -7,25 +7,28 @@
 #ifndef PXR_IMAGING_HD_ST_RESOURCE_BINDER_H
 #define PXR_IMAGING_HD_ST_RESOURCE_BINDER_H
 
-#include "Hd/version.h"
+#include "pxr/pxrns.h"
 #include "HdSt/api.h"
 #include "HdSt/binding.h"
+#include "Hd/version.h"
 #include "Hgi/capabilities.h"
 #include "Hgi/handle.h"
-#include "Tf/staticTokens.h"
-#include "Tf/stl.h"
 #include "Tf/token.h"
-#include "pxr/pxrns.h"
+#include "Tf/stl.h"
+#include "Tf/staticTokens.h"
 
 #include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class HdStDrawItem;
 struct HgiResourceBindingsDesc;
 
-using HdStBufferResourceSharedPtr = std::shared_ptr<class HdStBufferResource>;
-using HdStBufferArrayRangeSharedPtr = std::shared_ptr<class HdStBufferArrayRange>;
+using HdStBufferResourceSharedPtr = 
+    std::shared_ptr<class HdStBufferResource>;
+using HdStBufferArrayRangeSharedPtr =
+    std::shared_ptr<class HdStBufferArrayRange>;
 
 using HdStShaderCodeSharedPtr = std::shared_ptr<class HdStShaderCode>;
 using HdStShaderCodeSharedPtrVector = std::vector<HdStShaderCodeSharedPtr>;
@@ -37,14 +40,18 @@ using HgiShaderProgramHandle = HgiHandle<class HgiShaderProgram>;
 
 /// Suffixes appended to material param names for a binding name.
 ///
-#define HDST_RESOURCE_BINDING_SUFFIX_TOKENS \
-  ((fallback, "_fallback"))((samplingTransform, "_samplingTransform"))((layout, "_layout"))( \
-      (texture, "_texture"))((valid, "_valid"))
+#define HDST_RESOURCE_BINDING_SUFFIX_TOKENS     \
+    ((fallback, "_fallback"))                   \
+    ((samplingTransform, "_samplingTransform")) \
+    ((layout, "_layout"))                       \
+    ((texture, "_texture"))                     \
+    ((valid, "_valid"))
 
-TF_DECLARE_PUBLIC_TOKENS(HdSt_ResourceBindingSuffixTokens, HDST_RESOURCE_BINDING_SUFFIX_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSt_ResourceBindingSuffixTokens,
+                         HDST_RESOURCE_BINDING_SUFFIX_TOKENS);
 
 /// \class HdSt_ResourceBinder
-///
+/// 
 /// A helper class to maintain all vertex/buffer/uniform binding points to be
 /// used for both codegen time and rendering time.
 ///
@@ -125,394 +132,437 @@ TF_DECLARE_PUBLIC_TOKENS(HdSt_ResourceBindingSuffixTokens, HDST_RESOURCE_BINDING
 /// \endcode
 ///
 class HdSt_ResourceBinder {
- public:
-  /// binding metadata for codegen
-  class MetaData {
-   public:
-    MetaData() : instancerNumLevels(0) {}
+public:
+    /// binding metadata for codegen
+    class MetaData {
+    public:
+        MetaData() : instancerNumLevels(0) {}
 
-    typedef size_t ID;
-    /// Returns the hash value of this metadata.
+        typedef size_t ID;
+        /// Returns the hash value of this metadata.
+        HDST_API
+        ID ComputeHash() const;
+
+        // -------------------------------------------------------------------
+        // for a primvar in interleaved buffer array (Constant, ShaderData)
+        struct StructEntry {
+            StructEntry(TfToken const &name,
+                        TfToken const &dataType,
+                        int offset, int arraySize,
+                        bool concatenateNames=false)
+                : name(name)
+                , dataType(dataType)
+                , offset(offset)
+                , arraySize(arraySize)
+                , concatenateNames(concatenateNames)
+            {}
+
+            TfToken name;
+            TfToken dataType;
+            int offset;
+            int arraySize;
+            bool concatenateNames;
+
+            bool operator < (StructEntry const &other) const {
+                return offset < other.offset;
+            }
+        };
+        struct StructBlock {
+            StructBlock(TfToken const &name, int arraySize = 1)
+                : blockName(name)
+                , arraySize(arraySize) {}
+            TfToken blockName;
+            std::vector<StructEntry> entries;
+            int arraySize;
+        };
+        using StructBlockBinding = std::map<HdStBinding, StructBlock>;
+
+        // -------------------------------------------------------------------
+        // for a primvar in non-interleaved buffer array (Vertex, Element, ...)
+        struct Primvar {
+            Primvar() {}
+            Primvar(TfToken const &name, TfToken const &dataType)
+                : name(name), dataType(dataType) {}
+            TfToken name;
+            TfToken dataType;
+        };
+        using PrimvarBinding = std::map<HdStBinding, Primvar>;
+
+        // -------------------------------------------------------------------
+        // for a face-varying primvar in non-interleaved buffer array
+        struct FvarPrimvar : Primvar {
+            FvarPrimvar() : channel(0) {}
+            FvarPrimvar(TfToken const &name, TfToken const &dataType, 
+                        int channel)
+                : Primvar(name, dataType), channel(channel) {}
+            int channel;
+        };
+        using FvarPrimvarBinding = std::map<HdStBinding, FvarPrimvar>;
+
+        // -------------------------------------------------------------------
+        // for instance primvars
+        struct NestedPrimvar {
+            NestedPrimvar() {}
+            NestedPrimvar(TfToken const &name, TfToken const &dataType,
+                        int level)
+                : name(name), dataType(dataType), level(level) {}
+            TfToken name;
+            TfToken dataType;
+            int level;
+        };
+        using NestedPrimvarBinding = std::map<HdStBinding, NestedPrimvar>;
+
+        // -------------------------------------------------------------------
+        // for shader parameter accessors
+        struct ShaderParameterAccessor {
+             ShaderParameterAccessor() {}
+             ShaderParameterAccessor(TfToken const &name,
+                                     TfToken const &dataType,
+                                     std::string const &swizzle=std::string(),
+                                     TfTokenVector const &inPrimvars=TfTokenVector(),
+                                     bool const isPremultiplied=false,
+                                     bool const processTextureFallbackValue=false,
+                                     size_t const arrayOfTexturesSize=0)
+                 : name(name), dataType(dataType), swizzle(swizzle),
+                  inPrimvars(inPrimvars), isPremultiplied(isPremultiplied),
+                  processTextureFallbackValue(processTextureFallbackValue),
+                  arrayOfTexturesSize(arrayOfTexturesSize) {}
+             TfToken name;        // e.g. Kd
+             TfToken dataType;    // e.g. vec4
+             std::string swizzle; // e.g. xyzw
+             TfTokenVector inPrimvars; // for primvar renaming and texture
+                                       // coordinates,
+             bool isPremultiplied; // indicates if texture parameter has been 
+                                   // pre-multiplied by alpha on the CPU
+             bool processTextureFallbackValue; // use NAME_fallback from shader
+                                               // bar if texture is not valid
+                                               // (determineed from bool
+                                               // NAME_valid or bindless
+                                               // handle), only supported for
+                                               // material shader and for uv
+                                               // and field textures.
+            size_t arrayOfTexturesSize; // If the shaderParameterAccessor is 
+                                     // associated with an HdStBinding of type 
+                                     // ARRAY_OF_TEXTURE_2D or 
+                                     // BINDLESS_ARRAY_OF_TEXTURE_2D, this will 
+                                     // indicate the size of the array.
+        };
+        using ShaderParameterBinding =
+                std::map<HdStBinding, ShaderParameterAccessor>;
+
+        // -------------------------------------------------------------------
+        // for specific buffer array (drawing coordinate, instance indices)
+        struct BindingDeclaration {
+            BindingDeclaration() {}
+            BindingDeclaration(TfToken const &name,
+                               TfToken const &dataType,
+                               HdStBinding binding,
+                               bool isWritable = false)
+                : name(name)
+                , dataType(dataType)
+                , binding(binding)
+                , isWritable(isWritable) { }
+
+            TfToken name;
+            TfToken dataType;
+            HdStBinding binding;
+            bool isWritable;
+        };
+
+        // -------------------------------------------------------------------
+        // for accessing drawingCoord directly from a buffer
+        struct DrawingCoordBufferBinding {
+            DrawingCoordBufferBinding()
+                : bufferName()
+                , offset(0)
+                , stride(0) { }
+            DrawingCoordBufferBinding(TfToken const &bufferName,
+                                      uint32_t offset,
+                                      uint32_t stride)
+                : bufferName(bufferName)
+                , offset(offset)
+                , stride(stride) { }
+            TfToken bufferName;
+            uint32_t offset;
+            uint32_t stride;
+        };
+        DrawingCoordBufferBinding drawingCoordBufferBinding;
+
+        // -------------------------------------------------------------------
+
+        StructBlockBinding constantData;
+        StructBlockBinding shaderData;
+        StructBlockBinding topologyVisibilityData;
+        PrimvarBinding elementData;
+        PrimvarBinding vertexData;
+        PrimvarBinding varyingData;
+        FvarPrimvarBinding fvarData;
+        PrimvarBinding computeReadWriteData;
+        PrimvarBinding computeReadOnlyData;
+        NestedPrimvarBinding instanceData;
+        int instancerNumLevels;
+
+        ShaderParameterBinding shaderParameterBinding;
+
+        BindingDeclaration drawingCoord0Binding;
+        BindingDeclaration drawingCoord1Binding;
+        BindingDeclaration drawingCoord2Binding;
+        BindingDeclaration drawingCoordIBinding;
+        BindingDeclaration instanceIndexArrayBinding;
+        BindingDeclaration culledInstanceIndexArrayBinding;
+        BindingDeclaration instanceIndexBaseBinding;
+        BindingDeclaration primitiveParamBinding;
+        BindingDeclaration tessFactorsBinding;
+        BindingDeclaration edgeIndexBinding;
+        BindingDeclaration coarseFaceIndexBinding;
+        BindingDeclaration indexBufferBinding;
+        std::vector<BindingDeclaration> fvarPatchParamBindings;
+        std::vector<BindingDeclaration> fvarIndicesBindings;
+
+        StructBlockBinding customInterleavedBindings;
+        std::vector<BindingDeclaration> customBindings;
+    };
+
+    /// Constructor.
     HDST_API
-    ID ComputeHash() const;
+    HdSt_ResourceBinder();
 
-    // -------------------------------------------------------------------
-    // for a primvar in interleaved buffer array (Constant, ShaderData)
-    struct StructEntry {
-      StructEntry(TfToken const &name,
-                  TfToken const &dataType,
-                  int offset,
-                  int arraySize,
-                  bool concatenateNames = false)
-          : name(name),
-            dataType(dataType),
-            offset(offset),
-            arraySize(arraySize),
-            concatenateNames(concatenateNames)
-      {
-      }
+    /// Assign all binding points used in drawitem and custom bindings.
+    /// Returns metadata to be used for codegen.
+    HDST_API
+    void ResolveBindings(HdStDrawItem const *drawItem,
+                         HdStShaderCodeSharedPtrVector const &shaders,
+                         MetaData *metaDataOut,
+                         MetaData::DrawingCoordBufferBinding const &dcBinding,
+                         bool instanceDraw,
+                         HdStBindingRequestVector const &customBindings,
+                         HgiCapabilities const *capabilities);
 
-      TfToken name;
-      TfToken dataType;
-      int offset;
-      int arraySize;
-      bool concatenateNames;
+    /// Assign all binding points used in computation.
+    /// Returns metadata to be used for codegen.
+    HDST_API
+    void ResolveComputeBindings(HdBufferSpecVector const &readWriteBufferSpecs,
+                                HdBufferSpecVector const &readOnlyBufferSpecs,
+                                HdStShaderCodeSharedPtrVector const &shaders,
+                                MetaData *metaDataOut,
+                                HgiCapabilities const *capabilities);
 
-      bool operator<(StructEntry const &other) const
-      {
-        return offset < other.offset;
-      }
-    };
-    struct StructBlock {
-      StructBlock(TfToken const &name, int arraySize = 1) : blockName(name), arraySize(arraySize)
-      {
-      }
-      TfToken blockName;
-      std::vector<StructEntry> entries;
-      int arraySize;
-    };
-    using StructBlockBinding = std::map<HdStBinding, StructBlock>;
+    ////////////////////////////////////////////////////////////
+    // Hgi Binding
+    ////////////////////////////////////////////////////////////
 
-    // -------------------------------------------------------------------
-    // for a primvar in non-interleaved buffer array (Vertex, Element, ...)
-    struct Primvar {
-      Primvar() {}
-      Primvar(TfToken const &name, TfToken const &dataType) : name(name), dataType(dataType) {}
-      TfToken name;
-      TfToken dataType;
-    };
-    using PrimvarBinding = std::map<HdStBinding, Primvar>;
+    HDST_API
+    void GetBufferBindingDesc(
+                HgiResourceBindingsDesc * bindingsDesc,
+                TfToken const & name,
+                HdStBufferResourceSharedPtr const & resource,
+                int offset,
+                int level = -1,
+                int numElements = 1) const;
 
-    // -------------------------------------------------------------------
-    // for a face-varying primvar in non-interleaved buffer array
-    struct FvarPrimvar : Primvar {
-      FvarPrimvar() : channel(0) {}
-      FvarPrimvar(TfToken const &name, TfToken const &dataType, int channel)
-          : Primvar(name, dataType), channel(channel)
-      {
-      }
-      int channel;
-    };
-    using FvarPrimvarBinding = std::map<HdStBinding, FvarPrimvar>;
+    HDST_API
+    void GetBufferArrayBindingDesc(
+                HgiResourceBindingsDesc * bindingsDesc,
+                HdStBufferArrayRangeSharedPtr const & bar) const;
 
-    // -------------------------------------------------------------------
-    // for instance primvars
-    struct NestedPrimvar {
-      NestedPrimvar() {}
-      NestedPrimvar(TfToken const &name, TfToken const &dataType, int level)
-          : name(name), dataType(dataType), level(level)
-      {
-      }
-      TfToken name;
-      TfToken dataType;
-      int level;
-    };
-    using NestedPrimvarBinding = std::map<HdStBinding, NestedPrimvar>;
+    HDST_API
+    void GetInterleavedBufferArrayBindingDesc(
+                HgiResourceBindingsDesc *bindingsDesc,
+                HdStBufferArrayRangeSharedPtr const & bar,
+                TfToken const & name) const;
 
-    // -------------------------------------------------------------------
-    // for shader parameter accessors
-    struct ShaderParameterAccessor {
-      ShaderParameterAccessor() {}
-      ShaderParameterAccessor(TfToken const &name,
-                              TfToken const &dataType,
-                              std::string const &swizzle = std::string(),
-                              TfTokenVector const &inPrimvars = TfTokenVector(),
-                              bool const isPremultiplied = false,
-                              bool const processTextureFallbackValue = false,
-                              size_t const arrayOfTexturesSize = 0)
-          : name(name),
-            dataType(dataType),
-            swizzle(swizzle),
-            inPrimvars(inPrimvars),
-            isPremultiplied(isPremultiplied),
-            processTextureFallbackValue(processTextureFallbackValue),
-            arrayOfTexturesSize(arrayOfTexturesSize)
-      {
-      }
-      TfToken name;                      // e.g. Kd
-      TfToken dataType;                  // e.g. vec4
-      std::string swizzle;               // e.g. xyzw
-      TfTokenVector inPrimvars;          // for primvar renaming and texture
-                                         // coordinates,
-      bool isPremultiplied;              // indicates if texture parameter has been
-                                         // pre-multiplied by alpha on the CPU
-      bool processTextureFallbackValue;  // use NAME_fallback from shader
-                                         // bar if texture is not valid
-                                         // (determineed from bool
-                                         // NAME_valid or bindless
-                                         // handle), only supported for
-                                         // material shader and for uv
-                                         // and field textures.
-      size_t arrayOfTexturesSize;        // If the shaderParameterAccessor is
-                                         // associated with an HdStBinding of type
-                                         // ARRAY_OF_TEXTURE_2D or
-                                         // BINDLESS_ARRAY_OF_TEXTURE_2D, this will
-                                         // indicate the size of the array.
-    };
-    using ShaderParameterBinding = std::map<HdStBinding, ShaderParameterAccessor>;
+    HDST_API
+    void GetInstanceBufferArrayBindingDesc(
+                HgiResourceBindingsDesc * bindingsDesc,
+                HdStBufferArrayRangeSharedPtr const & bar,
+                int level) const;
+    
+    HDST_API
+    void GetBindingRequestBindingDesc(
+                HgiResourceBindingsDesc * bindingsDesc,
+                HdStBindingRequest const & req) const;
 
-    // -------------------------------------------------------------------
-    // for specific buffer array (drawing coordinate, instance indices)
-    struct BindingDeclaration {
-      BindingDeclaration() {}
-      BindingDeclaration(TfToken const &name,
-                         TfToken const &dataType,
-                         HdStBinding binding,
-                         bool isWritable = false)
-          : name(name), dataType(dataType), binding(binding), isWritable(isWritable)
-      {
-      }
+    HDST_API
+    void GetTextureBindingDesc(
+                HgiResourceBindingsDesc * bindingsDesc,
+                TfToken const & name,
+                HgiSamplerHandle const & texelSampler,
+                HgiTextureHandle const & texelTexture) const;
 
-      TfToken name;
-      TfToken dataType;
-      HdStBinding binding;
-      bool isWritable;
-    };
+    HDST_API
+    void GetTextureBindingDescs(
+                HgiResourceBindingsDesc * bindingsDesc,
+                TfToken const & name,
+                std::vector<HgiSamplerHandle> const & texelSamplers,
+                std::vector<HgiTextureHandle> const & texelTextures) const;
 
-    // -------------------------------------------------------------------
-    // for accessing drawingCoord directly from a buffer
-    struct DrawingCoordBufferBinding {
-      DrawingCoordBufferBinding() : bufferName(), offset(0), stride(0) {}
-      DrawingCoordBufferBinding(TfToken const &bufferName, uint32_t offset, uint32_t stride)
-          : bufferName(bufferName), offset(offset), stride(stride)
-      {
-      }
-      TfToken bufferName;
-      uint32_t offset;
-      uint32_t stride;
-    };
-    DrawingCoordBufferBinding drawingCoordBufferBinding;
+    HDST_API
+    void GetTextureWithLayoutBindingDesc(
+                HgiResourceBindingsDesc * bindingsDesc,
+                TfToken const & name,
+                HgiSamplerHandle const & texelSampler,
+                HgiTextureHandle const & texelTexture,
+                HgiSamplerHandle const & layoutSampler,
+                HgiTextureHandle const & layoutTexture) const;
+    
+    HDST_API
+    void
+    GetTextureWithLayoutBindingDescs(
+                HgiResourceBindingsDesc * bindingsDesc,
+                TfToken const & name,
+                std::vector<HgiSamplerHandle> const & texelSamplers,
+                std::vector<HgiTextureHandle> const & texelTextures,
+                std::vector<HgiSamplerHandle> const & layoutSamplers,
+                std::vector<HgiTextureHandle> const & layoutTextures) const; 
 
-    // -------------------------------------------------------------------
+    ////////////////////////////////////////////////////////////
+    // GL Binding
+    ////////////////////////////////////////////////////////////
 
-    StructBlockBinding constantData;
-    StructBlockBinding shaderData;
-    StructBlockBinding topologyVisibilityData;
-    PrimvarBinding elementData;
-    PrimvarBinding vertexData;
-    PrimvarBinding varyingData;
-    FvarPrimvarBinding fvarData;
-    PrimvarBinding computeReadWriteData;
-    PrimvarBinding computeReadOnlyData;
-    NestedPrimvarBinding instanceData;
-    int instancerNumLevels;
+    HDST_API
+    void Bind(HdStBindingRequest const& req) const;
+    HDST_API
+    void Unbind(HdStBindingRequest const& req) const;
 
-    ShaderParameterBinding shaderParameterBinding;
+    /// bind/unbind BufferArray
+    HDST_API
+    void BindBufferArray(HdStBufferArrayRangeSharedPtr const &bar) const;
+    HDST_API
+    void UnbindBufferArray(HdStBufferArrayRangeSharedPtr const &bar) const;
 
-    BindingDeclaration drawingCoord0Binding;
-    BindingDeclaration drawingCoord1Binding;
-    BindingDeclaration drawingCoord2Binding;
-    BindingDeclaration drawingCoordIBinding;
-    BindingDeclaration instanceIndexArrayBinding;
-    BindingDeclaration culledInstanceIndexArrayBinding;
-    BindingDeclaration instanceIndexBaseBinding;
-    BindingDeclaration primitiveParamBinding;
-    BindingDeclaration tessFactorsBinding;
-    BindingDeclaration edgeIndexBinding;
-    BindingDeclaration coarseFaceIndexBinding;
-    BindingDeclaration indexBufferBinding;
-    std::vector<BindingDeclaration> fvarPatchParamBindings;
-    std::vector<BindingDeclaration> fvarIndicesBindings;
+    /// bind/unbind interleaved constant buffer
+    HDST_API
+    void BindConstantBuffer(
+        HdStBufferArrayRangeSharedPtr const & constantBar) const;
+    HDST_API
+    void UnbindConstantBuffer(
+        HdStBufferArrayRangeSharedPtr const &constantBar) const;
 
-    StructBlockBinding customInterleavedBindings;
-    std::vector<BindingDeclaration> customBindings;
-  };
+    /// bind/unbind interleaved buffer
+    HDST_API
+    void BindInterleavedBuffer(
+        HdStBufferArrayRangeSharedPtr const & constantBar,
+        TfToken const &name) const;
+    HDST_API
+    void UnbindInterleavedBuffer(
+        HdStBufferArrayRangeSharedPtr const &constantBar,
+        TfToken const &name) const;
 
-  /// Constructor.
-  HDST_API
-  HdSt_ResourceBinder();
+    /// bind/unbind nested instance BufferArray
+    HDST_API
+    void BindInstanceBufferArray(
+        HdStBufferArrayRangeSharedPtr const &bar, int level) const;
+    HDST_API
+    void UnbindInstanceBufferArray(
+        HdStBufferArrayRangeSharedPtr const &bar, int level) const;
 
-  /// Assign all binding points used in drawitem and custom bindings.
-  /// Returns metadata to be used for codegen.
-  HDST_API
-  void ResolveBindings(HdStDrawItem const *drawItem,
-                       HdStShaderCodeSharedPtrVector const &shaders,
-                       MetaData *metaDataOut,
-                       MetaData::DrawingCoordBufferBinding const &dcBinding,
-                       bool instanceDraw,
-                       HdStBindingRequestVector const &customBindings,
-                       HgiCapabilities const *capabilities);
-
-  /// Assign all binding points used in computation.
-  /// Returns metadata to be used for codegen.
-  HDST_API
-  void ResolveComputeBindings(HdBufferSpecVector const &readWriteBufferSpecs,
-                              HdBufferSpecVector const &readOnlyBufferSpecs,
-                              HdStShaderCodeSharedPtrVector const &shaders,
-                              MetaData *metaDataOut,
-                              HgiCapabilities const *capabilities);
-
-  ////////////////////////////////////////////////////////////
-  // Hgi Binding
-  ////////////////////////////////////////////////////////////
-
-  HDST_API
-  void GetBufferBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                            TfToken const &name,
-                            HdStBufferResourceSharedPtr const &resource,
-                            int offset,
-                            int level = -1,
-                            int numElements = 1) const;
-
-  HDST_API
-  void GetBufferArrayBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                                 HdStBufferArrayRangeSharedPtr const &bar) const;
-
-  HDST_API
-  void GetInterleavedBufferArrayBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                                            HdStBufferArrayRangeSharedPtr const &bar,
-                                            TfToken const &name) const;
-
-  HDST_API
-  void GetInstanceBufferArrayBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                                         HdStBufferArrayRangeSharedPtr const &bar,
-                                         int level) const;
-
-  HDST_API
-  void GetBindingRequestBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                                    HdStBindingRequest const &req) const;
-
-  HDST_API
-  void GetTextureBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                             TfToken const &name,
-                             HgiSamplerHandle const &texelSampler,
-                             HgiTextureHandle const &texelTexture) const;
-
-  HDST_API
-  void GetTextureWithLayoutBindingDesc(HgiResourceBindingsDesc *bindingsDesc,
-                                       TfToken const &name,
-                                       HgiSamplerHandle const &texelSampler,
-                                       HgiTextureHandle const &texelTexture,
-                                       HgiSamplerHandle const &layoutSampler,
-                                       HgiTextureHandle const &layoutTexture) const;
-
-  ////////////////////////////////////////////////////////////
-  // GL Binding
-  ////////////////////////////////////////////////////////////
-
-  HDST_API
-  void Bind(HdStBindingRequest const &req) const;
-  HDST_API
-  void Unbind(HdStBindingRequest const &req) const;
-
-  /// bind/unbind BufferArray
-  HDST_API
-  void BindBufferArray(HdStBufferArrayRangeSharedPtr const &bar) const;
-  HDST_API
-  void UnbindBufferArray(HdStBufferArrayRangeSharedPtr const &bar) const;
-
-  /// bind/unbind interleaved constant buffer
-  HDST_API
-  void BindConstantBuffer(HdStBufferArrayRangeSharedPtr const &constantBar) const;
-  HDST_API
-  void UnbindConstantBuffer(HdStBufferArrayRangeSharedPtr const &constantBar) const;
-
-  /// bind/unbind interleaved buffer
-  HDST_API
-  void BindInterleavedBuffer(HdStBufferArrayRangeSharedPtr const &constantBar,
-                             TfToken const &name) const;
-  HDST_API
-  void UnbindInterleavedBuffer(HdStBufferArrayRangeSharedPtr const &constantBar,
-                               TfToken const &name) const;
-
-  /// bind/unbind nested instance BufferArray
-  HDST_API
-  void BindInstanceBufferArray(HdStBufferArrayRangeSharedPtr const &bar, int level) const;
-  HDST_API
-  void UnbindInstanceBufferArray(HdStBufferArrayRangeSharedPtr const &bar, int level) const;
-
-  /// piecewise buffer binding utility
-  /// (to be used for frustum culling, draw indirect result)
-  HDST_API
-  void BindBuffer(TfToken const &name, HdStBufferResourceSharedPtr const &resource) const;
-  HDST_API
-  void BindBuffer(TfToken const &name,
-                  HdStBufferResourceSharedPtr const &resource,
-                  int offset,
-                  int level = -1,
-                  int numElements = 1) const;
-  HDST_API
-  void UnbindBuffer(TfToken const &name,
+    /// piecewise buffer binding utility
+    /// (to be used for frustum culling, draw indirect result)
+    HDST_API
+    void BindBuffer(TfToken const &name,
+                    HdStBufferResourceSharedPtr const &resource) const;
+    HDST_API
+    void BindBuffer(TfToken const &name,
                     HdStBufferResourceSharedPtr const &resource,
-                    int level = -1) const;
+                    int offset, int level=-1, int numElements=1) const;
+    HDST_API
+    void UnbindBuffer(TfToken const &name,
+                      HdStBufferResourceSharedPtr const &resource,
+                      int level=-1) const;
 
-  /// bind(update) a standalone uniform (unsigned int)
-  HDST_API
-  void BindUniformui(TfToken const &name, int count, const unsigned int *value) const;
+    /// bind(update) a standalone uniform (unsigned int)
+    HDST_API
+    void BindUniformui(TfToken const &name, int count,
+                       const unsigned int *value) const;
 
-  /// bind a standalone uniform (signed int, ivec2, ivec3, ivec4)
-  HDST_API
-  void BindUniformi(TfToken const &name, int count, const int *value) const;
+    /// bind a standalone uniform (signed int, ivec2, ivec3, ivec4)
+    HDST_API
+    void BindUniformi(TfToken const &name, int count, const int *value) const;
 
-  /// bind a standalone uniform array (int[N])
-  HDST_API
-  void BindUniformArrayi(TfToken const &name, int count, const int *value) const;
+    /// bind a standalone uniform array (int[N])
+    HDST_API
+    void BindUniformArrayi(TfToken const &name, int count, const int *value) const;
 
-  /// bind a standalone uniform (float, vec2, vec3, vec4, mat4)
-  HDST_API
-  void BindUniformf(TfToken const &name, int count, const float *value) const;
+    /// bind a standalone uniform (float, vec2, vec3, vec4, mat4)
+    HDST_API
+    void BindUniformf(TfToken const &name, int count, const float *value) const;
 
-  ////////////////////////////////////////////////////////////
-  // Binding Queries
-  ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////
+    // Binding Queries
+    ////////////////////////////////////////////////////////////
 
-  /// Returns whether a binding exists.
-  bool HasBinding(TfToken const &name, int level = -1) const
-  {
-    return _bindingMap.find(NameAndLevel(name, level)) != _bindingMap.end();
-  }
-
-  /// Returns binding point.
-  HdStBinding GetBinding(TfToken const &name, int level = -1) const
-  {
-    HdStBinding binding;
-    TfMapLookup(_bindingMap, NameAndLevel(name, level), &binding);
-    return binding;
-  }
-
-  /// Returns the bindless handle for \p textureHandle using \p samplerHandle
-  HDST_API
-  static uint64_t GetSamplerBindlessHandle(HgiSamplerHandle const &samplerHandle,
-                                           HgiTextureHandle const &textureHandle);
-
-  /// Returns the bindless handle for \p textureHandle w/o separate sampler
-  HDST_API
-  static uint64_t GetTextureBindlessHandle(HgiTextureHandle const &textureHandle);
-
-  /// Binds the sampler and texture for \p name
-  /// Does nothing if the named resource is a bindless resource.
-  HDST_API
-  void BindTexture(const TfToken &name,
-                   HgiSamplerHandle const &samplerHandle,
-                   HgiTextureHandle const &textureHandle,
-                   const bool bind) const;
-
-  /// Binds the sampler and texture for \p name along with an additional
-  /// layout texture as needed for Ptex or UDIM textures.
-  /// Does nothing if the named resource is a bindless resource.
-  HDST_API
-  void BindTextureWithLayout(TfToken const &name,
-                             HgiSamplerHandle const &texelSampler,
-                             HgiTextureHandle const &texelTexture,
-                             HgiSamplerHandle const &layoutSampler,
-                             HgiTextureHandle const &layoutTexture,
-                             const bool bind) const;
-
- private:
-  // for batch execution
-  struct NameAndLevel {
-    NameAndLevel(TfToken const &n, int lv = -1) : name(n), level(lv) {}
-    TfToken name;
-    int level;
-
-    bool operator<(NameAndLevel const &other) const
-    {
-      return name < other.name || (name == other.name && level < other.level);
+    /// Returns whether a binding exists.
+    bool HasBinding(TfToken const &name, int level=-1) const {
+        return _bindingMap.find(NameAndLevel(name, level)) != _bindingMap.end();
     }
-  };
-  using _BindingMap = std::map<NameAndLevel, HdStBinding>;
-  _BindingMap _bindingMap;
+
+    /// Returns binding point.
+    HdStBinding GetBinding(TfToken const &name, int level=-1) const {
+        HdStBinding binding;
+        TfMapLookup(_bindingMap, NameAndLevel(name, level), &binding);
+        return binding;
+    }
+
+    /// Returns the bindless handle for \p textureHandle using \p samplerHandle
+    HDST_API
+    static uint64_t GetSamplerBindlessHandle(
+        HgiSamplerHandle const &samplerHandle,
+        HgiTextureHandle const &textureHandle);
+
+    /// Returns the bindless handle for \p textureHandle w/o separate sampler
+    HDST_API
+    static uint64_t GetTextureBindlessHandle(
+        HgiTextureHandle const &textureHandle);
+
+    /// Binds the sampler and texture for \p name
+    /// Does nothing if the named resource is a bindless resource.
+    HDST_API
+    void BindTexture(const TfToken &name,
+                     HgiSamplerHandle const &samplerHandle,
+                     HgiTextureHandle const &textureHandle,
+                     const bool bind) const;
+    HDST_API
+    void BindTextures(const TfToken &name,
+                      std::vector<HgiSamplerHandle> const &samplerHandles,
+                      std::vector<HgiTextureHandle> const &textureHandles,
+                      const bool bind) const;
+
+    /// Binds the sampler and texture for \p name along with an additional
+    /// layout texture as needed for Ptex or UDIM textures.
+    /// Does nothing if the named resource is a bindless resource.
+    HDST_API
+    void BindTextureWithLayout(TfToken const &name,
+                               HgiSamplerHandle const &texelSampler,
+                               HgiTextureHandle const &texelTexture,
+                               HgiSamplerHandle const &layoutSampler,
+                               HgiTextureHandle const &layoutTexture,
+                               const bool bind) const;
+    HDST_API
+    void BindTexturesWithLayout(
+        TfToken const &name,
+        std::vector<HgiSamplerHandle> const &texelSamplers,
+        std::vector<HgiTextureHandle> const &texelTextures,
+        std::vector<HgiSamplerHandle> const &layoutSamplers,
+        std::vector<HgiTextureHandle> const &layoutTextures,
+        const bool bind) const;
+
+private:
+    // for batch execution
+    struct NameAndLevel {
+        NameAndLevel(TfToken const &n, int lv=-1) :
+            name(n), level(lv) {}
+        TfToken name;
+        int level;
+
+        bool operator < (NameAndLevel const &other) const {
+            return name  < other.name ||
+                  (name == other.name && level < other.level);
+        }
+    };
+    using _BindingMap = std::map<NameAndLevel, HdStBinding>;
+    _BindingMap _bindingMap;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

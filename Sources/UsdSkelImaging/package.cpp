@@ -14,19 +14,22 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static TfToken _GetShaderPath(char const *shader)
+static TfToken
+_GetShaderPath(char const * shader)
 {
-  static PlugPluginPtr plugin = PLUG_THIS_PLUGIN;
-  const std::string path = PlugFindPluginResource(plugin, TfStringCatPaths("shaders", shader));
-  TF_VERIFY(!path.empty(), "Could not find shader: %s\n", shader);
+    static PlugPluginPtr plugin = PLUG_THIS_PLUGIN;
+    const std::string path =
+        PlugFindPluginResource(plugin, TfStringCatPaths("shaders", shader));
+    TF_VERIFY(!path.empty(), "Could not find shader: %s\n", shader);
 
-  return TfToken(path);
+    return TfToken(path);
 }
 
-TfToken UsdSkelImagingPackageSkinningShader()
+TfToken
+UsdSkelImagingPackageSkinningShader()
 {
-  static TfToken skinningShader = _GetShaderPath("skinning.glslfx");
-  return skinningShader;
+    static TfToken skinningShader = _GetShaderPath("skinning.glslfx");
+    return skinningShader;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

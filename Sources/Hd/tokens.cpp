@@ -51,55 +51,73 @@ TF_DEFINE_PUBLIC_TOKENS(HdAovTokens, HD_AOV_TOKENS);
 
 TF_DEFINE_PUBLIC_TOKENS(HdRenderSettingsTokens, HD_RENDER_SETTINGS_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens, HD_RENDER_SETTINGS_PRIM_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens,
+                        HD_RENDER_SETTINGS_PRIM_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdAspectRatioConformPolicyTokens, HD_ASPECT_RATIO_CONFORM_POLICY);
+TF_DEFINE_PUBLIC_TOKENS(HdAspectRatioConformPolicyTokens, 
+                        HD_ASPECT_RATIO_CONFORM_POLICY);
 
 TF_DEFINE_PUBLIC_TOKENS(HdResourceTypeTokens, HD_RESOURCE_TYPE_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, HD_SCENE_INDEX_EMULATION_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, 
+                        HD_SCENE_INDEX_EMULATION_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdCollectionEmulationTokens, HD_COLLECTION_EMULATION_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCollectionEmulationTokens, 
+                        HD_COLLECTION_EMULATION_TOKENS);
 
-bool HdPrimTypeIsGprim(TfToken const &primType)
+TF_DEFINE_PUBLIC_TOKENS(HdSkinningInputTokens, HD_SKINNING_INPUT_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSkinningSkelInputTokens, 
+                        HD_SKINNING_SKEL_INPUT_TOKENS);
+
+bool HdPrimTypeIsGprim(TfToken const& primType)
 {
-  return (primType == HdPrimTypeTokens->mesh || primType == HdPrimTypeTokens->basisCurves ||
-          primType == HdPrimTypeTokens->points || primType == HdPrimTypeTokens->volume);
+    return (primType == HdPrimTypeTokens->mesh ||
+            primType == HdPrimTypeTokens->basisCurves ||
+            primType == HdPrimTypeTokens->points ||
+            primType == HdPrimTypeTokens->volume);
 }
 
 const TfTokenVector &HdLightPrimTypeTokens()
 {
-  return HdLightTypeTokens->allTokens;
+    return HdLightTypeTokens->allTokens;
 }
 
-bool HdPrimTypeIsLight(TfToken const &primType)
+bool HdPrimTypeIsLight(TfToken const& primType)
 {
-  const auto &lightTypes = HdLightPrimTypeTokens();
-  return std::find(lightTypes.begin(), lightTypes.end(), primType) != lightTypes.end();
+    const auto &lightTypes = HdLightPrimTypeTokens();
+    return std::find(lightTypes.begin(), lightTypes.end(), primType) !=
+        lightTypes.end();
 }
 
-bool HdPrimTypeSupportsGeomSubsets(const TfToken &primType)
-{
-  static const TfTokenVector types = {
-      HdPrimTypeTokens->mesh, HdPrimTypeTokens->basisCurves,
-      // XXX: tetMesh not yet supported
-  };
-  return std::find(types.begin(), types.end(), primType) != types.end();
+bool HdPrimTypeSupportsGeomSubsets(const TfToken& primType) {
+    static const TfTokenVector types = {
+        HdPrimTypeTokens->mesh,
+        HdPrimTypeTokens->basisCurves,
+        // XXX: tetMesh not yet supported
+    };
+    return std::find(types.begin(), types.end(), primType) != types.end();
 }
 
-TfToken HdAovTokensMakePrimvar(TfToken const &primvar)
+TfToken HdAovTokensMakePrimvar(TfToken const& primvar)
 {
-  return TfToken(HdAovTokens->primvars.GetString() + primvar.GetString());
+    return TfToken(
+        HdAovTokens->primvars.GetString() +
+        primvar.GetString());
 }
 
-TfToken HdAovTokensMakeLpe(TfToken const &lpe)
+TfToken HdAovTokensMakeLpe(TfToken const& lpe)
 {
-  return TfToken(HdAovTokens->lpe.GetString() + lpe.GetString());
+    return TfToken(
+        HdAovTokens->lpe.GetString() +
+        lpe.GetString());
 }
 
-TfToken HdAovTokensMakeShader(TfToken const &shader)
+TfToken HdAovTokensMakeShader(TfToken const& shader)
 {
-  return TfToken(HdAovTokens->shader.GetString() + shader.GetString());
+    return TfToken(
+        HdAovTokens->shader.GetString() +
+        shader.GetString());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

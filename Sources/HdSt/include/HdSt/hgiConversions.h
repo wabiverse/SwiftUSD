@@ -7,11 +7,11 @@
 #ifndef PXR_IMAGING_HD_ST_HGI_CONVERSIONS_H
 #define PXR_IMAGING_HD_ST_HGI_CONVERSIONS_H
 
+#include "HdSt/api.h"
 #include "Hd/enums.h"
 #include "Hd/types.h"
-#include "HdSt/api.h"
-#include "Hgi/enums.h"
 #include "Hgi/types.h"
+#include "Hgi/enums.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -20,37 +20,41 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Converts from Hd types to Hgi types
 ///
-class HdStHgiConversions {
- public:
-  HDST_API
-  static HgiFormat GetHgiFormat(HdFormat hdFormat);
+class HdStHgiConversions
+{
+public:
 
-  HDST_API
-  static HgiFormat GetHgiVertexFormat(HdType hdType);
+    HDST_API
+    static HgiFormat GetHgiFormat(HdFormat hdFormat);
 
-  HDST_API
-  static HgiSamplerAddressMode GetHgiSamplerAddressMode(HdWrap hdWrap);
+    HDST_API
+    static HgiFormat GetHgiVertexFormat(HdType hdType);
 
-  HDST_API
-  static HgiSamplerFilter GetHgiMagFilter(HdMagFilter hdMagFilter);
+    HDST_API
+    static HgiSamplerAddressMode GetHgiSamplerAddressMode(HdWrap hdWrap);
 
-  /// The HdMinFilter translates into two Hgi enums for
-  /// HgiSamplerDesc::minFilter and HgiSamplerDesc::mipFilter.
-  ///
-  HDST_API
-  static void GetHgiMinAndMipFilter(HdMinFilter hdMinFilter,
-                                    HgiSamplerFilter *hgiSamplerFilter,
-                                    HgiMipFilter *hgiMipFilter);
+    HDST_API
+    static HgiSamplerFilter GetHgiMagFilter(HdMagFilter hdMagFilter);
 
-  HDST_API
-  static HgiBorderColor GetHgiBorderColor(HdBorderColor hdBorderColor);
+    /// The HdMinFilter translates into two Hgi enums for
+    /// HgiSamplerDesc::minFilter and HgiSamplerDesc::mipFilter.
+    ///
+    HDST_API
+    static void GetHgiMinAndMipFilter(
+        HdMinFilter hdMinFilter,
+        HgiSamplerFilter *hgiSamplerFilter, HgiMipFilter *hgiMipFilter);
 
-  HDST_API
-  static HgiCompareFunction GetHgiCompareFunction(HdCompareFunction hdCompareFunc);
+    HDST_API
+    static HgiBorderColor GetHgiBorderColor(HdBorderColor hdBorderColor);
 
-  HDST_API
-  static HgiStencilOp GetHgiStencilOp(HdStencilOp hdStencilOp);
+    HDST_API
+    static HgiCompareFunction GetHgiCompareFunction(
+        HdCompareFunction hdCompareFunc);
+
+    HDST_API
+    static HgiStencilOp GetHgiStencilOp(HdStencilOp hdStencilOp);
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -5,8 +5,8 @@
 // https://openusd.org/license.
 //
 
-#include "Tf/nullPtr.h"
 #include "pxr/pxrns.h"
+#include "Tf/nullPtr.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

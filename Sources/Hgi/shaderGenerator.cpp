@@ -20,48 +20,53 @@ HgiShaderGenerator::HgiShaderGenerator(const HgiShaderFunctionDesc &descriptor)
 
 HgiShaderGenerator::~HgiShaderGenerator() = default;
 
-void HgiShaderGenerator::Execute()
+void
+HgiShaderGenerator::Execute()
 {
-  std::stringstream ss;
+    std::stringstream ss;
 
-  // Use the protected version which can be overridden
-  _Execute(ss);
+    // Use the protected version which can be overridden
+    _Execute(ss);
 
-  // Capture the result as specified by the descriptor or locally.
-  if (_descriptor.generatedShaderCodeOut) {
-    *_descriptor.generatedShaderCodeOut = ss.str();
-  }
-  else {
-    _localGeneratedShaderCode = ss.str();
-  }
+    // Capture the result as specified by the descriptor or locally.
+    if (_descriptor.generatedShaderCodeOut) {
+       *_descriptor.generatedShaderCodeOut = ss.str();
+    } else {
+       _localGeneratedShaderCode = ss.str();
+    }
 }
 
-const char *HgiShaderGenerator::_GetShaderCodeDeclarations() const
+const char *
+HgiShaderGenerator::_GetShaderCodeDeclarations() const
 {
-  static const char *emptyString = "";
-  return _descriptor.shaderCodeDeclarations ? _descriptor.shaderCodeDeclarations : emptyString;
+    static const char *emptyString = "";
+    return _descriptor.shaderCodeDeclarations
+                ? _descriptor.shaderCodeDeclarations : emptyString;
 }
 
-const char *HgiShaderGenerator::_GetShaderCode() const
+const char *
+HgiShaderGenerator::_GetShaderCode() const
 {
-  static const char *emptyString = "";
-  return _descriptor.shaderCode ? _descriptor.shaderCode : emptyString;
+    static const char *emptyString = "";
+    return _descriptor.shaderCode
+                ? _descriptor.shaderCode : emptyString;
 }
 
-HgiShaderStage HgiShaderGenerator::_GetShaderStage() const
+HgiShaderStage
+HgiShaderGenerator::_GetShaderStage() const
 {
-  return _descriptor.shaderStage;
+    return _descriptor.shaderStage;
 }
 
-const char *HgiShaderGenerator::GetGeneratedShaderCode() const
+const char *
+HgiShaderGenerator::GetGeneratedShaderCode() const
 {
-  // Return the result as specified by the descriptor or locally.
-  if (_descriptor.generatedShaderCodeOut) {
-    return _descriptor.generatedShaderCodeOut->c_str();
-  }
-  else {
-    return _localGeneratedShaderCode.c_str();
-  }
+    // Return the result as specified by the descriptor or locally.
+    if (_descriptor.generatedShaderCodeOut) {
+       return _descriptor.generatedShaderCodeOut->c_str();
+    } else {
+       return _localGeneratedShaderCode.c_str();
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

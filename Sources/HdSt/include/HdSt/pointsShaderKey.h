@@ -7,44 +7,36 @@
 #ifndef PXR_IMAGING_HD_ST_POINTS_SHADER_KEY_H
 #define PXR_IMAGING_HD_ST_POINTS_SHADER_KEY_H
 
-#include "Hd/enums.h"
+#include "pxr/pxrns.h"
 #include "Hd/version.h"
+#include "Hd/enums.h"
 #include "HdSt/geometricShader.h"
 #include "HdSt/shaderKey.h"
 #include "Tf/token.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-struct HdSt_PointsShaderKey : public HdSt_ShaderKey {
-  HDST_API
-  HdSt_PointsShaderKey();
-  HDST_API
-  ~HdSt_PointsShaderKey();
+struct HdSt_PointsShaderKey : public HdSt_ShaderKey
+{
+    HDST_API
+    HdSt_PointsShaderKey(bool nativeRoundPoints);
+    HDST_API
+    ~HdSt_PointsShaderKey();
 
-  TfToken const &GetGlslfxFilename() const override
-  {
-    return glslfx;
-  }
-  TfToken const *GetVS() const override
-  {
-    return VS;
-  }
-  // Skip TCS, TES and GS stages
-  TfToken const *GetFS() const override
-  {
-    return FS;
-  }
+    TfToken const &GetGlslfxFilename() const override { return glslfx; }
+    TfToken const *GetVS() const override { return VS; }
+    // Skip TCS, TES and GS stages
+    TfToken const *GetFS() const override { return FS; }
 
-  HdSt_GeometricShader::PrimitiveType GetPrimitiveType() const override
-  {
-    return HdSt_GeometricShader::PrimitiveType::PRIM_POINTS;
-  }
+    HdSt_GeometricShader::PrimitiveType GetPrimitiveType() const override {
+        return HdSt_GeometricShader::PrimitiveType::PRIM_POINTS; 
+    }
 
-  TfToken glslfx;
-  TfToken VS[6];
-  TfToken FS[6];
+    TfToken glslfx;
+    TfToken VS[7];
+    TfToken FS[7];
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

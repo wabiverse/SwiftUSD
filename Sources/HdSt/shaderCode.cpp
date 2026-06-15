@@ -24,118 +24,139 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 HdStShaderCode::HdStShaderCode() = default;
 
 /*virtual*/
 HdStShaderCode::~HdStShaderCode() = default;
 
 /* static */
-size_t HdStShaderCode::ComputeHash(HdStShaderCodeSharedPtrVector const &shaders)
+size_t
+HdStShaderCode::ComputeHash(HdStShaderCodeSharedPtrVector const &shaders)
 {
-  size_t hash = 0;
-
-  TF_FOR_ALL(it, shaders)
-  {
-    hash = TfHash::Combine(hash, (*it)->ComputeHash());
-  }
-
-  return hash;
+    size_t hash = 0;
+    
+    TF_FOR_ALL(it, shaders) {
+        hash = TfHash::Combine(hash, (*it)->ComputeHash());
+    }
+    
+    return hash;
 }
 
 /* virtual */
-TfToken HdStShaderCode::GetMaterialTag() const
+TfToken
+HdStShaderCode::GetMaterialTag() const
 {
-  return TfToken();
+    return TfToken();
 }
 
 /*virtual*/
-HdSt_MaterialParamVector const &HdStShaderCode::GetParams() const
+HdSt_MaterialParamVector const&
+HdStShaderCode::GetParams() const
 {
-  static HdSt_MaterialParamVector const empty;
-  return empty;
+    static HdSt_MaterialParamVector const empty;
+    return empty;
 }
 
 /* virtual */
-bool HdStShaderCode::IsEnabledPrimvarFiltering() const
+bool
+HdStShaderCode::IsEnabledPrimvarFiltering() const
 {
-  return false;
+    return false;
 }
 
 /* virtual */
-TfTokenVector const &HdStShaderCode::GetPrimvarNames() const
+TfTokenVector const&
+HdStShaderCode::GetPrimvarNames() const
 {
-  static const TfTokenVector EMPTY;
-  return EMPTY;
+    static const TfTokenVector EMPTY;
+    return EMPTY;
 }
 
 /*virtual*/
-HdBufferArrayRangeSharedPtr const &HdStShaderCode::GetShaderData() const
+HdBufferArrayRangeSharedPtr const&
+HdStShaderCode::GetShaderData() const
 {
-  static HdBufferArrayRangeSharedPtr EMPTY;
-  return EMPTY;
+    static HdBufferArrayRangeSharedPtr EMPTY;
+    return EMPTY;
 }
 
 /* virtual */
-HdStShaderCode::NamedTextureHandleVector const &HdStShaderCode::GetNamedTextureHandles() const
+HdStShaderCode::NamedTextureHandleVector const &
+HdStShaderCode::GetNamedTextureHandles() const
 {
-  static HdStShaderCode::NamedTextureHandleVector empty;
-  return empty;
+    static HdStShaderCode::NamedTextureHandleVector empty;
+    return empty;
 }
 
 /*virtual*/
-void HdStShaderCode::AddResourcesFromTextures(ResourceContext &ctx) const {}
-
-HdStShaderCode::ID HdStShaderCode::ComputeTextureSourceHash() const
+void
+HdStShaderCode::AddResourcesFromTextures(ResourceContext &ctx) const
 {
-  return 0;
 }
 
-void HdStShaderCode::ResourceContext::AddSource(HdBufferArrayRangeSharedPtr const &range,
-                                                HdBufferSourceSharedPtr const &source)
-{
-  _registry->AddSource(range, source);
+HdStShaderCode::ID
+HdStShaderCode::ComputeTextureSourceHash() const {
+    return 0;
 }
 
-void HdStShaderCode::ResourceContext::AddSources(HdBufferArrayRangeSharedPtr const &range,
-                                                 HdBufferSourceSharedPtrVector &&sources)
+void
+HdStShaderCode::ResourceContext::AddSource(
+    HdBufferArrayRangeSharedPtr const &range,
+    HdBufferSourceSharedPtr const &source)
 {
-  _registry->AddSources(range, std::move(sources));
+    _registry->AddSource(range, source);
 }
 
-void HdStShaderCode::ResourceContext::AddComputation(HdBufferArrayRangeSharedPtr const &range,
-                                                     HdStComputationSharedPtr const &computation,
-                                                     HdStComputeQueue const queue)
+void
+HdStShaderCode::ResourceContext::AddSources(
+    HdBufferArrayRangeSharedPtr const &range,
+    HdBufferSourceSharedPtrVector && sources)
 {
-  _registry->AddComputation(range, computation, queue);
+    _registry->AddSources(range, std::move(sources));
 }
 
-HdStShaderCode::ResourceContext::ResourceContext(HdStResourceRegistry *const registry)
-    : _registry(registry)
+void
+HdStShaderCode::ResourceContext::AddComputation(
+    HdBufferArrayRangeSharedPtr const &range,
+    HdStComputationSharedPtr const &computation,
+    HdStComputeQueue const queue)
+{
+    _registry->AddComputation(range, computation, queue);
+}
+
+HdStShaderCode::ResourceContext::ResourceContext(
+    HdStResourceRegistry * const registry)
+  : _registry(registry)
 {
 }
 
 /* virtual */
-HioGlslfx const *HdStShaderCode::_GetGlslfx() const
+HioGlslfx const *
+HdStShaderCode::_GetGlslfx() const
 {
-  return nullptr;
+    return nullptr;
 }
 
-VtDictionary HdStShaderCode::GetLayout(TfTokenVector const &shaderStageKeys) const
+VtDictionary
+HdStShaderCode::GetLayout(TfTokenVector const &shaderStageKeys) const
 {
-  HioGlslfx const *glslfx = _GetGlslfx();
-  if (!glslfx) {
-    VtDictionary static emptyLayoutDictionary;
-    return emptyLayoutDictionary;
-  }
+    HioGlslfx const *glslfx = _GetGlslfx();
+    if (!glslfx) {
+        VtDictionary static emptyLayoutDictionary;
+        return emptyLayoutDictionary;
+    }
 
-  std::string errorStr;
-  VtDictionary layoutAsDict = glslfx->GetLayoutAsDictionary(shaderStageKeys, &errorStr);
+    std::string errorStr;
+    VtDictionary layoutAsDict =
+        glslfx->GetLayoutAsDictionary(shaderStageKeys, &errorStr);
 
-  if (!errorStr.empty()) {
-    TF_CODING_ERROR("Error parsing GLSLFX layout:\n%s\n", errorStr.c_str());
-  }
+    if (!errorStr.empty()) {
+        TF_CODING_ERROR("Error parsing GLSLFX layout:\n%s\n",
+                        errorStr.c_str());
+    }
 
-  return layoutAsDict;
+    return layoutAsDict;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

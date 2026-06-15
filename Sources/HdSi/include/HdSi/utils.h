@@ -7,13 +7,38 @@
 #ifndef PXR_IMAGING_HDSI_UTILS_H
 #define PXR_IMAGING_HDSI_UTILS_H
 
+#include "pxr/pxrns.h"
 #include "HdSi/api.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
+#include "Tf/declarePtrs.h"
+#include "Tf/token.h"
+#include <optional>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+TF_DECLARE_WEAK_AND_REF_PTRS(HdSceneIndexBase);
+
 class HdCollectionExpressionEvaluator;
+class HdCollectionsSchema;
+class SdfPathExpression;
+
+struct HdSceneIndexPrim;
+
+/// --------------------------------------------------------------------------
+/// General use collection utilities.
+/// --------------------------------------------------------------------------
+
+/// Extracts and compiles the membership expression of the collection
+/// with the given \p collectionName, if it exists.
+///
+HDSI_API
+void
+HdsiUtilsCompileCollection(
+    HdCollectionsSchema &collections,
+    TfToken const& collectionName,
+    HdSceneIndexBaseRefPtr const& sceneIndex,
+    SdfPathExpression *expr,
+    std::optional<HdCollectionExpressionEvaluator> *eval);
 
 /// --------------------------------------------------------------------------
 /// Utilities to evaluate membership expressions for collections with pruning
@@ -24,16 +49,35 @@ class HdCollectionExpressionEvaluator;
 /// evaluator.
 ///
 HDSI_API
-bool HdsiUtilsIsPruned(const SdfPath &primPath, const HdCollectionExpressionEvaluator &eval);
+bool 
+HdsiUtilsIsPruned(
+    const SdfPath &primPath,
+    const HdCollectionExpressionEvaluator &eval);
 
 /// Prunes the given list of children using the supplied evaluator.
 HDSI_API
-void HdsiUtilsRemovePrunedChildren(const SdfPath &parentPath,
-                                   const HdCollectionExpressionEvaluator &eval,
-                                   SdfPathVector *children);
+void
+HdsiUtilsRemovePrunedChildren(
+    const SdfPath &parentPath,
+    const HdCollectionExpressionEvaluator &eval,
+    SdfPathVector *children);
+
+/// --------------------------------------------------------------------------
+/// Utilities for working with materials
+/// --------------------------------------------------------------------------
+
+/// Returns the path of the material bound to \p prim for the 'full' or 
+/// 'allPurpose' purposes (whichever is found first).
+///
+/// If no material is bound to this prim for either of those purposes, an
+/// empty path is returned.
+HDSI_API
+SdfPath 
+HdsiUtilsGetBoundMaterial(
+    const HdSceneIndexPrim& prim);
 
 /// ------------------------------------------------------------------------
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDSI_UTILS_H
+#endif //PXR_IMAGING_HDSI_UTILS_H

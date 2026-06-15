@@ -4,8 +4,6 @@
 #ifndef PXR_PEGTL_CONTRIB_INTERNAL_ENDIAN_GCC_HPP
 #define PXR_PEGTL_CONTRIB_INTERNAL_ENDIAN_GCC_HPP
 
-#if !defined(_WIN32)
-
 #include <cstdint>
 #include <cstring>
 
@@ -196,7 +194,5 @@ namespace PXR_PEGTL_NAMESPACE::internal
 #endif
 
 }  // namespace PXR_PEGTL_NAMESPACE::internal
-
-#endif // !defined(_WIN32)
 
 #endif

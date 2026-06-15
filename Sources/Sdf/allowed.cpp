@@ -6,15 +6,16 @@
 //
 /// \file Allowed.cpp
 
-#include "Sdf/allowed.h"
 #include "pxr/pxrns.h"
+#include "Sdf/allowed.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-const std::string &SdfAllowed::GetWhyNot() const
+const std::string&
+SdfAllowed::GetWhyNot() const
 {
-  static std::string empty;
-  return _state ? *_state : empty;
+    static std::string empty;
+    return _state ? *_state : empty;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

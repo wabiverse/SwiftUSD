@@ -8,38 +8,57 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiComputeShaderConstantsDesc::HgiComputeShaderConstantsDesc() : byteSize(0) {}
-
-bool operator==(const HgiComputeShaderConstantsDesc &lhs, const HgiComputeShaderConstantsDesc &rhs)
+HgiComputeShaderConstantsDesc::HgiComputeShaderConstantsDesc()
+    : byteSize(0)
 {
-  return lhs.byteSize == rhs.byteSize;
 }
 
-bool operator!=(const HgiComputeShaderConstantsDesc &lhs, const HgiComputeShaderConstantsDesc &rhs)
+bool operator==(
+    const HgiComputeShaderConstantsDesc& lhs,
+    const HgiComputeShaderConstantsDesc& rhs)
 {
-  return !(lhs == rhs);
+    return lhs.byteSize == rhs.byteSize;
 }
 
-HgiComputePipelineDesc::HgiComputePipelineDesc() : shaderProgram() {}
-
-bool operator==(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc &rhs)
+bool operator!=(
+    const HgiComputeShaderConstantsDesc& lhs,
+    const HgiComputeShaderConstantsDesc& rhs)
 {
-  return lhs.debugName == rhs.debugName && lhs.shaderProgram == rhs.shaderProgram &&
-         lhs.shaderConstantsDesc == rhs.shaderConstantsDesc;
+    return !(lhs == rhs);
 }
 
-bool operator!=(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc &rhs)
+HgiComputePipelineDesc::HgiComputePipelineDesc()
+    : shaderProgram()
 {
-  return !(lhs == rhs);
 }
 
-HgiComputePipeline::HgiComputePipeline(HgiComputePipelineDesc const &desc) : _descriptor(desc) {}
+bool operator==(
+    const HgiComputePipelineDesc& lhs,
+    const HgiComputePipelineDesc& rhs)
+{
+    return lhs.debugName == rhs.debugName &&
+           lhs.shaderProgram == rhs.shaderProgram &&
+           lhs.shaderConstantsDesc == rhs.shaderConstantsDesc;
+}
+
+bool operator!=(
+    const HgiComputePipelineDesc& lhs,
+    const HgiComputePipelineDesc& rhs)
+{
+    return !(lhs == rhs);
+}
+
+HgiComputePipeline::HgiComputePipeline(HgiComputePipelineDesc const& desc)
+    : _descriptor(desc)
+{
+}
 
 HgiComputePipeline::~HgiComputePipeline() = default;
 
-HgiComputePipelineDesc const &HgiComputePipeline::GetDescriptor() const
+HgiComputePipelineDesc const&
+HgiComputePipeline::GetDescriptor() const
 {
-  return _descriptor;
+    return _descriptor;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

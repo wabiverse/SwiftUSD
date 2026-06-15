@@ -11,117 +11,138 @@
 
 #include "Usd/stageCache.h"
 
+#include "Tf/staticData.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens,
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
 
-                         /* discoveryTypes */
-                         (usda)(usdc)(usd));
+    /* discoveryTypes */
+    (usda)
+    (usdc)
+    (usd)
+);
 
-UsdStageCache UsdShadeShaderDefParserPlugin::_cache;
+static TfStaticData<UsdStageCache> _StageCache;
 
-static NdrTokenMap _GetSdrMetadata(const UsdShadeShader &shaderDef,
-                                   const NdrTokenMap &discoveryResultMetadata)
+static
+SdrTokenMap
+_GetSdrMetadata(const UsdShadeShader &shaderDef,
+                const SdrTokenMap &discoveryResultMetadata) 
 {
-  // XXX Currently, this parser does not support 'vstruct' parsing, but if
-  //     we decide to support 'vstruct' type in the future, we would need to
-  //     identify 'vstruct' types in this function by examining the metadata.
+    // XXX Currently, this parser does not support 'vstruct' parsing, but if
+    //     we decide to support 'vstruct' type in the future, we would need to
+    //     identify 'vstruct' types in this function by examining the metadata.
 
-  NdrTokenMap metadata = discoveryResultMetadata;
+    SdrTokenMap metadata = discoveryResultMetadata;
 
-  auto shaderDefMetadata = shaderDef.GetSdrMetadata();
-  metadata.insert(shaderDefMetadata.begin(), shaderDefMetadata.end());
+    auto shaderDefMetadata = shaderDef.GetSdrMetadata();
+    metadata.insert(shaderDefMetadata.begin(), shaderDefMetadata.end());
 
-  metadata[SdrNodeMetadata->Primvars] = UsdShadeShaderDefUtils::GetPrimvarNamesMetadataString(
-      metadata, shaderDef.ConnectableAPI());
-
-  return metadata;
-}
-
-NdrNodeUniquePtr UsdShadeShaderDefParserPlugin::Parse(
-    const NdrNodeDiscoveryResult &discoveryResult)
-{
-  const std::string &rootLayerPath = discoveryResult.resolvedUri;
-
-  SdfLayerRefPtr rootLayer = SdfLayer::FindOrOpen(rootLayerPath);
-  UsdStageRefPtr stage = UsdShadeShaderDefParserPlugin::_cache.FindOneMatching(rootLayer);
-  if (!stage) {
-    stage = UsdStage::Open(rootLayer);
-    UsdShadeShaderDefParserPlugin::_cache.Insert(stage);
-  }
-
-  if (!stage) {
-    return NdrParserPlugin::GetInvalidNode(discoveryResult);
-    ;
-  }
-
-  UsdPrim shaderDefPrim;
-  // Fallback to looking for the subidentifier if the identifier does not
-  // produce a valid shader def prim
-  TfTokenVector identifiers = {discoveryResult.identifier, discoveryResult.subIdentifier};
-  for (const TfToken &identifier : identifiers) {
-    SdfPath shaderDefPath = SdfPath::AbsoluteRootPath().AppendChild(identifier);
-    shaderDefPrim = stage->GetPrimAtPath(shaderDefPath);
-
-    if (shaderDefPrim) {
-      break;
+    const std::string primvarsStr = 
+        UsdShadeShaderDefUtils::GetPrimvarNamesMetadataString(
+                                          metadata, shaderDef.ConnectableAPI());
+    if (!primvarsStr.empty()) {
+        metadata[SdrNodeMetadata->Primvars] = primvarsStr;
     }
-  }
 
-  if (!shaderDefPrim) {
-    return NdrParserPlugin::GetInvalidNode(discoveryResult);
-    ;
-  }
-
-  UsdShadeShader shaderDef(shaderDefPrim);
-  if (!shaderDef) {
-    return NdrParserPlugin::GetInvalidNode(discoveryResult);
-    ;
-  }
-
-  SdfAssetPath nodeUriAssetPath;
-  if (!shaderDef.GetSourceAsset(&nodeUriAssetPath, discoveryResult.sourceType)) {
-    return NdrParserPlugin::GetInvalidNode(discoveryResult);
-  }
-
-  const std::string &resolvedImplementationUri = nodeUriAssetPath.GetResolvedPath();
-  if (resolvedImplementationUri.empty()) {
-    TF_RUNTIME_ERROR(
-        "Unable to resolve path @%s@ in shader "
-        "definition file '%s'",
-        nodeUriAssetPath.GetAssetPath().c_str(),
-        rootLayerPath.c_str());
-    return NdrParserPlugin::GetInvalidNode(discoveryResult);
-  }
-
-  return NdrNodeUniquePtr(
-      new SdrShaderNode(discoveryResult.identifier,
-                        discoveryResult.version,
-                        discoveryResult.name,
-                        discoveryResult.family,
-                        discoveryResult.discoveryType, /* discoveryType */
-                        discoveryResult.sourceType,    /* sourceType */
-                        rootLayerPath,
-                        resolvedImplementationUri,
-                        UsdShadeShaderDefUtils::GetShaderProperties(shaderDef.ConnectableAPI()),
-                        _GetSdrMetadata(shaderDef, discoveryResult.metadata),
-                        discoveryResult.sourceCode));
+    return metadata;
 }
 
-const NdrTokenVec &UsdShadeShaderDefParserPlugin::GetDiscoveryTypes() const
+SdrShaderNodeUniquePtr 
+UsdShadeShaderDefParserPlugin::ParseShaderNode(
+    const SdrShaderNodeDiscoveryResult &discoveryResult)
 {
-  static const NdrTokenVec discoveryTypes{_tokens->usda, _tokens->usdc, _tokens->usd};
-  return discoveryTypes;
+    const std::string &rootLayerPath = discoveryResult.resolvedUri;
+
+    SdfLayerRefPtr rootLayer = SdfLayer::FindOrOpen(rootLayerPath);
+    UsdStageRefPtr stage = _StageCache->FindOneMatching(rootLayer);
+    if (!stage) {
+        stage = UsdStage::Open(rootLayer);
+        _StageCache->Insert(stage);
+    }
+
+    if (!stage) {
+        return SdrParserPlugin::GetInvalidShaderNode(discoveryResult);;
+    }
+
+    UsdPrim shaderDefPrim;
+    // Fallback to looking for the subidentifier if the identifier does not
+    // produce a valid shader def prim
+    TfTokenVector identifiers =
+        { discoveryResult.identifier, discoveryResult.subIdentifier };
+    for (const TfToken& identifier : identifiers) {
+        SdfPath shaderDefPath =
+            SdfPath::AbsoluteRootPath().AppendChild(identifier);
+        shaderDefPrim = stage->GetPrimAtPath(shaderDefPath);
+
+        if (shaderDefPrim) {
+            break;
+        }
+    }
+
+    if (!shaderDefPrim) {
+        return SdrParserPlugin::GetInvalidShaderNode(discoveryResult);;
+    }
+
+    UsdShadeShader shaderDef(shaderDefPrim);
+    if (!shaderDef) {
+        return SdrParserPlugin::GetInvalidShaderNode(discoveryResult);;
+    }
+
+    SdfAssetPath nodeUriAssetPath;
+    if (!shaderDef.GetSourceAsset(&nodeUriAssetPath,
+                                  discoveryResult.shadingSystem)) {
+        return SdrParserPlugin::GetInvalidShaderNode(discoveryResult);
+    }
+
+    const std::string &resolvedImplementationUri = nodeUriAssetPath.GetResolvedPath();
+    if (resolvedImplementationUri.empty()) {
+        TF_RUNTIME_ERROR("Unable to resolve path @%s@ in shader "
+            "definition file '%s'", nodeUriAssetPath.GetAssetPath().c_str(), 
+            rootLayerPath.c_str());
+        return SdrParserPlugin::GetInvalidShaderNode(discoveryResult);
+    }
+
+    return SdrShaderNodeUniquePtr(new SdrShaderNode(
+        discoveryResult.identifier, 
+        discoveryResult.version,
+        discoveryResult.name,
+        discoveryResult.function,
+        // NOTE: discoveryType as context will be replaced in a future
+        // release with shader-specific terms that have correct "context"
+        // semantics
+        discoveryResult.discoveryType, /* context */
+        discoveryResult.shadingSystem, /* shadingSystem */
+        rootLayerPath,
+        resolvedImplementationUri,
+        UsdShadeShaderDefUtils::GetProperties(
+            shaderDef.ConnectableAPI()),
+        _GetSdrMetadata(shaderDef, discoveryResult.metadata),
+        discoveryResult.sourceCode
+    ));
+    
 }
 
-const TfToken &UsdShadeShaderDefParserPlugin::GetSourceType() const
+const SdrTokenVec &
+UsdShadeShaderDefParserPlugin::GetDiscoveryTypes() const 
 {
-  // The sourceType if this parser plugin is empty, because it can generate
-  // nodes of any sourceType.
-  static TfToken empty;
-  return empty;
+    static const SdrTokenVec discoveryTypes{_tokens->usda, 
+                                            _tokens->usdc, 
+                                            _tokens->usd};
+    return discoveryTypes;
 }
 
-NDR_REGISTER_PARSER_PLUGIN(UsdShadeShaderDefParserPlugin);
+const TfToken &
+UsdShadeShaderDefParserPlugin::GetShadingSystem() const
+{
+    // The shadingSystem of this parser plugin is empty, because it can 
+    // generate nodes of any shadingSystem.
+    static TfToken empty;
+    return empty;
+}
+
+SDR_REGISTER_PARSER_PLUGIN(UsdShadeShaderDefParserPlugin);
 
 PXR_NAMESPACE_CLOSE_SCOPE

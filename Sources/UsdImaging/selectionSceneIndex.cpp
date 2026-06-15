@@ -6,20 +6,23 @@
 //
 #include "UsdImaging/selectionSceneIndex.h"
 
-#include "Hd/instanceIndicesSchema.h"
-#include "Hd/instanceSchema.h"
-#include "Hd/instancedBySchema.h"
-#include "Hd/instancerTopologySchema.h"
-#include "Hd/retainedDataSource.h"
-#include "Hd/selectionSchema.h"
-#include "Hd/selectionsSchema.h"
-#include "Trace/traceImpl.h"
 #include "UsdImaging/debugCodes.h"
 #include "UsdImaging/usdPrimInfoSchema.h"
+#include "Hd/instanceSchema.h"
+#include "Hd/instancedBySchema.h"
+#include "Hd/instanceIndicesSchema.h"
+#include "Hd/instancerTopologySchema.h"
+#include "Hd/retainedDataSource.h"
+#include "Hd/sceneIndexPrimView.h"
+#include "Hd/selectionSchema.h"
+#include "Hd/selectionsSchema.h"
+#include "Hd/tokens.h"
+#include "Trace/trace.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace UsdImagingSelectionSceneIndex_Impl {
+namespace UsdImagingSelectionSceneIndex_Impl
+{
 
 // The following struct's align with the selection Hydra schemata.
 //
@@ -34,13 +37,14 @@ namespace UsdImagingSelectionSceneIndex_Impl {
 // To select particular instances of this geometry, we give the following
 // information:
 //
-struct _InstanceIndices {
-  // The instancer.
-  SdfPath instancer;
-  // The index of the prototype within the prototypes of the above instancer.
-  int prototypeIndex;
-  // The selected instances.
-  VtIntArray instanceIndices;
+struct _InstanceIndices
+{
+    // The instancer.
+    SdfPath instancer;
+    // The index of the prototype within the prototypes of the above instancer.
+    int prototypeIndex;
+    // The selected instances.
+    VtIntArray instanceIndices;
 };
 
 // Data for HdInstanceIndicesVectorSchema
@@ -55,113 +59,135 @@ struct _InstanceIndices {
 using _InstanceIndicesVector = std::vector<_InstanceIndices>;
 
 // Data for HdSelectionSchema
-struct _Selection {
-  // In the future, this might contain further information such as which
-  // highlighting mode is used or whether some subset of faces, ...
-  // is selected.
+struct _Selection
+{
+    // In the future, this might contain further information such as which
+    // highlighting mode is used or whether some subset of faces, ...
+    // is selected.
 
-  // Which nested instances of this piece of geometry are selected.
-  _InstanceIndicesVector nestedInstanceIndices;
+    // Which nested instances of this piece of geometry are selected.
+    _InstanceIndicesVector nestedInstanceIndices;
 };
 
 // Data for HdSelectionsSchema.
 using _Selections = std::vector<_Selection>;
 
 // Information shared between scene index and data sources.
-struct _SelectionInfo {
-  // The selection state by path in the scene index.
-  std::map<SdfPath, _Selections> primToSelections;
+struct _SelectionInfo
+{
+    // The selection state by path in the scene index.
+    std::map<SdfPath, _Selections> primToSelections;
 };
 
-HdContainerDataSourceHandle _ToDs(const _InstanceIndices &i)
+HdContainerDataSourceHandle
+_ToDs(const _InstanceIndices &i)
 {
-  return HdInstanceIndicesSchema::Builder()
-      .SetInstancer(HdRetainedTypedSampledDataSource<SdfPath>::New(i.instancer))
-      .SetPrototypeIndex(HdRetainedTypedSampledDataSource<int>::New(i.prototypeIndex))
-      .SetInstanceIndices(HdRetainedTypedSampledDataSource<VtIntArray>::New(i.instanceIndices))
-      .Build();
+    return
+        HdInstanceIndicesSchema::Builder()
+            .SetInstancer(
+                HdRetainedTypedSampledDataSource<SdfPath>::New(
+                    i.instancer))
+            .SetPrototypeIndex(
+                HdRetainedTypedSampledDataSource<int>::New(
+                    i.prototypeIndex))
+            .SetInstanceIndices(
+                HdRetainedTypedSampledDataSource<VtIntArray>::New(
+                    i.instanceIndices))
+            .Build();
 }
 
-HdVectorDataSourceHandle _ToDs(const _InstanceIndicesVector &v)
+HdVectorDataSourceHandle
+_ToDs(const _InstanceIndicesVector &v)
 {
-  if (v.empty()) {
-    return nullptr;
-  }
+    if (v.empty()) {
+        return nullptr;
+    }
 
-  std::vector<HdDataSourceBaseHandle> r;
-  r.reserve(v.size());
-  for (const auto &i : v) {
-    r.push_back(_ToDs(i));
-  }
+    std::vector<HdDataSourceBaseHandle> r;
+    r.reserve(v.size());
+    for (const auto &i : v) {
+        r.push_back(_ToDs(i));
+    }
 
-  return HdRetainedSmallVectorDataSource::New(r.size(), r.data());
+    return HdRetainedSmallVectorDataSource::New(
+        r.size(),
+        r.data());
 }
 
-HdContainerDataSourceHandle _ToDs(const _Selection &s)
+HdContainerDataSourceHandle
+_ToDs(const _Selection &s)
 {
-  return HdSelectionSchema::Builder()
-      .SetFullySelected(HdRetainedTypedSampledDataSource<bool>::New(true))
-      .SetNestedInstanceIndices(_ToDs(s.nestedInstanceIndices))
-      .Build();
+    return
+        HdSelectionSchema::Builder()
+            .SetFullySelected(
+                HdRetainedTypedSampledDataSource<bool>::New(true))
+            .SetNestedInstanceIndices(
+                _ToDs(s.nestedInstanceIndices))
+            .Build();
 }
 
-HdVectorDataSourceHandle _ToDs(const _Selections &s)
+HdVectorDataSourceHandle
+_ToDs(const _Selections &s)
 {
-  if (s.empty()) {
-    return nullptr;
-  }
+    if (s.empty()) {
+        return nullptr;
+    }
 
-  std::vector<HdDataSourceBaseHandle> r;
-  r.reserve(s.size());
-  for (const auto &i : s) {
-    r.push_back(_ToDs(i));
-  }
+    std::vector<HdDataSourceBaseHandle> r;
+    r.reserve(s.size());
+    for (const auto &i : s) {
+        r.push_back(_ToDs(i));
+    }
 
-  return HdRetainedSmallVectorDataSource::New(r.size(), r.data());
+    return HdRetainedSmallVectorDataSource::New(
+        r.size(),
+        r.data());
 }
 
 // Populate selections data source for prims using _SelectionInfo
 //
-class _PrimSource : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(_PrimSource);
+class _PrimSource : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(_PrimSource);
 
-  _PrimSource(HdContainerDataSourceHandle const &inputSource,
-              _SelectionInfoSharedPtr const &selectionInfo,
-              const SdfPath &primPath)
-      : _inputSource(inputSource), _selectionInfo(selectionInfo), _primPath(primPath)
-  {
-  }
-
-  TfTokenVector GetNames() override
-  {
-    TfTokenVector names = _inputSource->GetNames();
-    auto it = _selectionInfo->primToSelections.find(_primPath);
-    if (it != _selectionInfo->primToSelections.end()) {
-      names.push_back(HdSelectionsSchema::GetSchemaToken());
-    }
-    return names;
-  }
-
-  HdDataSourceBaseHandle Get(const TfToken &name) override
-  {
-    if (name == HdSelectionsSchema::GetSchemaToken()) {
-      auto it = _selectionInfo->primToSelections.find(_primPath);
-      if (it != _selectionInfo->primToSelections.end()) {
-        return _ToDs(it->second);
-      }
-      else {
-        return nullptr;
-      }
+    _PrimSource(HdContainerDataSourceHandle const &inputSource,
+                _SelectionInfoSharedPtr const &selectionInfo,
+                const SdfPath &primPath)
+        : _inputSource(inputSource)
+        , _selectionInfo(selectionInfo)
+        , _primPath(primPath)
+    {
     }
 
-    return _inputSource->Get(name);
-  }
+    TfTokenVector GetNames() override
+    {
+        TfTokenVector names = _inputSource->GetNames();
+        auto it = _selectionInfo->primToSelections.find(_primPath);
+        if (it != _selectionInfo->primToSelections.end()) {
+            names.push_back(HdSelectionsSchema::GetSchemaToken());
+        }
+        return names;
+    }
 
- private:
-  HdContainerDataSourceHandle const _inputSource;
-  _SelectionInfoSharedPtr const _selectionInfo;
-  const SdfPath _primPath;
+    HdDataSourceBaseHandle Get(const TfToken &name) override
+    {
+        if (name == HdSelectionsSchema::GetSchemaToken()) {
+            auto it = _selectionInfo->primToSelections.find(_primPath);
+            if (it != _selectionInfo->primToSelections.end()) {
+                return _ToDs(it->second);
+            } else {
+                return nullptr;
+            }
+        }
+
+        return _inputSource->Get(name);
+    }
+
+private:
+    HdContainerDataSourceHandle const _inputSource;
+    _SelectionInfoSharedPtr const _selectionInfo;
+    const SdfPath _primPath;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,72 +195,80 @@ class _PrimSource : public HdContainerDataSource {
 // Code to convert USD paths to scene index paths and nested instance
 // indices.
 
-struct _PrimAndNestedInstanceIndices {
-  SdfPath prim;
-  _InstanceIndicesVector nestedInstanceIndices;
+struct _PrimAndNestedInstanceIndices
+{
+    SdfPath prim;
+    _InstanceIndicesVector nestedInstanceIndices;
 };
 
 // Safe accessor for vector data source.
-SdfPath _GetPath(HdPathArrayDataSourceHandle const dataSource, const int index)
+SdfPath
+_GetPath(HdPathArrayDataSourceHandle const dataSource,
+         const int index)
 {
-  if (index < 0) {
-    return SdfPath();
-  }
+    if (index < 0) {
+        return SdfPath();
+    }
 
-  if (!dataSource) {
-    return SdfPath();
-  }
+    if (!dataSource) {
+        return SdfPath();
+    }
 
-  const VtArray<SdfPath> paths = dataSource->GetTypedValue(0.0f);
+    const VtArray<SdfPath> paths = dataSource->GetTypedValue(0.0f);
 
-  if (!(static_cast<size_t>(index) < paths.size())) {
-    return SdfPath();
-  }
+    if (!(static_cast<size_t>(index) < paths.size())) {
+        return SdfPath();
+    }
 
-  return paths[index];
+    return paths[index];
 }
 
 // An instancer can have multiple prototypes stored in an array.
 //
 // Get the index of the given prototype in that array.
-int _GetIndexOfPrototype(HdInstancerTopologySchema &schema, const SdfPath &prototype)
+int
+_GetIndexOfPrototype(HdInstancerTopologySchema &schema,
+                     const SdfPath &prototype)
 {
-  HdPathArrayDataSourceHandle const prototypesDs = schema.GetPrototypes();
-  if (!prototypesDs) {
-    return 0;
-  }
-  const VtArray<SdfPath> &prototypes = prototypesDs->GetTypedValue(0.0f);
-  for (size_t i = 0; i < prototypes.size(); i++) {
-    if (prototypes[i] == prototype) {
-      return static_cast<int>(i);
+    HdPathArrayDataSourceHandle const prototypesDs = schema.GetPrototypes();
+    if (!prototypesDs) {
+        return 0;
     }
-  }
-  return 0;
+    const VtArray<SdfPath> &prototypes = prototypesDs->GetTypedValue(0.0f);
+    for (size_t i = 0; i < prototypes.size(); i++) {
+        if (prototypes[i] == prototype) {
+            return static_cast<int>(i);
+        }
+    }
+    return 0;
 }
 
 // Get how often the prototype identified by prototypeIndex is
 // instantiated by the instancer.
-size_t _NumInstances(HdInstancerTopologySchema &schema, const size_t prototypeIndex)
+size_t
+_NumInstances(HdInstancerTopologySchema &schema,
+              const size_t prototypeIndex)
 {
-  HdIntArrayDataSourceHandle const indicesDs = schema.GetInstanceIndices().GetElement(
-      prototypeIndex);
-  if (!indicesDs) {
-    return 0;
-  }
+    HdIntArrayDataSourceHandle const indicesDs =
+        schema.GetInstanceIndices().GetElement(prototypeIndex);
+    if (!indicesDs) {
+        return 0;
+    }
 
-  const VtIntArray &indices = indicesDs->GetTypedValue(0.0f);
-  return indices.size();
+    const VtIntArray &indices = indicesDs->GetTypedValue(0.0f);
+    return indices.size();
 }
 
 // [0, 1, 2, ..., n - 1]
 //
-VtIntArray _Range(const size_t n)
+VtIntArray
+_Range(const size_t n)
 {
-  VtIntArray result(n);
-  for (size_t i = 0; i < n; i++) {
-    result[i] = i;
-  }
-  return result;
+    VtIntArray result(n);
+    for (size_t i = 0; i < n; i++) {
+        result[i] = i;
+    }
+    return result;
 }
 
 // If the prim in the scene index at prototypePath is a prototype,
@@ -246,35 +280,43 @@ VtIntArray _Range(const size_t n)
 // identifies an instancer (that is a prim with an instancer topology
 // data source) and the instancer's prototype paths includes the prim
 // itself.
-//
-_InstanceIndices _ComputeAllInstanceIndicesForPrototype(const SdfPath &prototypePath,
-                                                        HdSceneIndexBaseRefPtr const &sceneIndex)
+// 
+_InstanceIndices
+_ComputeAllInstanceIndicesForPrototype(
+    const SdfPath &prototypePath,
+    HdSceneIndexBaseRefPtr const &sceneIndex)
 {
-  HdContainerDataSourceHandle const primSource = sceneIndex->GetPrim(prototypePath).dataSource;
-  HdInstancedBySchema instancedBySchema = HdInstancedBySchema::GetFromParent(primSource);
-  HdPathArrayDataSourceHandle instancersDs = instancedBySchema.GetPaths();
-  if (!instancersDs) {
-    return {SdfPath(), 0, {}};
-  }
+    TRACE_FUNCTION();
 
-  const VtArray<SdfPath> &instancers = instancersDs->GetTypedValue(0.0f);
-  if (instancers.empty()) {
-    return {SdfPath(), 0, {}};
-  }
+    HdContainerDataSourceHandle const primSource =
+        sceneIndex->GetPrim(prototypePath).dataSource;
+    HdInstancedBySchema instancedBySchema =
+        HdInstancedBySchema::GetFromParent(primSource);
+    HdPathArrayDataSourceHandle instancersDs = instancedBySchema.GetPaths();
+    if (!instancersDs) {
+        return { SdfPath(), 0, {}};
+    }
 
-  if (instancers.size() > 1) {
-    TF_CODING_ERROR("Expected at most one instancer");
-  }
+    const VtArray<SdfPath> &instancers = instancersDs->GetTypedValue(0.0f);
+    if (instancers.empty()) {
+        return { SdfPath(), 0, {}};
+    }
 
-  const SdfPath &instancer = instancers[0];
-  HdInstancerTopologySchema instancerTopologySchema = HdInstancerTopologySchema::GetFromParent(
-      sceneIndex->GetPrim(instancer).dataSource);
-  const int prototypeIndex = _GetIndexOfPrototype(instancerTopologySchema, prototypePath);
+    if (instancers.size() > 1) {
+        TF_CODING_ERROR("Expected at most one instancer");
+    }
 
-  const VtIntArray instanceIndices = _Range(
-      _NumInstances(instancerTopologySchema, prototypeIndex));
+    const SdfPath &instancer = instancers[0];
+    HdInstancerTopologySchema instancerTopologySchema =
+        HdInstancerTopologySchema::GetFromParent(
+            sceneIndex->GetPrim(instancer).dataSource);
+    const int prototypeIndex =
+        _GetIndexOfPrototype(instancerTopologySchema, prototypePath);
 
-  return {instancer, prototypeIndex, instanceIndices};
+    const VtIntArray instanceIndices =
+        _Range(_NumInstances(instancerTopologySchema, prototypeIndex));
+
+    return { instancer, prototypeIndex, instanceIndices};
 }
 
 // If a prim in the scene index at prototypePath is a prototype (see above),
@@ -285,227 +327,284 @@ _InstanceIndices _ComputeAllInstanceIndicesForPrototype(const SdfPath &prototype
 // prototype that is instances, and so on... include the instance indices
 // for each level of nesting.
 //
-_InstanceIndicesVector _ComputeAllNestedInstanceIndicesForPrototype(
-    const SdfPath &prototypePath, HdSceneIndexBaseRefPtr const &sceneIndex)
+_InstanceIndicesVector
+_ComputeAllNestedInstanceIndicesForPrototype(
+    const SdfPath &prototypePath,
+    HdSceneIndexBaseRefPtr const &sceneIndex)
 {
-  std::vector<_InstanceIndices> result;
+    TRACE_FUNCTION();
 
-  SdfPath path = prototypePath;
+    std::vector<_InstanceIndices> result;
 
-  while (true) {
-    _InstanceIndices instanceIndices = _ComputeAllInstanceIndicesForPrototype(path, sceneIndex);
+    SdfPath path = prototypePath;
 
-    if (TfDebug::IsEnabled(USDIMAGING_SELECTION)) {
-      if (!instanceIndices.instancer.IsEmpty()) {
-        TF_DEBUG(USDIMAGING_SELECTION)
-            .Msg(
-                "                Protoype %s is instanced by instancer %s "
-                "(as its %d. prototype)\n"
-                "                    Instance indices: %s\n",
-                path.GetText(),
-                instanceIndices.instancer.GetText(),
-                instanceIndices.prototypeIndex,
-                TfStringify(instanceIndices.instanceIndices).c_str());
-      }
+    while (true) {
+        _InstanceIndices instanceIndices =
+            _ComputeAllInstanceIndicesForPrototype(
+                path, sceneIndex);
+
+        if (TfDebug::IsEnabled(USDIMAGING_SELECTION)) {
+            if (!instanceIndices.instancer.IsEmpty()) {
+                TF_DEBUG(USDIMAGING_SELECTION).Msg(
+                    "                Protoype %s is instanced by instancer %s "
+                    "(as its %d. prototype)\n"
+                    "                    Instance indices: %s\n",
+                    path.GetText(),
+                    instanceIndices.instancer.GetText(),
+                    instanceIndices.prototypeIndex,
+                    TfStringify(instanceIndices.instanceIndices).c_str());
+            }
+        }
+
+        path = instanceIndices.instancer;
+
+        if (path.IsEmpty()) {
+            std::reverse(result.begin(), result.end());
+            return result;
+        }
+        result.push_back(std::move(instanceIndices));
     }
-
-    path = instanceIndices.instancer;
-
-    if (path.IsEmpty()) {
-      std::reverse(result.begin(), result.end());
-      return result;
-    }
-    result.push_back(std::move(instanceIndices));
-  }
-  // Make compiler happy.
-  return {};
+    // Make compiler happy.
+    return {};
 }
 
-std::vector<_PrimAndNestedInstanceIndices> _ComputePiPropagatedPathsAndNestedInstanceIndices(
-    HdContainerDataSourceHandle const &primSource, HdSceneIndexBaseRefPtr const &sceneIndex)
+std::vector<_PrimAndNestedInstanceIndices>
+_ComputePiPropagatedPathsAndNestedInstanceIndices(
+    HdContainerDataSourceHandle const &primSource,
+    HdSceneIndexBaseRefPtr const &sceneIndex)
 {
-  std::vector<_PrimAndNestedInstanceIndices> result;
+    TRACE_FUNCTION();
 
-  UsdImagingUsdPrimInfoSchema schema = UsdImagingUsdPrimInfoSchema::GetFromParent(primSource);
-  HdContainerDataSourceHandle propagatedPrototypesDs = schema.GetPiPropagatedPrototypes();
-  if (!propagatedPrototypesDs) {
-    return result;
-  }
+    std::vector<_PrimAndNestedInstanceIndices> result;
 
-  for (const TfToken &name : propagatedPrototypesDs->GetNames()) {
-    HdPathDataSourceHandle const propagatedPrototypeDs = HdPathDataSource::Cast(
-        propagatedPrototypesDs->Get(name));
-    if (!propagatedPrototypeDs) {
-      continue;
+    UsdImagingUsdPrimInfoSchema schema =
+        UsdImagingUsdPrimInfoSchema::GetFromParent(primSource);
+    HdContainerDataSourceHandle propagatedPrototypesDs =
+        schema.GetPiPropagatedPrototypes();
+    if (!propagatedPrototypesDs) {
+        return result;
     }
 
-    const SdfPath &propagatedPrototype = propagatedPrototypeDs->GetTypedValue(0.0f);
+    for (const TfToken &name : propagatedPrototypesDs->GetNames()) {
+        HdPathDataSourceHandle const propagatedPrototypeDs =
+            HdPathDataSource::Cast(propagatedPrototypesDs->Get(name));
+        if (!propagatedPrototypeDs) {
+            continue;
+        }
 
-    TF_DEBUG(USDIMAGING_SELECTION)
-        .Msg("            Prim is PI prototype with propagated copy at %s\n",
-             propagatedPrototype.GetText());
+        const SdfPath &propagatedPrototype =
+            propagatedPrototypeDs->GetTypedValue(0.0f);
 
-    result.push_back(
-        {propagatedPrototype,
-         _ComputeAllNestedInstanceIndicesForPrototype(propagatedPrototype, sceneIndex)});
-  }
+        TF_DEBUG(USDIMAGING_SELECTION).Msg(
+            "            Prim is PI prototype with propagated copy at %s\n",
+            propagatedPrototype.GetText());
 
-  return result;
+        result.push_back(
+            { propagatedPrototype,
+              _ComputeAllNestedInstanceIndicesForPrototype(
+                  propagatedPrototype, sceneIndex)});
+    }
+
+    return result;
 }
 
 // Compute prototype path and a container data source conforming to
 // HdInstanceIndicesSchema given the instance schema of an instance prim
 // and the instancer topology schema of the corresponding instancer
 // prim.
-std::pair<SdfPath, _InstanceIndices> _ComputeNiPrototypePathAndInstanceIndices(
-    HdInstanceSchema &instance, HdInstancerTopologySchema &instancerTopology)
+std::pair<SdfPath, _InstanceIndices>
+_ComputeNiPrototypePathAndInstanceIndices(
+    HdInstanceSchema &instance,
+    HdInstancerTopologySchema &instancerTopology)
 {
-  SdfPath prototypePath;
+    TRACE_FUNCTION();
 
-  // Set instancer path.
-  _InstanceIndices result;
-  if (HdPathDataSourceHandle const instancerDs = instance.GetInstancer()) {
-    result.instancer = instancerDs->GetTypedValue(0.0f);
-  }
+    SdfPath prototypePath;
 
-  if (HdIntDataSourceHandle const prototypeIndexDs = instance.GetPrototypeIndex()) {
+    // Set instancer path.
+    _InstanceIndices result;
+    if (HdPathDataSourceHandle const instancerDs = instance.GetInstancer()) {
+        result.instancer = instancerDs->GetTypedValue(0.0f);
+    }
 
-    // Set prototype id, the index into the prototypes of the instancer.
-    result.prototypeIndex = prototypeIndexDs->GetTypedValue(0.0f);
+    if (HdIntDataSourceHandle const prototypeIndexDs =
+                    instance.GetPrototypeIndex()) {
 
-    // Use the index to get the prototype path from the instancer.
-    prototypePath = _GetPath(instancerTopology.GetPrototypes(), result.prototypeIndex);
-  }
+        // Set prototype id, the index into the prototypes of the instancer.
+        result.prototypeIndex = prototypeIndexDs->GetTypedValue(0.0f);
 
-  if (HdIntDataSourceHandle const instanceIndexDs = instance.GetInstanceIndex()) {
-    // Note that an instance has a unique instance index, but
-    // HdInstanceIndicesSchema can have a list of indices.
-    // So we need to wrap it.
-    result.instanceIndices = {instanceIndexDs->GetTypedValue(0.0f)};
-  }
+        // Use the index to get the prototype path from the instancer.
+        prototypePath = _GetPath(
+            instancerTopology.GetPrototypes(),
+            result.prototypeIndex);
+    }
 
-  return {prototypePath, result};
+    if (HdIntDataSourceHandle const instanceIndexDs =
+                    instance.GetInstanceIndex()) {
+        // Note that an instance has a unique instance index, but
+        // HdInstanceIndicesSchema can have a list of indices.
+        // So we need to wrap it.
+        result.instanceIndices = { instanceIndexDs->GetTypedValue(0.0f) };
+    }
+
+    return { prototypePath, result };
 }
 
 // Check whether the prim at the given path is an instance.
 // If yes, return the prototype path and a container data source
 // conforming to HdInstanceIndicesSchema.
-std::pair<SdfPath, _InstanceIndices> _ComputeNiPrototypePathAndInstanceIndices(
-    HdContainerDataSourceHandle const &primSource, HdSceneIndexBaseRefPtr const &sceneIndex)
+std::pair<SdfPath, _InstanceIndices>
+_ComputeNiPrototypePathAndInstanceIndices(
+    HdContainerDataSourceHandle const &primSource,
+    HdSceneIndexBaseRefPtr const &sceneIndex)
 {
-  // Extract instance information.
-  HdInstanceSchema instanceSchema = HdInstanceSchema::GetFromParent(primSource);
+    TRACE_FUNCTION();
 
-  HdPathDataSourceHandle const instancerPathDs = instanceSchema.GetInstancer();
-  if (!instancerPathDs) {
-    return {SdfPath(), {SdfPath(), 0, {}}};
-  }
+    // Extract instance information.
+    HdInstanceSchema instanceSchema =
+      HdInstanceSchema::GetFromParent(primSource);
 
-  // Extract information of instancer realizing this instance.
-  const SdfPath instancerPath = instancerPathDs->GetTypedValue(0.0f);
-  HdInstancerTopologySchema instancerTopologySchema = HdInstancerTopologySchema::GetFromParent(
-      sceneIndex->GetPrim(instancerPath).dataSource);
+    HdPathDataSourceHandle const instancerPathDs = instanceSchema.GetInstancer();
+    if (!instancerPathDs) {
+        return { SdfPath(), { SdfPath(), 0, {}} };
+    }
 
-  return _ComputeNiPrototypePathAndInstanceIndices(instanceSchema, instancerTopologySchema);
+    // Extract information of instancer realizing this instance.
+    const SdfPath instancerPath = instancerPathDs->GetTypedValue(0.0f);
+    HdInstancerTopologySchema instancerTopologySchema =
+        HdInstancerTopologySchema::GetFromParent(
+            sceneIndex->GetPrim(instancerPath).dataSource);
+
+    return _ComputeNiPrototypePathAndInstanceIndices(
+        instanceSchema, instancerTopologySchema);
 }
 
-bool _TranslatePathToNiPrototype(HdContainerDataSourceHandle const &primSource,
-                                 HdSceneIndexBaseRefPtr const &sceneIndex,
-                                 _PrimAndNestedInstanceIndices *const primAndInstanceIndices)
+bool
+_TranslatePathToNiPrototype(
+    HdContainerDataSourceHandle const &primSource,
+    HdSceneIndexBaseRefPtr const &sceneIndex,
+    _PrimAndNestedInstanceIndices * const primAndInstanceIndices)
 {
-  SdfPath prototypePath;
-  _InstanceIndices instanceIndices;
-  std::tie(prototypePath, instanceIndices) = _ComputeNiPrototypePathAndInstanceIndices(primSource,
-                                                                                       sceneIndex);
+    TRACE_FUNCTION();
 
-  if (prototypePath.IsEmpty()) {
-    return false;
-  }
+    SdfPath prototypePath;
+    _InstanceIndices instanceIndices;
+    std::tie(prototypePath, instanceIndices) =
+        _ComputeNiPrototypePathAndInstanceIndices(
+            primSource,
+            sceneIndex);
+    
+    if (prototypePath.IsEmpty()) {
+        return false;
+    }
 
-  TF_DEBUG(USDIMAGING_SELECTION)
-      .Msg("            Prim is USD native instance of prototype %s\n", prototypePath.GetText());
+    TF_DEBUG(USDIMAGING_SELECTION).Msg(
+        "            Prim is USD native instance of prototype %s\n",
+        prototypePath.GetText());
+    
+    // If we hit an instance, we need to replace the path to
+    // the prototype (in the scene index) that this instance
+    // is instancing. More precisely, the prototype that
+    // was added by the prototype propagating scene index after
+    // instancing aggregation.
+    primAndInstanceIndices->prim = std::move(prototypePath);
 
-  // If we hit an instance, we need to replace the path to
-  // the prototype (in the scene index) that this instance
-  // is instancing. More precisely, the prototype that
-  // was added by the prototype propagating scene index after
-  // instancing aggregation.
-  primAndInstanceIndices->prim = std::move(prototypePath);
-
-  if (!instanceIndices.instancer.IsEmpty()) {
-    TF_DEBUG(USDIMAGING_SELECTION)
-        .Msg(
+    if (!instanceIndices.instancer.IsEmpty()) {
+        TF_DEBUG(USDIMAGING_SELECTION).Msg(
             "                Instancer: %s\n"
             "                Instance indices: %s\n",
             instanceIndices.instancer.GetText(),
             TfStringify(instanceIndices.instanceIndices).c_str());
 
-    // If we hit an instance, record the instancing info such
-    // as what instancer was added by instance aggregation to
-    // realize this instance and what the instance index within
-    // that instancer is.
-    primAndInstanceIndices->nestedInstanceIndices.push_back(std::move(instanceIndices));
-  }
+        // If we hit an instance, record the instancing info such
+        // as what instancer was added by instance aggregation to
+        // realize this instance and what the instance index within
+        // that instancer is.
+        primAndInstanceIndices->nestedInstanceIndices.push_back(
+            std::move(instanceIndices));
+    }
 
-  TF_DEBUG(USDIMAGING_SELECTION)
-      .Msg("            New path: %s\n", primAndInstanceIndices->prim.GetText());
-
-  return true;
+    TF_DEBUG(USDIMAGING_SELECTION).Msg(
+        "            New path: %s\n",
+        primAndInstanceIndices->prim.GetText());
+ 
+    return true;
 }
 
-_InstanceIndicesVector _Concat(const _InstanceIndicesVector &a, const _InstanceIndicesVector &b)
+_InstanceIndicesVector
+_Concat(const _InstanceIndicesVector &a,
+        const _InstanceIndicesVector &b)
 {
-  _InstanceIndicesVector result = a;
-  result.insert(result.end(), b.begin(), b.end());
-  return result;
+    _InstanceIndicesVector result = a;
+    result.insert(result.end(), b.begin(), b.end());
+    return result;
 }
 
 // If we hit a prototype instanced by a point instancer, the propagating
 // scene index will have made a copy of the prototype. We need to select
 // this copy as well. Add the copy to the entries.
-void _AddPiPropagatedPrototypes(
+void
+_AddPiPropagatedPrototypes(
     HdContainerDataSourceHandle const &primSource,
     HdSceneIndexBaseRefPtr const &sceneIndex,
     const _PrimAndNestedInstanceIndices &primAndInstanceIndices,
-    std::vector<_PrimAndNestedInstanceIndices> *const newPrimAndInstanceIndices)
+    std::vector<_PrimAndNestedInstanceIndices> * const newPrimAndInstanceIndices)
 {
-  const _InstanceIndicesVector oldIndices = primAndInstanceIndices.nestedInstanceIndices;
+    TRACE_FUNCTION();
 
-  const std::vector<_PrimAndNestedInstanceIndices> propagatedPathsAndIndices =
-      _ComputePiPropagatedPathsAndNestedInstanceIndices(primSource, sceneIndex);
+    const _InstanceIndicesVector oldIndices =
+        primAndInstanceIndices.nestedInstanceIndices;
 
-  for (auto &propagatedPathAndIndices : propagatedPathsAndIndices) {
+    const std::vector<_PrimAndNestedInstanceIndices> propagatedPathsAndIndices =
+        _ComputePiPropagatedPathsAndNestedInstanceIndices(
+            primSource, sceneIndex);
 
-    TF_DEBUG(USDIMAGING_SELECTION)
-        .Msg("            New path: %s\n", propagatedPathAndIndices.prim.GetText());
+    for (auto &propagatedPathAndIndices : propagatedPathsAndIndices) {
 
-    newPrimAndInstanceIndices->push_back(
-        {propagatedPathAndIndices.prim,
-         _Concat(oldIndices, propagatedPathAndIndices.nestedInstanceIndices)});
-  }
-}
+        TF_DEBUG(USDIMAGING_SELECTION).Msg(
+            "            New path: %s\n",
+            propagatedPathAndIndices.prim.GetText());
+
+        newPrimAndInstanceIndices->push_back(
+            { propagatedPathAndIndices.prim,
+              _Concat(oldIndices,
+                      propagatedPathAndIndices.nestedInstanceIndices)});
+    }             
+}       
 
 // Given the instancing information to select a prim at
 // primAndInstanceIndices.prim, compute the information to select
 // the child at primName.
-void _AppendNameToSceneIndexPrimsAndInstanceIndices(
+void
+_AppendNameToSceneIndexPrimsAndInstanceIndices(
     _PrimAndNestedInstanceIndices primAndInstanceIndices,
     const TfToken &primName,
     HdSceneIndexBaseRefPtr const &sceneIndex,
-    std::vector<_PrimAndNestedInstanceIndices> *const result)
+    std::vector<_PrimAndNestedInstanceIndices> * const result)
 {
-  SdfPath &prim = primAndInstanceIndices.prim;
-  prim = prim.AppendChild(primName);
+    TRACE_FUNCTION();
 
-  HdContainerDataSourceHandle const primSource = sceneIndex->GetPrim(prim).dataSource;
+    SdfPath &prim = primAndInstanceIndices.prim;
+    prim = prim.AppendChild(primName);
 
-  TF_DEBUG(USDIMAGING_SELECTION)
-      .Msg("            Scene index prim to process: %s\n", prim.GetText());
+    HdContainerDataSourceHandle const primSource =
+        sceneIndex->GetPrim(prim).dataSource;
 
-  if (!_TranslatePathToNiPrototype(primSource, sceneIndex, &primAndInstanceIndices)) {
-    _AddPiPropagatedPrototypes(primSource, sceneIndex, primAndInstanceIndices, result);
-  }
-  result->push_back(std::move(primAndInstanceIndices));
+    TF_DEBUG(USDIMAGING_SELECTION).Msg(
+        "            Scene index prim to process: %s\n",
+        prim.GetText());
+
+    if (!_TranslatePathToNiPrototype(
+            primSource,
+            sceneIndex,
+            &primAndInstanceIndices)) {
+        _AddPiPropagatedPrototypes(
+            primSource,
+            sceneIndex,
+            primAndInstanceIndices,
+            result);
+    }
+    result->push_back(std::move(primAndInstanceIndices));
 }
 
 // Given a usd proxy path, computes the corresponding paths in the scene index
@@ -590,7 +689,7 @@ void _AppendNameToSceneIndexPrimsAndInstanceIndices(
 //         prototypeIndex: 0
 //         instance indices: [ 0, 1 ]
 //       ]
-//
+// 
 //
 // Example 2:
 //
@@ -617,8 +716,7 @@ void _AppendNameToSceneIndexPrimsAndInstanceIndices(
 //     primType: ""
 //     dataSource:
 //         instance:
-//             instancer:
-//             /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer
+//             instancer: /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer
 //             prototypeIndex: 0
 //             instanceIndex: 0
 //         ...
@@ -631,9 +729,7 @@ void _AppendNameToSceneIndexPrimsAndInstanceIndices(
 //     dataSource:
 //         instancerTopology:
 //             instanceLocations: [ /Instance1 ]
-//             prototypes: [
-//             /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype
-//             ]
+//             prototypes: [ /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype ]
 //             ...
 //         ...
 // /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype
@@ -647,11 +743,9 @@ void _AppendNameToSceneIndexPrimsAndInstanceIndices(
 // Thus, /Instance1 is translated into the following
 // std::vector<_PrimAndNestedInstanceIndice>:
 //
-// prim:
-// /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype
+// prim: /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype
 //     nestedInstanceIndices: [
-//         instancer:
-//         /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer
+//         instancer: /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer
 //         prototypeIndex: 0
 //         instanceIndices: [ 0 ]
 //
@@ -659,189 +753,380 @@ void _AppendNameToSceneIndexPrimsAndInstanceIndices(
 // /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype/cube
 // has no pi propagated or instance data source, we simply append "Cube":
 //
-// prim:
-// /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype/Cube
+// prim: /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer/UsdNiPrototype/Cube
 //     nestedInstanceIndices: [
-//         instancer:
-//         /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer
+//         instancer: /UsdNiPropagatedPrototypes/NoPrimvars_NoMaterialBindings/__Prototype_1/UsdNiInstancer
 //         prototypeIndex: 0
 //         instanceIndices: [ 0 ]
 //
-std::vector<_PrimAndNestedInstanceIndices> _ComputeSceneIndexPrimsAndInstanceIndices(
+std::vector<_PrimAndNestedInstanceIndices>
+_ComputeSceneIndexPrimsAndInstanceIndices(
     const SdfPath &usdPath, HdSceneIndexBaseRefPtr const &sceneIndex)
 {
-  static const _PrimAndNestedInstanceIndices root{SdfPath::AbsoluteRootPath(), {}};
+    TRACE_FUNCTION();
 
-  std::vector<_PrimAndNestedInstanceIndices> result = {root};
+    static const _PrimAndNestedInstanceIndices root{
+        SdfPath::AbsoluteRootPath(), {}};
 
-  // Iterate through elements of path and build up path in scene index,
-  // replacing the path if we hit a native instance.
-  for (const SdfPath &usdPrefix : usdPath.GetPrefixes()) {
-    const TfToken primName = usdPrefix.GetNameToken();
+    std::vector<_PrimAndNestedInstanceIndices> result = { root };
 
-    TF_DEBUG(USDIMAGING_SELECTION)
-        .Msg("    Processing next path element of usdPath: %s\n", primName.GetText());
+    // Iterate through elements of path and build up path in scene index,
+    // replacing the path if we hit a native instance.
+    for (const SdfPath &usdPrefix : usdPath.GetPrefixes()) {
+        const TfToken primName = usdPrefix.GetNameToken();
 
-    std::vector<_PrimAndNestedInstanceIndices> newResult;
+        TF_DEBUG(USDIMAGING_SELECTION).Msg(
+            "    Processing next path element of usdPath: %s\n",
+            primName.GetText());
 
-    for (const _PrimAndNestedInstanceIndices &primAndIndices : result) {
-      _AppendNameToSceneIndexPrimsAndInstanceIndices(
-          primAndIndices, primName, sceneIndex, &newResult);
+        std::vector<_PrimAndNestedInstanceIndices> newResult;
+
+        for (const _PrimAndNestedInstanceIndices &primAndIndices : result) {
+            _AppendNameToSceneIndexPrimsAndInstanceIndices(
+                primAndIndices, primName, sceneIndex, &newResult);
+        }
+
+        result = std::move(newResult);
     }
 
-    result = std::move(newResult);
-  }
-
-  TF_DEBUG(USDIMAGING_SELECTION)
-      .Msg("    Traversing descendants of usdPath %s\n", usdPath.GetText());
-
-  // Now add all namespace descendants of the paths we determined.
-  size_t i = 0;
-  while (i < result.size()) {
-    TF_DEBUG(USDIMAGING_SELECTION)
-        .Msg("        Adding children of scene index prim %s\n", result[i].prim.GetText());
-    for (const SdfPath &child : sceneIndex->GetChildPrimPaths(result[i].prim)) {
-      _AppendNameToSceneIndexPrimsAndInstanceIndices(
-          result[i], child.GetNameToken(), sceneIndex, &result);
+    if (ARCH_UNLIKELY(TfDebug::IsEnabled(USDIMAGING_SELECTION))) {
+        TF_DEBUG(USDIMAGING_SELECTION).Msg(
+            "    usdPath expanded to scene index paths:\n");
+        for (const auto &primAndNestedInstanceIndices : result) {
+            TF_DEBUG(USDIMAGING_SELECTION).Msg(
+                "         %s\n",
+                primAndNestedInstanceIndices.prim.GetText());
+            for (const auto &instanceIndices :
+                     primAndNestedInstanceIndices.nestedInstanceIndices) {
+                TF_DEBUG(USDIMAGING_SELECTION).Msg(
+                    "            instancer: %s\n",
+                    instanceIndices.instancer.GetText());
+                TF_DEBUG(USDIMAGING_SELECTION).Msg(
+                    "            prototypeIndex: %d\n",
+                    instanceIndices.prototypeIndex);
+                TF_DEBUG(USDIMAGING_SELECTION).Msg(
+                    "            instanceIndices:");
+                for (const int i : instanceIndices.instanceIndices) {
+                    TF_DEBUG(USDIMAGING_SELECTION).Msg(" %d", i);
+                }
+                TF_DEBUG(USDIMAGING_SELECTION).Msg("\n");
+            }
+        }
     }
-    ++i;
-  }
 
-  return result;
+    return result;
 }
 
-}  // namespace UsdImagingSelectionSceneIndex_Impl
+bool
+_PrimTypeSupportsSelection(const TfToken &primType)
+{
+    TRACE_FUNCTION();
+
+    if (primType.IsEmpty()) {
+        return false;
+    }
+    for (const TfToken &t : {
+            // "Rprims"
+
+            // Most frequent ones on top
+            HdPrimTypeTokens->mesh,
+            HdPrimTypeTokens->basisCurves,
+            HdPrimTypeTokens->points,
+            HdPrimTypeTokens->nurbsPatch,
+            HdPrimTypeTokens->nurbsCurves,
+            HdPrimTypeTokens->volume,
+            HdPrimTypeTokens->tetMesh,
+            HdPrimTypeTokens->geomSubset,
+            HdPrimTypeTokens->plane,
+
+            HdPrimTypeTokens->capsule,
+            HdPrimTypeTokens->cone,
+            HdPrimTypeTokens->cube,
+            HdPrimTypeTokens->cylinder,
+            HdPrimTypeTokens->sphere,
+            HdPrimTypeTokens->model }) {
+        if (primType == t) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+// For each seed, traverses the name space children and collects them
+// recursively as follows:
+// - If it is just a normal prim, add it to the result.
+// - It it is a normal prim but also the prototype of a point instancer,
+//   add the corresponding propagated prototype to the result.
+// - If it is a native instance, aggregate them by prototype and instancer
+//   and add the prototype to the result with the respective instance indices.
+//
+std::vector<_PrimAndNestedInstanceIndices>
+_ExpandToDescendants(
+    std::vector<_PrimAndNestedInstanceIndices> &&seeds,
+    HdSceneIndexBaseRefPtr const &sceneIndex)
+{
+    TRACE_FUNCTION();
+
+    std::vector<_PrimAndNestedInstanceIndices> result;
+
+    // Breadth first recursion as described above.
+    size_t i = 0;
+    while(i < seeds.size()) {
+        using NiInstanceSignature =
+            std::tuple<
+                SdfPath, // Propagated native prototype
+                SdfPath, // Instancer
+                int>; // Prototype index
+        
+        std::map<NiInstanceSignature, VtIntArray>
+            niInstanceSignatureToInstanceIndices;
+
+        TF_DEBUG(USDIMAGING_SELECTION).Msg(
+            "        Processing seed %s\n",
+            seeds[i].prim.GetText());
+
+        for (const SdfPath &descendant :
+                 HdSceneIndexPrimView(sceneIndex, seeds[i].prim)) {
+            const HdSceneIndexPrim prim =
+                sceneIndex->GetPrim(descendant);
+
+            SdfPath prototypePath;
+            _InstanceIndices instanceIndices;
+            std::tie(prototypePath, instanceIndices) =
+                _ComputeNiPrototypePathAndInstanceIndices(
+                    prim.dataSource,
+                    sceneIndex);
+            const bool isNativeInstance = !prototypePath.IsEmpty();
+
+            if (isNativeInstance) {
+                // Aggregate native instances.
+                const NiInstanceSignature sig{
+                    std::move(prototypePath),
+                    std::move(instanceIndices.instancer),
+                    instanceIndices.prototypeIndex};
+
+                VtIntArray &indices =
+                    niInstanceSignatureToInstanceIndices[sig];
+                for (const int i : instanceIndices.instanceIndices) {
+                    indices.push_back(i);
+                }
+            } else {
+                _PrimAndNestedInstanceIndices
+                    primAndNestedInstanceIndices = seeds[i];
+                primAndNestedInstanceIndices.prim = descendant;
+
+                // Check if this prim is the prototype of a point instancer.
+                // If yes, add corresponding propagated prototype to seeds.
+                _AddPiPropagatedPrototypes(
+                    prim.dataSource,
+                    sceneIndex,
+                    primAndNestedInstanceIndices,
+                    &seeds);
+
+                if (_PrimTypeSupportsSelection(prim.primType)) {
+                    result.push_back(std::move(primAndNestedInstanceIndices));
+                }
+            }
+        }
+
+        // Process aggregated native instances.
+        for (const auto &it : niInstanceSignatureToInstanceIndices) {
+            _PrimAndNestedInstanceIndices
+                primAndNestedInstanceIndices = seeds[i];
+            const SdfPath &niPropagatedPrototype = std::get<0>(it.first);
+            const SdfPath &instancer = std::get<1>(it.first);
+            const int &prototypeIndex = std::get<2>(it.first);
+
+            primAndNestedInstanceIndices.prim = niPropagatedPrototype;
+            primAndNestedInstanceIndices.nestedInstanceIndices.push_back(
+                { instancer,
+                  prototypeIndex,
+                  /* instanceIndices = */ std::move(it.second) });
+
+            seeds.push_back(primAndNestedInstanceIndices);            
+        }
+
+        ++i;
+    }
+
+    return result;
+}
+
+}
 
 using namespace UsdImagingSelectionSceneIndex_Impl;
 
-UsdImagingSelectionSceneIndexRefPtr UsdImagingSelectionSceneIndex::New(
+UsdImagingSelectionSceneIndexRefPtr
+UsdImagingSelectionSceneIndex::New(
     HdSceneIndexBaseRefPtr const &inputSceneIndex)
 {
-  return TfCreateRefPtr(new UsdImagingSelectionSceneIndex(inputSceneIndex));
+    return TfCreateRefPtr(
+        new UsdImagingSelectionSceneIndex(
+            inputSceneIndex));
 }
 
-UsdImagingSelectionSceneIndex::UsdImagingSelectionSceneIndex(
-    HdSceneIndexBaseRefPtr const &inputSceneIndex)
-    : HdSingleInputFilteringSceneIndexBase(inputSceneIndex),
-      _selectionInfo(std::make_shared<_SelectionInfo>())
+UsdImagingSelectionSceneIndex::
+UsdImagingSelectionSceneIndex(
+        HdSceneIndexBaseRefPtr const &inputSceneIndex)
+  : HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
+  , _selectionInfo(std::make_shared<_SelectionInfo>())
 {
 }
 
 UsdImagingSelectionSceneIndex::~UsdImagingSelectionSceneIndex() = default;
 
-HdSceneIndexPrim UsdImagingSelectionSceneIndex::GetPrim(const SdfPath &primPath) const
+HdSceneIndexPrim
+UsdImagingSelectionSceneIndex::GetPrim(
+    const SdfPath &primPath) const
 {
-  HdSceneIndexPrim result = _GetInputSceneIndex()->GetPrim(primPath);
-  if (!result.dataSource) {
+    HdSceneIndexPrim result = _GetInputSceneIndex()->GetPrim(primPath);
+    if (!result.dataSource) {
+        return result;
+    }
+
+    result.dataSource = _PrimSource::New(
+        result.dataSource, _selectionInfo, primPath);
+
     return result;
-  }
-
-  result.dataSource = _PrimSource::New(result.dataSource, _selectionInfo, primPath);
-
-  return result;
 }
 
-SdfPathVector UsdImagingSelectionSceneIndex::GetChildPrimPaths(const SdfPath &primPath) const
+SdfPathVector
+UsdImagingSelectionSceneIndex::GetChildPrimPaths(
+    const SdfPath &primPath) const
 {
-  return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+    return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
 }
 
-void UsdImagingSelectionSceneIndex::AddSelection(const SdfPath &usdPath)
+void
+UsdImagingSelectionSceneIndex::AddSelection(
+    const SdfPath &usdPath)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  TF_DEBUG(USDIMAGING_SELECTION)
-      .Msg("UsdImagingSelectionSceneInedx::AddSelection(usdPath = %s)\n", usdPath.GetText());
+    TF_DEBUG(USDIMAGING_SELECTION).Msg(
+        "UsdImagingSelectionSceneInedx::AddSelection(usdPath = %s)\n",
+        usdPath.GetText());
 
-  // From the USD path, compute the corresponding selections for
-  // the paths in the scene index - taking into account, e.g.,
-  // that selecting a native instance in USD should translate into
-  // selecting the prototype and its descendants and add to the
-  // selections schema the index of the native instance.
-  const std::vector<_PrimAndNestedInstanceIndices> primsAndIndices =
-      _ComputeSceneIndexPrimsAndInstanceIndices(usdPath, _GetInputSceneIndex());
+    // From the USD path, compute the corresponding selections for 
+    // the paths in the scene index - taking into account, e.g.,
+    // that selecting a native instance in USD should translate into
+    // selecting the prototype and its descendants and add to the
+    // selections schema the index of the native instance.
+    const std::vector<_PrimAndNestedInstanceIndices> primsAndIndices =
+        _ExpandToDescendants(
+            _ComputeSceneIndexPrimsAndInstanceIndices(
+                usdPath,
+                _GetInputSceneIndex()),
+            _GetInputSceneIndex());
+            
 
-  SdfPathSet dirtiedPrims;
-
-  for (const _PrimAndNestedInstanceIndices &primAndIndices : primsAndIndices) {
-    const SdfPath &prim = primAndIndices.prim;
-    _Selections &selections = _selectionInfo->primToSelections[prim];
-    selections.push_back({primAndIndices.nestedInstanceIndices});
-    dirtiedPrims.insert(prim);
-  }
-
-  if (dirtiedPrims.empty()) {
-    return;
-  }
-
-  HdSceneIndexObserver::DirtiedPrimEntries entries;
-  entries.reserve(dirtiedPrims.size());
-  for (const SdfPath &dirtiedPrim : dirtiedPrims) {
-    static const HdDataSourceLocatorSet locators{HdSelectionsSchema::GetDefaultLocator()};
-    entries.push_back({dirtiedPrim, locators});
-  }
-  _SendPrimsDirtied(entries);
-}
-
-void UsdImagingSelectionSceneIndex::ClearSelection()
-{
-  TRACE_FUNCTION();
-
-  TF_DEBUG(USDIMAGING_SELECTION).Msg("UsdImagingSelectionSceneIndex::ClearSelection()\n");
-
-  if (_selectionInfo->primToSelections.empty()) {
-    return;
-  }
-
-  HdSceneIndexObserver::DirtiedPrimEntries entries;
-  if (_IsObserved()) {
-    entries.reserve(_selectionInfo->primToSelections.size());
-    for (const auto &primAndSelections : _selectionInfo->primToSelections) {
-      static const HdDataSourceLocatorSet locators{HdSelectionsSchema::GetDefaultLocator()};
-      entries.emplace_back(primAndSelections.first, locators);
+    SdfPathSet dirtiedPrims;
+    
+    for (const _PrimAndNestedInstanceIndices &primAndIndices : primsAndIndices) {
+        const SdfPath &prim = primAndIndices.prim;
+        _Selections &selections = _selectionInfo->primToSelections[prim];
+        selections.push_back({ primAndIndices.nestedInstanceIndices });
+        dirtiedPrims.insert(prim);
     }
-  }
 
-  _selectionInfo->primToSelections.clear();
+    if (dirtiedPrims.empty()) {
+        return;
+    }
+    
+    HdSceneIndexObserver::DirtiedPrimEntries entries;
+    entries.reserve(dirtiedPrims.size());
+    for (const SdfPath &dirtiedPrim : dirtiedPrims) {
+        static const HdDataSourceLocatorSet locators{
+            HdSelectionsSchema::GetDefaultLocator()};
+        entries.push_back({dirtiedPrim, locators});
+    }
 
-  if (!entries.empty()) {
+    {
+        TRACE_FUNCTION_SCOPE("_SendPrimsDirtied");
+
+        _SendPrimsDirtied(entries);
+    }
+}
+
+void
+UsdImagingSelectionSceneIndex::ClearSelection()
+{
+    TRACE_FUNCTION();
+
+    TF_DEBUG(USDIMAGING_SELECTION).Msg(
+        "UsdImagingSelectionSceneIndex::ClearSelection()\n");
+
+    if (_selectionInfo->primToSelections.empty()) {
+        return;
+    }
+
+    HdSceneIndexObserver::DirtiedPrimEntries entries;
+    if (_IsObserved()) {
+        TRACE_FUNCTION_SCOPE("_Create prims dirtied entries");
+
+        entries.reserve(_selectionInfo->primToSelections.size());
+        for (const auto &primAndSelections : _selectionInfo->primToSelections) {
+            static const HdDataSourceLocatorSet locators{
+                HdSelectionsSchema::GetDefaultLocator()};
+            entries.emplace_back(primAndSelections.first, locators);
+        }
+    }
+
+    _selectionInfo->primToSelections.clear();
+
+    if (!entries.empty()) {
+        TRACE_FUNCTION_SCOPE("_SendPrimsDirtied");
+
+        _SendPrimsDirtied(entries);
+    }
+}
+
+void
+UsdImagingSelectionSceneIndex::_PrimsAdded(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::AddedPrimEntries &entries)
+{
+    _SendPrimsAdded(entries);
+}
+
+void
+UsdImagingSelectionSceneIndex::_PrimsDirtied(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+{
     _SendPrimsDirtied(entries);
-  }
 }
 
-void UsdImagingSelectionSceneIndex::_PrimsAdded(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::AddedPrimEntries &entries)
+static
+void
+_DeletePrefix(const SdfPath &prefix,
+              std::map<SdfPath, _Selections> * const m)
 {
-  _SendPrimsAdded(entries);
-}
-
-void UsdImagingSelectionSceneIndex::_PrimsDirtied(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::DirtiedPrimEntries &entries)
-{
-  _SendPrimsDirtied(entries);
-}
-
-static void _DeletePrefix(const SdfPath &prefix, std::map<SdfPath, _Selections> *const m)
-{
-  auto it = m->lower_bound(prefix);
-  while (it != m->end() && it->first.HasPrefix(prefix)) {
-    it = m->erase(it);
-  }
-}
-
-void UsdImagingSelectionSceneIndex::_PrimsRemoved(
-    const HdSceneIndexBase &sender, const HdSceneIndexObserver::RemovedPrimEntries &entries)
-{
-  TRACE_FUNCTION();
-
-  if (!_selectionInfo->primToSelections.empty()) {
-    TRACE_SCOPE("Deleting prefixes");
-    for (const HdSceneIndexObserver::RemovedPrimEntry &entry : entries) {
-      _DeletePrefix(entry.primPath, std::addressof(_selectionInfo->primToSelections));
+    auto it = m->lower_bound(prefix);
+    while (it != m->end() && it->first.HasPrefix(prefix)) {
+        it = m->erase(it);
     }
-  }
+}
 
-  _SendPrimsRemoved(entries);
+void
+UsdImagingSelectionSceneIndex::_PrimsRemoved(
+    const HdSceneIndexBase &sender,
+    const HdSceneIndexObserver::RemovedPrimEntries &entries)
+{
+    TRACE_FUNCTION();
+
+    if (!_selectionInfo->primToSelections.empty()) {
+        TRACE_SCOPE("Deleting prefixes");
+        for (const HdSceneIndexObserver::RemovedPrimEntry &entry : entries) {
+            _DeletePrefix(
+                entry.primPath,
+                std::addressof(_selectionInfo->primToSelections));
+        }
+    }
+
+    _SendPrimsRemoved(entries);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

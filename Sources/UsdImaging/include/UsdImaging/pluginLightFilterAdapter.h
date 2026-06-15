@@ -9,11 +9,12 @@
 
 /// \file usdImaging/pluginLightFilterAdapter.h
 
+#include "pxr/pxrns.h"
 #include "UsdImaging/api.h"
 #include "UsdImaging/lightFilterAdapter.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 class UsdPrim;
 
@@ -22,26 +23,31 @@ class UsdPrim;
 /// Adapter class for lights of type PluginLightFilter
 ///
 class UsdImagingPluginLightFilterAdapter : public UsdImagingLightFilterAdapter {
- public:
-  typedef UsdImagingLightFilterAdapter BaseAdapter;
+public:
+    typedef UsdImagingLightFilterAdapter BaseAdapter;
 
-  UsdImagingPluginLightFilterAdapter() : UsdImagingLightFilterAdapter() {}
+    UsdImagingPluginLightFilterAdapter()
+        : UsdImagingLightFilterAdapter()
+    {}
 
-  USDIMAGING_API
-  virtual ~UsdImagingPluginLightFilterAdapter();
+    USDIMAGING_API
+    virtual ~UsdImagingPluginLightFilterAdapter();
 
-  USDIMAGING_API
-  virtual SdfPath Populate(UsdPrim const &prim,
-                           UsdImagingIndexProxy *index,
-                           UsdImagingInstancerContext const *instancerContext = NULL);
+    USDIMAGING_API
+    virtual SdfPath Populate(UsdPrim const& prim,
+                     UsdImagingIndexProxy* index,
+                     UsdImagingInstancerContext const* instancerContext = NULL);
 
-  USDIMAGING_API
-  virtual bool IsSupported(UsdImagingIndexProxy const *index) const;
+    USDIMAGING_API
+    virtual bool IsSupported(UsdImagingIndexProxy const* index) const;
 
- protected:
-  virtual void _RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index) final;
+protected:
+    virtual void _RemovePrim(SdfPath const& cachePath,
+                             UsdImagingIndexProxy* index) final;
+
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_PLUGIN_LIGHT_FILTER_ADAPTER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_PLUGIN_LIGHT_FILTER_ADAPTER_H

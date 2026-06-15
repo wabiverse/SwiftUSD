@@ -15,9 +15,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<HdRenderDelegate>();
+    TfType::Define<HdRenderDelegate>();
 }
 
 //
@@ -34,186 +35,263 @@ TF_REGISTRY_FUNCTION(TfType)
 HdRenderParam::~HdRenderParam() = default;
 HdRenderDelegate::~HdRenderDelegate() = default;
 
-HdRenderDelegate::HdRenderDelegate() : _settingsVersion(1) {}
+HdRenderDelegate::HdRenderDelegate()
+    : _settingsVersion(1)
+{
+}
 
-HdRenderDelegate::HdRenderDelegate(HdRenderSettingsMap const &settingsMap)
+bool
+HdRenderParam::SetArbitraryValue(const TfToken& key, const VtValue& value)
+{
+    // Default implementation does not allow setting any arbitrary values.
+    return false;
+}
+
+VtValue
+HdRenderParam::GetArbitraryValue(const TfToken& key) const
+{
+    // Default implementation does not provide any arbitrary values.
+    return VtValue();
+}
+
+bool
+HdRenderParam::HasArbitraryValue(const TfToken& key) const
+{
+    // Default implementation does not provide any arbitrary values.
+    return false;
+}
+
+bool
+HdRenderParam::IsValid() const
+{
+    return false;
+}
+
+HdRenderDelegate::HdRenderDelegate(HdRenderSettingsMap const& settingsMap)
     : _settingsMap(settingsMap), _settingsVersion(1)
 {
-  if (TfDebug::IsEnabled(HD_RENDER_SETTINGS)) {
-    std::cout << "Initial Render Settings" << std::endl;
-    for (auto const &pair : _settingsMap) {
-      std::cout << "\t[" << pair.first << "] = " << pair.second << std::endl;
+    if (TfDebug::IsEnabled(HD_RENDER_SETTINGS)) {
+        std::cout << "Initial Render Settings" << std::endl;
+        for (auto const& pair : _settingsMap) {
+            std::cout << "\t[" << pair.first << "] = " << pair.second
+                      << std::endl;
+        }
     }
-  }
 }
 
-void HdRenderDelegate::SetDrivers(HdDriverVector const &drivers) {}
-
-HdRenderPassStateSharedPtr HdRenderDelegate::CreateRenderPassState() const
+void
+HdRenderDelegate::SetDrivers(HdDriverVector const& drivers)
 {
-  return std::make_shared<HdRenderPassState>();
 }
 
-TfToken HdRenderDelegate::GetMaterialBindingPurpose() const
+HdRenderPassStateSharedPtr
+HdRenderDelegate::CreateRenderPassState() const
 {
-  return HdTokens->preview;
+    return std::make_shared<HdRenderPassState>();
 }
 
-TfTokenVector HdRenderDelegate::GetShaderSourceTypes() const
+TfToken
+HdRenderDelegate::GetMaterialBindingPurpose() const
 {
-  return TfTokenVector();
+    return HdTokens->preview;
+}
+
+TfTokenVector 
+HdRenderDelegate::GetShadingSystems() const
+{
+    return GetShaderSourceTypes();
+}
+
+
+TfTokenVector 
+HdRenderDelegate::GetShaderSourceTypes() const
+{
+    return TfTokenVector();
 }
 
 // deprecated
-TfToken HdRenderDelegate::GetMaterialNetworkSelector() const
+TfToken 
+HdRenderDelegate::GetMaterialNetworkSelector() const
 {
-  return TfToken();
+    return TfToken();
 }
 
-TfTokenVector HdRenderDelegate::GetMaterialRenderContexts() const
+TfTokenVector
+HdRenderDelegate::GetMaterialRenderContexts() const
 {
-  // To support RenderDelegates that have not yet updated
-  // GetMaterialNetworkSelector()
-  return {GetMaterialNetworkSelector()};
+    // To support RenderDelegates that have not yet updated 
+    // GetMaterialNetworkSelector()
+    return {GetMaterialNetworkSelector()};
 }
 
-TfTokenVector HdRenderDelegate::GetRenderSettingsNamespaces() const
+TfTokenVector
+HdRenderDelegate::GetRenderSettingsNamespaces() const
 {
-  return TfTokenVector();
+    return TfTokenVector();
 }
 
-bool HdRenderDelegate::IsPrimvarFilteringNeeded() const
+
+bool
+HdRenderDelegate::IsPrimvarFilteringNeeded() const
 {
-  return false;
+    return false;
 }
 
-HdAovDescriptor HdRenderDelegate::GetDefaultAovDescriptor(TfToken const &name) const
+HdAovDescriptor
+HdRenderDelegate::GetDefaultAovDescriptor(TfToken const& name) const
 {
-  return HdAovDescriptor();
+    return HdAovDescriptor();
 }
 
-HdRenderSettingDescriptorList HdRenderDelegate::GetRenderSettingDescriptors() const
+HdRenderSettingDescriptorList
+HdRenderDelegate::GetRenderSettingDescriptors() const
 {
-  return HdRenderSettingDescriptorList();
+    return HdRenderSettingDescriptorList();
 }
 
-void HdRenderDelegate::SetRenderSetting(TfToken const &key, VtValue const &value)
+void
+HdRenderDelegate::SetRenderSetting(TfToken const& key, VtValue const& value)
 {
-  auto iter = _settingsMap.find(key);
-  if (iter == _settingsMap.end()) {
-    _settingsMap[key] = value;
-    ++_settingsVersion;
-  }
-  else if (iter->second != value) {
-    iter->second = value;
-    ++_settingsVersion;
-  }
-
-  if (TfDebug::IsEnabled(HD_RENDER_SETTINGS)) {
-    std::cout << "Render Setting [" << key << "] = " << value << std::endl;
-  }
-}
-
-VtValue HdRenderDelegate::GetRenderSetting(TfToken const &key) const
-{
-  auto it = _settingsMap.find(key);
-  if (it != _settingsMap.end()) {
-    return it->second;
-  }
-
-  if (TfDebug::IsEnabled(HD_RENDER_SETTINGS)) {
-    std::cout << "Render setting not found for key [" << key << "]" << std::endl;
-  }
-  return VtValue();
-}
-
-unsigned int HdRenderDelegate::GetRenderSettingsVersion() const
-{
-  return _settingsVersion;
-}
-
-HdCommandDescriptors HdRenderDelegate::GetCommandDescriptors() const
-{
-  return HdCommandDescriptors();
-}
-
-bool HdRenderDelegate::InvokeCommand(const TfToken &command, const HdCommandArgs &args)
-{
-  // Fail all commands that get here.
-  return false;
-}
-
-VtDictionary HdRenderDelegate::GetRenderStats() const
-{
-  return VtDictionary();
-}
-
-HdContainerDataSourceHandle HdRenderDelegate::GetCapabilities() const
-{
-  return nullptr;
-}
-
-void HdRenderDelegate::_PopulateDefaultSettings(
-    HdRenderSettingDescriptorList const &defaultSettings)
-{
-  for (size_t i = 0; i < defaultSettings.size(); ++i) {
-    if (_settingsMap.count(defaultSettings[i].key) == 0) {
-      _settingsMap[defaultSettings[i].key] = defaultSettings[i].defaultValue;
+    auto iter = _settingsMap.find(key);
+    if (iter == _settingsMap.end()) {
+        _settingsMap[key] = value;
+        ++_settingsVersion;
+    } else if (iter->second != value) {
+        iter->second = value;
+        ++_settingsVersion;
     }
-  }
+    
+    if (TfDebug::IsEnabled(HD_RENDER_SETTINGS)) {
+        std::cout << "Render Setting [" << key << "] = " << value << std::endl;
+    }
 }
 
-HdRenderParam *HdRenderDelegate::GetRenderParam() const
+VtValue
+HdRenderDelegate::GetRenderSetting(TfToken const& key) const
 {
-  return nullptr;
+    auto it = _settingsMap.find(key);
+    if (it != _settingsMap.end()) {
+        return it->second;
+    }
+
+    if (TfDebug::IsEnabled(HD_RENDER_SETTINGS)) {
+        std::cout << "Render setting not found for key [" << key << "]"
+                  << std::endl;
+    }
+    return VtValue();
 }
 
-bool HdRenderDelegate::IsPauseSupported() const
+unsigned int
+HdRenderDelegate::GetRenderSettingsVersion() const
 {
-  return false;
+    return _settingsVersion;
 }
 
-bool HdRenderDelegate::IsPaused() const
+HdCommandDescriptors 
+HdRenderDelegate::GetCommandDescriptors() const
 {
-  return false;
+    return HdCommandDescriptors();
 }
 
-bool HdRenderDelegate::Pause()
+bool 
+HdRenderDelegate::InvokeCommand(
+    const TfToken &command,
+    const HdCommandArgs &args)
 {
-  return false;
+    // Fail all commands that get here.
+    return false;
 }
 
-bool HdRenderDelegate::IsParallelSyncEnabled(const TfToken &primType) const
+VtDictionary 
+HdRenderDelegate::GetRenderStats() const
 {
-  if (primType == HdPrimTypeTokens->extComputation) {
+    return VtDictionary();
+}
+
+HdContainerDataSourceHandle
+HdRenderDelegate::GetCapabilities() const
+{
+    return nullptr;
+}
+
+void
+HdRenderDelegate::_PopulateDefaultSettings(
+    HdRenderSettingDescriptorList const& defaultSettings)
+{
+    for (size_t i = 0; i < defaultSettings.size(); ++i) {
+        if (_settingsMap.count(defaultSettings[i].key) == 0) {
+            _settingsMap[defaultSettings[i].key] =
+                defaultSettings[i].defaultValue;
+        }
+    }
+}
+
+HdRenderParam *
+HdRenderDelegate::GetRenderParam() const 
+{
+    return nullptr;
+}
+
+bool
+HdRenderDelegate::IsPauseSupported() const
+{
+    return false;
+}
+
+bool
+HdRenderDelegate::IsPaused() const
+{
+    return false;
+}
+
+bool
+HdRenderDelegate::Pause()
+{
+    return false;
+}
+
+bool HdRenderDelegate::IsParallelSyncEnabled(
+    const TfToken &primType) const
+{
+    if (primType == HdPrimTypeTokens->extComputation) {
+        return true;
+    }
+    return false;
+}
+
+bool HdRenderDelegate::RequiresStormTasks() const
+{
+    return false;
+}
+
+bool
+HdRenderDelegate::Resume()
+{
+    return false;
+}
+
+bool
+HdRenderDelegate::IsStopSupported() const
+{
+    return false;
+}
+
+bool
+HdRenderDelegate::IsStopped() const
+{
     return true;
-  }
-  return false;
 }
 
-bool HdRenderDelegate::Resume()
+bool
+HdRenderDelegate::Stop(bool blocking)
 {
-  return false;
+    return true;
 }
 
-bool HdRenderDelegate::IsStopSupported() const
+bool
+HdRenderDelegate::Restart()
 {
-  return false;
-}
-
-bool HdRenderDelegate::IsStopped() const
-{
-  return true;
-}
-
-bool HdRenderDelegate::Stop(bool blocking)
-{
-  return true;
-}
-
-bool HdRenderDelegate::Restart()
-{
-  return false;
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -222,8 +300,16 @@ bool HdRenderDelegate::Restart()
 ///
 ////////////////////////////////////////////////////////////////////////////
 
-void HdRenderDelegate::SetTerminalSceneIndex(const HdSceneIndexBaseRefPtr &terminalSceneIndex) {}
+void
+HdRenderDelegate::SetTerminalSceneIndex(
+    const HdSceneIndexBaseRefPtr &terminalSceneIndex)
+{
+}
 
-void HdRenderDelegate::Update() {}
+void
+HdRenderDelegate::Update()
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

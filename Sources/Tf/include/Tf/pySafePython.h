@@ -11,7 +11,7 @@
 
 /// \file tf/pySafePython.h
 /// Intended to replace a direct include of Python.h, which causes several
-/// build problems with certain configurations and platforms (e.g., debug
+/// build problems with certain configurations and platforms (e.g., debug 
 /// builds on Windows, Qt slots keyword, etc.)
 
 // This include is a hack to avoid build errors due to incompatible
@@ -21,13 +21,15 @@
 
 // Python 3 has a conflict with the slots macro defined by the Qt library,
 // so we're undef'ing here temporarily before including Python.
+#if PXR_PYTHON_SUPPORT_ENABLED
 ARCH_PRAGMA_PUSH_MACRO(slots)
 #undef slots
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/python/detail/wrap_python.hpp>)
-# include <boost/python/detail/wrap_python.hpp>
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/python/detail/wrap_python.hpp>)
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/detail/wrap_python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 ARCH_PRAGMA_POP_MACRO(slots)
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif  // PXR_BASE_TF_PY_SAFE_PYTHON_H
+#endif // PXR_BASE_TF_PY_SAFE_PYTHON_H

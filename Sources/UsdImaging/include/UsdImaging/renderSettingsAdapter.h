@@ -9,113 +9,141 @@
 
 /// \file usdImaging/renderSettingsAdapter.h
 
+#include "pxr/pxrns.h"
+#include "Tf/envSetting.h"
 #include "UsdImaging/api.h"
 #include "UsdImaging/primAdapter.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \class UsdImagingRenderSettingsAdapter
 ///
 /// Delegate support for UsdRenderSettings.
 ///
-class UsdImagingRenderSettingsAdapter : public UsdImagingPrimAdapter {
- public:
-  using BaseAdapter = UsdImagingPrimAdapter;
+class UsdImagingRenderSettingsAdapter : public UsdImagingPrimAdapter
+{
+public:
+    using BaseAdapter = UsdImagingPrimAdapter;
 
-  UsdImagingRenderSettingsAdapter() : UsdImagingPrimAdapter() {}
+    UsdImagingRenderSettingsAdapter()
+        : UsdImagingPrimAdapter()
+    {}
 
-  USDIMAGING_API
-  ~UsdImagingRenderSettingsAdapter() override;
+    USDIMAGING_API
+    ~UsdImagingRenderSettingsAdapter() override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Scene Index Support
-  // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  TfTokenVector GetImagingSubprims(UsdPrim const &prim) override;
 
-  USDIMAGING_API
-  TfToken GetImagingSubprimType(UsdPrim const &prim, TfToken const &subprim) override;
+    // ---------------------------------------------------------------------- //
+    /// \name Scene Index Support
+    // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  HdContainerDataSourceHandle GetImagingSubprimData(
-      UsdPrim const &prim,
-      TfToken const &subprim,
-      const UsdImagingDataSourceStageGlobals &stageGlobals) override;
+    USDIMAGING_API
+    TfTokenVector GetImagingSubprims(UsdPrim const& prim) override;
 
-  USDIMAGING_API
-  HdDataSourceLocatorSet InvalidateImagingSubprim(
-      UsdPrim const &prim,
-      TfToken const &subprim,
-      TfTokenVector const &properties,
-      UsdImagingPropertyInvalidationType invalidationType) override;
+    USDIMAGING_API
+    TfToken GetImagingSubprimType(
+            UsdPrim const& prim,
+            TfToken const& subprim) override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Initialization
-  // ---------------------------------------------------------------------- //
+    USDIMAGING_API
+    HdContainerDataSourceHandle GetImagingSubprimData(
+            UsdPrim const& prim,
+            TfToken const& subprim,
+            const UsdImagingDataSourceStageGlobals &stageGlobals) override;
 
-  USDIMAGING_API
-  SdfPath Populate(UsdPrim const &prim,
-                   UsdImagingIndexProxy *index,
-                   UsdImagingInstancerContext const *instancerContext = nullptr) override;
+    USDIMAGING_API
+    HdDataSourceLocatorSet InvalidateImagingSubprim(
+            UsdPrim const& prim,
+            TfToken const& subprim,
+            TfTokenVector const& properties,
+            UsdImagingPropertyInvalidationType invalidationType) override;
 
-  USDIMAGING_API
-  bool IsSupported(UsdImagingIndexProxy const *index) const override;
+    // ---------------------------------------------------------------------- //
+    /// \name Initialization
+    // ---------------------------------------------------------------------- //
 
-  // ---------------------------------------------------------------------- //
-  /// \name Parallel Setup and Resolve
-  // ---------------------------------------------------------------------- //
+    USDIMAGING_API
+    SdfPath Populate(UsdPrim const& prim,
+                     UsdImagingIndexProxy* index,
+                     UsdImagingInstancerContext const*
+                     instancerContext = nullptr) override;
 
-  /// Thread Safe.
-  USDIMAGING_API
-  void TrackVariability(
-      UsdPrim const &prim,
-      SdfPath const &cachePath,
-      HdDirtyBits *timeVaryingBits,
-      UsdImagingInstancerContext const *instancerContext = nullptr) const override;
+    USDIMAGING_API
+    bool IsSupported(UsdImagingIndexProxy const* index) const override;
 
-  /// Thread Safe.
-  USDIMAGING_API
-  void UpdateForTime(UsdPrim const &prim,
-                     SdfPath const &cachePath,
-                     UsdTimeCode time,
-                     HdDirtyBits requestedBits,
-                     UsdImagingInstancerContext const *instancerContext = nullptr) const override;
+    // ---------------------------------------------------------------------- //
+    /// \name Parallel Setup and Resolve
+    // ---------------------------------------------------------------------- //
 
-  // ---------------------------------------------------------------------- //
-  /// \name Change Processing
-  // ---------------------------------------------------------------------- //
+    /// Thread Safe.
+    USDIMAGING_API
+    void TrackVariability(UsdPrim const& prim,
+                          SdfPath const& cachePath,
+                          HdDirtyBits* timeVaryingBits,
+                          UsdImagingInstancerContext const* 
+                          instancerContext = nullptr) const override;
 
-  /// Returns a bit mask of attributes to be udpated, or
-  /// HdChangeTracker::AllDirty if the entire prim must be resynchronized.
-  USDIMAGING_API
-  HdDirtyBits ProcessPropertyChange(UsdPrim const &prim,
-                                    SdfPath const &cachePath,
-                                    TfToken const &propertyName) override;
 
-  USDIMAGING_API
-  void MarkDirty(UsdPrim const &prim,
-                 SdfPath const &cachePath,
-                 HdDirtyBits dirty,
-                 UsdImagingIndexProxy *index) override;
+    /// Thread Safe.
+    USDIMAGING_API
+    void UpdateForTime(UsdPrim const& prim,
+                       SdfPath const& cachePath,
+                       UsdTimeCode time,
+                       HdDirtyBits requestedBits,
+                       UsdImagingInstancerContext const* 
+                       instancerContext = nullptr) const override;
 
-  // ---------------------------------------------------------------------- //
-  /// \name Data access
-  // ---------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------- //
+    /// \name Change Processing 
+    // ---------------------------------------------------------------------- //
 
-  USDIMAGING_API
-  VtValue Get(UsdPrim const &prim,
-              SdfPath const &cachePath,
-              TfToken const &key,
-              UsdTimeCode time,
-              VtIntArray *outIndices) const override;
+    /// Returns a bit mask of attributes to be udpated, or
+    /// HdChangeTracker::AllDirty if the entire prim must be resynchronized.
+    USDIMAGING_API
+    HdDirtyBits ProcessPropertyChange(UsdPrim const& prim,
+                                      SdfPath const& cachePath,
+                                      TfToken const& propertyName) override;
 
- protected:
-  USDIMAGING_API
-  void _RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index) override;
+    USDIMAGING_API
+    void MarkDirty(UsdPrim const& prim,
+                   SdfPath const& cachePath,
+                   HdDirtyBits dirty,
+                   UsdImagingIndexProxy* index) override;
+
+    // ---------------------------------------------------------------------- //
+    /// \name Data access
+    // ---------------------------------------------------------------------- //
+
+    USDIMAGING_API
+    VtValue Get(UsdPrim const& prim,
+                SdfPath const& cachePath,
+                TfToken const& key,
+                UsdTimeCode time,
+                VtIntArray *outIndices) const override;
+
+protected:
+    USDIMAGING_API
+    void _RemovePrim(SdfPath const& cachePath,
+                     UsdImagingIndexProxy* index) override;
+
 };
+
+
+// XXX: This should be moved to renderman in an upcoming change.
+//
+// For PxrRenderTerminalsAPI schemas applied on RenderSettings that
+// allow specification of display filters, sample filters, and 
+// integrators: if the shema expects relationships, perform the
+// following actions for each value of the environment variable.
+// true : Produce a warning message if connections are used.
+// false : Disallow the use of attribute connections for the purposes of
+//         connecting display filters, sample filters, and integrators.
+USDIMAGING_API
+extern TfEnvSetting<bool>
+        LEGACY_PXR_RENDER_TERMINALS_API_ALLOWED_AND_WARN;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_RENDER_SETTINGS_ADAPTER_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_RENDER_SETTINGS_ADAPTER_H

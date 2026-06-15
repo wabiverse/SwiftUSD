@@ -4,8 +4,6 @@
 #ifndef PXR_PEGTL_CONTRIB_INTERNAL_ENDIAN_WIN_HPP
 #define PXR_PEGTL_CONTRIB_INTERNAL_ENDIAN_WIN_HPP
 
-#if defined(_WIN32)
-
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -100,7 +98,5 @@ namespace PXR_PEGTL_NAMESPACE::internal
    };
 
 }  // namespace PXR_PEGTL_NAMESPACE::internal
-
-#endif // defined(_WIN32)
 
 #endif

@@ -9,9 +9,9 @@
 
 #include "pxr/pxrns.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-#  include "Tf/pySafePython.h"
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "Tf/pySafePython.h"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "Tf/api.h"
 
@@ -20,19 +20,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
 /// \struct TfPyTraceInfo
 /// Structure passed to python trace functions.  See the Python C API
 /// documentation reference for the meaning of \a what and \a arg.
 struct TfPyTraceInfo {
-  PyObject *arg;
-  char const *funcName;
-  char const *fileName;
-  int funcLine;
-  int what;
+    PyObject *arg;
+    char const *funcName;
+    char const *fileName;
+    int funcLine;
+    int what;
 };
 
-typedef std::function<void(TfPyTraceInfo const &)> TfPyTraceFn;
+typedef std::function<void (TfPyTraceInfo const &)> TfPyTraceFn;
 typedef std::shared_ptr<TfPyTraceFn> TfPyTraceFnId;
 
 /// Register \a f as a python trace function.
@@ -45,14 +45,14 @@ void Tf_PyFabricateTraceEvent(TfPyTraceInfo const &info);
 
 // For internal use only.  Do not use.
 void Tf_PyTracingPythonInitialized();
-#else // !defined(PXR_PYTHON_SUPPORT_ENABLED) || !PXR_PYTHON_SUPPORT_ENABLED
+#else
 /// \struct TfPyTraceInfo
 /// For storage alignment when PXR_PYTHON_SUPPORT_ENABLED is not enabled.
 struct TfPyTraceInfo;
-typedef std::function<void(TfPyTraceInfo const &)> TfPyTraceFn;
+typedef std::function<void (TfPyTraceInfo const &)> TfPyTraceFn;
 typedef std::shared_ptr<TfPyTraceFn> TfPyTraceFnId;
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_PY_TRACING_H
+#endif // PXR_BASE_TF_PY_TRACING_H

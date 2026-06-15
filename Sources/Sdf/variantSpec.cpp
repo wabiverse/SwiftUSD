@@ -6,6 +6,7 @@
 //
 /// \file VariantSpec.cpp
 
+#include "pxr/pxrns.h"
 #include "Sdf/variantSpec.h"
 #include "Sdf/changeBlock.h"
 #include "Sdf/childrenUtils.h"
@@ -15,109 +16,120 @@
 #include "Sdf/variantSetSpec.h"
 #include "Tf/diagnostic.h"
 #include "Tf/type.h"
-#include "Trace/traceImpl.h"
-#include "pxr/pxrns.h"
+#include "Trace/trace.h"
 
 using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypeVariant, SdfVariantSpec, SdfSpec);
-
-SdfVariantSpecHandle SdfVariantSpec::New(const SdfVariantSetSpecHandle &owner,
-                                         const std::string &name)
+SdfVariantSpecHandle
+SdfVariantSpec::New(
+    const SdfVariantSetSpecHandle& owner, const std::string& name)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  if (!owner) {
-    TF_CODING_ERROR("NULL owner variant set");
-    return TfNullPtr;
-  }
+    if (!owner) {
+        TF_CODING_ERROR("NULL owner variant set");
+        return TfNullPtr;
+    }
 
-  if (!SdfSchema::IsValidVariantIdentifier(name)) {
-    TF_CODING_ERROR("Invalid variant name: %s", name.c_str());
-    return TfNullPtr;
-  }
+    if (!SdfSchema::IsValidVariantIdentifier(name)) {
+        TF_CODING_ERROR("Invalid variant name: %s", name.c_str());
+        return TfNullPtr;
+    }
 
-  SdfPath childPath = Sdf_VariantChildPolicy::GetChildPath(owner->GetPath(), TfToken(name));
+    SdfPath childPath = 
+        Sdf_VariantChildPolicy::GetChildPath(owner->GetPath(), TfToken(name));
 
-  SdfLayerHandle layer = owner->GetLayer();
-  if (!Sdf_ChildrenUtils<Sdf_VariantChildPolicy>::CreateSpec(layer, childPath, SdfSpecTypeVariant))
-  {
-    return TfNullPtr;
-  }
+    SdfLayerHandle layer = owner->GetLayer();
+    if (!Sdf_ChildrenUtils<Sdf_VariantChildPolicy>::CreateSpec(
+            layer, childPath, SdfSpecTypeVariant)) {
+        return TfNullPtr;
+    }
 
-  layer->SetField(childPath, SdfFieldKeys->Specifier, SdfSpecifierOver);
+    layer->SetField(childPath, SdfFieldKeys->Specifier, SdfSpecifierOver);
 
-  return TfStatic_cast<SdfVariantSpecHandle>(layer->GetObjectAtPath(childPath));
+    return TfStatic_cast<SdfVariantSpecHandle>(
+        layer->GetObjectAtPath(childPath));
 }
+
 
 //
 // Name
 //
 
-std::string SdfVariantSpec::GetName() const
+std::string
+SdfVariantSpec::GetName() const
 {
-  return GetPath().GetVariantSelection().second;
+    return GetPath().GetVariantSelection().second;
 }
 
-TfToken SdfVariantSpec::GetNameToken() const
+TfToken
+SdfVariantSpec::GetNameToken() const
 {
-  return TfToken(GetPath().GetVariantSelection().second);
+    return TfToken(GetPath().GetVariantSelection().second);
 }
 
 //
 // Namespace hierarchy
 //
 
-SdfVariantSetSpecHandle SdfVariantSpec::GetOwner() const
+SdfVariantSetSpecHandle
+SdfVariantSpec::GetOwner() const
 {
-  SdfPath path = Sdf_VariantChildPolicy::GetParentPath(GetPath());
-  return TfStatic_cast<SdfVariantSetSpecHandle>(GetLayer()->GetObjectAtPath(path));
+    SdfPath path = Sdf_VariantChildPolicy::GetParentPath(GetPath());
+    return TfStatic_cast<SdfVariantSetSpecHandle>(
+        GetLayer()->GetObjectAtPath(path));
 }
 
-SdfPrimSpecHandle SdfVariantSpec::GetPrimSpec() const
+SdfPrimSpecHandle
+SdfVariantSpec::GetPrimSpec() const
 {
-  return GetLayer()->GetPrimAtPath(GetPath());
+    return GetLayer()->GetPrimAtPath(GetPath());
 }
 
-SdfVariantSetsProxy SdfVariantSpec::GetVariantSets() const
+SdfVariantSetsProxy
+SdfVariantSpec::GetVariantSets() const
 {
-  return SdfVariantSetsProxy(
-      SdfVariantSetView(GetLayer(), GetPath(), SdfChildrenKeys->VariantSetChildren),
-      "variant sets",
-      SdfVariantSetsProxy::CanErase);
+    return SdfVariantSetsProxy(SdfVariantSetView(GetLayer(),
+            GetPath(), SdfChildrenKeys->VariantSetChildren),
+            "variant sets", SdfVariantSetsProxy::CanErase);
 }
 
-std::vector<std::string> SdfVariantSpec::GetVariantNames(const std::string &name) const
+std::vector<std::string> 
+SdfVariantSpec::GetVariantNames(const std::string& name) const
 {
-  std::vector<std::string> variantNames;
+    std::vector<std::string> variantNames;
 
-  SdfPath variantSetPath = GetPath().AppendVariantSelection(name, "");
-  std::vector<TfToken> variantNameTokens = GetLayer()->GetFieldAs<std::vector<TfToken>>(
-      variantSetPath, SdfChildrenKeys->VariantChildren);
+    SdfPath variantSetPath = GetPath().AppendVariantSelection(name, "");
+    std::vector<TfToken> variantNameTokens =
+        GetLayer()->GetFieldAs<std::vector<TfToken> >(variantSetPath,
+            SdfChildrenKeys->VariantChildren);
 
-  variantNames.reserve(variantNameTokens.size());
-  TF_FOR_ALL(i, variantNameTokens)
-  {
-    variantNames.push_back(i->GetString());
-  }
+    variantNames.reserve(variantNameTokens.size());
+    TF_FOR_ALL(i, variantNameTokens) {
+        variantNames.push_back(i->GetString());
+    }
 
-  return variantNames;
+    return variantNames;
 }
 
-SdfVariantSpecHandle SdfCreateVariantInLayer(const SdfLayerHandle &layer,
-                                             const SdfPath &primPath,
-                                             const string &variantSetName,
-                                             const string &variantName)
+SdfVariantSpecHandle
+SdfCreateVariantInLayer(
+    const SdfLayerHandle &layer,
+    const SdfPath &primPath,
+    const string &variantSetName,
+    const string &variantName )
 {
-  SdfPath variantPath = primPath.AppendVariantSelection(variantSetName, variantName);
+    SdfPath variantPath =
+        primPath.AppendVariantSelection(variantSetName, variantName);
 
-  // Create the ancestor prim and variant specs.
-  SdfCreatePrimInLayer(layer, variantPath);
+    // Create the ancestor prim and variant specs.
+    SdfCreatePrimInLayer(layer, variantPath);
 
-  // Look up the resulting variant spec.
-  return TfStatic_cast<SdfVariantSpecHandle>(layer->GetObjectAtPath(variantPath));
+    // Look up the resulting variant spec.
+    return TfStatic_cast<SdfVariantSpecHandle>(
+        layer->GetObjectAtPath(variantPath));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

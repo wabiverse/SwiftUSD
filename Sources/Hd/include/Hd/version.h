@@ -63,7 +63,7 @@
 // 56 -> 57: Changing SetOverrideWindowPolicy to std::optional on
 //           HdRenderPassState, HdxPickFromRenderBufferTaskParams,
 //           HdxTaskController and UsdImagingGLEngine.
-// 57 -> 58: Introducing version.h
+// 57 -> 58: Introducing hdsi/version.h
 // 58 -> 59: HdGeomSubsetsSchema::GetIds() renamed to
 //           HdGeomSubsetsSchema::GetGeomSubsetNames().
 // 59 -> 60: Introduced HdRenderDelegate::GetCapabilities().
@@ -91,11 +91,64 @@
 // 69 -> 70: Add dirty bit translation for light filter prims in backend
 //           emulation.
 // 70 -> 71: Add virtual HdRenderDelegate::IsParallelSyncEnabled.
-//
+// 71 -> 72: Add render index API to batch notices sent by the merging scene
+//           index.
+// 72 -> 73: Adds HdExtComputationUtils::SampleComputedPrimvarValues with
+//           startTime and endTime
+// 73 -> 74: Extended HdMeshReprDesc to support optional generation of
+//           surface edge ids.
+// 74 -> 75: Added overload of HdSceneIndexPlugin::_AppendSceneIndex that
+//           passes the renderInstanceId to the plugin callback.
+// 75 -> 76: Added Scene State ID tunneling through the Hydra pipeline and
+//           arbitrary values Setter/Getter to HdRenderParam.
+// 76 -> 77: Added GetInputPrimType() to HdFlattenedDataSourceProvider::Context.
+//           The Context now stores an HdSceneIndexPrim containing the data
+//           source and prim type.
+// 77 -> 78: Removed the widget renderTag and added a displayInOverlay boolean
+//           attribute to serve the same purpose that widget signified.
+// 78 -> 79: Added Hgi::GarbageCollect.
+// 79 -> 80: Added refinedSolidWireOnSurf and solidWireOnSurf to HD_REPR_TOKENS.
+// 80 -> 81: Added IsValid() to HdRenderParam.
+// 81 -> 82: Added hgi/version.h
+// 82 -> 83: Added overloads for HdRendererPlugin::IsSupported and
+//           HdRendererPluginRegistry::GetDefaultPluginId.
+// 83 -> 84: Added HdDataSourceLocatorSentinelTokens.
+// 84 -> 85: Deprecate HdMaterialNetworkSchema::GetInterfaceMappings().
+//           Add HdMaterialNetworkSchema::GetInterface().
+//           Add HdMaterialInterfaceSchema, HdMaterialInterfaceParameterSchema.
+// 85 -> 86: Rename Hd[Typed|SchemaBased][Container|Vector]Schema to
+//           Hd[Container|Vector]Of[Schemas|TypedSampledDataSources]Schema.
+// 86 -> 87: Added HdContainerDataSourceEditor::ComputeDirtyLocators.
+// 87 -> 88: Added support for parameterValues data source in
+//           HdMaterialOverrideSchema and related functions (GetParameterValues,
+//           SetParameterValues). The deprecated method BuildRetained now
+//           requires a second parameter for the parameterValues data source.
+// 88 -> 89: HdRenderSettingsSchema namespacedSettings is a
+//           HdSampledDataSourceContainerSchema.
+// 89 -> 90: Added HdRendererPlugin::GetSceneIndexInputArgs and
+//           HdSceneIndexInputArgsSchema.
+// 90 -> 91: Add camera, disableMotionBlur, and disableDepthOfField to
+//           HdRenderSettingsSchema and rename shutterInterval to
+//           unionedSamplingInterval
+// 91 -> 92: Expose camera, disableMotionBlur, and disableDepthOfField
+//           through HdSceneIndexAdapterSceneDelegate, HdDirtyBitsTranslator,
+//           and HdRenderSettings; finish renaming shutterInterval to
+//           unionedSamplingInterval
+// 92 -> 93: Add HdVolumeSchema, HdSceneDelegate::GetVolumeParamValue(),
+//           HdChangeTracker::AddSprimRprimDependency(), and
+//           HdChangeTracker::RemoveSprimRprimDependency().
+// 93 -> 94: Add HdSceneIndexPlugin::IsEnabled() and _IsEnabled().
+// 94 -> 95: Add HdRenderDelegate::GetShadingSystems to replace deprecated
+//           HdRenderDelegate::GetShaderSourceTypes
+// 95 -> 96: Added HdVisitSampledDataSourceType and HdCopySampledDataSourceType.
+// 96 -> 97: Added HdsiParticleFieldConversionSceneIndex
 
-#define HD_API_VERSION 71
+#define HD_API_VERSION 97
 
 // 1  ->  2: SimpleLighting -> FallbackLighting
-#define HD_SHADER_API 2
+// 2  ->  3: Use GetLightCount() instead of NUM_LIGHTS to get light count.
+//           NUM_LIGHTS still exists for shader code requiring a compile time
+//           max count constant. Ex: MAX_LIGHT_SOURCES in MaterialX
+#define HD_SHADER_API 3
 
-#endif  // PXR_IMAGING_HD_VERSION_H
+#endif // PXR_IMAGING_HD_VERSION_H

@@ -28,7 +28,7 @@
 #ifndef DOUBLE_CONVERSION_DOUBLE_CONVERSION_H_
 #define DOUBLE_CONVERSION_DOUBLE_CONVERSION_H_
 
-#include "Tf/pxrDoubleConversion/string-to-double.h"
-#include "Tf/pxrDoubleConversion/double-to-string.h"
+#include "string-to-double.h"
+#include "double-to-string.h"
 
 #endif  // DOUBLE_CONVERSION_DOUBLE_CONVERSION_H_

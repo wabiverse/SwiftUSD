@@ -7,8 +7,8 @@
 #ifndef PXR_BASE_ARCH_BUILD_MODE_H
 #define PXR_BASE_ARCH_BUILD_MODE_H
 
-#include "Arch/defines.h"
 #include "pxr/pxrns.h"
+#include "Arch/defines.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -17,9 +17,9 @@ struct ArchBuildMode {
 // back to commonly-used macros if it has not. (Typically, _DEBUG
 // is defined by Visual Studio and DEBUG by Xcode for debug-mode builds)
 #if defined(BUILD_OPTLEVEL_DEV) || defined(_DEBUG) || defined(DEBUG)
-  enum { DEV_BUILD = 1 };
+    enum { DEV_BUILD = 1 };
 #else
-  enum { DEV_BUILD = 0 };
+    enum { DEV_BUILD = 0 };
 #endif
 };
 
@@ -27,4 +27,4 @@ struct ArchBuildMode {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_ARCH_BUILD_MODE_H
+#endif // PXR_BASE_ARCH_BUILD_MODE_H

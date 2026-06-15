@@ -10,20 +10,26 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiVulkanPipelineCache::HgiVulkanPipelineCache(HgiVulkanDevice *device)
-    : _device(device), _vkPipelineCache(nullptr)
+HgiVulkanPipelineCache::HgiVulkanPipelineCache(
+    HgiVulkanDevice* device)
+    : _device(device)
+    , _vkPipelineCache(nullptr)
 {
-  // xxx we need to add a pipeline cache to avoid app having to keep compiling
-  // shader micro-code for every pipeline combination. We except that the
-  // spir-V shader code is not compiled for the target device until this point
-  // where we create the pipeline. So a pipeline cache can be helpful.
+    // xxx we need to add a pipeline cache to avoid app having to keep compiling
+    // shader micro-code for every pipeline combination. We except that the
+    // spir-V shader code is not compiled for the target device until this point
+    // where we create the pipeline. So a pipeline cache can be helpful.
 }
 
-HgiVulkanPipelineCache::~HgiVulkanPipelineCache() {}
-
-VkPipelineCache HgiVulkanPipelineCache::GetVulkanPipelineCache() const
+HgiVulkanPipelineCache::~HgiVulkanPipelineCache()
 {
-  return _vkPipelineCache;
 }
+
+VkPipelineCache
+HgiVulkanPipelineCache::GetVulkanPipelineCache() const
+{
+    return _vkPipelineCache;
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

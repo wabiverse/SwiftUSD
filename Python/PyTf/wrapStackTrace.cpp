@@ -8,52 +8,56 @@
 #include "pxr/pxrns.h"
 
 #include "Arch/fileSystem.h"
-#include "Tf/pyUtils.h"
 #include "Tf/stackTrace.h"
+#include "Tf/pyUtils.h"
 
-#include <boost/python/def.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static void _PrintStackTrace(object &obj, const std::string &reason)
+static void
+_PrintStackTrace(object &obj, const std::string &reason)
 {
-  int fd = PyObject_AsFileDescriptor(obj.ptr());
-  if (fd >= 0) {
-    FILE *file = expect_non_null(ArchFdOpen(fd, "w"));
-    if (file) {
-      TfPrintStackTrace(file, reason);
-      fclose(file);
+    int fd = PyObject_AsFileDescriptor(obj.ptr());
+    if (fd >= 0)
+    {
+        FILE * file = expect_non_null(ArchFdOpen(fd, "w"));
+        if (file)
+        {
+            TfPrintStackTrace(file, reason);
+            fclose(file);
+        }
     }
-  }
-  else {
-    // Wrong type for obj
-    TfPyThrowTypeError("Expected file object.");
-  }
+    else {
+        // Wrong type for obj
+        TfPyThrowTypeError("Expected file object.");
+    }
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapStackTrace()
+void
+wrapStackTrace()
 {
-  def("GetStackTrace",
-      TfGetStackTrace,
-      "GetStackTrace()\n\n"
-      "Return both the C++ and the python stack as a string.");
+    def("GetStackTrace", TfGetStackTrace,
+        "GetStackTrace()\n\n"
+        "Return both the C++ and the python stack as a string.");
+    
+    def("PrintStackTrace", _PrintStackTrace,
+        "PrintStackTrace(file, str)\n\n"
+        "Prints both the C++ and the python stack to the file provided.");
 
-  def("PrintStackTrace",
-      _PrintStackTrace,
-      "PrintStackTrace(file, str)\n\n"
-      "Prints both the C++ and the python stack to the file provided.");
+    def("LogStackTrace", TfLogStackTrace,
+        (arg("reason"), arg("logToDb")=false));
 
-  def("LogStackTrace", TfLogStackTrace, (arg("reason"), arg("logToDb") = false));
-
-  def("GetAppLaunchTime",
-      TfGetAppLaunchTime,
-      "GetAppLaunchTime() -> int \n\n"
-      "Return the time (in seconds since the epoch) at which "
-      "the application was started.");
+    def("GetAppLaunchTime", TfGetAppLaunchTime,
+        "GetAppLaunchTime() -> int \n\n"
+        "Return the time (in seconds since the epoch) at which "
+        "the application was started.");
 }

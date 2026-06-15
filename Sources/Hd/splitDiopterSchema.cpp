@@ -17,203 +17,243 @@
 
 #include "Hd/splitDiopterSchema.h"
 
-#include "Hd/cameraSchema.h"
 #include "Hd/retainedDataSource.h"
+#include "Hd/cameraSchema.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSplitDiopterSchemaTokens, HD_SPLIT_DIOPTER_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSplitDiopterSchemaTokens,
+    HD_SPLIT_DIOPTER_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdIntDataSourceHandle HdSplitDiopterSchema::GetCount() const
+HdIntDataSourceHandle
+HdSplitDiopterSchema::GetCount() const
 {
-  return _GetTypedDataSource<HdIntDataSource>(HdSplitDiopterSchemaTokens->count);
+    return _GetTypedDataSource<HdIntDataSource>(
+        HdSplitDiopterSchemaTokens->count);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetAngle() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetAngle() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->angle);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->angle);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetOffset1() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetOffset1() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->offset1);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->offset1);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetWidth1() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetWidth1() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->width1);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->width1);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetFocusDistance1() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetFocusDistance1() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->focusDistance1);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->focusDistance1);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetOffset2() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetOffset2() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->offset2);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->offset2);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetWidth2() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetWidth2() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->width2);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->width2);
 }
 
-HdFloatDataSourceHandle HdSplitDiopterSchema::GetFocusDistance2() const
+HdFloatDataSourceHandle
+HdSplitDiopterSchema::GetFocusDistance2() const
 {
-  return _GetTypedDataSource<HdFloatDataSource>(HdSplitDiopterSchemaTokens->focusDistance2);
+    return _GetTypedDataSource<HdFloatDataSource>(
+        HdSplitDiopterSchemaTokens->focusDistance2);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdSplitDiopterSchema::BuildRetained(
-    const HdIntDataSourceHandle &count,
-    const HdFloatDataSourceHandle &angle,
-    const HdFloatDataSourceHandle &offset1,
-    const HdFloatDataSourceHandle &width1,
-    const HdFloatDataSourceHandle &focusDistance1,
-    const HdFloatDataSourceHandle &offset2,
-    const HdFloatDataSourceHandle &width2,
-    const HdFloatDataSourceHandle &focusDistance2)
+HdContainerDataSourceHandle
+HdSplitDiopterSchema::BuildRetained(
+        const HdIntDataSourceHandle &count,
+        const HdFloatDataSourceHandle &angle,
+        const HdFloatDataSourceHandle &offset1,
+        const HdFloatDataSourceHandle &width1,
+        const HdFloatDataSourceHandle &focusDistance1,
+        const HdFloatDataSourceHandle &offset2,
+        const HdFloatDataSourceHandle &width2,
+        const HdFloatDataSourceHandle &focusDistance2
+)
 {
-  TfToken _names[8];
-  HdDataSourceBaseHandle _values[8];
+    TfToken _names[8];
+    HdDataSourceBaseHandle _values[8];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (count) {
-    _names[_count] = HdSplitDiopterSchemaTokens->count;
-    _values[_count++] = count;
-  }
+    if (count) {
+        _names[_count] = HdSplitDiopterSchemaTokens->count;
+        _values[_count++] = count;
+    }
 
-  if (angle) {
-    _names[_count] = HdSplitDiopterSchemaTokens->angle;
-    _values[_count++] = angle;
-  }
+    if (angle) {
+        _names[_count] = HdSplitDiopterSchemaTokens->angle;
+        _values[_count++] = angle;
+    }
 
-  if (offset1) {
-    _names[_count] = HdSplitDiopterSchemaTokens->offset1;
-    _values[_count++] = offset1;
-  }
+    if (offset1) {
+        _names[_count] = HdSplitDiopterSchemaTokens->offset1;
+        _values[_count++] = offset1;
+    }
 
-  if (width1) {
-    _names[_count] = HdSplitDiopterSchemaTokens->width1;
-    _values[_count++] = width1;
-  }
+    if (width1) {
+        _names[_count] = HdSplitDiopterSchemaTokens->width1;
+        _values[_count++] = width1;
+    }
 
-  if (focusDistance1) {
-    _names[_count] = HdSplitDiopterSchemaTokens->focusDistance1;
-    _values[_count++] = focusDistance1;
-  }
+    if (focusDistance1) {
+        _names[_count] = HdSplitDiopterSchemaTokens->focusDistance1;
+        _values[_count++] = focusDistance1;
+    }
 
-  if (offset2) {
-    _names[_count] = HdSplitDiopterSchemaTokens->offset2;
-    _values[_count++] = offset2;
-  }
+    if (offset2) {
+        _names[_count] = HdSplitDiopterSchemaTokens->offset2;
+        _values[_count++] = offset2;
+    }
 
-  if (width2) {
-    _names[_count] = HdSplitDiopterSchemaTokens->width2;
-    _values[_count++] = width2;
-  }
+    if (width2) {
+        _names[_count] = HdSplitDiopterSchemaTokens->width2;
+        _values[_count++] = width2;
+    }
 
-  if (focusDistance2) {
-    _names[_count] = HdSplitDiopterSchemaTokens->focusDistance2;
-    _values[_count++] = focusDistance2;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (focusDistance2) {
+        _names[_count] = HdSplitDiopterSchemaTokens->focusDistance2;
+        _values[_count++] = focusDistance2;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetCount(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetCount(
     const HdIntDataSourceHandle &count)
 {
-  _count = count;
-  return *this;
+    _count = count;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetAngle(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetAngle(
     const HdFloatDataSourceHandle &angle)
 {
-  _angle = angle;
-  return *this;
+    _angle = angle;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetOffset1(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetOffset1(
     const HdFloatDataSourceHandle &offset1)
 {
-  _offset1 = offset1;
-  return *this;
+    _offset1 = offset1;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetWidth1(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetWidth1(
     const HdFloatDataSourceHandle &width1)
 {
-  _width1 = width1;
-  return *this;
+    _width1 = width1;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetFocusDistance1(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetFocusDistance1(
     const HdFloatDataSourceHandle &focusDistance1)
 {
-  _focusDistance1 = focusDistance1;
-  return *this;
+    _focusDistance1 = focusDistance1;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetOffset2(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetOffset2(
     const HdFloatDataSourceHandle &offset2)
 {
-  _offset2 = offset2;
-  return *this;
+    _offset2 = offset2;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetWidth2(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetWidth2(
     const HdFloatDataSourceHandle &width2)
 {
-  _width2 = width2;
-  return *this;
+    _width2 = width2;
+    return *this;
 }
 
-HdSplitDiopterSchema::Builder &HdSplitDiopterSchema::Builder::SetFocusDistance2(
+HdSplitDiopterSchema::Builder &
+HdSplitDiopterSchema::Builder::SetFocusDistance2(
     const HdFloatDataSourceHandle &focusDistance2)
 {
-  _focusDistance2 = focusDistance2;
-  return *this;
+    _focusDistance2 = focusDistance2;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdSplitDiopterSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdSplitDiopterSchema::Builder::Build()
 {
-  return HdSplitDiopterSchema::BuildRetained(
-      _count, _angle, _offset1, _width1, _focusDistance1, _offset2, _width2, _focusDistance2);
-}
-
-/*static*/
-HdSplitDiopterSchema HdSplitDiopterSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdSplitDiopterSchema(fromParentContainer ?
-                                  HdContainerDataSource::Cast(fromParentContainer->Get(
-                                      HdSplitDiopterSchemaTokens->splitDiopter)) :
-                                  nullptr);
-}
-
-/*static*/
-const TfToken &HdSplitDiopterSchema::GetSchemaToken()
-{
-  return HdSplitDiopterSchemaTokens->splitDiopter;
+    return HdSplitDiopterSchema::BuildRetained(
+        _count,
+        _angle,
+        _offset1,
+        _width1,
+        _focusDistance1,
+        _offset2,
+        _width2,
+        _focusDistance2
+    );
 }
 
 /*static*/
-const HdDataSourceLocator &HdSplitDiopterSchema::GetDefaultLocator()
+HdSplitDiopterSchema
+HdSplitDiopterSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  static const HdDataSourceLocator locator = HdCameraSchema::GetDefaultLocator().Append(
-      GetSchemaToken());
-  return locator;
+    return HdSplitDiopterSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdSplitDiopterSchemaTokens->splitDiopter))
+        : nullptr);
 }
+
+/*static*/
+const TfToken &
+HdSplitDiopterSchema::GetSchemaToken()
+{
+    return HdSplitDiopterSchemaTokens->splitDiopter;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdSplitDiopterSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator =
+        HdCameraSchema::GetDefaultLocator().Append(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

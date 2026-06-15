@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/HdSt/shaders/fallbackLighting.glslfx
+--- #import $TOOLS/hdSt/shaders/fallbackLighting.glslfx
 
 --- --------------------------------------------------------------------------
 -- glsl Fallback.LightIntegrator

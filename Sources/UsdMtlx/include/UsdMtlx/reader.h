@@ -6,11 +6,11 @@
 //
 #ifndef PXR_USD_USDMTLX_READER_H
 #define PXR_USD_USDMTLX_READER_H
-
+ 
+#include "pxr/pxrns.h"
+#include "UsdMtlx/api.h"
 #include "Sdf/path.h"
 #include "Tf/declarePtrs.h"
-#include "UsdMtlx/api.h"
-#include "pxr/pxrns.h"
 #include <MaterialX/MXCoreDocument.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -27,10 +27,10 @@ TF_DECLARE_WEAK_PTRS(UsdStage);
 /// Note that this method will traverse the materialx network following material
 /// nodes, and does an early exit if no looks are defined in the mtlx document.
 USDMTLX_API
-void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlx,
-                 const UsdStagePtr &stage,
-                 const SdfPath &internalPath = SdfPath("/MaterialX"),
-                 const SdfPath &externalPath = SdfPath("/ModelRoot"));
+void UsdMtlxRead(const MaterialX::ConstDocumentPtr& mtlx,
+                 const UsdStagePtr& stage,
+                 const SdfPath& internalPath = SdfPath("/MaterialX"),
+                 const SdfPath& externalPath = SdfPath("/ModelRoot"));
 
 /// Translate node graphs in the MaterialX document in \p mtlx into the
 /// stage \p stage.  \p internalPath is a namespace path where converted
@@ -38,10 +38,10 @@ void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlx,
 ///
 /// Note that this method will traverse all the nodegraphs in the mtlx document.
 USDMTLX_API
-void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr &mtlx,
-                           const UsdStagePtr &stage,
-                           const SdfPath &internalPath = SdfPath("/MaterialX"));
+void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr& mtlx,
+                           const UsdStagePtr& stage,
+                           const SdfPath& internalPath = SdfPath("/MaterialX"));
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USDMTLX_READER_H
+#endif // PXR_USD_USDMTLX_READER_H

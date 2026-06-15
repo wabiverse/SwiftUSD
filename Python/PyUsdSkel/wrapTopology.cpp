@@ -6,47 +6,57 @@
 //
 #include "UsdSkel/topology.h"
 
+#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "Usd/pyConversions.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
+
 namespace {
 
-tuple _Validate(const UsdSkelTopology &self)
+
+tuple
+_Validate(const UsdSkelTopology& self)
 {
-  std::string reason;
-  bool success = self.Validate(&reason);
-  return boost::python::make_tuple(success, reason);
+    std::string reason;
+    bool success = self.Validate(&reason);
+    return pxr_boost::python::make_tuple(success, reason);
 }
 
-}  // namespace
+
+} // namespace
+
 
 void wrapUsdSkelTopology()
 {
-  using This = UsdSkelTopology;
+    using This = UsdSkelTopology;
 
-  class_<This>("Topology", no_init)
-      .def(init<const SdfPathVector &>())
-      .def(init<const VtTokenArray &>())
-      .def(init<VtIntArray>())
+    class_<This>("Topology", no_init)
+        .def(init<const SdfPathVector&>())
+        .def(init<const VtTokenArray&>())
+        .def(init<VtIntArray>())
 
-      .def("GetParent", &This::GetParent)
+        .def("GetParent", &This::GetParent)
 
-      .def("IsRoot", &This::IsRoot)
+        .def("IsRoot", &This::IsRoot)
+        
+        .def("GetParentIndices", &This::GetParentIndices,
+             return_value_policy<return_by_value>())
 
-      .def("GetParentIndices", &This::GetParentIndices, return_value_policy<return_by_value>())
+        .def("GetNumJoints", &This::GetNumJoints)
 
-      .def("GetNumJoints", &This::GetNumJoints)
+        .def("__len__", &This::size)
 
-      .def("__len__", &This::size)
-
-      .def("Validate", &_Validate);
+        .def("Validate", &_Validate)
+        ;
 }

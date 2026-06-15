@@ -1,18 +1,18 @@
 {
-  "Plugins": [
-    {
-      "Info": {
-        "Types": {
-          "HgiVulkan": {
-            "bases": ["Hgi"]
-          }
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "HgiVulkan" : {
+                        "bases": ["Hgi"]
+                    }
+                }
+            },
+            "LibraryPath": "",
+            "Name": "hgiVulkan",
+            "ResourcePath": ".",
+            "Root": ".",
+            "Type": "library"
         }
-      },
-      "LibraryPath": "",
-      "Name": "HgiVulkan",
-      "ResourcePath": ".",
-      "Root": ".",
-      "Type": "library"
-    }
-  ]
+    ]
 }

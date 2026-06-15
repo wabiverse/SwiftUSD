@@ -1,24 +1,28 @@
 {
-  "Plugins": [
-    {
-      "Info": {
-        "Types": {
-          "UsdAbcAlembicFileFormat": {
-            "bases": ["SdfFileFormat"],
-            "displayName": "USD Alembic File Format",
-            "extensions": ["abc"],
-            "formatId": "abc",
-            "primary": true,
-            "target": "usd",
-            "supportsEditing": false
-          }
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "UsdAbcAlembicFileFormat": {
+                        "bases": [
+                            "SdfFileFormat"
+                        ],
+                        "displayName": "USD Alembic File Format",
+                        "extensions": [
+                            "abc"
+                        ],
+                        "formatId": "abc",
+                        "primary": true,
+                        "target": "usd",
+                        "supportsEditing": false
+                    }
+                }
+            },
+            "LibraryPath": "",
+            "Name": "usdAbc",
+            "ResourcePath": ".",
+            "Root": ".",
+            "Type": "library"
         }
-      },
-      "LibraryPath": "",
-      "Name": "UsdAbc",
-      "ResourcePath": ".",
-      "Root": ".",
-      "Type": "library"
-    }
-  ]
+    ]
 }

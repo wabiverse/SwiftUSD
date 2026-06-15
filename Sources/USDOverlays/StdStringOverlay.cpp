@@ -89,7 +89,12 @@ namespace Overlay
     return shader.CreateIdAttr(Pixar::VtValue(std::string(defaultValue)), writeSparsely);
   }
 
-  Pixar::PlugRegistry::PlugPathsVector PushBackPath(Pixar::PlugRegistry::PlugPathsVector paths, const char *path)
+  std::vector<std::string> MakeStringVector()
+  {
+    return std::vector<std::string>();
+  }
+
+  std::vector<std::string> PushBackPath(std::vector<std::string> paths, const char *path)
   {
     paths.push_back(std::string(path));
     return paths;

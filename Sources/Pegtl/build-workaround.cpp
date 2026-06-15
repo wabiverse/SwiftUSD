@@ -10,5 +10,8 @@
 // adding this, an "empty" .so gets built and other libs can link it.
 
 #include "Arch/export.h"
+#include "Pegtl/config.hpp"
 
+namespace PXR_PEGTL_NAMESPACE {
 ARCH_EXPORT int __pxr_pegtl_workaround__;
+}

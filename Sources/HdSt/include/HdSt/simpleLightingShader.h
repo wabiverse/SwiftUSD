@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HDST_SIMPLE_LIGHTING_SHADER_H
 #define PXR_IMAGING_HDST_SIMPLE_LIGHTING_SHADER_H
 
+#include "pxr/pxrns.h"
 #include "HdSt/api.h"
 #include "HdSt/binding.h"
 #include "HdSt/lightingShader.h"
-#include "pxr/pxrns.h"
 
 #include "Hd/version.h"
 
@@ -27,7 +27,8 @@ class HdRenderParam;
 class HdSceneDelegate;
 class HdStRenderBuffer;
 struct HdRenderPassAovBinding;
-using HdStSimpleLightingShaderSharedPtr = std::shared_ptr<class HdStSimpleLightingShader>;
+using HdStSimpleLightingShaderSharedPtr =
+    std::shared_ptr<class HdStSimpleLightingShader>;
 using HdRenderPassAovBindingVector = std::vector<HdRenderPassAovBinding>;
 
 TF_DECLARE_REF_PTRS(GlfBindingMap);
@@ -36,118 +37,153 @@ TF_DECLARE_REF_PTRS(GlfBindingMap);
 ///
 /// A shader that supports simple lighting functionality.
 ///
-class HdStSimpleLightingShader : public HdStLightingShader {
- public:
-  HDST_API
-  HdStSimpleLightingShader();
-  HDST_API
-  ~HdStSimpleLightingShader() override;
+class HdStSimpleLightingShader : public HdStLightingShader 
+{
+public:
+    HDST_API
+    HdStSimpleLightingShader();
+    HDST_API
+    ~HdStSimpleLightingShader() override;
 
-  /// HdShader overrides
-  HDST_API
-  ID ComputeHash() const override;
-  HDST_API
-  std::string GetSource(TfToken const &shaderStageKey) const override;
-  HDST_API
-  void BindResources(int program, HdSt_ResourceBinder const &binder) override;
-  HDST_API
-  void UnbindResources(int program, HdSt_ResourceBinder const &binder) override;
+    /// HdShader overrides
+    HDST_API
+    ID ComputeHash() const override;
+    HDST_API
+    std::string GetSource(TfToken const &shaderStageKey) const override;
+    HDST_API
+    void BindResources(int program,
+                       HdSt_ResourceBinder const &binder) override;
+    HDST_API
+    void UnbindResources(int program,
+                         HdSt_ResourceBinder const &binder) override;
 
-  /// Add a custom binding request for use when this shader executes.
-  HDST_API
-  void AddBufferBinding(HdStBindingRequest const &req);
+    /// Add a custom binding request for use when this shader executes.
+    HDST_API
+    void AddBufferBinding(HdStBindingRequest const& req);
 
-  /// Remove \p name from custom binding.
-  HDST_API
-  void RemoveBufferBinding(TfToken const &name);
+    /// Remove \p name from custom binding.
+    HDST_API
+    void RemoveBufferBinding(TfToken const &name);
 
-  /// Clear all custom bindings associated with this shader.
-  HDST_API
-  void ClearBufferBindings();
+    /// Clear all custom bindings associated with this shader.
+    HDST_API
+    void ClearBufferBindings();
 
-  HDST_API
-  void AddBindings(HdStBindingRequestVector *customBindings) override;
+    HDST_API
+    void AddBindings(HdStBindingRequestVector *customBindings) override;
 
-  /// Adds computations to create the dome light textures that
-  /// are pre-calculated from the environment map texture.
-  HDST_API
-  void AddResourcesFromTextures(ResourceContext &ctx) const override;
+    /// Adds computations to create the dome light textures that
+    /// are pre-calculated from the environment map texture.
+    HDST_API
+    void AddResourcesFromTextures(ResourceContext &ctx) const override;
 
-  /// HdStShaderCode overrides
-  HDST_API
-  HdSt_MaterialParamVector const &GetParams() const override;
+    /// HdStShaderCode overrides
+    HDST_API
+    HdSt_MaterialParamVector const& GetParams() const override;
 
-  /// HdStLightingShader overrides
-  HDST_API
-  void SetCamera(GfMatrix4d const &worldToViewMatrix, GfMatrix4d const &projectionMatrix) override;
+    /// HdStLightingShader overrides
+    HDST_API
+    void SetCamera(
+        GfMatrix4d const &worldToViewMatrix,
+        GfMatrix4d const &projectionMatrix) override;
+    
+    GlfSimpleLightingContextRefPtr GetLightingContext() const {
+        return _lightingContext;
+    };
 
-  GlfSimpleLightingContextRefPtr GetLightingContext() const
-  {
-    return _lightingContext;
-  };
+    /// Allocates texture handles (texture loading happens later during commit)
+    /// needed for lights.
+    ///
+    /// Call after lighting context has been set or updated in Sync-phase.
+    ///
+    HDST_API
+    void AllocateTextureHandles(
+        HdRenderIndex const &renderIndex,
+        const SdfPath& graphPath);
 
-  /// Allocates texture handles (texture loading happens later during commit)
-  /// needed for lights.
-  ///
-  /// Call after lighting context has been set or updated in Sync-phase.
-  ///
-  HDST_API
-  void AllocateTextureHandles(HdRenderIndex const &renderIndex);
+    /// The dome light environment map used as source for the other
+    /// dome light textures.
+    const HdStTextureHandleSharedPtr &
+    GetDomeLightEnvironmentTextureHandle() const {
+        return _domeLightEnvironmentTextureHandle;
+    }
 
-  /// The dome light environment map used as source for the other
-  /// dome light textures.
-  const HdStTextureHandleSharedPtr &GetDomeLightEnvironmentTextureHandle() const
-  {
-    return _domeLightEnvironmentTextureHandle;
-  }
+    /// The textures computed from the dome light environment map that
+    /// the shader needs to bind for the dome light shading.
+    HDST_API
+    NamedTextureHandleVector const &GetNamedTextureHandles() const override;
 
-  /// The textures computed from the dome light environment map that
-  /// the shader needs to bind for the dome light shading.
-  HDST_API
-  NamedTextureHandleVector const &GetNamedTextureHandles() const override;
+    /// Get one of the textures that need to be computed from the dome
+    /// light environment map.
+    HDST_API
+    const HdStTextureHandleSharedPtr &GetTextureHandle(
+        const TfToken &name) const;
 
-  /// Get one of the textures that need to be computed from the dome
-  /// light environment map.
-  HDST_API
-  const HdStTextureHandleSharedPtr &GetTextureHandle(const TfToken &name) const;
+    /// The dome light environment cubemap texture generated from the
+    /// latlong dome light texture.
+    HDST_API
+    const HdStTextureHandleSharedPtr &
+    GetDomeLightEnvironmentCubemapTextureHandle() const;
 
-  HdRenderPassAovBindingVector const &GetShadowAovBindings()
-  {
-    return _shadowAovBindings;
-  }
+    HdRenderPassAovBindingVector const& GetShadowAovBindings() {
+        return _shadowAovBindings;
+    }
 
- private:
-  SdfPath _GetAovPath(TfToken const &aov, size_t shadowIndex) const;
-  void _ResizeOrCreateBufferForAov(size_t shadowIndex) const;
-  void _CleanupAovBindings();
+    HDST_API
+    void SetDomeLightCubemapTargetMemory(unsigned int targetMemoryMB);
 
-  GlfSimpleLightingContextRefPtr _lightingContext;
-  bool _useLighting;
-  std::unique_ptr<class HioGlslfx> _glslfx;
+    HDST_API
+    void SetMaxLights(uint32_t maxLights);
 
-  // Lexicographic ordering for stable output between runs.
-  std::map<TfToken, HdStBindingRequest> _customBuffers;
+    HDST_API
+    static constexpr uint32_t GetMaxShadows() {
+        // Could only be higher with a texture atlas/array, since GL limits
+        // the number of bound samplers per shader stage.
+        return 16;
+    }
 
-  // The environment map used as source for the dome light textures.
-  //
-  // Handle is allocated in AllocateTextureHandles. Actual loading
-  // happens during commit.
-  HdStTextureHandleSharedPtr _domeLightEnvironmentTextureHandle;
+private:
+    void _AllocateShadowTextures(
+        HdStResourceRegistry* const resourceRegistry,
+        const SdfPath& graphPath);
+    void _CleanupAovBindings();
 
-  // Other dome light textures.
-  NamedTextureHandleVector _namedTextureHandles;
+    GlfSimpleLightingContextRefPtr _lightingContext; 
+    std::unique_ptr<class HioGlslfx> _glslfx;
 
-  NamedTextureHandleVector _domeLightTextureHandles;
-  NamedTextureHandleVector _shadowTextureHandles;
+    // Lexicographic ordering for stable output between runs.
+    std::map<TfToken, HdStBindingRequest> _customBuffers;
 
-  HdSt_MaterialParamVector _lightTextureParams;
+    // The environment map used as source for the dome light textures.
+    //
+    // Handle is allocated in AllocateTextureHandles. Actual loading
+    // happens during commit.
+    HdStTextureHandleSharedPtr _domeLightEnvironmentTextureHandle;
 
-  HdRenderParam *_renderParam;
+    // Other dome light textures.
+    NamedTextureHandleVector _namedTextureHandles;
 
-  HdRenderPassAovBindingVector _shadowAovBindings;
-  std::vector<std::unique_ptr<HdStRenderBuffer>> _shadowAovBuffers;
+    NamedTextureHandleVector _domeLightTextureHandles;
+
+    // Maximum target memory of computed dome light cubemap texture (in MB)
+    unsigned int _domeLightCubemapTargetMemoryMB;
+    
+    NamedTextureHandle _shadowTextureHandle;
+    
+    HdSt_MaterialParamVector _lightTextureParams;
+
+    HdRenderParam *_renderParam;
+
+    HdRenderPassAovBindingVector _shadowAovBindings;
+
+    std::vector<HdStPooledRenderBufferUniquePtr> _shadowBuffers;
+
+    HdStPooledRenderBufferUniquePtr _shadowBufferFallback;
+
+    uint32_t _maxLights;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDST_SIMPLE_LIGHTING_SHADER_H
+#endif // PXR_IMAGING_HDST_SIMPLE_LIGHTING_SHADER_H

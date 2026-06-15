@@ -14,46 +14,63 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 HdStOpenVDBAssetSubtextureIdentifier::HdStOpenVDBAssetSubtextureIdentifier(
     TfToken const &fieldName, const int fieldIndex)
-    : HdStFieldBaseSubtextureIdentifier(fieldName, fieldIndex)
+  : HdStFieldBaseSubtextureIdentifier(fieldName, fieldIndex)
 {
 }
 
-HdStOpenVDBAssetSubtextureIdentifier::~HdStOpenVDBAssetSubtextureIdentifier() = default;
+HdStOpenVDBAssetSubtextureIdentifier::~HdStOpenVDBAssetSubtextureIdentifier()
+ = default;
 
-std::unique_ptr<HdStSubtextureIdentifier> HdStOpenVDBAssetSubtextureIdentifier::Clone() const
+std::unique_ptr<HdStSubtextureIdentifier>
+HdStOpenVDBAssetSubtextureIdentifier::Clone() const
 {
-  return std::make_unique<HdStOpenVDBAssetSubtextureIdentifier>(GetFieldName(), GetFieldIndex());
+    return std::make_unique<HdStOpenVDBAssetSubtextureIdentifier>(
+        GetFieldName(), GetFieldIndex());
 }
 
-HdStSubtextureIdentifier::ID HdStOpenVDBAssetSubtextureIdentifier::_Hash() const
+HdStSubtextureIdentifier::ID
+HdStOpenVDBAssetSubtextureIdentifier::_Hash() const
 {
-  static ID typeHash = TfHash()(std::string("vdb"));
+    static ID typeHash =
+        TfHash()(std::string("vdb"));
 
-  return TfHash::Combine(typeHash, HdStFieldBaseSubtextureIdentifier::_Hash());
+    return TfHash::Combine(
+        typeHash,
+        HdStFieldBaseSubtextureIdentifier::_Hash());
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // HdStField3DAssetSubtextureIdentifier
 
 HdStField3DAssetSubtextureIdentifier::HdStField3DAssetSubtextureIdentifier(
-    TfToken const &fieldName, const int fieldIndex, TfToken const &fieldPurpose)
-    : HdStFieldBaseSubtextureIdentifier(fieldName, fieldIndex), _fieldPurpose(fieldPurpose)
+    TfToken const &fieldName,
+    const int fieldIndex,
+    TfToken const &fieldPurpose)
+  : HdStFieldBaseSubtextureIdentifier(fieldName, fieldIndex)
+  , _fieldPurpose(fieldPurpose)
 {
 }
 
-HdStField3DAssetSubtextureIdentifier::~HdStField3DAssetSubtextureIdentifier() = default;
+HdStField3DAssetSubtextureIdentifier::~HdStField3DAssetSubtextureIdentifier()
+ = default;
 
-std::unique_ptr<HdStSubtextureIdentifier> HdStField3DAssetSubtextureIdentifier::Clone() const
+std::unique_ptr<HdStSubtextureIdentifier>
+HdStField3DAssetSubtextureIdentifier::Clone() const
 {
-  return std::make_unique<HdStField3DAssetSubtextureIdentifier>(
-      GetFieldName(), GetFieldIndex(), GetFieldPurpose());
+    return std::make_unique<HdStField3DAssetSubtextureIdentifier>(
+        GetFieldName(), GetFieldIndex(), GetFieldPurpose());
 }
 
-HdStSubtextureIdentifier::ID HdStField3DAssetSubtextureIdentifier::_Hash() const
+HdStSubtextureIdentifier::ID
+HdStField3DAssetSubtextureIdentifier::_Hash() const
 {
-  static ID typeHash = TfHash()(std::string("Field3D"));
+    static ID typeHash =
+        TfHash()(std::string("Field3D"));
 
-  return TfHash::Combine(typeHash, HdStFieldBaseSubtextureIdentifier::_Hash(), _fieldPurpose);
+    return TfHash::Combine(
+        typeHash,
+        HdStFieldBaseSubtextureIdentifier::_Hash(),
+        _fieldPurpose);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

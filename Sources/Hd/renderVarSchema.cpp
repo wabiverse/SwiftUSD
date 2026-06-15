@@ -19,152 +19,183 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderVarSchemaTokens, HD_RENDER_VAR_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderVarSchemaTokens,
+    HD_RENDER_VAR_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathDataSourceHandle HdRenderVarSchema::GetPath() const
+HdPathDataSourceHandle
+HdRenderVarSchema::GetPath() const
 {
-  return _GetTypedDataSource<HdPathDataSource>(HdRenderVarSchemaTokens->path);
+    return _GetTypedDataSource<HdPathDataSource>(
+        HdRenderVarSchemaTokens->path);
 }
 
-HdTokenDataSourceHandle HdRenderVarSchema::GetDataType() const
+HdTokenDataSourceHandle
+HdRenderVarSchema::GetDataType() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdRenderVarSchemaTokens->dataType);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdRenderVarSchemaTokens->dataType);
 }
 
-HdTokenDataSourceHandle HdRenderVarSchema::GetSourceName() const
+HdTokenDataSourceHandle
+HdRenderVarSchema::GetSourceName() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdRenderVarSchemaTokens->sourceName);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdRenderVarSchemaTokens->sourceName);
 }
 
-HdTokenDataSourceHandle HdRenderVarSchema::GetSourceType() const
+HdTokenDataSourceHandle
+HdRenderVarSchema::GetSourceType() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdRenderVarSchemaTokens->sourceType);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdRenderVarSchemaTokens->sourceType);
 }
 
-HdContainerDataSourceHandle HdRenderVarSchema::GetNamespacedSettings() const
+HdContainerDataSourceHandle
+HdRenderVarSchema::GetNamespacedSettings() const
 {
-  return _GetTypedDataSource<HdContainerDataSource>(HdRenderVarSchemaTokens->namespacedSettings);
+    return _GetTypedDataSource<HdContainerDataSource>(
+        HdRenderVarSchemaTokens->namespacedSettings);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdRenderVarSchema::BuildRetained(
-    const HdPathDataSourceHandle &path,
-    const HdTokenDataSourceHandle &dataType,
-    const HdTokenDataSourceHandle &sourceName,
-    const HdTokenDataSourceHandle &sourceType,
-    const HdContainerDataSourceHandle &namespacedSettings)
+HdContainerDataSourceHandle
+HdRenderVarSchema::BuildRetained(
+        const HdPathDataSourceHandle &path,
+        const HdTokenDataSourceHandle &dataType,
+        const HdTokenDataSourceHandle &sourceName,
+        const HdTokenDataSourceHandle &sourceType,
+        const HdContainerDataSourceHandle &namespacedSettings
+)
 {
-  TfToken _names[5];
-  HdDataSourceBaseHandle _values[5];
+    TfToken _names[5];
+    HdDataSourceBaseHandle _values[5];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (path) {
-    _names[_count] = HdRenderVarSchemaTokens->path;
-    _values[_count++] = path;
-  }
+    if (path) {
+        _names[_count] = HdRenderVarSchemaTokens->path;
+        _values[_count++] = path;
+    }
 
-  if (dataType) {
-    _names[_count] = HdRenderVarSchemaTokens->dataType;
-    _values[_count++] = dataType;
-  }
+    if (dataType) {
+        _names[_count] = HdRenderVarSchemaTokens->dataType;
+        _values[_count++] = dataType;
+    }
 
-  if (sourceName) {
-    _names[_count] = HdRenderVarSchemaTokens->sourceName;
-    _values[_count++] = sourceName;
-  }
+    if (sourceName) {
+        _names[_count] = HdRenderVarSchemaTokens->sourceName;
+        _values[_count++] = sourceName;
+    }
 
-  if (sourceType) {
-    _names[_count] = HdRenderVarSchemaTokens->sourceType;
-    _values[_count++] = sourceType;
-  }
+    if (sourceType) {
+        _names[_count] = HdRenderVarSchemaTokens->sourceType;
+        _values[_count++] = sourceType;
+    }
 
-  if (namespacedSettings) {
-    _names[_count] = HdRenderVarSchemaTokens->namespacedSettings;
-    _values[_count++] = namespacedSettings;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (namespacedSettings) {
+        _names[_count] = HdRenderVarSchemaTokens->namespacedSettings;
+        _values[_count++] = namespacedSettings;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdRenderVarSchema::Builder &HdRenderVarSchema::Builder::SetPath(const HdPathDataSourceHandle &path)
+HdRenderVarSchema::Builder &
+HdRenderVarSchema::Builder::SetPath(
+    const HdPathDataSourceHandle &path)
 {
-  _path = path;
-  return *this;
+    _path = path;
+    return *this;
 }
 
-HdRenderVarSchema::Builder &HdRenderVarSchema::Builder::SetDataType(
+HdRenderVarSchema::Builder &
+HdRenderVarSchema::Builder::SetDataType(
     const HdTokenDataSourceHandle &dataType)
 {
-  _dataType = dataType;
-  return *this;
+    _dataType = dataType;
+    return *this;
 }
 
-HdRenderVarSchema::Builder &HdRenderVarSchema::Builder::SetSourceName(
+HdRenderVarSchema::Builder &
+HdRenderVarSchema::Builder::SetSourceName(
     const HdTokenDataSourceHandle &sourceName)
 {
-  _sourceName = sourceName;
-  return *this;
+    _sourceName = sourceName;
+    return *this;
 }
 
-HdRenderVarSchema::Builder &HdRenderVarSchema::Builder::SetSourceType(
+HdRenderVarSchema::Builder &
+HdRenderVarSchema::Builder::SetSourceType(
     const HdTokenDataSourceHandle &sourceType)
 {
-  _sourceType = sourceType;
-  return *this;
+    _sourceType = sourceType;
+    return *this;
 }
 
-HdRenderVarSchema::Builder &HdRenderVarSchema::Builder::SetNamespacedSettings(
+HdRenderVarSchema::Builder &
+HdRenderVarSchema::Builder::SetNamespacedSettings(
     const HdContainerDataSourceHandle &namespacedSettings)
 {
-  _namespacedSettings = namespacedSettings;
-  return *this;
+    _namespacedSettings = namespacedSettings;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdRenderVarSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdRenderVarSchema::Builder::Build()
 {
-  return HdRenderVarSchema::BuildRetained(
-      _path, _dataType, _sourceName, _sourceType, _namespacedSettings);
-}
-
-/*static*/
-HdRenderVarSchema HdRenderVarSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdRenderVarSchema(fromParentContainer ?
-                               HdContainerDataSource::Cast(
-                                   fromParentContainer->Get(HdRenderVarSchemaTokens->renderVar)) :
-                               nullptr);
+    return HdRenderVarSchema::BuildRetained(
+        _path,
+        _dataType,
+        _sourceName,
+        _sourceType,
+        _namespacedSettings
+    );
 }
 
 /*static*/
-const TfToken &HdRenderVarSchema::GetSchemaToken()
+HdRenderVarSchema
+HdRenderVarSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdRenderVarSchemaTokens->renderVar;
+    return HdRenderVarSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdRenderVarSchemaTokens->renderVar))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdRenderVarSchema::GetDefaultLocator()
+const TfToken &
+HdRenderVarSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdRenderVarSchemaTokens->renderVar;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdRenderVarSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdRenderVarSchema::GetNamespacedSettingsLocator()
+const HdDataSourceLocator &
+HdRenderVarSchema::GetNamespacedSettingsLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdRenderVarSchemaTokens->namespacedSettings);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdRenderVarSchemaTokens->namespacedSettings);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

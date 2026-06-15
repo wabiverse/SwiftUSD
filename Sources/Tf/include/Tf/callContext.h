@@ -18,9 +18,9 @@
 /// which will produce a temporary structure containing the local contextual
 /// information. The intended usage is in a macro.
 
-#include "Arch/functionLite.h"
-#include "Tf/api.h"
 #include "pxr/pxrns.h"
+#include "Tf/api.h"
+#include "Arch/functionLite.h"
 
 #include <stddef.h>
 
@@ -28,71 +28,68 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \hideinitializer
 #define TF_CALL_CONTEXT \
-  TfCallContext(__ARCH_FILE__, __ARCH_FUNCTION__, __LINE__, __ARCH_PRETTY_FUNCTION__)
+TfCallContext(__ARCH_FILE__, __ARCH_FUNCTION__, __LINE__, __ARCH_PRETTY_FUNCTION__)
 
-class TfCallContext {
- public:
-  constexpr TfCallContext()
-      : _file(nullptr), _function(nullptr), _line(0), _prettyFunction(nullptr), _hidden(false)
-  {
-  }
-
-  constexpr TfCallContext(char const *file,
-                          char const *function,
-                          size_t line,
-                          char const *prettyFunction)
-      : _file(file),
+class TfCallContext
+{
+public:
+    constexpr TfCallContext()
+        : _file(nullptr)
+        , _function(nullptr)
+        , _line(0)
+        , _prettyFunction(nullptr)
+        , _hidden(false) {}
+    
+    constexpr TfCallContext(char const *file,
+                            char const *function,
+                            size_t line,
+                            char const *prettyFunction) :
+        _file(file),
         _function(function),
         _line(line),
         _prettyFunction(prettyFunction),
         _hidden(false)
-  {
-  }
+    {
+    }
 
-  char const *GetFile() const
-  {
-    return _file;
-  }
+    char const *GetFile() const {
+        return _file;
+    }
 
-  char const *GetFunction() const
-  {
-    return _function;
-  }
+    char const *GetFunction() const {
+        return _function;
+    }
 
-  size_t GetLine() const
-  {
-    return _line;
-  }
+    size_t GetLine() const {
+        return _line;
+    }
 
-  char const *GetPrettyFunction() const
-  {
-    return _prettyFunction;
-  }
+    char const *GetPrettyFunction() const {
+        return _prettyFunction;
+    }
 
-  TfCallContext const &Hide() const
-  {
-    _hidden = true;
-    return *this;
-  }
+    TfCallContext const& Hide() const {
+        _hidden = true;
+        return *this;
+    }
+    
+    bool IsHidden() const {
+        return _hidden;
+    }
 
-  bool IsHidden() const
-  {
-    return _hidden;
-  }
+    explicit operator bool() const {
+        return _file && _function && *_file && *_function;
+    }
+    
+  private:
 
-  explicit operator bool() const
-  {
-    return _file && _function;
-  }
-
- private:
-  char const *_file;
-  char const *_function;
-  size_t _line;
-  char const *_prettyFunction;
-  mutable bool _hidden;
+    char const *_file;
+    char const *_function;
+    size_t _line;
+    char const *_prettyFunction;
+    mutable bool _hidden;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_CALL_CONTEXT_H
+#endif // PXR_BASE_TF_CALL_CONTEXT_H

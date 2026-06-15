@@ -9,27 +9,27 @@
 
 /// \file garch/glPlatformContext.h
 
-#include "Arch/defines.h"
-#include "Garch/api.h"
 #include "pxr/pxrns.h"
+#include "Garch/api.h"
+#include "Arch/defines.h"
 #include <cstddef>
 #include <functional>
 
 #if defined(ARCH_OS_LINUX)
 
-#  include "Garch/GarchGLX/glPlatformContextGLX.h"
+#include "Garch/glPlatformContextGLX.h"
 
 #elif defined(ARCH_OS_DARWIN)
 
-#  include "Garch/GarchDarwin/glPlatformContextDarwin.h"
+#include "Garch/glPlatformContextDarwin.h"
 
 #elif defined(ARCH_OS_WINDOWS)
 
-#  include "Garch/GarchWindows/glPlatformContextWindows.h"
+#include "Garch/glPlatformContextWindows.h"
 
 #else
 
-#  error "Unknown platform"
+#error "Unknown platform"
 
 #endif
 
@@ -39,13 +39,17 @@ GARCH_API GarchGLPlatformContextState GarchGetNullGLPlatformContextState();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-namespace std {
-template<> struct hash<PXR_NS::GarchGLPlatformContextState> {
-  inline size_t operator()(const PXR_NS::GarchGLPlatformContextState &x) const
-  {
-    return x.GetHash();
-  }
+namespace std 
+{
+template<> 
+struct hash<PXR_NS::GarchGLPlatformContextState>
+{
+    inline size_t operator()(const PXR_NS::GarchGLPlatformContextState& x) const
+    {
+        return x.GetHash();
+    }
 };
-}  // namespace std
+}
+
 
 #endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_H

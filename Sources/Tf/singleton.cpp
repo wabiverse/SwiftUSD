@@ -5,10 +5,10 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Tf/singleton.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/pyLock.h"
-#include "pxr/pxrns.h"
 
 #include <memory>
 
@@ -20,12 +20,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 Tf_SingletonPyGILDropper::Tf_SingletonPyGILDropper()
 {
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-  if (PyGILState_Check()) {
-    _pyLock = std::make_unique<TfPyLock>();
-    _pyLock->BeginAllowThreads();
-  }
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+    if (PyGILState_Check()) {
+        _pyLock = std::make_unique<TfPyLock>();
+        _pyLock->BeginAllowThreads();
+    }
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 }
 
 Tf_SingletonPyGILDropper::~Tf_SingletonPyGILDropper() = default;

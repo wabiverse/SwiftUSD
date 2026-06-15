@@ -32,68 +32,77 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_CATEGORIES_SCHEMA_TOKENS (categories)
+#define HD_CATEGORIES_SCHEMA_TOKENS \
+    (categories) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdCategoriesSchemaTokens, HD_API, HD_CATEGORIES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCategoriesSchemaTokens, HD_API,
+    HD_CATEGORIES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdCategoriesSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdCategoriesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdCategoriesSchema
+///
+class HdCategoriesSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "categories" from the parent container and constructs a
-  /// HdCategoriesSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdCategoriesSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
+    HdCategoriesSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
+    /// Retrieves a container data source with the schema's default name token
+    /// "categories" from the parent container and constructs a
+    /// HdCategoriesSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
+    HD_API
+    static HdCategoriesSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  HD_API
-  VtArray<TfToken> GetIncludedCategoryNames();
+    /// @}
 
-  HD_API
-  bool IsIncludedInCategory(const TfToken &categoryName);
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+    HD_API
+    VtArray<TfToken> GetIncludedCategoryNames();
 
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(size_t includedNameCount,
-                                                   const TfToken *includedNames,
-                                                   size_t excludedNameCount,
-                                                   const TfToken *excludedNames);
+    HD_API
+    bool IsIncludedInCategory(const TfToken &categoryName);
 
-  // --(END CUSTOM CODE: Schema Methods)--
+    HD_API
+    static HdContainerDataSourceHandle BuildRetained(
+        size_t includedNameCount,
+        const TfToken *includedNames,
+        size_t excludedNameCount,
+        const TfToken *excludedNames);
 
-  /// \name Member accessor
-  /// @{
+// --(END CUSTOM CODE: Schema Methods)--
 
-  /// @}
+    /// \name Member accessor
+    /// @{ 
 
-  /// \name Schema location
-  /// @{
+    /// @}
 
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
+    /// \name Schema location
+    /// @{
 
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
 
-  /// @}
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
 
-  /// \name Schema construction
-  /// @{
+    /// @} 
 
-  /// @}
+    /// \name Schema construction
+    /// @{
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

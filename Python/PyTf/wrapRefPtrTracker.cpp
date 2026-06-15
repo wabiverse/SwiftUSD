@@ -8,52 +8,62 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/pySingleton.h"
 #include "Tf/refPtr.h"
-#include "Tf/refPtrTracker.h"
 #include "Tf/weakPtr.h"
+#include "Tf/refPtrTracker.h"
+#include "Tf/pySingleton.h"
 
-#include <boost/python/class.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <sstream>
-
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static std::string _ReportAllWatchedCounts(TfRefPtrTracker &tracker)
+static
+std::string
+_ReportAllWatchedCounts(TfRefPtrTracker& tracker)
 {
-  std::ostringstream s;
-  tracker.ReportAllWatchedCounts(s);
-  return s.str();
+    std::ostringstream s;
+    tracker.ReportAllWatchedCounts(s);
+    return s.str();
 }
 
-static std::string _ReportAllTraces(TfRefPtrTracker &tracker)
+static
+std::string
+_ReportAllTraces(TfRefPtrTracker& tracker)
 {
-  std::ostringstream s;
-  tracker.ReportAllTraces(s);
-  return s.str();
+    std::ostringstream s;
+    tracker.ReportAllTraces(s);
+    return s.str();
 }
 
-static std::string _ReportTracesForWatched(TfRefPtrTracker &tracker, uintptr_t ptr)
+static
+std::string
+_ReportTracesForWatched(TfRefPtrTracker& tracker, uintptr_t ptr)
 {
-  std::ostringstream s;
-  tracker.ReportTracesForWatched(s, (TfRefBase *)ptr);
-  return s.str();
+    std::ostringstream s;
+    tracker.ReportTracesForWatched(s, (TfRefBase*)ptr);
+    return s.str();
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapRefPtrTracker()
+void
+wrapRefPtrTracker()
 {
-  typedef TfRefPtrTracker This;
-  typedef TfWeakPtr<TfRefPtrTracker> ThisPtr;
+     typedef TfRefPtrTracker This;
+     typedef TfWeakPtr<TfRefPtrTracker> ThisPtr;
+     
+     class_<This, ThisPtr, noncopyable>("RefPtrTracker", no_init)
+        .def(TfPySingleton())
 
-  class_<This, ThisPtr, boost::noncopyable>("RefPtrTracker", no_init)
-      .def(TfPySingleton())
-
-      .def("GetAllWatchedCountsReport", _ReportAllWatchedCounts)
-      .def("GetAllTracesReport", _ReportAllTraces)
-      .def("GetTracesReportForWatched", _ReportTracesForWatched);
+        .def("GetAllWatchedCountsReport", _ReportAllWatchedCounts)
+        .def("GetAllTracesReport", _ReportAllTraces)
+        .def("GetTracesReportForWatched", _ReportTracesForWatched)
+        ;
 }

@@ -7,9 +7,9 @@
 #ifndef PXR_IMAGING_GARCH_GL_H
 #define PXR_IMAGING_GARCH_GL_H
 
-#include "Arch/defines.h"
 #include "pxr/pxrns.h"
+#include "Arch/defines.h"
 
 #include "Garch/glApi.h"
 
-#endif  // PXR_IMAGING_GARCH_GL_H
+#endif // PXR_IMAGING_GARCH_GL_H

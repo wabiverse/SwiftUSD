@@ -9,11 +9,10 @@
 
 #include <Metal/Metal.h>
 
-#include "Arch/swiftInterop.h"
-
-#include "Hgi/texture.h"
-#include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
+#include "HgiMetal/api.h"
+#include "Hgi/texture.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -24,44 +23,47 @@ class HgiMetal;
 /// Represents a Metal GPU texture resource.
 ///
 class HgiMetalTexture final : public HgiTexture {
- public:
-  HGIMETAL_API
-  ~HgiMetalTexture() override;
+public:
+    HGIMETAL_API
+    ~HgiMetalTexture() override;
 
-  HGIMETAL_API
-  size_t GetByteSizeOfResource() const override;
+    HGIMETAL_API
+    size_t GetByteSizeOfResource() const override;
 
-  /// This hgi transition helper returns the Metal resource as uint64_t
-  /// for external clients.
-  HGIMETAL_API
-  uint64_t GetRawResource() const override;
+    /// This hgi transition helper returns the Metal resource as uint64_t
+    /// for external clients.
+    HGIMETAL_API
+    uint64_t GetRawResource() const override;
 
-  /// Returns the handle to the Metal texture.
-  HGIMETAL_API
-  id<MTLTexture> GetTextureId() const;
+    /// Returns the handle to the Metal texture.
+    HGIMETAL_API
+    id<MTLTexture> GetTextureId() const;
+    
+    /// This function does not do anything. At the moment there is no need for 
+    /// explicit layout transitions for the Metal backend. Hence this function 
+    /// simply returns 0 (none).
+    HGIMETAL_API
+    HgiTextureUsage SubmitLayoutChange(HgiTextureUsage newLayout) override;
 
-  /// This function does not do anything. At the moment there is no need for
-  /// explicit layout transitions for the Metal backend. Hence this function
-  /// simply returns void.
-  HGIMETAL_API
-  void SubmitLayoutChange(HgiTextureUsage newLayout) override;
+protected:
+    friend class HgiMetal;
 
- protected:
-  friend class HgiMetal;
+    HGIMETAL_API
+    HgiMetalTexture(HgiMetal *hgi,
+                    HgiTextureDesc const & desc);
+    
+    HGIMETAL_API
+    HgiMetalTexture(HgiMetal *hgi,
+                    HgiTextureViewDesc const & desc);
+    
+private:
+    HgiMetalTexture() = delete;
+    HgiMetalTexture & operator=(const HgiMetalTexture&) = delete;
+    HgiMetalTexture(const HgiMetalTexture&) = delete;
 
-  HGIMETAL_API
-  HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc);
+    id<MTLTexture> _textureId;
+};
 
-  HGIMETAL_API
-  HgiMetalTexture(HgiMetal *hgi, HgiTextureViewDesc const &desc);
-
- private:
-  HgiMetalTexture() = delete;
-  HgiMetalTexture &operator=(const HgiMetalTexture &) = delete;
-  HgiMetalTexture(const HgiMetalTexture &) = delete;
-
-  id<MTLTexture> _textureId;
-} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

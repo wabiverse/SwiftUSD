@@ -7,108 +7,127 @@
 
 #include "pxr/pxrns.h"
 
-#include "Trace/collector.h"
-#include "Trace/reporter.h"
 #include "Trace/traceImpl.h"
+#include "Trace/reporter.h"
+#include "Trace/collector.h"
 
-#include <boost/python/def.hpp>
-#include <boost/python/enum.hpp>
-#include <boost/python/list.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/enum.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/list.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <chrono>
 #include <string>
 #include <thread>
 
 using namespace std::chrono_literals;
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 // ----------------------------------------
 // A set of functions using TRACE_FUNCTION, TRACE_SCOPE
 
-static void TestNestingFunc2()
+static void
+TestNestingFunc2()
 {
-  TRACE_FUNCTION();
-  std::this_thread::sleep_for(1us);
+    TRACE_FUNCTION();
+    std::this_thread::sleep_for(1us);
 }
 
-static void TestNestingFunc3()
+static void
+TestNestingFunc3()
 {
-  TRACE_FUNCTION();
-  std::this_thread::sleep_for(1us);
-  TRACE_SCOPE("Foo");
-  std::this_thread::sleep_for(1us);
+    TRACE_FUNCTION();
+    std::this_thread::sleep_for(1us);
+    TRACE_SCOPE("Foo");
+    std::this_thread::sleep_for(1us);
 
-  TraceCollector &gc = TraceCollector::GetInstance();
-  TF_UNUSED(gc);
+    TraceCollector& gc = TraceCollector::GetInstance();
+    TF_UNUSED(gc);
 }
 
-static void TestNestingFunc1()
+static void
+TestNestingFunc1()
 {
-  TRACE_FUNCTION();
-  std::this_thread::sleep_for(1us);
+    TRACE_FUNCTION();
+    std::this_thread::sleep_for(1us);
 
-  TestNestingFunc2();
-  TestNestingFunc3();
+    TestNestingFunc2();
+    TestNestingFunc3();
 }
 
-static void TestNesting()
+static void
+TestNesting()
 {
-  TRACE_FUNCTION();
-  std::this_thread::sleep_for(1us);
+    TRACE_FUNCTION();
+    std::this_thread::sleep_for(1us);
 
-  TestNestingFunc1();
+    TestNestingFunc1();
 }
 
 // ----------------------------------------
 // A set of functions using TraceAuto
 
-static void TestAutoFunc2()
+static void
+TestAutoFunc2()
 {
-  TraceAuto t(TF_FUNC_NAME());
-  std::this_thread::sleep_for(1us);
+    TraceAuto t(TF_FUNC_NAME());
+    std::this_thread::sleep_for(1us);
 }
 
-static void TestAutoFunc3()
+static void
+TestAutoFunc3()
 {
-  TraceAuto t(TF_FUNC_NAME());
-  std::this_thread::sleep_for(1us);
+    TraceAuto t(TF_FUNC_NAME());
+    std::this_thread::sleep_for(1us);
 }
 
-static void TestAutoFunc1()
+static void
+TestAutoFunc1()
 {
-  TraceAuto t(TF_FUNC_NAME());
-  std::this_thread::sleep_for(1us);
+    TraceAuto t(TF_FUNC_NAME());
+    std::this_thread::sleep_for(1us);
 
-  TestAutoFunc2();
-  TestAutoFunc3();
+    TestAutoFunc2();
+    TestAutoFunc3();
 }
 
-static void TestAuto()
+static void
+TestAuto()
 {
-  TraceAuto t(TF_FUNC_NAME());
-  std::this_thread::sleep_for(1us);
+    TraceAuto t(TF_FUNC_NAME());
+    std::this_thread::sleep_for(1us);
 
-  TestAutoFunc1();
+    TestAutoFunc1();
 }
 
-static std::string TestEventName()
+static std::string
+TestEventName()
 {
-  return "C_PLUS_PLUS_EVENT";
+    return "C_PLUS_PLUS_EVENT";
 }
 
-static void TestCreateEvents()
+
+static void
+TestCreateEvents()
 {
-  TraceCollector *gc = &TraceCollector::GetInstance();
-  gc->BeginEvent(TestEventName());
-  gc->EndEvent(TestEventName());
+    TraceCollector* gc = &TraceCollector::GetInstance();
+    gc->BeginEvent(TestEventName());
+    gc->EndEvent(TestEventName());
+    
 }
 
 void wrapTestTrace()
-{
-  def("TestNesting", &::TestNesting);
-  def("TestAuto", &::TestAuto);
-  def("TestCreateEvents", &::TestCreateEvents);
-  def("GetTestEventName", &::TestEventName);
+{    
+    def("TestNesting", &::TestNesting);
+    def("TestAuto", &::TestAuto);
+    def("TestCreateEvents", &::TestCreateEvents);
+    def("GetTestEventName", &::TestEventName);
 }
+

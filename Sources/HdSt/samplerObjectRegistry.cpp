@@ -6,122 +6,151 @@
 //
 #include "HdSt/samplerObjectRegistry.h"
 
-#include "HdSt/ptexTextureObject.h"
 #include "HdSt/samplerObject.h"
+#include "HdSt/ptexTextureObject.h"
 #include "HdSt/textureObject.h"
 #include "HdSt/udimTextureObject.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdSt_SamplerObjectRegistry::HdSt_SamplerObjectRegistry(HdStResourceRegistry *registry)
-    : _garbageCollectionNeeded(false), _resourceRegistry(registry)
+HdSt_SamplerObjectRegistry::HdSt_SamplerObjectRegistry(
+    HdStResourceRegistry * registry)
+  : _garbageCollectionNeeded(false)
+  , _resourceRegistry(registry)
 {
 }
 
 HdSt_SamplerObjectRegistry::~HdSt_SamplerObjectRegistry() = default;
 
 template<HdStTextureType textureType>
-static HdStSamplerObjectSharedPtr _MakeTypedSamplerObject(
+static
+HdStSamplerObjectSharedPtr
+_MakeTypedSamplerObject(
     HdStTextureObjectSharedPtr const &texture,
     HdSamplerParameters const &samplerParameters,
-    HdSt_SamplerObjectRegistry *const samplerObjectRegistry)
+    HdSt_SamplerObjectRegistry * const samplerObjectRegistry)
 {
-  // e.g. HdStUvTextureObject
-  using TextureObject = HdStTypedTextureObject<textureType>;
-  // e.g. HdStUvSamplerObject
-  using SamplerObject = HdStTypedSamplerObject<textureType>;
+    // e.g. HdStUvTextureObject
+    using TextureObject = HdStTypedTextureObject<textureType>;
+    // e.g. HdStUvSamplerObject
+    using SamplerObject = HdStTypedSamplerObject<textureType>;
 
-  const TextureObject *const typedTexture = dynamic_cast<TextureObject *>(texture.get());
-  if (!typedTexture) {
-    TF_CODING_ERROR("Bad texture object");
-    return nullptr;
-  }
+    const TextureObject * const typedTexture =
+        dynamic_cast<TextureObject *>(texture.get());
+    if (!typedTexture) {
+        TF_CODING_ERROR("Bad texture object");
+        return nullptr;
+    }
 
-  return std::make_shared<SamplerObject>(*typedTexture, samplerParameters, samplerObjectRegistry);
+    return std::make_shared<SamplerObject>(
+        *typedTexture,
+        samplerParameters,
+        samplerObjectRegistry);
 }
 
-static HdStSamplerObjectSharedPtr _MakeSamplerObject(
+static
+HdStSamplerObjectSharedPtr
+_MakeSamplerObject(
     HdStTextureObjectSharedPtr const &texture,
     HdSamplerParameters const &samplerParameters,
-    HdSt_SamplerObjectRegistry *const samplerObjectRegistry)
+    HdSt_SamplerObjectRegistry * const samplerObjectRegistry)
 {
-  switch (texture->GetTextureType()) {
+    switch(texture->GetTextureType()) {
     case HdStTextureType::Uv:
-      return _MakeTypedSamplerObject<HdStTextureType::Uv>(
-          texture, samplerParameters, samplerObjectRegistry);
+        return _MakeTypedSamplerObject<HdStTextureType::Uv>(
+            texture,
+            samplerParameters,
+            samplerObjectRegistry);
     case HdStTextureType::Field:
-      return _MakeTypedSamplerObject<HdStTextureType::Field>(
-          texture, samplerParameters, samplerObjectRegistry);
+        return _MakeTypedSamplerObject<HdStTextureType::Field>(
+            texture,
+            samplerParameters,
+            samplerObjectRegistry);
     case HdStTextureType::Ptex:
-      return _MakeTypedSamplerObject<HdStTextureType::Ptex>(
-          texture, samplerParameters, samplerObjectRegistry);
+        return _MakeTypedSamplerObject<HdStTextureType::Ptex>(
+            texture,
+            samplerParameters,
+            samplerObjectRegistry);
     case HdStTextureType::Udim:
-      return _MakeTypedSamplerObject<HdStTextureType::Udim>(
-          texture, samplerParameters, samplerObjectRegistry);
-  }
+        return _MakeTypedSamplerObject<HdStTextureType::Udim>(
+            texture,
+            samplerParameters,
+            samplerObjectRegistry);
+    case HdStTextureType::Cubemap:
+        return _MakeTypedSamplerObject<HdStTextureType::Cubemap>(
+            texture,
+            samplerParameters,
+            samplerObjectRegistry);
+    }
 
-  TF_CODING_ERROR("Unsupported texture type");
-  return nullptr;
+    TF_CODING_ERROR("Unsupported texture type");
+    return nullptr;
+}    
+
+HdStSamplerObjectSharedPtr
+HdSt_SamplerObjectRegistry::AllocateSampler(
+    HdStTextureObjectSharedPtr const &texture,
+    HdSamplerParameters const &samplerParameters)
+{
+    TRACE_FUNCTION();
+
+    HdStSamplerObjectSharedPtr const result = _MakeSamplerObject(
+        texture, samplerParameters, this);
+
+    if (result) {
+        // Record sampler object
+        _samplerObjects.push_back(result);
+    }
+
+    return result;
 }
 
-HdStSamplerObjectSharedPtr HdSt_SamplerObjectRegistry::AllocateSampler(
-    HdStTextureObjectSharedPtr const &texture, HdSamplerParameters const &samplerParameters)
+void
+HdSt_SamplerObjectRegistry::MarkGarbageCollectionNeeded()
 {
-  TRACE_FUNCTION();
-
-  HdStSamplerObjectSharedPtr const result = _MakeSamplerObject(texture, samplerParameters, this);
-
-  if (result) {
-    // Record sampler object
-    _samplerObjects.push_back(result);
-  }
-
-  return result;
+    _garbageCollectionNeeded = true;
 }
 
-void HdSt_SamplerObjectRegistry::MarkGarbageCollectionNeeded()
+HdStResourceRegistry *
+HdSt_SamplerObjectRegistry::GetResourceRegistry() const
 {
-  _garbageCollectionNeeded = true;
-}
-
-HdStResourceRegistry *HdSt_SamplerObjectRegistry::GetResourceRegistry() const
-{
-  return _resourceRegistry;
+    return _resourceRegistry;
 }
 
 // Remove all shared pointers to objects not referenced by any client.
-void HdSt_SamplerObjectRegistry::GarbageCollect()
+void
+HdSt_SamplerObjectRegistry::GarbageCollect()
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  if (!_garbageCollectionNeeded) {
-    return;
-  }
-
-  // Go from left to right, filling slots that became empty
-  // with "shared" shared pointers from the right.
-  size_t last = _samplerObjects.size();
-
-  for (size_t i = 0; i < last; i++) {
-    if (_samplerObjects[i].unique()) {
-      while (true) {
-        last--;
-        if (i == last) {
-          break;
-        }
-        if (!_samplerObjects[last].unique()) {
-          _samplerObjects[i] = _samplerObjects[last];
-          break;
-        }
-      }
+    if (!_garbageCollectionNeeded) {
+        return;
     }
-  }
 
-  _samplerObjects.resize(last);
+    // Go from left to right, filling slots that became empty
+    // with "shared" shared pointers from the right.
+    size_t last = _samplerObjects.size();
 
-  _garbageCollectionNeeded = false;
+    for (size_t i = 0; i < last; i++) {
+        if (_samplerObjects[i].use_count() == 1) {
+            while(true) {
+                last--;
+                if (i == last) {
+                    break;
+                }
+                if (_samplerObjects[last].use_count() != 1) {
+                    _samplerObjects[i] = _samplerObjects[last];
+                    break;
+                }
+            }
+        }
+    }
+    
+    _samplerObjects.resize(last);
+
+    _garbageCollectionNeeded = false;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

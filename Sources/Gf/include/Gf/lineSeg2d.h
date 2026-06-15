@@ -10,10 +10,10 @@
 /// \file gf/lineSeg2d.h
 /// \ingroup group_gf_BasicGeometry
 
-#include "Gf/api.h"
+#include "pxr/pxrns.h"
 #include "Gf/line2d.h"
 #include "Gf/vec2d.h"
-#include "pxr/pxrns.h"
+#include "Gf/api.h"
 
 #include <float.h>
 
@@ -28,66 +28,58 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class GfLineSeg2d {
 
- public:
-  /// The default constructor leaves line parameters undefined.
-  GfLineSeg2d() {}
+  public:
 
-  /// Construct a line segment that spans two points.
-  GfLineSeg2d(const GfVec2d &p0, const GfVec2d &p1)
-  {
-    _length = _line.Set(p0, p1 - p0);
-  }
+    /// The default constructor leaves line parameters undefined.
+    GfLineSeg2d() {
+    }
 
-  /// Return the point on the segment specified by the parameter t.
-  /// p = p0 + t * (p1 - p0)
-  GfVec2d GetPoint(double t) const
-  {
-    return _line.GetPoint(t * _length);
-  }
+    /// Construct a line segment that spans two points.
+    GfLineSeg2d(const GfVec2d &p0, const GfVec2d &p1 ) {
+        _length = _line.Set( p0, p1 - p0 );
+    }
 
-  /// Return the normalized direction of the line.
-  const GfVec2d &GetDirection() const
-  {
-    return _line.GetDirection();
-  }
+    /// Return the point on the segment specified by the parameter t. 
+    /// p = p0 + t * (p1 - p0)
+    GfVec2d GetPoint( double t ) const {return _line.GetPoint( t * _length );}
 
-  /// Return the length of the line
-  double GetLength() const
-  {
-    return _length;
-  }
+    /// Return the normalized direction of the line.
+    const GfVec2d &GetDirection() const { return _line.GetDirection(); }
 
-  /// Returns the point on the line that is closest to \p point. If
-  /// \p t is not \c NULL, it will be set to the parametric
-  /// distance along the line of the closest point.
-  GF_API
-  GfVec2d FindClosestPoint(const GfVec2d &point, double *t = NULL) const;
+    /// Return the length of the line
+    double GetLength() const { return _length; }
 
-  /// Component-wise equality test. The starting points and directions,
-  /// must match exactly for lines to be considered equal.
-  bool operator==(const GfLineSeg2d &l) const
-  {
-    return (_line == l._line && _length == l._length);
-  }
+    /// Returns the point on the line that is closest to \p point. If
+    /// \p t is not \c NULL, it will be set to the parametric
+    /// distance along the line of the closest point.
+    GF_API
+    GfVec2d FindClosestPoint(const GfVec2d &point, double *t = NULL) const;
 
-  /// Component-wise inequality test. The starting points,
-  /// and directions must match exactly for lines to be
-  /// considered equal.
-  bool operator!=(const GfLineSeg2d &r) const
-  {
-    return !(*this == r);
-  }
+    /// Component-wise equality test. The starting points and directions,
+    /// must match exactly for lines to be considered equal.
+    bool        operator ==(const GfLineSeg2d &l) const {
+        return (_line == l._line && _length  == l._length);
+    }
 
- private:
-  GF_API
-  friend bool GfFindClosestPoints(
-      const GfLine2d &, const GfLineSeg2d &, GfVec2d *, GfVec2d *, double *t1, double *t2);
-  GF_API
-  friend bool GfFindClosestPoints(
-      const GfLineSeg2d &, const GfLineSeg2d &, GfVec2d *, GfVec2d *, double *, double *);
+    /// Component-wise inequality test. The starting points,
+    /// and directions must match exactly for lines to be
+    /// considered equal.
+    bool        operator !=(const GfLineSeg2d &r) const {
+        return ! (*this == r);
+    }
 
-  GfLine2d _line;
-  double _length;  // distance from p0 to p1
+  private:
+    GF_API
+    friend bool GfFindClosestPoints( const GfLine2d &, const GfLineSeg2d &,
+                                     GfVec2d *, GfVec2d *,
+                                     double *t1, double *t2 );
+    GF_API
+    friend bool GfFindClosestPoints( const GfLineSeg2d &, const GfLineSeg2d &,
+                                     GfVec2d *, GfVec2d *,
+                                     double *, double * );
+
+    GfLine2d            _line;
+    double              _length;   // distance from p0 to p1
 };
 
 /// Computes the closets points on \p line and \p seg.
@@ -100,12 +92,9 @@ class GfLineSeg2d {
 /// points could be computed; in this case, the other return values are
 /// undefined.
 GF_API
-bool GfFindClosestPoints(const GfLine2d &line,
-                         const GfLineSeg2d &seg,
-                         GfVec2d *p1 = nullptr,
-                         GfVec2d *p2 = nullptr,
-                         double *t1 = nullptr,
-                         double *t2 = nullptr);
+bool GfFindClosestPoints( const GfLine2d &line, const GfLineSeg2d &seg,
+                          GfVec2d *p1 = nullptr, GfVec2d *p2 = nullptr,
+                          double *t1 = nullptr, double *t2 = nullptr );
 
 /// Computes the closets points on two line segments, \p seg1 and \p seg2.
 ///
@@ -116,13 +105,10 @@ bool GfFindClosestPoints(const GfLine2d &line,
 /// points could be computed; in this case, the other return values are
 /// undefined.
 GF_API
-bool GfFindClosestPoints(const GfLineSeg2d &seg1,
-                         const GfLineSeg2d &seg2,
-                         GfVec2d *p1 = nullptr,
-                         GfVec2d *p2 = nullptr,
-                         double *t1 = nullptr,
-                         double *t2 = nullptr);
+bool GfFindClosestPoints( const GfLineSeg2d &seg1, const GfLineSeg2d &seg2,
+                          GfVec2d *p1 = nullptr, GfVec2d *p2 = nullptr,
+                          double *t1 = nullptr, double *t2 = nullptr );
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_GF_LINE_SEG2D_H
+#endif // PXR_BASE_GF_LINE_SEG2D_H

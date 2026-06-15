@@ -9,31 +9,38 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdSt_ExtCompSceneInputSource::HdSt_ExtCompSceneInputSource(const TfToken &inputName,
-                                                           const VtValue &value)
-    : HdSt_ExtCompInputSource(inputName), _value(value)
+
+HdSt_ExtCompSceneInputSource::HdSt_ExtCompSceneInputSource(
+    const TfToken &inputName,
+    const VtValue &value)
+    : HdSt_ExtCompInputSource(inputName)
+    , _value(value)
 {
 }
 
 HdSt_ExtCompSceneInputSource::~HdSt_ExtCompSceneInputSource() = default;
 
-bool HdSt_ExtCompSceneInputSource::Resolve()
+bool
+HdSt_ExtCompSceneInputSource::Resolve()
 {
-  if (!_TryLock())
-    return false;
+    if (!_TryLock()) return false;
 
-  _SetResolved();
-  return true;
+    _SetResolved();
+    return true;
 }
 
-const VtValue &HdSt_ExtCompSceneInputSource::GetValue() const
+const VtValue &
+HdSt_ExtCompSceneInputSource::GetValue() const
 {
-  return _value;
+    return _value;
 }
 
-bool HdSt_ExtCompSceneInputSource::_CheckValid() const
+bool
+HdSt_ExtCompSceneInputSource::_CheckValid() const
 {
-  return true;
+    return true;
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

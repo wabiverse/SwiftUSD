@@ -4,7 +4,6 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "HgiVulkan/hgi.h"
 #include "Hgi/debugCodes.h"
 #include "HgiVulkan/blitCmds.h"
 #include "HgiVulkan/buffer.h"
@@ -17,6 +16,7 @@
 #include "HgiVulkan/garbageCollector.h"
 #include "HgiVulkan/graphicsCmds.h"
 #include "HgiVulkan/graphicsPipeline.h"
+#include "HgiVulkan/hgi.h"
 #include "HgiVulkan/instance.h"
 #include "HgiVulkan/resourceBindings.h"
 #include "HgiVulkan/sampler.h"
@@ -24,311 +24,388 @@
 #include "HgiVulkan/shaderProgram.h"
 #include "HgiVulkan/texture.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 #include "Tf/envSetting.h"
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
+#include "HgiVulkan/debugCodes.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType t = TfType::Define<HgiVulkan, TfType::Bases<Hgi>>();
-  t.SetFactory<HgiFactory<HgiVulkan>>();
+    TfType t = TfType::Define<HgiVulkan, TfType::Bases<Hgi> >();
+    t.SetFactory<HgiFactory<HgiVulkan>>();
 }
 
 HgiVulkan::HgiVulkan()
-    : _instance(new HgiVulkanInstance()),
-      _device(new HgiVulkanDevice(_instance)),
-      _garbageCollector(new HgiVulkanGarbageCollector(this)),
-      _threadId(std::this_thread::get_id()),
-      _frameDepth(0)
+    : _instance(new HgiVulkanInstance())
+    , _device(new HgiVulkanDevice(_instance))
+    , _garbageCollector(new HgiVulkanGarbageCollector(this))
+    , _threadId(std::this_thread::get_id())
+    , _frameDepth(0)
 {
 }
 
 HgiVulkan::~HgiVulkan()
 {
-  HgiVulkanCommandQueue *queue = _device->GetCommandQueue();
+    if (HgiVulkanCommandQueue* queue = _device->GetCommandQueue()) {
+        // Wait for command buffers to complete, then reset command buffers for
+        // each device's queue.
+        queue->ResetConsumedCommandBuffers(
+            HgiSubmitWaitTypeWaitUntilCompleted);
 
-  // Wait for command buffers to complete, then reset command buffers for
-  // each device's queue.
-  queue->ResetConsumedCommandBuffers(HgiSubmitWaitTypeWaitUntilCompleted);
+        // Wait for all devices and perform final garbage collection.
+        _device->WaitForIdle();
+        _garbageCollector->PerformGarbageCollection(_device);
+    }
 
-  // Wait for all devices and perform final garbage collection.
-  _device->WaitForIdle();
-  _garbageCollector->PerformGarbageCollection(_device);
-  delete _garbageCollector;
-  delete _device;
-  delete _instance;
+    delete _garbageCollector;
+    delete _device;
+    delete _instance;
 }
 
-bool HgiVulkan::IsBackendSupported() const
+bool
+HgiVulkan::IsBackendSupported() const
 {
-  // Want Vulkan 1.2 or higher.
-  const uint32_t apiVersion = GetCapabilities()->GetAPIVersion();
-  const uint32_t majorVersion = VK_VERSION_MAJOR(apiVersion);
-  const uint32_t minorVersion = VK_VERSION_MINOR(apiVersion);
+    // Check if we at least found a usable device.
+    if (!_device->GetVulkanDevice()) {
+        return false;
+    }
 
-  bool support = (majorVersion > 1) || ((majorVersion == 1) && (minorVersion >= 2));
-  if (!support) {
-    TF_DEBUG(HGI_DEBUG_IS_SUPPORTED)
-        .Msg(
+    // Want Vulkan 1.2 or higher.
+    const uint32_t apiVersion = GetCapabilities()->GetAPIVersion();
+    const uint32_t majorVersion = VK_VERSION_MAJOR(apiVersion);
+    const uint32_t minorVersion = VK_VERSION_MINOR(apiVersion);
+
+    bool support = (majorVersion > 1) ||
+        ((majorVersion == 1) && (minorVersion >= 2));
+    if (!support) {
+        TF_DEBUG(HGI_DEBUG_IS_SUPPORTED).Msg(
             "HgiVulkan unsupported due to Vulkan API version: %d.%d "
             "(must be >= 1.2)\n",
-            majorVersion,
-            minorVersion);
-  }
-  return support;
+            majorVersion, minorVersion);
+    }
+    return support;
 }
 
 /* Multi threaded */
-HgiGraphicsCmdsUniquePtr HgiVulkan::CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc)
+HgiGraphicsCmdsUniquePtr
+HgiVulkan::CreateGraphicsCmds(
+    HgiGraphicsCmdsDesc const& desc)
 {
-  HgiVulkanGraphicsCmds *cmds(new HgiVulkanGraphicsCmds(this, desc));
-  return HgiGraphicsCmdsUniquePtr(cmds);
+    HgiVulkanGraphicsCmds* cmds(new HgiVulkanGraphicsCmds(this, desc));
+    return HgiGraphicsCmdsUniquePtr(cmds);
 }
 
 /* Multi threaded */
-HgiBlitCmdsUniquePtr HgiVulkan::CreateBlitCmds()
+HgiBlitCmdsUniquePtr
+HgiVulkan::CreateBlitCmds()
 {
-  return HgiBlitCmdsUniquePtr(new HgiVulkanBlitCmds(this));
+    return HgiBlitCmdsUniquePtr(new HgiVulkanBlitCmds(this));
 }
 
-HgiComputeCmdsUniquePtr HgiVulkan::CreateComputeCmds(HgiComputeCmdsDesc const &desc)
+HgiComputeCmdsUniquePtr
+HgiVulkan::CreateComputeCmds(
+    HgiComputeCmdsDesc const& desc)
 {
-  HgiVulkanComputeCmds *cmds(new HgiVulkanComputeCmds(this, desc));
-  return HgiComputeCmdsUniquePtr(cmds);
-}
-
-/* Multi threaded */
-HgiTextureHandle HgiVulkan::CreateTexture(HgiTextureDesc const &desc)
-{
-  return HgiTextureHandle(new HgiVulkanTexture(this, GetPrimaryDevice(), desc), GetUniqueId());
+    HgiVulkanComputeCmds* cmds(new HgiVulkanComputeCmds(this, desc));
+    return HgiComputeCmdsUniquePtr(cmds);
 }
 
 /* Multi threaded */
-void HgiVulkan::DestroyTexture(HgiTextureHandle *texHandle)
+HgiTextureHandle
+HgiVulkan::_CreateTexture(HgiTextureDesc const & desc)
 {
-  TrashObject(texHandle, GetGarbageCollector()->GetTextureList());
+    return HgiTextureHandle(
+        new HgiVulkanTexture(this, desc,
+            /*optimalTiling=*/ true, /*interop=*/false), GetUniqueId());
 }
 
 /* Multi threaded */
-HgiTextureViewHandle HgiVulkan::CreateTextureView(HgiTextureViewDesc const &desc)
+HgiTextureHandle
+HgiVulkan::CreateTextureForInterop(
+    HgiTextureDesc const & desc,
+    bool optimalTiling)
 {
-  if (!desc.sourceTexture) {
-    TF_CODING_ERROR("Source texture is null");
-  }
-
-  HgiTextureHandle src = HgiTextureHandle(new HgiVulkanTexture(this, GetPrimaryDevice(), desc),
-                                          GetUniqueId());
-  HgiTextureView *view = new HgiTextureView(desc);
-  view->SetViewTexture(src);
-  return HgiTextureViewHandle(view, GetUniqueId());
-}
-
-void HgiVulkan::DestroyTextureView(HgiTextureViewHandle *viewHandle)
-{
-  // Trash the texture inside the view and invalidate the view handle.
-  HgiTextureHandle texHandle = (*viewHandle)->GetViewTexture();
-  TrashObject(&texHandle, GetGarbageCollector()->GetTextureList());
-  (*viewHandle)->SetViewTexture(HgiTextureHandle());
-  delete viewHandle->Get();
-  *viewHandle = HgiTextureViewHandle();
+    return HgiTextureHandle(
+        new HgiVulkanTexture(this, desc,
+            optimalTiling, /*interop=*/true), GetUniqueId());
 }
 
 /* Multi threaded */
-HgiSamplerHandle HgiVulkan::CreateSampler(HgiSamplerDesc const &desc)
+void
+HgiVulkan::DestroyTexture(HgiTextureHandle* texHandle)
 {
-  return HgiSamplerHandle(new HgiVulkanSampler(GetPrimaryDevice(), desc), GetUniqueId());
+    TrashObject(texHandle, GetGarbageCollector()->GetTextureList());
 }
 
 /* Multi threaded */
-void HgiVulkan::DestroySampler(HgiSamplerHandle *smpHandle)
+HgiTextureViewHandle
+HgiVulkan::_CreateTextureView(HgiTextureViewDesc const & desc)
 {
-  TrashObject(smpHandle, GetGarbageCollector()->GetSamplerList());
+    HgiTextureHandle src = HgiTextureHandle(
+        new HgiVulkanTexture(this, desc), GetUniqueId());
+    HgiTextureView* view = new HgiTextureView(desc);
+    view->SetViewTexture(src);
+    return HgiTextureViewHandle(view, GetUniqueId());
+}
+
+void
+HgiVulkan::DestroyTextureView(HgiTextureViewHandle* viewHandle)
+{
+    // Trash the texture inside the view and invalidate the view handle.
+    HgiTextureHandle texHandle = (*viewHandle)->GetViewTexture();
+    TrashObject(&texHandle, GetGarbageCollector()->GetTextureList());
+    (*viewHandle)->SetViewTexture(HgiTextureHandle());
+    delete viewHandle->Get();
+    *viewHandle = HgiTextureViewHandle();
 }
 
 /* Multi threaded */
-HgiBufferHandle HgiVulkan::CreateBuffer(HgiBufferDesc const &desc)
+HgiSamplerHandle
+HgiVulkan::CreateSampler(HgiSamplerDesc const & desc)
 {
-  return HgiBufferHandle(new HgiVulkanBuffer(this, GetPrimaryDevice(), desc), GetUniqueId());
+    return HgiSamplerHandle(
+        new HgiVulkanSampler(GetPrimaryDevice(), desc),
+        GetUniqueId());
 }
 
 /* Multi threaded */
-void HgiVulkan::DestroyBuffer(HgiBufferHandle *bufHandle)
+void
+HgiVulkan::DestroySampler(HgiSamplerHandle* smpHandle)
 {
-  TrashObject(bufHandle, GetGarbageCollector()->GetBufferList());
+    TrashObject(smpHandle, GetGarbageCollector()->GetSamplerList());
 }
 
 /* Multi threaded */
-HgiShaderFunctionHandle HgiVulkan::CreateShaderFunction(HgiShaderFunctionDesc const &desc)
+HgiBufferHandle
+HgiVulkan::_CreateBuffer(HgiBufferDesc const & desc)
 {
-  return HgiShaderFunctionHandle(
-      new HgiVulkanShaderFunction(
-          GetPrimaryDevice(), this, desc, GetCapabilities()->GetShaderVersion()),
-      GetUniqueId());
+    return HgiBufferHandle(
+        new HgiVulkanBuffer(this, desc),
+        GetUniqueId());
 }
 
 /* Multi threaded */
-void HgiVulkan::DestroyShaderFunction(HgiShaderFunctionHandle *shaderFnHandle)
+void
+HgiVulkan::DestroyBuffer(HgiBufferHandle* bufHandle)
 {
-  TrashObject(shaderFnHandle, GetGarbageCollector()->GetShaderFunctionList());
+    TrashObject(bufHandle, GetGarbageCollector()->GetBufferList());
 }
 
 /* Multi threaded */
-HgiShaderProgramHandle HgiVulkan::CreateShaderProgram(HgiShaderProgramDesc const &desc)
+HgiShaderFunctionHandle
+HgiVulkan::CreateShaderFunction(HgiShaderFunctionDesc const& desc)
 {
-  return HgiShaderProgramHandle(new HgiVulkanShaderProgram(GetPrimaryDevice(), desc),
-                                GetUniqueId());
+    return HgiShaderFunctionHandle(
+        new HgiVulkanShaderFunction(GetPrimaryDevice(), this, desc,
+        GetCapabilities()->GetShaderVersion()), GetUniqueId());
 }
 
 /* Multi threaded */
-void HgiVulkan::DestroyShaderProgram(HgiShaderProgramHandle *shaderPrgHandle)
+void
+HgiVulkan::DestroyShaderFunction(HgiShaderFunctionHandle* shaderFnHandle)
 {
-  TrashObject(shaderPrgHandle, GetGarbageCollector()->GetShaderProgramList());
+    TrashObject(shaderFnHandle, GetGarbageCollector()->GetShaderFunctionList());
 }
 
 /* Multi threaded */
-HgiResourceBindingsHandle HgiVulkan::CreateResourceBindings(HgiResourceBindingsDesc const &desc)
+HgiShaderProgramHandle
+HgiVulkan::CreateShaderProgram(HgiShaderProgramDesc const& desc)
 {
-  return HgiResourceBindingsHandle(new HgiVulkanResourceBindings(GetPrimaryDevice(), desc),
-                                   GetUniqueId());
+    return HgiShaderProgramHandle(
+        new HgiVulkanShaderProgram(GetPrimaryDevice(), desc),
+        GetUniqueId());
 }
 
 /* Multi threaded */
-void HgiVulkan::DestroyResourceBindings(HgiResourceBindingsHandle *resHandle)
+void
+HgiVulkan::DestroyShaderProgram(HgiShaderProgramHandle* shaderPrgHandle)
 {
-  TrashObject(resHandle, GetGarbageCollector()->GetResourceBindingsList());
-}
-
-HgiGraphicsPipelineHandle HgiVulkan::CreateGraphicsPipeline(HgiGraphicsPipelineDesc const &desc)
-{
-  return HgiGraphicsPipelineHandle(new HgiVulkanGraphicsPipeline(GetPrimaryDevice(), desc),
-                                   GetUniqueId());
-}
-
-void HgiVulkan::DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle)
-{
-  TrashObject(pipeHandle, GetGarbageCollector()->GetGraphicsPipelineList());
-}
-
-HgiComputePipelineHandle HgiVulkan::CreateComputePipeline(HgiComputePipelineDesc const &desc)
-{
-  return HgiComputePipelineHandle(new HgiVulkanComputePipeline(GetPrimaryDevice(), desc),
-                                  GetUniqueId());
-}
-
-void HgiVulkan::DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle)
-{
-  TrashObject(pipeHandle, GetGarbageCollector()->GetComputePipelineList());
+    TrashObject(shaderPrgHandle, GetGarbageCollector()->GetShaderProgramList());
 }
 
 /* Multi threaded */
-TfToken const &HgiVulkan::GetAPIName() const
+HgiResourceBindingsHandle
+HgiVulkan::_CreateResourceBindings(HgiResourceBindingsDesc const& desc)
 {
-  return HgiTokens->Vulkan;
+    return HgiResourceBindingsHandle(
+        new HgiVulkanResourceBindings(GetPrimaryDevice(), desc),
+        GetUniqueId());
 }
 
 /* Multi threaded */
-HgiVulkanCapabilities const *HgiVulkan::GetCapabilities() const
+void
+HgiVulkan::DestroyResourceBindings(HgiResourceBindingsHandle* resHandle)
 {
-  return &_device->GetDeviceCapabilities();
+    TrashObject(resHandle, GetGarbageCollector()->GetResourceBindingsList());
 }
 
-HgiIndirectCommandEncoder *HgiVulkan::GetIndirectCommandEncoder() const
+HgiGraphicsPipelineHandle
+HgiVulkan::CreateGraphicsPipeline(HgiGraphicsPipelineDesc const& desc)
 {
-  return nullptr;
+    return HgiGraphicsPipelineHandle(
+        new HgiVulkanGraphicsPipeline(GetPrimaryDevice(), desc),
+        GetUniqueId());
+}
+
+void
+HgiVulkan::DestroyGraphicsPipeline(HgiGraphicsPipelineHandle* pipeHandle)
+{
+    TrashObject(pipeHandle, GetGarbageCollector()->GetGraphicsPipelineList());
+}
+
+HgiComputePipelineHandle
+HgiVulkan::CreateComputePipeline(HgiComputePipelineDesc const& desc)
+{
+    return HgiComputePipelineHandle(
+        new HgiVulkanComputePipeline(GetPrimaryDevice(), desc),
+        GetUniqueId());
+}
+
+void
+HgiVulkan::DestroyComputePipeline(HgiComputePipelineHandle* pipeHandle)
+{
+    TrashObject(pipeHandle, GetGarbageCollector()->GetComputePipelineList());
+}
+
+/* Multi threaded */
+TfToken const&
+HgiVulkan::GetAPIName() const {
+    return HgiTokens->Vulkan;
+}
+
+/* Multi threaded */
+HgiVulkanCapabilities const*
+HgiVulkan::GetCapabilities() const
+{
+    return &_device->GetDeviceCapabilities();
+}
+
+
+HgiIndirectCommandEncoder*
+HgiVulkan::GetIndirectCommandEncoder() const
+{
+    return nullptr;
 }
 
 /* Single threaded */
-void HgiVulkan::StartFrame()
+void
+HgiVulkan::StartFrame()
 {
-  // Please read important usage limitations for Hgi::StartFrame
+    // Please read important usage limitations for Hgi::StartFrame
 
-  if (_frameDepth++ == 0) {
-    HgiVulkanBeginQueueLabel(GetPrimaryDevice(), "Full Hydra Frame");
-  }
+    if (_frameDepth++ == 0) {
+        HgiVulkanBeginQueueLabel(GetPrimaryDevice(), "Full Hydra Frame");
+    }
 }
 
 /* Single threaded */
-void HgiVulkan::EndFrame()
+void
+HgiVulkan::EndFrame()
 {
-  // Please read important usage limitations for Hgi::EndFrame
+    // Please read important usage limitations for Hgi::EndFrame
 
-  if (--_frameDepth == 0) {
-    _EndFrameSync();
-    HgiVulkanEndQueueLabel(GetPrimaryDevice());
-  }
+    if (--_frameDepth == 0) {
+        _EndFrameSync();
+        HgiVulkanEndQueueLabel(GetPrimaryDevice());
+    }
+}
+
+void
+HgiVulkan::GarbageCollect()
+{
+    if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
+        TF_CODING_ERROR("Secondary thread violation");
+        return;
+    }
+    HgiVulkanDevice* device = GetPrimaryDevice();
+
+    // Perform garbage collection for each device.
+    _garbageCollector->PerformGarbageCollection(device);
 }
 
 /* Multi threaded */
-HgiVulkanInstance *HgiVulkan::GetVulkanInstance() const
+HgiVulkanInstance*
+HgiVulkan::GetVulkanInstance() const
 {
-  return _instance;
+    return _instance;
 }
 
 /* Multi threaded */
-HgiVulkanDevice *HgiVulkan::GetPrimaryDevice() const
+HgiVulkanDevice*
+HgiVulkan::GetPrimaryDevice() const
 {
-  return _device;
+    return _device;
 }
 
 /* Multi threaded */
-HgiVulkanGarbageCollector *HgiVulkan::GetGarbageCollector() const
+HgiVulkanGarbageCollector*
+HgiVulkan::GetGarbageCollector() const
 {
-  return _garbageCollector;
+    return _garbageCollector;
 }
 
 /* Single threaded */
-bool HgiVulkan::_SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
+bool
+HgiVulkan::_SubmitCmds(HgiCmds* cmds, HgiSubmitWaitType wait)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  // XXX The device queue is externally synchronized so we would at minimum
-  // need a mutex here to ensure only one thread submits cmds at a time.
-  // However, since we currently call garbage collection here and because
-  // we only have one resource command buffer, we cannot support submitting
-  // cmds from secondary threads until those issues are resolved.
-  if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
-    TF_CODING_ERROR("Secondary threads should not submit cmds");
-    return false;
-  }
+    // XXX The device queue is externally synchronized so we would at minimum
+    // need a mutex here to ensure only one thread submits cmds at a time.
+    // However, since we currently call garbage collection here and because
+    // we only have one resource command buffer, we cannot support submitting
+    // cmds from secondary threads until those issues are resolved.
+    if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
+        TF_CODING_ERROR("Secondary threads should not submit cmds");
+        return false;
+    }
 
-  // Submit Cmds work
-  bool result = false;
-  if (cmds) {
-    result = Hgi::_SubmitCmds(cmds, wait);
-  }
+    // Submit Cmds work
+    bool result = false;
+    if (cmds) {
+        result = Hgi::_SubmitCmds(cmds, wait);
+    }
 
-  // XXX If client does not call StartFrame / EndFrame we perform end of frame
-  // cleanup after each SubmitCmds. This is more frequent than ideal and also
-  // prevents us from making SubmitCmds thread-safe.
-  if (_frameDepth == 0) {
-    _EndFrameSync();
-  }
+    // XXX If client does not call StartFrame / EndFrame we perform end of frame
+    // cleanup after each SubmitCmds. This is more frequent than ideal and also
+    // prevents us from making SubmitCmds thread-safe.
+    if (_frameDepth==0) {
+        _EndFrameSync();
+    }
 
-  return result;
+    return result;
 }
 
 /* Single threaded */
-void HgiVulkan::_EndFrameSync()
+void
+HgiVulkan::_EndFrameSync()
 {
-  // The garbage collector and command buffer reset must happen on the
-  // main-thread when no threads are recording.
-  if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
-    TF_CODING_ERROR("Secondary thread violation");
-    return;
-  }
+    // The garbage collector and command buffer reset must happen on the
+    // main-thread when no threads are recording.
+    if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
+        TF_CODING_ERROR("Secondary thread violation");
+        return;
+    }
 
-  HgiVulkanDevice *device = GetPrimaryDevice();
-  HgiVulkanCommandQueue *queue = device->GetCommandQueue();
+    HgiVulkanDevice* device = GetPrimaryDevice();
+    HgiVulkanCommandQueue* queue = device->GetCommandQueue();
 
-  // Reset command buffers for each device's queue.
-  queue->ResetConsumedCommandBuffers();
+    // Reset command buffers for each device's queue.
+    queue->ResetConsumedCommandBuffers();
 
-  // Perform garbage collection for each device.
-  _garbageCollector->PerformGarbageCollection(device);
+    // Perform garbage collection for each device.
+    _garbageCollector->PerformGarbageCollection(device);
+
+    if (TfDebug::IsEnabled(HGIVULKAN_DUMP_VMA_STATS)) {
+        TfDebug::Disable(HGIVULKAN_DUMP_VMA_STATS);
+        device->DumpMemoryStats();
+    }
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

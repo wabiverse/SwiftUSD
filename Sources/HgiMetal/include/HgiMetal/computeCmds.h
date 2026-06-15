@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HGI_METAL_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGI_METAL_COMPUTE_CMDS_H
 
-#include "Gf/vec4i.h"
-#include "Hgi/computeCmds.h"
-#include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
+#include "Gf/vec4i.h"
+#include "HgiMetal/api.h"
+#include "Hgi/computeCmds.h"
 #include <cstdint>
 
 #include <Metal/Metal.h>
@@ -24,65 +24,73 @@ class HgiMetalComputePipeline;
 ///
 /// Metal implementation of HgiGraphicsEncoder.
 ///
-class HgiMetalComputeCmds final : public HgiComputeCmds {
- public:
-  HGIMETAL_API
-  ~HgiMetalComputeCmds() override;
+class HgiMetalComputeCmds final : public HgiComputeCmds
+{
+public:
+    HGIMETAL_API
+    ~HgiMetalComputeCmds() override;
 
-  HGIMETAL_API
-  void BindPipeline(HgiComputePipelineHandle pipeline) override;
+    HGIMETAL_API
+    void BindPipeline(HgiComputePipelineHandle pipeline) override;
 
-  HGIMETAL_API
-  void BindResources(HgiResourceBindingsHandle resources) override;
+    HGIMETAL_API
+    void BindResources(HgiResourceBindingsHandle resources) override;
 
-  HGIMETAL_API
-  void SetConstantValues(HgiComputePipelineHandle pipeline,
-                         uint32_t bindIndex,
-                         uint32_t byteSize,
-                         const void *data) override;
+    HGIMETAL_API
+    void SetConstantValues(
+        HgiComputePipelineHandle pipeline,
+        uint32_t bindIndex,
+        uint32_t byteSize,
+        const void* data) override;
 
-  HGIMETAL_API
-  void Dispatch(int dimX, int dimY) override;
+    HGIMETAL_API
+    void Dispatch(int dimX, int dimY) override;
 
-  HGIMETAL_API
-  void PushDebugGroup(const char *label) override;
+    HGIMETAL_API
+    void PushDebugGroup(const char* label,
+        const GfVec4f& color = s_computeDebugColor) override;
 
-  HGIMETAL_API
-  void PopDebugGroup() override;
+    HGIMETAL_API
+    void PopDebugGroup() override;
 
-  HGIMETAL_API
-  void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
+    HGIMETAL_API
+    void InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color = s_markerDebugColor) override;
 
-  HGIMETAL_API
-  HgiComputeDispatch GetDispatchMethod() const override;
+    HGIMETAL_API
+    void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
 
-  HGIMETAL_API
-  id<MTLComputeCommandEncoder> GetEncoder();
+    HGIMETAL_API
+    HgiComputeDispatch GetDispatchMethod() const override;
 
- protected:
-  friend class HgiMetal;
+    HGIMETAL_API
+    id<MTLComputeCommandEncoder> GetEncoder();
 
-  HGIMETAL_API
-  HgiMetalComputeCmds(HgiMetal *hgi, HgiComputeCmdsDesc const &desc);
+protected:
+    friend class HgiMetal;
 
-  HGIMETAL_API
-  bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
+    HGIMETAL_API
+    HgiMetalComputeCmds(HgiMetal* hgi, HgiComputeCmdsDesc const& desc);
 
- private:
-  HgiMetalComputeCmds() = delete;
-  HgiMetalComputeCmds &operator=(const HgiMetalComputeCmds &) = delete;
-  HgiMetalComputeCmds(const HgiMetalComputeCmds &) = delete;
+    HGIMETAL_API
+    bool _Submit(Hgi* hgi, HgiSubmitWaitType wait) override;
 
-  void _CreateEncoder();
-  void _CreateArgumentBuffer();
+private:
+    HgiMetalComputeCmds() = delete;
+    HgiMetalComputeCmds & operator=(const HgiMetalComputeCmds&) = delete;
+    HgiMetalComputeCmds(const HgiMetalComputeCmds&) = delete;
 
-  HgiMetal *_hgi;
-  HgiMetalComputePipeline *_pipelineState;
-  id<MTLCommandBuffer> _commandBuffer;
-  id<MTLBuffer> _argumentBuffer;
-  id<MTLComputeCommandEncoder> _encoder;
-  bool _secondaryCommandBuffer;
-  HgiComputeDispatch _dispatchMethod;
+    void _CreateEncoder();
+    void _CreateArgumentBuffer();
+    
+    HgiMetal* _hgi;
+    HgiMetalComputePipeline* _pipelineState;
+    id<MTLCommandBuffer> _commandBuffer;
+    id<MTLBuffer> _argumentBuffer;
+    id<MTLComputeCommandEncoder> _encoder;
+    bool _secondaryCommandBuffer;
+    HgiComputeDispatch _dispatchMethod;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

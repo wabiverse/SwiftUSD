@@ -7,20 +7,25 @@
 /// \file wrapStitch.cpp
 
 #include "pxr/pxrns.h"
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "UsdUtils/stitch.h"
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapStitch()
+using namespace pxr_boost::python;
+
+void 
+wrapStitch()
 {
-  def("StitchLayers",
-      (void (*)(const SdfLayerHandle &, const SdfLayerHandle &)) & UsdUtilsStitchLayers,
-      (arg("strongLayer"), arg("weakLayer")));
-  def("StitchInfo",
-      (void (*)(const SdfSpecHandle &, const SdfSpecHandle &)) & UsdUtilsStitchInfo,
-      (arg("strongObj"), arg("weakObj")));
+    def("StitchLayers", 
+        (void(*)(const SdfLayerHandle&, const SdfLayerHandle&))
+            &UsdUtilsStitchLayers,
+        (arg("strongLayer"), arg("weakLayer")));
+    def("StitchInfo", 
+        (void(*)(const SdfSpecHandle&, const SdfSpecHandle&))
+            &UsdUtilsStitchInfo, 
+        (arg("strongObj"), arg("weakObj")));
 }

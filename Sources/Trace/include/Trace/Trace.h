@@ -1,22 +1,36 @@
-
 #ifndef __PXR_BASE_TRACE_H__
 #define __PXR_BASE_TRACE_H__
 
 // Trace
-#include <Trace/api.h>
-
+#include <Trace/collectionNotice.h>
+#include <Trace/jsonSerialization.h>
+#include <Trace/eventData.h>
+#include <Trace/aggregateTree.h>
 #include <Trace/aggregateNode.h>
-#include <Trace/aggregateTreeBuilder.h>
-#include <Trace/category.h>
-#include <Trace/collection.h>
-#include <Trace/collector.h>
+#include <Trace/reporterDataSourceBase.h>
+#include <Trace/eventNode.h>
+#include <Trace/stringHash.h>
+#include <Trace/event.h>
+#include <Trace/eventTree.h>
+#include <Trace/key.h>
+#include <Trace/serialization.h>
+#include <Trace/eventContainer.h>
+#include <Trace/reporter.h>
+#include <Trace/threads.h>
+#include <Trace/concurrentList.h>
+#include <Trace/dataBuffer.h>
+#include <Trace/reporterBase.h>
+#include <Trace/api.h>
+#include <Trace/traceImpl.h>
 #include <Trace/counterAccumulator.h>
-#include <Trace/dynamicKey.h>
+#include <Trace/reporterDataSourceCollector.h>
+#include <Trace/category.h>
+#include <Trace/staticKeyData.h>
+#include <Trace/aggregateTreeBuilder.h>
+#include <Trace/collection.h>
 #include <Trace/eventList.h>
+#include <Trace/dynamicKey.h>
+#include <Trace/collector.h>
 #include <Trace/eventTreeBuilder.h>
 #include <Trace/reporterDataSourceCollection.h>
-#include <Trace/reporterDataSourceCollector.h>
-#include <Trace/staticKeyData.h>
-#include <Trace/traceImpl.h>
-
 #endif  // __PXR_BASE_TRACE_H__

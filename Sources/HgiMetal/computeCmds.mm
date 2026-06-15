@@ -130,7 +130,7 @@ HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
         [_argumentBuffer didModifyRange:range];
         ARCH_PRAGMA_POP
     }
-#endif // defined(ARCH_OS_OSX)
+#endif
 
     [_encoder dispatchThreads:MTLSizeMake(dimX, dimY, 1)
         threadsPerThreadgroup:MTLSizeMake(MIN(thread_width, dimX),
@@ -144,7 +144,9 @@ HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
 }
 
 void
-HgiMetalComputeCmds::PushDebugGroup(const char* label)
+HgiMetalComputeCmds::PushDebugGroup(
+        const char* label,
+        const GfVec4f& color)
 {
     _CreateEncoder();
     HGIMETAL_DEBUG_PUSH_GROUP(_encoder, label)
@@ -155,6 +157,20 @@ HgiMetalComputeCmds::PopDebugGroup()
 {
     if (_encoder) {
         HGIMETAL_DEBUG_POP_GROUP(_encoder)
+    }
+}
+
+void
+HgiMetalComputeCmds::InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color)
+{
+    if (!HgiMetalDebugEnabled()) {
+        return;
+    }
+
+    if (_encoder) {
+        HGIMETAL_DEBUG_INSERT_DEBUG_MARKER(_encoder, label)
     }
 }
 

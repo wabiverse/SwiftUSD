@@ -31,9 +31,10 @@ TF_DECLARE_WEAK_AND_REF_PTRS(HdFilteringSceneIndexBase);
 /// An abstract base class for scene indexes that have one or more input scene
 /// indexes which serve as a basis for their own scene.
 ///
-class HdFilteringSceneIndexBase : public HdSceneIndexBase {
- public:
-  virtual std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const = 0;
+class HdFilteringSceneIndexBase : public HdSceneIndexBase
+{
+public:
+    virtual std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const = 0;
 };
 
 ///
@@ -100,11 +101,13 @@ class HdFilteringSceneIndexBase : public HdSceneIndexBase {
 ///                |
 ///                G
 ///
-class HdEncapsulatingSceneIndexBase {
- public:
-  virtual std::vector<HdSceneIndexBaseRefPtr> GetEncapsulatedScenes() const = 0;
+class HdEncapsulatingSceneIndexBase
+{
+public:
+    virtual std::vector<HdSceneIndexBaseRefPtr>
+    GetEncapsulatedScenes() const = 0;
 
-  static HdEncapsulatingSceneIndexBase *Cast(const HdSceneIndexBaseRefPtr &);
+    static HdEncapsulatingSceneIndexBase * Cast(const HdSceneIndexBaseRefPtr &);
 };
 
 TF_DECLARE_WEAK_AND_REF_PTRS(HdSingleInputFilteringSceneIndexBase);
@@ -112,65 +115,85 @@ TF_DECLARE_WEAK_AND_REF_PTRS(HdSingleInputFilteringSceneIndexBase);
 ///
 /// \class HdSingleInputFilteringSceneIndexBase
 ///
-/// An abstract base class for a filtering scene index that observes a single
+/// An abstract base class for a filtering scene index that observes a single 
 /// input scene index.
 ///
-class HdSingleInputFilteringSceneIndexBase : public HdFilteringSceneIndexBase {
- public:
-  HD_API
-  std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const final;
+class HdSingleInputFilteringSceneIndexBase : public HdFilteringSceneIndexBase
+{
+public:
+    HD_API
+    std::vector<HdSceneIndexBaseRefPtr> GetInputScenes() const final;
 
- protected:
-  HD_API
-  HdSingleInputFilteringSceneIndexBase(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+protected:
+    HD_API
+    HdSingleInputFilteringSceneIndexBase(
+            const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  virtual void _PrimsAdded(const HdSceneIndexBase &sender,
-                           const HdSceneIndexObserver::AddedPrimEntries &entries) = 0;
+    virtual void _PrimsAdded(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::AddedPrimEntries &entries) = 0;
 
-  virtual void _PrimsRemoved(const HdSceneIndexBase &sender,
-                             const HdSceneIndexObserver::RemovedPrimEntries &entries) = 0;
+    virtual void _PrimsRemoved(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::RemovedPrimEntries &entries) = 0;
 
-  virtual void _PrimsDirtied(const HdSceneIndexBase &sender,
-                             const HdSceneIndexObserver::DirtiedPrimEntries &entries) = 0;
+    virtual void _PrimsDirtied(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::DirtiedPrimEntries &entries) = 0;
 
-  // Base implementation converts prim removed messages.
-  HD_API
-  virtual void _PrimsRenamed(const HdSceneIndexBase &sender,
-                             const HdSceneIndexObserver::RenamedPrimEntries &entries);
+    // Base implementation converts prim removed messages.
+    HD_API
+    virtual void _PrimsRenamed(
+            const HdSceneIndexBase &sender,
+            const HdSceneIndexObserver::RenamedPrimEntries &entries);
 
-  /// Returns the input scene.
-  ///
-  /// It is always safe to call and dereference this return value.  If this
-  /// was constructed with a null scene index, a fallback one will be used.
-  const HdSceneIndexBaseRefPtr &_GetInputSceneIndex() const
-  {
-    return _inputSceneIndex;
-  }
+    /// Returns the input scene.  
+    ///
+    /// It is always safe to call and dereference this return value.  If this
+    /// was constructed with a null scene index, a fallback one will be used.
+    const HdSceneIndexBaseRefPtr &_GetInputSceneIndex() const {
+        return _inputSceneIndex;
+    }
 
- private:
-  HdSceneIndexBaseRefPtr _inputSceneIndex;
+private:
 
-  friend class _Observer;
+    HdSceneIndexBaseRefPtr _inputSceneIndex;
 
-  class _Observer : public HdSceneIndexObserver {
-   public:
-    _Observer(HdSingleInputFilteringSceneIndexBase *owner) : _owner(owner) {}
+    friend class _Observer;
 
-    void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
+    class _Observer : public HdSceneIndexObserver
+    {
+    public:
+        _Observer(HdSingleInputFilteringSceneIndexBase *owner)
+        : _owner(owner) {}
 
-    void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
+        HD_API
+        void PrimsAdded(
+                const HdSceneIndexBase &sender,
+                const AddedPrimEntries &entries) override;
 
-    void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
+        HD_API
+        void PrimsRemoved(
+                const HdSceneIndexBase &sender,
+                const RemovedPrimEntries &entries) override;
 
-    void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
+        HD_API
+        void PrimsDirtied(
+                const HdSceneIndexBase &sender,
+                const DirtiedPrimEntries &entries) override;
 
-   private:
-    HdSingleInputFilteringSceneIndexBase *_owner;
-  };
+        HD_API
+        void PrimsRenamed(
+                const HdSceneIndexBase &sender,
+                const RenamedPrimEntries &entries) override;
+    private:
+        HdSingleInputFilteringSceneIndexBase *_owner;
+    };
 
-  _Observer _observer;
+    _Observer _observer;
+
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_FILTERING_SCENE_INDEX_H
+#endif // PXR_IMAGING_HD_FILTERING_SCENE_INDEX_H

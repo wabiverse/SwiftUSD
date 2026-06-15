@@ -11,6 +11,7 @@
 
 #include "Hd/filteringSceneIndex.h"
 #include "Sdf/path.h"
+#include <optional>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -21,70 +22,100 @@ TF_DECLARE_WEAK_AND_REF_PTRS(HdsiSceneGlobalsSceneIndex);
 
 /// \class HdsiSceneGlobalsSceneIndex
 ///
-/// Scene index that populates a "sceneGlobals" data source as modeled
+/// Scene index that populates the "sceneGlobals" data source as modeled
 /// by HdSceneGlobalsSchema and provides public API to mutate it.
+/// This provides a way for applications to control high-level scene behavior.
 ///
-class HdsiSceneGlobalsSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  HDSI_API
-  static HdsiSceneGlobalsSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+class HdsiSceneGlobalsSceneIndex : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    HDSI_API
+    static HdsiSceneGlobalsSceneIndexRefPtr
+    New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  // ------------------------------------------------------------------------
-  // Public (non-virtual) API
-  // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Public (non-virtual) API
+    // ------------------------------------------------------------------------
+    
+    /// Caches the provided path and notifies any observers when the active 
+    /// render pass prim path is modified.
+    ///
+    HDSI_API
+    void SetActiveRenderPassPrimPath(const SdfPath &);
+    
+    /// Caches the provided path and notifies any observers when the active 
+    /// render settings prim path is modified.
+    ///
+    HDSI_API
+    void SetActiveRenderSettingsPrimPath(const SdfPath &);
+    
+    /// Set the path to use as the primaryCameraPrim in the scene
+    /// globals schema.
+    HDSI_API
+    void SetPrimaryCameraPrimPath(const SdfPath &);
 
-  /// Caches the provided path and notifies any observers when the active
-  /// render pass prim path is modified.
-  ///
-  HDSI_API
-  void SetActiveRenderPassPrimPath(const SdfPath &);
+    /// Set the frame number to use the as the currentFrame in the
+    /// scene globals schema.
+    HDSI_API
+    void SetCurrentFrame(double);
 
-  /// Caches the provided path and notifies any observers when the active
-  /// render settings prim path is modified.
-  ///
-  HDSI_API
-  void SetActiveRenderSettingsPrimPath(const SdfPath &);
+    /// Set the timeCodesPerSecond to use the as the currentFrame in the
+    /// scene globals schema.
+    HDSI_API
+    void SetTimeCodesPerSecond(double);
 
-  ///
-  HDSI_API
-  void SetCurrentFrame(const double &);
+    /// Injects an arbitrary value that identifies the state of the input scene
+    /// at that point in time. This value ends up in the render index scene
+    /// globals once that state is processed by Hydra. This is useful for the
+    /// client to identify when certain scene edits have been processed by
+    /// Hydra.
+    HDSI_API
+    void SetSceneStateId(int);
 
-  // ------------------------------------------------------------------------
-  // Satisfying HdSceneIndexBase
-  // ------------------------------------------------------------------------
-  HDSI_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override final;
+    // ------------------------------------------------------------------------
+    // Satisfying HdSceneIndexBase
+    // ------------------------------------------------------------------------
+    HDSI_API
+    HdSceneIndexPrim
+    GetPrim(const SdfPath &primPath) const override final;
 
-  HDSI_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override final;
+    HDSI_API
+    SdfPathVector
+    GetChildPrimPaths(const SdfPath &primPath) const override final;
 
- protected:
-  HDSI_API
-  HdsiSceneGlobalsSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+protected:
+    HDSI_API
+    HdsiSceneGlobalsSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  // ------------------------------------------------------------------------
-  // Satisfying HdSingleInputFilteringSceneIndexBase
-  // ------------------------------------------------------------------------
-  HDSI_API
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    // ------------------------------------------------------------------------
+    // Satisfying HdSingleInputFilteringSceneIndexBase
+    // ------------------------------------------------------------------------
+    HDSI_API
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  HDSI_API
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    HDSI_API
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  HDSI_API
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    HDSI_API
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
- private:
-  friend class _SceneGlobalsDataSource;
+private:
+    friend class _SceneGlobalsDataSource;
 
-  SdfPath _activeRenderPassPrimPath;
-  SdfPath _activeRenderSettingsPrimPath;
-  double _time = std::numeric_limits<double>::quiet_NaN();
+    SdfPath _activeRenderPassPrimPath;
+    std::optional<SdfPath> _activeRenderSettingsPrimPath;
+    std::optional<SdfPath> _primaryCameraPrimPath;
+    double _time = std::numeric_limits<double>::quiet_NaN();
+    double _timeCodesPerSecond = 24.0;
+    int _sceneStateId = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDSI_SCENE_GLOBALS_SCENE_INDEX_H
+#endif //PXR_IMAGING_HDSI_SCENE_GLOBALS_SCENE_INDEX_H

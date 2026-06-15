@@ -7,10 +7,10 @@
 #ifndef PXR_USD_USD_RELATIONSHIP_H
 #define PXR_USD_USD_RELATIONSHIP_H
 
+#include "pxr/pxrns.h"
 #include "Usd/api.h"
 #include "Usd/common.h"
 #include "Usd/property.h"
-#include "pxr/pxrns.h"
 
 #include "Sdf/path.h"
 #include "Vt/value.h"
@@ -20,6 +20,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class UsdRelationship;
 
 /// A std::vector of UsdRelationships.
@@ -27,7 +28,7 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 
 /// \class UsdRelationship
 ///
-/// A UsdRelationship creates dependencies between scenegraph objects by
+/// A UsdRelationship creates dependencies between scenegraph objects by 
 /// allowing a prim to \em target other prims, attributes, or relationships.
 ///
 /// \section usd_relationship_chars Relationship Characteristics
@@ -40,7 +41,7 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 /// \ref UsdEditTarget), the target's path will be automatically translated
 /// into the proper namespace.
 ///
-/// A single UsdRelationship can target multiple other objects, which can be
+/// A single UsdRelationship can target multiple other objects, which can be 
 /// of UsdPrim, UsdAttribute, or UsdRelationship type.  UsdRelationship
 /// participates in "list editing", which means that stronger layers in a
 /// composed scene can add, remove, or reorder targets authored on the
@@ -59,14 +60,14 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 ///
 /// Unlike UsdAttribute s, which can either be uniform over all time
 /// or vary in value over time, UsdRelationship is <b>always uniform</b>.
-///
+/// 
 /// \section usd_relationship_restrictions Relationship Restrictions
 ///
 /// When authoring relationship targets in a stage's local LayerStack,
 /// all target paths are legal (Note we may restrict this prior to launch
 /// to only allowing targeting of already-extant scenegraph objects).  However,
 /// a relationship target that is legal in a local LayerStack may become
-/// unreachable when the stage's root layer is \em referenced into an
+/// unreachable when the stage's root layer is \em referenced into an 
 /// aggregate, and will cause an error when attempting to load/compose
 /// the aggregate.
 ///
@@ -78,7 +79,7 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 /// will error in GetTargets() or GetForwardedTargets().
 ///
 /// Authoring targets to objects within prototypes is not allowed, since
-/// prototype prims do not have a stable identity across runs.  Consumers must
+/// prototype prims do not have a stable identity across runs.  Consumers must 
 /// author targets to the object within an instance instead.
 ///
 /// Relationships authored in a descendent prim of a referenced prim may not
@@ -98,7 +99,7 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 ///     A prim can host a relationship that serves as a "binding post" for
 ///     other prims to target.  The prim also hosts a "bindingVariant"
 ///     UsdVariantSet whose variants each modulate the target of the
-///     binding-post relationship.  We can now change the \em forwarded target
+///     binding-post relationship.  We can now change the \em forwarded target 
 ///     of all prims targeting the binding-post by simply switching the
 ///     bindingVariant VariantSet.  We will work through this example in
 ///     the USD reference manual.
@@ -108,155 +109,155 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 ///     which may vary depending on the model's configured VariantSets.
 ///
 class UsdRelationship : public UsdProperty {
- public:
-  /// Construct an invalid relationship.
-  UsdRelationship() : UsdProperty(_Null<UsdRelationship>()) {}
+public:
+    /// Construct an invalid relationship.
+    UsdRelationship() : UsdProperty(_Null<UsdRelationship>()) {}
 
-  /// \name Editing Relationships at Current EditTarget
-  /// @{
+    /// \name Editing Relationships at Current EditTarget
+    /// @{
 
-  // XXX Should the mutation API be changed to take UsdObject
-  // pointers so that we can enforce (as does Mf) that you can only
-  // target extant scenegraph objects? (Note the API would still need to
-  // validate those objects since it is easy to create a UsdAttribute
-  // or UsdRelationship object not backed by scene description).
+    // XXX Should the mutation API be changed to take UsdObject
+    // pointers so that we can enforce (as does Mf) that you can only
+    // target extant scenegraph objects? (Note the API would still need to
+    // validate those objects since it is easy to create a UsdAttribute
+    // or UsdRelationship object not backed by scene description).
 
-  /// Adds \p target to the list of targets, in the position specified
-  /// by \p position.
-  ///
-  /// Passing paths to prototype prims or any other objects in prototypes
-  /// will cause an error to be issued. It is not valid to author targets to
-  /// these objects.
-  ///
-  /// What data this actually authors depends on what data is currently
-  /// authored in the authoring layer, with respect to list-editing
-  /// semantics, which we will document soon
-  USD_API
-  bool AddTarget(const SdfPath &target,
-                 UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList) const;
+    /// Adds \p target to the list of targets, in the position specified
+    /// by \p position.
+    ///
+    /// Passing paths to prototype prims or any other objects in prototypes
+    /// will cause an error to be issued. It is not valid to author targets to
+    /// these objects.
+    ///
+    /// What data this actually authors depends on what data is currently
+    /// authored in the authoring layer, with respect to list-editing
+    /// semantics, which we will document soon 
+    USD_API
+    bool AddTarget(const SdfPath& target,
+           UsdListPosition position=UsdListPositionBackOfPrependList) const;
 
-  /// Removes \p target from the list of targets.
-  ///
-  /// Passing paths to prototype prims or any other objects in prototypes
-  /// will cause an error to be issued. It is not valid to author targets to
-  /// these objects.
-  USD_API
-  bool RemoveTarget(const SdfPath &target) const;
+    /// Removes \p target from the list of targets.
+    ///
+    /// Passing paths to prototype prims or any other objects in prototypes
+    /// will cause an error to be issued. It is not valid to author targets to
+    /// these objects.
+    USD_API
+    bool RemoveTarget(const SdfPath& target) const;
 
-  /// Make the authoring layer's opinion of the targets list explicit,
-  /// and set exactly to \p targets.
-  ///
-  /// Passing paths to prototype prims or any other objects in prototypes
-  /// will cause an error to be issued. It is not valid to author targets to
-  /// these objects.
-  ///
-  /// If any target in \p targets is invalid, no targets will be authored
-  /// and this function will return false.
-  USD_API
-  bool SetTargets(const SdfPathVector &targets) const;
+    /// Make the authoring layer's opinion of the targets list explicit,
+    /// and set exactly to \p targets.
+    ///
+    /// Passing paths to prototype prims or any other objects in prototypes
+    /// will cause an error to be issued. It is not valid to author targets to
+    /// these objects.
+    ///
+    /// If any target in \p targets is invalid, no targets will be authored
+    /// and this function will return false.
+    USD_API
+    bool SetTargets(const SdfPathVector& targets) const;
 
-  /// Remove all opinions about the target list from the current edit
-  /// target.
-  ///
-  /// Only remove the spec if \p removeSpec is true (leave the spec to
-  /// preserve meta-data we may have intentionally authored on the
-  /// relationship)
-  USD_API
-  bool ClearTargets(bool removeSpec) const;
+    /// Remove all opinions about the target list from the current edit
+    /// target.
+    ///
+    /// Only remove the spec if \p removeSpec is true (leave the spec to
+    /// preserve meta-data we may have intentionally authored on the
+    /// relationship)
+    USD_API
+    bool ClearTargets(bool removeSpec) const;
 
-  /// Compose this relationship's targets and fill \p targets with the result.
-  /// All preexisting elements in \p targets are lost.
-  ///
-  /// Returns true if any target path opinions have been authored and no
-  /// composition errors were encountered, returns false otherwise.
-  /// Note that authored opinions may include opinions that clear the targets
-  /// and a return value of true does not necessarily indicate that \p targets
-  /// will contain any target paths.
-  ///
-  /// See \ref Usd_ScenegraphInstancing_TargetsAndConnections for details on
-  /// behavior when targets point to objects beneath instance prims.
-  ///
-  /// The result is not cached, so will be recomputed on every query.
-  USD_API
-  bool GetTargets(SdfPathVector *targets) const;
+    /// Compose this relationship's targets and fill \p targets with the result.
+    /// All preexisting elements in \p targets are lost.
+    /// 
+    /// Returns true if any target path opinions have been authored and no
+    /// composition errors were encountered, returns false otherwise. 
+    /// Note that authored opinions may include opinions that clear the targets 
+    /// and a return value of true does not necessarily indicate that \p targets 
+    /// will contain any target paths.
+    ///
+    /// See \ref Usd_ScenegraphInstancing_TargetsAndConnections for details on 
+    /// behavior when targets point to objects beneath instance prims.
+    ///
+    /// The result is not cached, so will be recomputed on every query.
+    USD_API
+    bool GetTargets(SdfPathVector* targets) const;
 
-  /// Compose this relationship's \em ultimate targets, taking into account
-  /// "relationship forwarding", and fill \p targets with the result.  All
-  /// preexisting elements in \p targets are lost. This method never inserts
-  /// relationship paths in \p targets.
-  ///
-  /// Returns true if any of the visited relationships that are not
-  /// "purely forwarding" has an authored opinion for its target paths and
-  /// no composition errors were encountered while computing any targets.
-  /// Purely forwarding, in this context, means the relationship has at least
-  /// one target but all of its targets are paths to other relationships.
-  /// Note that authored opinions may include opinions that clear the targets
-  /// and a return value of true does not necessarily indicate that \p targets
-  /// will not be empty.
-  ///
-  /// Returns false otherwise. When composition errors occur, this function
-  /// continues to collect successfully composed targets, but returns false
-  /// to indicate to the caller that errors occurred.
-  ///
-  /// When a forwarded target cannot be determined, e.g. due to a composition
-  /// error, no value is returned for that target; the alternative would be to
-  /// return the relationship path at which the forwarded targets could not be
-  /// composed, however this would require all callers of
-  /// GetForwardedTargets() to account for unexpected relationship paths
-  /// being returned with the expected target results. For example, a
-  /// particular caller may expect only prim paths in the target vector, but
-  /// when composition errors occur, relationships would be included,
-  /// potentially triggering additional down stream errors.
-  ///
-  /// See \ref usd_relationship_forwarding for details on the semantics.
-  ///
-  /// The result is not cached, so will be recomputed on every query.
-  USD_API
-  bool GetForwardedTargets(SdfPathVector *targets) const;
+    /// Compose this relationship's \em ultimate targets, taking into account
+    /// "relationship forwarding", and fill \p targets with the result.  All
+    /// preexisting elements in \p targets are lost. This method never inserts
+    /// relationship paths in \p targets.
+    ///
+    /// Returns true if any of the visited relationships that are not 
+    /// "purely forwarding" has an authored opinion for its target paths and
+    /// no composition errors were encountered while computing any targets. 
+    /// Purely forwarding, in this context, means the relationship has at least 
+    /// one target but all of its targets are paths to other relationships.
+    /// Note that authored opinions may include opinions that clear the targets 
+    /// and a return value of true does not necessarily indicate that \p targets 
+    /// will not be empty.
+    /// 
+    /// Returns false otherwise. When composition errors occur, this function 
+    /// continues to collect successfully composed targets, but returns false 
+    /// to indicate to the caller that errors occurred.
+    /// 
+    /// When a forwarded target cannot be determined, e.g. due to a composition
+    /// error, no value is returned for that target; the alternative would be to
+    /// return the relationship path at which the forwarded targets could not be
+    /// composed, however this would require all callers of 
+    /// GetForwardedTargets() to account for unexpected relationship paths
+    /// being returned with the expected target results. For example, a
+    /// particular caller may expect only prim paths in the target vector, but 
+    /// when composition errors occur, relationships would be included,
+    /// potentially triggering additional down stream errors.
+    ///
+    /// See \ref usd_relationship_forwarding for details on the semantics.
+    ///
+    /// The result is not cached, so will be recomputed on every query.
+    USD_API
+    bool GetForwardedTargets(SdfPathVector* targets) const;
 
-  /// Returns true if any target path opinions have been authored.
-  /// Note that this may include opinions that clear targets and may not
-  /// indicate that target paths will exist for this relationship.
-  USD_API
-  bool HasAuthoredTargets() const;
+    /// Returns true if any target path opinions have been authored. 
+    /// Note that this may include opinions that clear targets and may not 
+    /// indicate that target paths will exist for this relationship.
+    USD_API
+    bool HasAuthoredTargets() const;
 
-  /// @}
+    /// @}
 
- private:
-  friend class UsdObject;
-  friend class UsdPrim;
-  friend class Usd_PrimData;
-  template<class A0, class A1> friend struct UsdPrim_TargetFinder;
+private:
+    friend class UsdObject;
+    friend class UsdPrim;
+    friend class Usd_PrimData;
+    template <class A0, class A1>
+    friend struct UsdPrim_TargetFinder;
 
-  UsdRelationship(const Usd_PrimDataHandle &prim,
-                  const SdfPath &proxyPrimPath,
-                  const TfToken &relName)
-      : UsdProperty(UsdTypeRelationship, prim, proxyPrimPath, relName)
-  {
-  }
+    UsdRelationship(const Usd_PrimDataHandle &prim,
+                    const SdfPath &proxyPrimPath,
+                    const TfToken& relName)
+        : UsdProperty(UsdTypeRelationship, prim, proxyPrimPath, relName) {}
 
-  UsdRelationship(UsdObjType objType,
-                  const Usd_PrimDataHandle &prim,
-                  const SdfPath &proxyPrimPath,
-                  const TfToken &propName)
-      : UsdProperty(objType, prim, proxyPrimPath, propName)
-  {
-  }
+    UsdRelationship(UsdObjType objType,
+                    const Usd_PrimDataHandle &prim,
+                    const SdfPath &proxyPrimPath,
+                    const TfToken &propName)
+        : UsdProperty(objType, prim, proxyPrimPath, propName) {}
 
-  SdfRelationshipSpecHandle _CreateSpec(bool fallbackCustom = true) const;
-  bool _Create(bool fallbackCustom) const;
+    SdfRelationshipSpecHandle _CreateSpec(bool fallbackCustom=true) const;
+    bool _Create(bool fallbackCustom) const;
 
-  bool _GetForwardedTargets(SdfPathVector *targets, bool includeForwardingRels) const;
+    bool _GetForwardedTargets(SdfPathVector* targets,
+                              bool includeForwardingRels) const;
 
-  bool _GetForwardedTargetsImpl(SdfPathSet *visited,
-                                SdfPathSet *uniqueTargets,
-                                SdfPathVector *targets,
-                                bool *foundAnyErrors,
-                                bool includeForwardingRels) const;
+    bool _GetForwardedTargetsImpl(SdfPathSet* visited, 
+                                  SdfPathSet* uniqueTargets,
+                                  SdfPathVector* targets,
+                                  bool *foundAnyErrors,
+                                  bool includeForwardingRels) const;
 
-  SdfPath _GetTargetForAuthoring(const SdfPath &targetPath, std::string *whyNot = 0) const;
+    SdfPath _GetTargetForAuthoring(const SdfPath &targetPath,
+                                   std::string* whyNot = 0) const;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_RELATIONSHIP_H
+#endif //PXR_USD_USD_RELATIONSHIP_H

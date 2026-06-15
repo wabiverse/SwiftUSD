@@ -32,126 +32,156 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_CAPSULE_SCHEMA_TOKENS (capsule)(height)(radius)(radiusTop)(radiusBottom)(axis)(X)(Y)(Z)
+#define HD_CAPSULE_SCHEMA_TOKENS \
+    (capsule) \
+    (height) \
+    (radius) \
+    (radiusTop) \
+    (radiusBottom) \
+    (axis) \
+    (X) \
+    (Y) \
+    (Z) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdCapsuleSchemaTokens, HD_API, HD_CAPSULE_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCapsuleSchemaTokens, HD_API,
+    HD_CAPSULE_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdCapsuleSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdCapsuleSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdCapsuleSchema
+///
+class HdCapsuleSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "capsule" from the parent container and constructs a
-  /// HdCapsuleSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdCapsuleSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
+    HdCapsuleSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
-
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
-
-  /// \name Member accessor
-  /// @{
-
-  HD_API
-  HdDoubleDataSourceHandle GetHeight() const;
-
-  HD_API
-  HdDoubleDataSourceHandle GetRadius() const;
-
-  HD_API
-  HdDoubleDataSourceHandle GetRadiusTop() const;
-
-  HD_API
-  HdDoubleDataSourceHandle GetRadiusBottom() const;
-
-  HD_API
-  HdTokenDataSourceHandle GetAxis() const;
-
-  /// @}
-
-  /// \name Schema location
-  /// @{
-
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
-
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(const HdDoubleDataSourceHandle &height,
-                                                   const HdDoubleDataSourceHandle &radius,
-                                                   const HdDoubleDataSourceHandle &radiusTop,
-                                                   const HdDoubleDataSourceHandle &radiusBottom,
-                                                   const HdTokenDataSourceHandle &axis);
-
-  /// \class HdCapsuleSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
+    /// Retrieves a container data source with the schema's default name token
+    /// "capsule" from the parent container and constructs a
+    /// HdCapsuleSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
     HD_API
-    Builder &SetHeight(const HdDoubleDataSourceHandle &height);
-    HD_API
-    Builder &SetRadius(const HdDoubleDataSourceHandle &radius);
-    HD_API
-    Builder &SetRadiusTop(const HdDoubleDataSourceHandle &radiusTop);
-    HD_API
-    Builder &SetRadiusBottom(const HdDoubleDataSourceHandle &radiusBottom);
-    HD_API
-    Builder &SetAxis(const HdTokenDataSourceHandle &axis);
+    static HdCapsuleSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Returns a container data source containing the members set thus far.
+    /// @}
+
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
+
+    /// \name Member accessor
+    /// @{
+
     HD_API
-    HdContainerDataSourceHandle Build();
+    HdDoubleDataSourceHandle GetHeight() const;
 
-   private:
-    HdDoubleDataSourceHandle _height;
-    HdDoubleDataSourceHandle _radius;
-    HdDoubleDataSourceHandle _radiusTop;
-    HdDoubleDataSourceHandle _radiusBottom;
-    HdTokenDataSourceHandle _axis;
-  };
+    /// Deprecated. Only use if no radiusTop or radiusBottom data source.
+    /// Comes from UsdGeom Capsule which has been deprecated in favor of
+    /// Capsule_1.
+    HD_API
+    HdDoubleDataSourceHandle GetRadius() const;
 
-  /// Returns token data source for use as axis value.
-  ///
-  /// The following values will be stored statically and reused for future
-  /// calls:
-  /// - HdCapsuleSchemaTokens->X
-  /// - HdCapsuleSchemaTokens->Y
-  /// - HdCapsuleSchemaTokens->Z
-  HD_API
-  static HdTokenDataSourceHandle BuildAxisDataSource(const TfToken &axis);
+    HD_API
+    HdDoubleDataSourceHandle GetRadiusTop() const;
 
-  /// @}
+    HD_API
+    HdDoubleDataSourceHandle GetRadiusBottom() const;
+
+    HD_API
+    HdTokenDataSourceHandle GetAxis() const; 
+
+    /// @}
+
+    /// \name Schema location
+    /// @{
+
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
+
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
+
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdDoubleDataSourceHandle &height,
+        const HdDoubleDataSourceHandle &radius,
+        const HdDoubleDataSourceHandle &radiusTop,
+        const HdDoubleDataSourceHandle &radiusBottom,
+        const HdTokenDataSourceHandle &axis
+    );
+
+    /// \class HdCapsuleSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetHeight(
+            const HdDoubleDataSourceHandle &height);
+        HD_API
+        Builder &SetRadius(
+            const HdDoubleDataSourceHandle &radius);
+        HD_API
+        Builder &SetRadiusTop(
+            const HdDoubleDataSourceHandle &radiusTop);
+        HD_API
+        Builder &SetRadiusBottom(
+            const HdDoubleDataSourceHandle &radiusBottom);
+        HD_API
+        Builder &SetAxis(
+            const HdTokenDataSourceHandle &axis);
+
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdDoubleDataSourceHandle _height;
+        HdDoubleDataSourceHandle _radius;
+        HdDoubleDataSourceHandle _radiusTop;
+        HdDoubleDataSourceHandle _radiusBottom;
+        HdTokenDataSourceHandle _axis;
+
+    };
+
+    /// Returns token data source for use as axis value.
+    ///
+    /// The following values will be stored statically and reused for future
+    /// calls:
+    /// - HdCapsuleSchemaTokens->X
+    /// - HdCapsuleSchemaTokens->Y
+    /// - HdCapsuleSchemaTokens->Z
+    HD_API
+    static HdTokenDataSourceHandle BuildAxisDataSource(
+        const TfToken &axis);
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

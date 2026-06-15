@@ -12,19 +12,22 @@
 #include "Tf/makePyConstructor.h"
 #include "Tf/pyPtrHelpers.h"
 
-#include <boost/python/class.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-using namespace boost::python;
+using namespace pxr_boost::python;
 
 void wrapAggregateTree()
 {
-  using This = TraceAggregateTree;
-  using ThisPtr = TraceAggregateTreePtr;
+    using This = TraceAggregateTree;
+    using ThisPtr = TraceAggregateTreePtr;
 
-  class_<This, ThisPtr>("AggregateTree", no_init)
-      .def(TfPyRefAndWeakPtr())
-      .def(TfMakePyConstructor(&This::New))
-      .add_property("root", &This::GetRoot);
+    class_<This, ThisPtr>("AggregateTree", no_init)
+        .def(TfPyRefAndWeakPtr())
+        .def(TfMakePyConstructor(&This::New))
+        .add_property("root", &This::GetRoot)
+    ;
 }

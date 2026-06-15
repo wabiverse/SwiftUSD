@@ -12,7 +12,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<HdSceneIndexPlugin>();
+    TfType::Define<HdSceneIndexPlugin>();
 }
 
 //
@@ -28,17 +28,53 @@ TF_REGISTRY_FUNCTION(TfType)
 // in this compilation unit.
 HdSceneIndexPlugin::~HdSceneIndexPlugin() = default;
 
-// base implementation is a no-op which returns the input
-HdSceneIndexBaseRefPtr HdSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
+// base implementation is a no-op which returns the input. Note that calls the
+// _AppendSceneIndex virtual with no renderInstanceId as a shim in order to
+// support the old plugin API that didn't get a renderInstanceId. That way,
+// plugin implementers can override either method and will get invoked either
+// way.
+HdSceneIndexBaseRefPtr
+HdSceneIndexPlugin::_AppendSceneIndex(
+    const std::string &renderInstanceId,
+    const HdSceneIndexBaseRefPtr &inputScene,
+    const HdContainerDataSourceHandle &inputArgs)
 {
-  return inputScene;
+    return _AppendSceneIndex(inputScene, inputArgs);
 }
 
-HdSceneIndexBaseRefPtr HdSceneIndexPlugin::AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr
+HdSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene,
+    const HdContainerDataSourceHandle &inputArgs)
 {
-  return _AppendSceneIndex(inputScene, inputArgs);
+    return inputScene;
 }
+
+bool
+HdSceneIndexPlugin::_IsEnabled(
+    const HdContainerDataSourceHandle &inputArgs) const
+{
+    return true;
+}
+
+HdSceneIndexBaseRefPtr
+HdSceneIndexPlugin::AppendSceneIndex(
+    const std::string &renderInstanceId,
+    const HdSceneIndexBaseRefPtr &inputScene,
+    const HdContainerDataSourceHandle &inputArgs)
+{
+    if (IsEnabled(inputArgs)) {
+        return _AppendSceneIndex(renderInstanceId, inputScene, inputArgs);
+    }
+    return inputScene;
+}
+
+bool
+HdSceneIndexPlugin::IsEnabled(
+    const HdContainerDataSourceHandle &inputArgs) const
+{
+    return _IsEnabled(inputArgs);
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

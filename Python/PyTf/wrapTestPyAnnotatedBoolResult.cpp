@@ -5,37 +5,39 @@
 // https://openusd.org/license.
 //
 
-#include "Tf/pyAnnotatedBoolResult.h"
 #include "pxr/pxrns.h"
+#include "Tf/pyAnnotatedBoolResult.h"
 
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <string>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
 struct Tf_TestAnnotatedBoolResult : TfPyAnnotatedBoolResult<std::string> {
-  Tf_TestAnnotatedBoolResult(bool value, const std::string &annotation)
-      : TfPyAnnotatedBoolResult<std::string>(value, annotation)
-  {
-  }
+    Tf_TestAnnotatedBoolResult(bool value, const std::string& annotation)
+        : TfPyAnnotatedBoolResult<std::string>(value, annotation) { }
 };
 
-static Tf_TestAnnotatedBoolResult _TestAnnotatedBoolResult(bool value,
-                                                           const std::string &annotation)
+static Tf_TestAnnotatedBoolResult
+_TestAnnotatedBoolResult(
+    bool value,
+    const std::string& annotation)
 {
-  return Tf_TestAnnotatedBoolResult(value, annotation);
+    return Tf_TestAnnotatedBoolResult(value, annotation);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapTf_TestPyAnnotatedBoolResult()
 {
-  def("_TestAnnotatedBoolResult", &_TestAnnotatedBoolResult);
+    def("_TestAnnotatedBoolResult", &_TestAnnotatedBoolResult);
 
-  Tf_TestAnnotatedBoolResult::Wrap<Tf_TestAnnotatedBoolResult>("Tf_TestAnnotatedBoolResult",
-                                                               "annotation");
+    Tf_TestAnnotatedBoolResult::Wrap<Tf_TestAnnotatedBoolResult>(
+        "Tf_TestAnnotatedBoolResult", "annotation");
 }

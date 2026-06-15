@@ -7,84 +7,95 @@
 #ifndef PXR_IMAGING_HGIVULKAN_BLIT_CMDS_H
 #define PXR_IMAGING_HGIVULKAN_BLIT_CMDS_H
 
-#include "Hgi/blitCmds.h"
-#include "HgiVulkan/api.h"
 #include "pxr/pxrns.h"
+#include "HgiVulkan/api.h"
+#include "Hgi/blitCmds.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiVulkan;
 class HgiVulkanCommandBuffer;
 
+
 /// \class HgiVulkanBlitCmds
 ///
 /// Vulkan implementation of HgiBlitCmds.
 ///
-class HgiVulkanBlitCmds final : public HgiBlitCmds {
- public:
-  HGIVULKAN_API
-  ~HgiVulkanBlitCmds() override;
+class HgiVulkanBlitCmds final : public HgiBlitCmds
+{
+public:
+    HGIVULKAN_API
+    ~HgiVulkanBlitCmds() override;
 
-  HGIVULKAN_API
-  void PushDebugGroup(const char *label) override;
+    HGIVULKAN_API
+    void PushDebugGroup(const char* label,
+        const GfVec4f& color = s_blitDebugColor) override;
 
-  HGIVULKAN_API
-  void PopDebugGroup() override;
+    HGIVULKAN_API
+    void PopDebugGroup() override;
 
-  HGIVULKAN_API
-  void CopyTextureGpuToCpu(HgiTextureGpuToCpuOp const &copyOp) override;
+    HGIVULKAN_API
+    void InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color = s_markerDebugColor) override;
 
-  HGIVULKAN_API
-  void CopyTextureCpuToGpu(HgiTextureCpuToGpuOp const &copyOp) override;
+    HGIVULKAN_API
+    void CopyTextureGpuToCpu(HgiTextureGpuToCpuOp const& copyOp) override;
 
-  HGIVULKAN_API
-  void CopyBufferGpuToGpu(HgiBufferGpuToGpuOp const &copyOp) override;
+    HGIVULKAN_API
+    void CopyTextureCpuToGpu(HgiTextureCpuToGpuOp const& copyOp) override;
 
-  HGIVULKAN_API
-  void CopyBufferCpuToGpu(HgiBufferCpuToGpuOp const &copyOp) override;
+    HGIVULKAN_API
+    void CopyBufferGpuToGpu(HgiBufferGpuToGpuOp const& copyOp) override;
 
-  HGIVULKAN_API
-  void CopyBufferGpuToCpu(HgiBufferGpuToCpuOp const &copyOp) override;
+    HGIVULKAN_API
+    void BlitTexture(HgiTextureHandle src, HgiTextureHandle dst);
 
-  HGIVULKAN_API
-  void CopyTextureToBuffer(HgiTextureToBufferOp const &copyOp) override;
+    HGIVULKAN_API
+    void CopyBufferCpuToGpu(HgiBufferCpuToGpuOp const& copyOp) override;
 
-  HGIVULKAN_API
-  void CopyBufferToTexture(HgiBufferToTextureOp const &copyOp) override;
+    HGIVULKAN_API
+    void CopyBufferGpuToCpu(HgiBufferGpuToCpuOp const& copyOp) override;
 
-  HGIVULKAN_API
-  void GenerateMipMaps(HgiTextureHandle const &texture) override;
+    HGIVULKAN_API
+    void CopyTextureToBuffer(HgiTextureToBufferOp const& copyOp) override;
+    
+    HGIVULKAN_API
+    void CopyBufferToTexture(HgiBufferToTextureOp const& copyOp) override;
 
-  HGIVULKAN_API
-  void FillBuffer(HgiBufferHandle const &buffer, uint8_t value) override;
+    HGIVULKAN_API
+    void GenerateMipMaps(HgiTextureHandle const& texture) override;
 
-  HGIVULKAN_API
-  void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
+    HGIVULKAN_API
+    void FillBuffer(HgiBufferHandle const& buffer, uint8_t value) override;
 
-  /// Returns the command buffer used inside this cmds.
-  HGIVULKAN_API
-  HgiVulkanCommandBuffer *GetCommandBuffer();
+    HGIVULKAN_API
+    void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
+        
+    /// Returns the command buffer used inside this cmds.
+    HGIVULKAN_API
+    HgiVulkanCommandBuffer* GetCommandBuffer();
 
- protected:
-  friend class HgiVulkan;
+protected:
+    friend class HgiVulkan;
 
-  HGIVULKAN_API
-  HgiVulkanBlitCmds(HgiVulkan *hgi);
+    HGIVULKAN_API
+    HgiVulkanBlitCmds(HgiVulkan* hgi);
 
-  HGIVULKAN_API
-  bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
+    HGIVULKAN_API
+    bool _Submit(Hgi* hgi, HgiSubmitWaitType wait) override;
 
- private:
-  HgiVulkanBlitCmds &operator=(const HgiVulkanBlitCmds &) = delete;
-  HgiVulkanBlitCmds(const HgiVulkanBlitCmds &) = delete;
+private:
+    HgiVulkanBlitCmds & operator=(const HgiVulkanBlitCmds&) = delete;
+    HgiVulkanBlitCmds(const HgiVulkanBlitCmds&) = delete;
 
-  void _CreateCommandBuffer();
+    void _CreateCommandBuffer();
 
-  HgiVulkan *_hgi;
-  HgiVulkanCommandBuffer *_commandBuffer;
+    HgiVulkan* _hgi;
+    HgiVulkanCommandBuffer* _commandBuffer;
 
-  // BlitCmds is used only one frame so storing multi-frame state on BlitCmds
-  // will not survive.
+    // BlitCmds is used only one frame so storing multi-frame state on BlitCmds
+    // will not survive.
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -7,9 +7,9 @@
 #ifndef PXR_IMAGING_HIO_IMAGE_REGISTRY_H
 #define PXR_IMAGING_HIO_IMAGE_REGISTRY_H
 
+#include "pxr/pxrns.h"
 #include "Hio/api.h"
 #include "Tf/singleton.h"
-#include "pxr/pxrns.h"
 
 #include <memory>
 #include <string>
@@ -24,26 +24,27 @@ class HioRankedTypeMap;
 ///
 /// Manages plugin registration and loading for HioImage subclasses.
 ///
-class HioImageRegistry : public TfSingleton<HioImageRegistry> {
- public:
-  HIO_API
-  static HioImageRegistry &GetInstance();
+class HioImageRegistry : public TfSingleton<HioImageRegistry>
+{
+public:
+    HIO_API
+    static HioImageRegistry& GetInstance();
 
-  HIO_API
-  bool IsSupportedImageFile(std::string const &filename);
+    HIO_API
+    bool IsSupportedImageFile(std::string const & filename);
 
- private:
-  friend class TfSingleton<HioImageRegistry>;
-  HioImageRegistry();
+private:
+    friend class TfSingleton<HioImageRegistry>;
+    HioImageRegistry();
 
-  friend class HioImage;
+    friend class HioImage;
 
-  HioImageSharedPtr _ConstructImage(std::string const &filename);
+    HioImageSharedPtr _ConstructImage(std::string const & filename);
 
- private:
-  std::unique_ptr<HioRankedTypeMap> const _typeMap;
+private:
+    std::unique_ptr<HioRankedTypeMap> const _typeMap;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HIO_IMAGE_REGISTRY_H
+#endif // PXR_IMAGING_HIO_IMAGE_REGISTRY_H

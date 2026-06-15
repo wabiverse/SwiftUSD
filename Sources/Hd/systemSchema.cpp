@@ -19,7 +19,7 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 #include "Hd/overlayContainerDataSource.h"
@@ -28,102 +28,121 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSystemSchemaTokens, HD_SYSTEM_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSystemSchemaTokens,
+    HD_SYSTEM_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 
 // static
-HdDataSourceBaseHandle HdSystemSchema::GetFromPath(HdSceneIndexBaseRefPtr const &inputScene,
-                                                   SdfPath const &fromPath,
-                                                   TfToken const &key,
-                                                   SdfPath *foundAtPath)
+HdDataSourceBaseHandle
+HdSystemSchema::GetFromPath(
+    HdSceneIndexBaseRefPtr const& inputScene,
+    SdfPath const& fromPath,
+    TfToken const& key,
+    SdfPath* foundAtPath)
 {
-  if (!inputScene) {
-    return nullptr;
-  }
-
-  const HdDataSourceLocator locator(HdSystemSchemaTokens->system, key);
-
-  for (SdfPath currPath = fromPath; !currPath.IsEmpty(); currPath = currPath.GetParentPath()) {
-    const HdSceneIndexPrim currPrim = inputScene->GetPrim(currPath);
-    if (HdDataSourceBaseHandle dataSource = HdContainerDataSource::Get(currPrim.dataSource,
-                                                                       locator))
-    {
-      if (foundAtPath) {
-        *foundAtPath = currPath;
-      }
-      return dataSource;
+    if (!inputScene) {
+        return nullptr;
     }
-  }
 
-  return nullptr;
+    const HdDataSourceLocator locator(HdSystemSchemaTokens->system, key);
+
+    for (SdfPath currPath = fromPath;
+            !currPath.IsEmpty();
+            currPath = currPath.GetParentPath()) {
+        const HdSceneIndexPrim currPrim = inputScene->GetPrim(currPath);
+        if (HdDataSourceBaseHandle dataSource
+            = HdContainerDataSource::Get(currPrim.dataSource, locator)) {
+            if (foundAtPath) {
+                *foundAtPath = currPath;
+            }
+            return dataSource;
+        }
+    }
+
+    return nullptr;
 }
 
 // static
-HdContainerDataSourceHandle HdSystemSchema::Compose(HdSceneIndexBaseRefPtr const &inputScene,
-                                                    SdfPath const &fromPath,
-                                                    SdfPath *foundAtPath)
+HdContainerDataSourceHandle
+HdSystemSchema::Compose(
+    HdSceneIndexBaseRefPtr const& inputScene,
+    SdfPath const& fromPath,
+    SdfPath* foundAtPath)
 {
-  if (!inputScene) {
-    return nullptr;
-  }
-
-  TfSmallVector<HdContainerDataSourceHandle, 4> systemContainers;
-
-  SdfPath lastFound;
-  for (SdfPath currPath = fromPath; !currPath.IsEmpty(); currPath = currPath.GetParentPath()) {
-    const HdSceneIndexPrim currPrim = inputScene->GetPrim(currPath);
-    if (HdContainerDataSourceHandle systemContainer =
-            HdSystemSchema::GetFromParent(currPrim.dataSource).GetContainer())
-    {
-      systemContainers.push_back(systemContainer);
-      lastFound = currPath;
+    if (!inputScene) {
+        return nullptr;
     }
-  }
 
-  if (systemContainers.empty()) {
-    return nullptr;
-  }
+    TfSmallVector<HdContainerDataSourceHandle, 4> systemContainers;
 
-  if (foundAtPath) {
-    *foundAtPath = lastFound;
-  }
+    SdfPath lastFound;
+    for (SdfPath currPath = fromPath;
+            !currPath.IsEmpty();
+            currPath = currPath.GetParentPath()) {
+        const HdSceneIndexPrim currPrim = inputScene->GetPrim(currPath);
+        if (HdContainerDataSourceHandle systemContainer
+            = HdSystemSchema::GetFromParent(currPrim.dataSource)
+                  .GetContainer()) {
+            systemContainers.push_back(systemContainer);
+            lastFound = currPath;
+        }
+    }
 
-  return HdOverlayContainerDataSource::New(systemContainers.size(), systemContainers.data());
+    if (systemContainers.empty()) {
+        return nullptr;
+    }
+
+    if (foundAtPath) {
+        *foundAtPath = lastFound;
+    }
+
+    return HdOverlayContainerDataSource::New(
+        systemContainers.size(), systemContainers.data());
 }
 
 // static
-HdContainerDataSourceHandle HdSystemSchema::ComposeAsPrimDataSource(
-    HdSceneIndexBaseRefPtr const &inputScene, SdfPath const &fromPath, SdfPath *foundAtPath)
+HdContainerDataSourceHandle
+HdSystemSchema::ComposeAsPrimDataSource(
+    HdSceneIndexBaseRefPtr const& inputScene,
+    SdfPath const& fromPath,
+    SdfPath* foundAtPath)
 {
-  if (HdContainerDataSourceHandle systemDs = Compose(inputScene, fromPath, foundAtPath)) {
-    return HdRetainedContainerDataSource::New(HdSystemSchemaTokens->system, systemDs);
-  }
-  return nullptr;
+    if (HdContainerDataSourceHandle systemDs
+        = Compose(inputScene, fromPath, foundAtPath)) {
+        return HdRetainedContainerDataSource::New(
+            HdSystemSchemaTokens->system, systemDs);
+    }
+    return nullptr;
 }
 
 // --(END CUSTOM CODE: Schema Methods)--
 
 /*static*/
-HdSystemSchema HdSystemSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdSystemSchema
+HdSystemSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdSystemSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                                  HdSystemSchemaTokens->system)) :
-                                              nullptr);
+    return HdSystemSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdSystemSchemaTokens->system))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdSystemSchema::GetSchemaToken()
+const TfToken &
+HdSystemSchema::GetSchemaToken()
 {
-  return HdSystemSchemaTokens->system;
+    return HdSystemSchemaTokens->system;
 }
 
 /*static*/
-const HdDataSourceLocator &HdSystemSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdSystemSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
-}
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

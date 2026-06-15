@@ -63,4 +63,4 @@ class GfVec4i;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_GF_DECLARE_H
+#endif // PXR_BASE_GF_DECLARE_H

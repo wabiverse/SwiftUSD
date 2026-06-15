@@ -7,16 +7,18 @@
 #ifndef PXR_USD_IMAGING_USD_VOL_IMAGING_TOKENS_H
 #define PXR_USD_IMAGING_USD_VOL_IMAGING_TOKENS_H
 
-#include "Tf/staticTokens.h"
-#include "UsdVolImaging/api.h"
 #include "pxr/pxrns.h"
+#include "UsdVolImaging/api.h"
+#include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define USDVOLIMAGING_TOKENS (field3dAsset)(openvdbAsset)
+#define USDVOLIMAGING_TOKENS \
+    (field3dAsset)           \
+    (openvdbAsset)
 
 TF_DECLARE_PUBLIC_TOKENS(UsdVolImagingTokens, USDVOLIMAGING_API, USDVOLIMAGING_TOKENS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_VOL_IMAGING_TOKENS_H
+#endif // PXR_USD_IMAGING_USD_VOL_IMAGING_TOKENS_H

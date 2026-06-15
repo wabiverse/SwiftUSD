@@ -35,101 +35,120 @@ class HdStRenderPassState;
 ///
 /// BoundingBoxTask parameters.
 ///
-struct HdxBoundingBoxTaskParams {
-  using BBoxVector = std::vector<GfBBox3d>;
+struct HdxBoundingBoxTaskParams
+{
+    using BBoxVector = std::vector<GfBBox3d>;
 
-  HDX_API
-  HdxBoundingBoxTaskParams() : aovName(), bboxes(), color(1), dashSize(3) {}
+    HDX_API
+    HdxBoundingBoxTaskParams()
+        : aovName()
+        , bboxes()
+        , color(1)
+        , dashSize(3)
+        {}
 
-  TfToken aovName;
+    TfToken aovName;
 
-  // Data provided by the application
-  BBoxVector bboxes;
-  GfVec4f color;
-  float dashSize;
+    // Data provided by the application
+    BBoxVector bboxes;
+    GfVec4f color;
+    float dashSize;
 };
 
 /// \class HdxBoundingBoxTask
 ///
 /// A task for rendering bounding boxes.
 ///
-class HdxBoundingBoxTask : public HdxTask {
- public:
-  HDX_API
-  HdxBoundingBoxTask(HdSceneDelegate *delegate, const SdfPath &id);
+class HdxBoundingBoxTask : public HdxTask
+{
+public:
+    using TaskParams = HdxBoundingBoxTaskParams;
 
-  HDX_API
-  ~HdxBoundingBoxTask() override;
+    HDX_API
+    HdxBoundingBoxTask(HdSceneDelegate* delegate, const SdfPath& id);
 
-  /// Prepare the bounding box task resources
-  HDX_API
-  void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override;
+    HDX_API
+    ~HdxBoundingBoxTask() override;
 
-  /// Execute the bounding box task
-  HDX_API
-  void Execute(HdTaskContext *ctx) override;
+    /// Prepare the bounding box task resources
+    HDX_API
+    void Prepare(HdTaskContext* ctx,
+                 HdRenderIndex* renderIndex) override;
 
- protected:
-  /// Sync the render pass resources
-  HDX_API
-  void _Sync(HdSceneDelegate *delegate, HdTaskContext *ctx, HdDirtyBits *dirtyBits) override;
+    /// Execute the bounding box task
+    HDX_API
+    void Execute(HdTaskContext* ctx) override;
 
- private:
-  HdxBoundingBoxTask() = delete;
-  HdxBoundingBoxTask(const HdxBoundingBoxTask &) = delete;
-  HdxBoundingBoxTask &operator=(const HdxBoundingBoxTask &) = delete;
+protected:
+    /// Sync the render pass resources
+    HDX_API
+    void _Sync(HdSceneDelegate* delegate,
+               HdTaskContext* ctx,
+               HdDirtyBits* dirtyBits) override;
 
-  // Utility function to create the shader for drawing dashed lines.
-  bool _CreateShaderResources();
+private:
+    HdxBoundingBoxTask() = delete;
+    HdxBoundingBoxTask(const HdxBoundingBoxTask&) = delete;
+    HdxBoundingBoxTask &operator =(const HdxBoundingBoxTask&) = delete;
 
-  // Utility function to create buffer resources.
-  bool _CreateBufferResources();
+    // Utility function to create the shader for drawing dashed lines.
+    bool _CreateShaderResources();
 
-  // Utility to create resource bindings
-  bool _CreateResourceBindings();
+    // Utility function to create buffer resources.
+    bool _CreateBufferResources();
 
-  // Utility to create a pipeline.
-  bool _CreatePipeline(const HgiTextureHandle &colorTexture, const HgiTextureHandle &depthTexture);
+    // Utility to create resource bindings
+    bool _CreateResourceBindings();
 
-  // Utility to get the view and projection matrix from the camera.
-  GfMatrix4d _ComputeViewProjectionMatrix(const HdStRenderPassState &hdStRenderPassState) const;
+    // Utility to create a pipeline.
+    bool _CreatePipeline(
+        const HgiTextureHandle& colorTexture,
+        const HgiTextureHandle& depthTexture);
 
-  // Utility to set the shader constants for drawing.
-  void _UpdateShaderConstants(HgiGraphicsCmds *gfxCmds,
-                              const GfVec4i &gfxViewport,
-                              const HdStRenderPassState &hdStRenderPassState);
+    // Utility to get the view and projection matrix from the camera.
+    GfMatrix4d _ComputeViewProjectionMatrix(
+        const HdStRenderPassState& hdStRenderPassState) const;
 
-  // Create and submit the draw commands.
-  void _DrawBBoxes(const HgiTextureHandle &colorTexture,
-                   const HgiTextureHandle &depthTexture,
-                   const HdStRenderPassState &hdStRenderPassState);
+    // Utility to set the shader constants for drawing.
+    void _UpdateShaderConstants(
+        HgiGraphicsCmds* gfxCmds,
+        const GfVec4i& gfxViewport,
+        const HdStRenderPassState& hdStRenderPassState);
 
-  // Destroy shader program and the shader functions it holds.
-  void _DestroyShaderProgram();
+    // Create and submit the draw commands.
+    void _DrawBBoxes(
+        const HgiTextureHandle& colorTexture,
+        const HgiTextureHandle& depthTexture,
+        const HdStRenderPassState& hdStRenderPassState);
 
-  // Print shader compile errors.
-  void _PrintCompileErrors();
+    // Destroy shader program and the shader functions it holds.
+    void _DestroyShaderProgram();
 
-  HgiAttachmentDesc _colorAttachment;
-  HgiAttachmentDesc _depthAttachment;
+    // Print shader compile errors.
+    void _PrintCompileErrors();
 
-  HgiBufferHandle _vertexBuffer;
-  size_t _maxTransforms;
-  HgiBufferHandle _transformsBuffer;
-  HgiShaderProgramHandle _shaderProgram;
-  HgiResourceBindingsHandle _resourceBindings;
-  HgiGraphicsPipelineHandle _pipeline;
+    HgiAttachmentDesc _colorAttachment;
+    HgiAttachmentDesc _depthAttachment;
 
-  HdxBoundingBoxTaskParams _params;
+    HgiBufferHandle _vertexBuffer;
+    size_t _maxTransforms;
+    HgiBufferHandle _transformsBuffer;
+    HgiShaderProgramHandle _shaderProgram;
+    HgiResourceBindingsHandle _resourceBindings;
+    HgiGraphicsPipelineHandle _pipeline;
+
+    HdxBoundingBoxTaskParams _params;
 };
 
 // VtValue requirements
 HDX_API
-std::ostream &operator<<(std::ostream &out, const HdxBoundingBoxTaskParams &pv);
+std::ostream& operator<<(std::ostream& out, const HdxBoundingBoxTaskParams& pv);
 HDX_API
-bool operator==(const HdxBoundingBoxTaskParams &lhs, const HdxBoundingBoxTaskParams &rhs);
+bool operator==(const HdxBoundingBoxTaskParams& lhs,
+                const HdxBoundingBoxTaskParams& rhs);
 HDX_API
-bool operator!=(const HdxBoundingBoxTaskParams &lhs, const HdxBoundingBoxTaskParams &rhs);
+bool operator!=(const HdxBoundingBoxTaskParams& lhs,
+                const HdxBoundingBoxTaskParams& rhs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

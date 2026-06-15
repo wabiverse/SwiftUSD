@@ -13,4 +13,5 @@ HgiBlitCmds::HgiBlitCmds() = default;
 
 HgiBlitCmds::~HgiBlitCmds() = default;
 
+
 PXR_NAMESPACE_CLOSE_SCOPE

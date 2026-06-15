@@ -28,7 +28,7 @@
 #ifndef DOUBLE_CONVERSION_FIXED_DTOA_H_
 #define DOUBLE_CONVERSION_FIXED_DTOA_H_
 
-#include "Tf/pxrDoubleConversion/utils.h"
+#include "utils.h"
 
 #include "pxr/pxrns.h"
 

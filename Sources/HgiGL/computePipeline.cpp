@@ -10,30 +10,36 @@
 #include "HgiGL/conversions.h"
 #include "HgiGL/diagnostic.h"
 #include "HgiGL/resourceBindings.h"
-#include "HgiGL/shaderFunction.h"
 #include "HgiGL/shaderProgram.h"
+#include "HgiGL/shaderFunction.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLComputePipeline::HgiGLComputePipeline(HgiComputePipelineDesc const &desc)
+HgiGLComputePipeline::HgiGLComputePipeline(
+    HgiComputePipelineDesc const& desc)
     : HgiComputePipeline(desc)
 {
 }
 
 HgiGLComputePipeline::~HgiGLComputePipeline() = default;
 
-void HgiGLComputePipeline::BindPipeline()
+void
+HgiGLComputePipeline::BindPipeline()
 {
-  //
-  // Shader program
-  //
-  HgiGLShaderProgram *glProgram = static_cast<HgiGLShaderProgram *>(
-      _descriptor.shaderProgram.Get());
-  if (glProgram) {
-    glUseProgram(glProgram->GetProgramId());
-  }
+    // Default to seamless cubemap sampling.
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-  HGIGL_POST_PENDING_GL_ERRORS();
+    //
+    // Shader program
+    //
+    HgiGLShaderProgram* glProgram = 
+        static_cast<HgiGLShaderProgram*>(_descriptor.shaderProgram.Get());
+    if (glProgram) {
+        glUseProgram(glProgram->GetProgramId());
+    }
+
+    HGIGL_POST_PENDING_GL_ERRORS();
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

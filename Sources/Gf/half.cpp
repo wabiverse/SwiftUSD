@@ -11,9 +11,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-  TfType::Define<GfHalf>();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<GfHalf>();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

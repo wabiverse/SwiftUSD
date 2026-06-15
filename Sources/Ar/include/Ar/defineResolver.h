@@ -10,9 +10,9 @@
 /// \file ar/defineResolver.h
 /// Macros for defining a custom resolver implementation.
 
+#include "pxr/pxrns.h"
 #include "Ar/api.h"
 #include "Ar/resolver.h"
-#include "pxr/pxrns.h"
 
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
@@ -30,38 +30,43 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// AR_DEFINE_RESOLVER(CustomResolverClass, ArResolver);
 /// \endcode
 #ifdef doxygen
-#  define AR_DEFINE_RESOLVER(ResolverClass, BaseClass1, ...)
+#define AR_DEFINE_RESOLVER(ResolverClass, BaseClass1, ...)
 #else
-#  define AR_DEFINE_RESOLVER(...) \
-    TF_REGISTRY_FUNCTION(TfType) \
-    { \
-      Ar_DefineResolver<__VA_ARGS__>(); \
-    }
-#endif  // doxygen
+#define AR_DEFINE_RESOLVER(...)       \
+TF_REGISTRY_FUNCTION(TfType) {        \
+    Ar_DefineResolver<__VA_ARGS__>(); \
+}
+#endif // doxygen
 
-class Ar_ResolverFactoryBase : public TfType::FactoryBase {
- public:
-  AR_API
-  virtual ~Ar_ResolverFactoryBase();
-
-  AR_API
-  virtual ArResolver *New() const = 0;
-};
-
-template<class T> class Ar_ResolverFactory : public Ar_ResolverFactoryBase {
- public:
-  virtual ArResolver *New() const override
-  {
-    return new T;
-  }
-};
-
-template<class Resolver, class... Bases> void Ar_DefineResolver()
+class Ar_ResolverFactoryBase 
+    : public TfType::FactoryBase 
 {
-  TfType::Define<Resolver, TfType::Bases<Bases...>>()
-      .template SetFactory<Ar_ResolverFactory<Resolver>>();
+public:
+    AR_API
+    virtual ~Ar_ResolverFactoryBase();
+
+    AR_API
+    virtual ArResolver* New() const = 0;
+};
+
+template <class T>
+class Ar_ResolverFactory 
+    : public Ar_ResolverFactoryBase 
+{
+public:
+    virtual ArResolver* New() const override
+    {
+        return new T;
+    }
+};
+
+template <class Resolver, class ...Bases>
+void Ar_DefineResolver()
+{
+    TfType::Define<Resolver, TfType::Bases<Bases...>>()
+        .template SetFactory<Ar_ResolverFactory<Resolver> >();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_DEFINE_RESOLVER_H
+#endif // PXR_USD_AR_DEFINE_RESOLVER_H

@@ -6,27 +6,24 @@
 //
 #include "HdSt/simpleLightingShader.h"
 #include "HdSt/binding.h"
-#include "HdSt/domeLightComputations.h"
-#include "HdSt/dynamicUvTextureObject.h"
-#include "HdSt/materialParam.h"
+#include "HdSt/textureIdentifier.h"
+#include "HdSt/subtextureIdentifier.h"
+#include "HdSt/textureObject.h"
+#include "HdSt/textureHandle.h"
 #include "HdSt/package.h"
-#include "HdSt/renderBuffer.h"
+#include "HdSt/materialParam.h"
 #include "HdSt/resourceBinder.h"
 #include "HdSt/resourceRegistry.h"
-#include "HdSt/subtextureIdentifier.h"
+#include "HdSt/domeLightComputations.h"
+#include "HdSt/renderBuffer.h"
 #include "HdSt/textureBinder.h"
-#include "HdSt/textureHandle.h"
-#include "HdSt/textureIdentifier.h"
-#include "HdSt/textureObject.h"
 #include "HdSt/tokens.h"
 
 #include "Hd/renderDelegate.h"
 #include "Hd/renderIndex.h"
-#include "Hd/sceneDelegate.h"
 
 #include "Hio/glslfx.h"
 
-#include "Glf/bindingMap.h"
 #include "Glf/simpleLightingContext.h"
 
 #include "Tf/staticTokens.h"
@@ -37,532 +34,676 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens, (domeLightIrradiance)(domeLightPrefilter)(domeLightBRDF));
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens,
+    (domeLightCubemap)
+    (domeLightIrradiance)
+    (domeLightPrefilter) 
+    (domeLightBRDF)
+);
 
-HdStSimpleLightingShader::HdStSimpleLightingShader()
-    : _lightingContext(GlfSimpleLightingContext::New()),
-      _useLighting(true),
-      _glslfx(std::make_unique<HioGlslfx>(HdStPackageSimpleLightingShader())),
-      _renderParam(nullptr)
+
+HdStSimpleLightingShader::HdStSimpleLightingShader() 
+    : _lightingContext(GlfSimpleLightingContext::New())
+    , _glslfx(std::make_unique<HioGlslfx>(HdStPackageSimpleLightingShader()))
+    , _domeLightCubemapTargetMemoryMB(0)
+    , _shadowTextureHandle(
+        NamedTextureHandle{ 
+            HdStTokens->shadowCompareTextures,
+            HdStTextureType::Uv,
+            {},
+            HdStTokens->shadowCompareTextures.Hash()})
+    , _renderParam(nullptr)
 {
 }
 
 HdStSimpleLightingShader::~HdStSimpleLightingShader()
 {
-  _CleanupAovBindings();
+    _CleanupAovBindings();
 };
 
 /* virtual */
-HdStSimpleLightingShader::ID HdStSimpleLightingShader::ComputeHash() const
+HdStSimpleLightingShader::ID
+HdStSimpleLightingShader::ComputeHash() const
 {
-  HD_TRACE_FUNCTION();
+    HD_TRACE_FUNCTION();
 
-  const TfToken glslfxFile = HdStPackageSimpleLightingShader();
-  const size_t numLights = _useLighting ? _lightingContext->GetNumLightsUsed() : 0;
-  const bool useShadows = _useLighting ? _lightingContext->GetUseShadows() : false;
-  const size_t numShadows = useShadows ? _lightingContext->ComputeNumShadowsUsed() : 0;
+    const TfToken glslfxFile = HdStPackageSimpleLightingShader();
+    const bool useShadows = _lightingContext->GetUseShadows();
+    const bool useLighting = _lightingContext->GetUseLighting();
 
-  size_t hash = glslfxFile.Hash();
-  hash = TfHash::Combine(
-      hash, numLights, useShadows, numShadows, _lightingContext->ComputeShaderSourceHash());
+    size_t hash = glslfxFile.Hash();
+    hash = TfHash::Combine(
+        hash,
+        useLighting,
+        _maxLights,
+        useShadows,
+        _lightingContext->ComputeShaderSourceHash()
+    );
 
-  for (const HdStShaderCode::NamedTextureHandle &namedHandle : _namedTextureHandles) {
-
-    // Use name and hash only - not the texture itself as this
-    // does not affect the generated shader source.
-    hash = TfHash::Combine(hash, namedHandle.name, namedHandle.hash);
-  }
-
-  return (ID)hash;
-}
-
-/* virtual */
-std::string HdStSimpleLightingShader::GetSource(TfToken const &shaderStageKey) const
-{
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
-
-  const std::string source = _glslfx->GetSource(shaderStageKey);
-
-  if (source.empty())
-    return source;
-
-  std::stringstream defineStream;
-  const size_t numLights = _useLighting ? _lightingContext->GetNumLightsUsed() : 0;
-  const bool useShadows = _useLighting ? _lightingContext->GetUseShadows() : false;
-  const size_t numShadows = useShadows ? _lightingContext->ComputeNumShadowsUsed() : 0;
-  defineStream << "#define NUM_LIGHTS " << numLights << "\n";
-  defineStream << "#define USE_SHADOWS " << (int)(useShadows) << "\n";
-  defineStream << "#define NUM_SHADOWS " << numShadows << "\n";
-
-  const std::string postSurfaceShader = _lightingContext->ComputeShaderSource(shaderStageKey);
-
-  if (!postSurfaceShader.empty()) {
-    defineStream << "#define HD_HAS_postSurfaceShader\n";
-  }
-
-  return defineStream.str() + postSurfaceShader + source;
-}
-
-/* virtual */
-void HdStSimpleLightingShader::SetCamera(GfMatrix4d const &worldToViewMatrix,
-                                         GfMatrix4d const &projectionMatrix)
-{
-  _lightingContext->SetCamera(worldToViewMatrix, projectionMatrix);
-}
-
-static bool _HasDomeLight(GlfSimpleLightingContextRefPtr const &ctx)
-{
-  for (auto const &light : ctx->GetLights()) {
-    if (light.IsDomeLight()) {
-      return true;
+    for (const HdStShaderCode::NamedTextureHandle &namedHandle :
+        _namedTextureHandles) {
+        
+        // Use name and hash only - not the texture itself as this
+        // does not affect the generated shader source.
+        hash = TfHash::Combine(
+            hash,
+            namedHandle.name,
+            namedHandle.hash
+        );
     }
-  }
-  return false;
+
+    return (ID)hash;
 }
 
 /* virtual */
-void HdStSimpleLightingShader::BindResources(const int program, HdSt_ResourceBinder const &binder)
+std::string
+HdStSimpleLightingShader::GetSource(TfToken const &shaderStageKey) const
 {
-  for (auto const &buffer : _customBuffers) {
-    binder.Bind(buffer.second);
-  }
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  HdSt_TextureBinder::BindResources(binder, _namedTextureHandles);
+    const std::string source = _glslfx->GetSource(shaderStageKey);
+
+    if (source.empty()) return source;
+
+    std::stringstream defineStream;
+    const size_t maxLights =
+        _lightingContext->GetUseLighting() ? _maxLights : 0;
+    const bool useShadows = _lightingContext->GetUseShadows();
+    const size_t numShadows =
+        useShadows ? GetMaxShadows() : 0;
+    defineStream << "#define NUM_LIGHTS " << maxLights<< "\n";
+    defineStream << "#define USE_SHADOWS " << (int)(useShadows) << "\n";
+    defineStream << "#define NUM_SHADOWS " << numShadows << "\n";
+
+    const std::string postSurfaceShader =
+        _lightingContext->ComputeShaderSource(shaderStageKey);
+
+    if (!postSurfaceShader.empty()) {
+        defineStream << "#define HD_HAS_postSurfaceShader\n";
+    }
+
+    return defineStream.str() + postSurfaceShader + source;
 }
 
 /* virtual */
-void HdStSimpleLightingShader::UnbindResources(const int program,
-                                               HdSt_ResourceBinder const &binder)
+void
+HdStSimpleLightingShader::SetCamera(GfMatrix4d const &worldToViewMatrix,
+                                    GfMatrix4d const &projectionMatrix)
 {
-  for (auto const &buffer : _customBuffers) {
-    binder.Unbind(buffer.second);
-  }
-
-  HdSt_TextureBinder::UnbindResources(binder, _namedTextureHandles);
+    _lightingContext->SetCamera(worldToViewMatrix, projectionMatrix);
 }
 
-void HdStSimpleLightingShader::AddBufferBinding(HdStBindingRequest const &req)
+static
+bool
+_HasDomeLight(GlfSimpleLightingContextRefPtr const &ctx)
 {
-  _customBuffers[req.GetName()] = req;
+    for (auto const& light : ctx->GetLights()){
+        if (light.IsDomeLight()) {
+            return true;
+        }
+    }
+    return false;
 }
 
-void HdStSimpleLightingShader::RemoveBufferBinding(TfToken const &name)
+/* virtual */
+void
+HdStSimpleLightingShader::BindResources(const int program,
+                                        HdSt_ResourceBinder const &binder)
 {
-  _customBuffers.erase(name);
+    for (auto const& buffer : _customBuffers) {
+        binder.Bind(buffer.second);
+    }
+    
+    HdSt_TextureBinder::BindResources(binder, _namedTextureHandles);
 }
 
-void HdStSimpleLightingShader::ClearBufferBindings()
+/* virtual */
+void
+HdStSimpleLightingShader::UnbindResources(const int program,
+                                          HdSt_ResourceBinder const &binder)
 {
-  _customBuffers.clear();
+    for (auto const& buffer : _customBuffers) {
+        binder.Unbind(buffer.second);
+    }
+
+    HdSt_TextureBinder::UnbindResources(binder, _namedTextureHandles);
+}
+
+void
+HdStSimpleLightingShader::AddBufferBinding(HdStBindingRequest const& req)
+{
+    _customBuffers[req.GetName()] = req;
+}
+
+void
+HdStSimpleLightingShader::RemoveBufferBinding(TfToken const &name)
+{
+    _customBuffers.erase(name);
+}
+
+void
+HdStSimpleLightingShader::ClearBufferBindings()
+{
+    _customBuffers.clear();
 }
 
 /*virtual*/
-void HdStSimpleLightingShader::AddBindings(HdStBindingRequestVector *customBindings)
+void
+HdStSimpleLightingShader::AddBindings(HdStBindingRequestVector *customBindings)
 {
-  customBindings->reserve(customBindings->size() + _customBuffers.size() + 1);
-  TF_FOR_ALL(it, _customBuffers)
-  {
-    customBindings->push_back(it->second);
-  }
+    customBindings->reserve(customBindings->size() + _customBuffers.size() + 1);
+    TF_FOR_ALL(it, _customBuffers) {
+        customBindings->push_back(it->second);
+    }
 
-  _lightTextureParams.clear();
+    _lightTextureParams.clear();
+    
+    // For now we assume that the only simple light with a texture is
+    // a domeLight (ignoring RectLights, and multiple domeLights)
+    if (_HasDomeLight(_lightingContext) && _domeLightEnvironmentTextureHandle) {
+        // cubemap generated from texture
+        _lightTextureParams.push_back(
+            HdSt_MaterialParam(
+                HdSt_MaterialParam::ParamTypeTexture,
+                _tokens->domeLightCubemap,
+                VtValue(GfVec4f(0.0)),
+                TfTokenVector(),
+                HdStTextureType::Cubemap));
+        // irradiance map
+        _lightTextureParams.push_back(
+            HdSt_MaterialParam(
+                HdSt_MaterialParam::ParamTypeTexture,
+                _tokens->domeLightIrradiance,
+                VtValue(GfVec4f(0.0)),
+                TfTokenVector(),
+                HdStTextureType::Cubemap));
+        // prefilter map
+        _lightTextureParams.push_back(
+            HdSt_MaterialParam(
+                HdSt_MaterialParam::ParamTypeTexture,
+                _tokens->domeLightPrefilter,
+                VtValue(GfVec4f(0.0)),
+                TfTokenVector(),
+                HdStTextureType::Cubemap));
+        // BRDF texture
+        _lightTextureParams.push_back(
+            HdSt_MaterialParam(
+                HdSt_MaterialParam::ParamTypeTexture,
+                _tokens->domeLightBRDF,
+                VtValue(GfVec4f(0.0)),
+                TfTokenVector(),
+                HdStTextureType::Uv));
+    }
 
-  // For now we assume that the only simple light with a texture is
-  // a domeLight (ignoring RectLights, and multiple domeLights)
-  if (_HasDomeLight(_lightingContext) && _domeLightEnvironmentTextureHandle) {
-    // irradiance map
-    _lightTextureParams.push_back(HdSt_MaterialParam(HdSt_MaterialParam::ParamTypeTexture,
-                                                     _tokens->domeLightIrradiance,
-                                                     VtValue(GfVec4f(0.0)),
-                                                     TfTokenVector(),
-                                                     HdStTextureType::Uv));
-    // prefilter map
-    _lightTextureParams.push_back(HdSt_MaterialParam(HdSt_MaterialParam::ParamTypeTexture,
-                                                     _tokens->domeLightPrefilter,
-                                                     VtValue(GfVec4f(0.0)),
-                                                     TfTokenVector(),
-                                                     HdStTextureType::Uv));
-    // BRDF texture
-    _lightTextureParams.push_back(HdSt_MaterialParam(HdSt_MaterialParam::ParamTypeTexture,
-                                                     _tokens->domeLightBRDF,
-                                                     VtValue(GfVec4f(0.0)),
-                                                     TfTokenVector(),
-                                                     HdStTextureType::Uv));
-  }
-
-  const bool useShadows = _useLighting ? _lightingContext->GetUseShadows() : false;
-  if (useShadows) {
-    size_t const numShadowPasses = _lightingContext->GetShadows()->GetNumShadowMapPasses();
-
-    // Create one param for all shadow passes as shadow compare textures
-    // will be bound to shader as an array of samplers.
-    _lightTextureParams.push_back(HdSt_MaterialParam(HdSt_MaterialParam::ParamTypeTexture,
-                                                     HdStTokens->shadowCompareTextures,
-                                                     VtValue(GfVec4f(0.0)),
-                                                     TfTokenVector(),
-                                                     HdStTextureType::Uv,
-                                                     /*swizzle*/ std::string(),
-                                                     /*isPremultiplied*/ false,
-                                                     /*arrayOfTexturesSize*/ numShadowPasses));
-  }
+    if (_lightingContext->GetUseShadows()) {
+        // Create one param for all shadow passes as shadow compare textures 
+        // will be bound to shader as an array of samplers.
+        _lightTextureParams.push_back(
+            HdSt_MaterialParam(
+                HdSt_MaterialParam::ParamTypeTexture,
+                HdStTokens->shadowCompareTextures,
+                VtValue(GfVec4f(0.0)),
+                TfTokenVector(),
+                HdStTextureType::Uv,
+                /*swizzle*/std::string(),
+                /*isPremultiplied*/false,
+                /*arrayOfTexturesSize*/GetMaxShadows()));
+    }
 }
 
-HdSt_MaterialParamVector const &HdStSimpleLightingShader::GetParams() const
+HdSt_MaterialParamVector const& 
+HdStSimpleLightingShader::GetParams() const 
 {
-  return _lightTextureParams;
+    return _lightTextureParams;
 }
 
-static const std::string &_GetResolvedDomeLightEnvironmentFilePath(
+static
+const std::string &
+_GetResolvedDomeLightEnvironmentFilePath(
     const GlfSimpleLightingContextRefPtr &ctx)
 {
-  static const std::string empty;
+    static const std::string empty;
 
-  if (!ctx) {
-    return empty;
-  }
-
-  const GlfSimpleLightVector &lights = ctx->GetLights();
-  for (auto it = lights.rbegin(); it != lights.rend(); ++it) {
-    if (it->IsDomeLight()) {
-      const SdfAssetPath &path = it->GetDomeLightTextureFile();
-      const std::string &assetPath = path.GetAssetPath();
-      if (assetPath.empty()) {
-        TF_WARN("Dome light has no texture asset path.");
+    if (!ctx) {
         return empty;
-      }
-
-      const std::string &resolvedPath = path.GetResolvedPath();
-      if (resolvedPath.empty()) {
-        TF_WARN("Texture asset path '%s' for dome light could not be resolved.",
-                assetPath.c_str());
-      }
-      return resolvedPath;
     }
-  }
+    
+    const GlfSimpleLightVector & lights = ctx->GetLights();
+    for (auto it = lights.rbegin(); it != lights.rend(); ++it) {
+        if (it->IsDomeLight()) {
+            const SdfAssetPath &path = it->GetDomeLightTextureFile();
+            const std::string &assetPath = path.GetAssetPath();
+            if (assetPath.empty()) {
+                TF_WARN("Dome light has no texture asset path.");
+                return empty;
+            }
 
-  return empty;
+            const std::string &resolvedPath = path.GetResolvedPath();
+            if (resolvedPath.empty()) {
+                TF_WARN("Texture asset path '%s' for dome light could not be resolved.",
+                        assetPath.c_str());
+            }
+            return resolvedPath;
+        }
+    }
+
+    return empty;
 }
 
-const HdStTextureHandleSharedPtr &HdStSimpleLightingShader::GetTextureHandle(
-    const TfToken &name) const
+const HdStTextureHandleSharedPtr &
+HdStSimpleLightingShader::GetTextureHandle(const TfToken &name) const
 {
-  for (auto const &namedTextureHandle : _namedTextureHandles) {
-    if (namedTextureHandle.name == name) {
-      return namedTextureHandle.handle;
+    // This is used specfically for dome lights, so ok to just return first 
+    // handle.
+    for (auto const & namedTextureHandle : _namedTextureHandles) {
+        if (namedTextureHandle.name == name) {
+            return namedTextureHandle.handles[0];
+        }
     }
-  }
 
-  static const HdStTextureHandleSharedPtr empty;
-  return empty;
+    static const HdStTextureHandleSharedPtr empty;
+    return empty;
 }
 
-static HdStShaderCode::NamedTextureHandle _MakeNamedTextureHandle(
+const HdStTextureHandleSharedPtr &
+HdStSimpleLightingShader::GetDomeLightEnvironmentCubemapTextureHandle() const
+{
+    return GetTextureHandle(_tokens->domeLightCubemap);
+}
+
+namespace {
+
+template<HdStTextureType textureType>
+struct _SubtextureIdTypeHelper;
+
+template<HdStTextureType textureType>
+using _SubtextureIdType =
+    typename _SubtextureIdTypeHelper<textureType>::type;
+
+template<>
+struct _SubtextureIdTypeHelper<HdStTextureType::Uv> {
+    using type = HdStDynamicUvSubtextureIdentifier;
+};
+
+template<>
+struct _SubtextureIdTypeHelper<HdStTextureType::Cubemap> {
+    using type = HdStDynamicCubemapSubtextureIdentifier;
+};
+
+template <HdStTextureType textureType>
+HdStShaderCode::NamedTextureHandle
+_MakeNamedTextureHandle(
     const TfToken &name,
     const std::string &texturePath,
     const HdWrap wrapModeS,
     const HdWrap wrapModeT,
     const HdWrap wrapModeR,
     const HdMinFilter minFilter,
-    HdStResourceRegistry *const resourceRegistry,
+    HdStResourceRegistry * const resourceRegistry,
     HdStShaderCodeSharedPtr const &shader)
 {
-  const HdStTextureIdentifier textureId(TfToken(texturePath + "[" + name.GetString() + "]"),
-                                        std::make_unique<HdStDynamicUvSubtextureIdentifier>());
-
-  const HdSamplerParameters samplerParameters(
-      wrapModeS, wrapModeT, wrapModeR, minFilter, HdMagFilterLinear);
-
-  HdStTextureHandleSharedPtr const textureHandle = resourceRegistry->AllocateTextureHandle(
-      textureId,
-      HdStTextureType::Uv,
-      samplerParameters,
-      /* memoryRequest = */ 0,
-      shader);
-
-  return {name, HdStTextureType::Uv, textureHandle, name.Hash()};
-}
-
-SdfPath HdStSimpleLightingShader::_GetAovPath(TfToken const &aovName, size_t shadowIndex) const
-{
-  std::string identifier = std::string("aov_shadowMap") + std::to_string(shadowIndex) + "_" +
-                           TfMakeValidIdentifier(aovName.GetString());
-  return SdfPath(identifier);
-}
-
-void HdStSimpleLightingShader::_ResizeOrCreateBufferForAov(size_t shadowIndex) const
-{
-  GlfSimpleShadowArrayRefPtr const &shadows = _lightingContext->GetShadows();
-
-  GfVec3i const dimensions = GfVec3i(
-      shadows->GetShadowMapSize(shadowIndex)[0], shadows->GetShadowMapSize(shadowIndex)[1], 1);
-
-  HdRenderPassAovBinding const &aovBinding = _shadowAovBindings[shadowIndex];
-  VtValue existingResource = aovBinding.renderBuffer->GetResource(false);
-  if (existingResource.IsHolding<HgiTextureHandle>()) {
-    int32_t const width = aovBinding.renderBuffer->GetWidth();
-    int32_t const height = aovBinding.renderBuffer->GetHeight();
-    if (width == dimensions[0] && height == dimensions[1]) {
-      return;
-    }
-  }
-
-  // If the resolution has changed then reallocate the
-  // renderBuffer and  texture.
-  aovBinding.renderBuffer->Allocate(dimensions,
-                                    HdFormatFloat32,
-                                    /*multiSampled*/ false);
-
-  VtValue newResource = aovBinding.renderBuffer->GetResource(false);
-
-  if (!newResource.IsHolding<HgiTextureHandle>()) {
-    TF_CODING_ERROR(
-        "No texture on render buffer for AOV "
-        "%s",
-        aovBinding.aovName.GetText());
-  }
-}
-
-void HdStSimpleLightingShader::_CleanupAovBindings()
-{
-  if (_renderParam) {
-    for (auto const &aovBuffer : _shadowAovBuffers) {
-      aovBuffer->Finalize(_renderParam);
-    }
-  }
-  _shadowAovBuffers.clear();
-  _shadowAovBindings.clear();
-}
-
-void HdStSimpleLightingShader::AllocateTextureHandles(HdRenderIndex const &renderIndex)
-{
-  const std::string &resolvedPath = _GetResolvedDomeLightEnvironmentFilePath(_lightingContext);
-  const bool useShadows = _useLighting ? _lightingContext->GetUseShadows() : false;
-  if (resolvedPath.empty()) {
-    _domeLightEnvironmentTextureHandle = nullptr;
-    _domeLightTextureHandles.clear();
-  }
-
-  if (!useShadows) {
-    _CleanupAovBindings();
-    _shadowTextureHandles.clear();
-  }
-
-  if (resolvedPath.empty() && !useShadows) {
-    _namedTextureHandles.clear();
-    return;
-  }
-
-  bool recomputeDomeLightTextures = !resolvedPath.empty();
-  if (_domeLightEnvironmentTextureHandle) {
-    HdStTextureObjectSharedPtr const &textureObject =
-        _domeLightEnvironmentTextureHandle->GetTextureObject();
-    HdStTextureIdentifier const &textureId = textureObject->GetTextureIdentifier();
-    if (textureId.GetFilePath() == resolvedPath) {
-      // Same environment map, no need to recompute
-      // dome light textures.
-      recomputeDomeLightTextures = false;
-    }
-  }
-
-  // Store render index for render buffer destruction.
-  _renderParam = renderIndex.GetRenderDelegate()->GetRenderParam();
-
-  HdStResourceRegistry *const resourceRegistry = dynamic_cast<HdStResourceRegistry *>(
-      renderIndex.GetResourceRegistry().get());
-  if (!TF_VERIFY(resourceRegistry)) {
-    return;
-  }
-
-  // Allocate texture handles for dome light textures.
-  if (recomputeDomeLightTextures) {
-    _domeLightTextureHandles.clear();
-
     const HdStTextureIdentifier textureId(
-        TfToken(resolvedPath),
-        std::make_unique<HdStAssetUvSubtextureIdentifier>(
-            /* flipVertically = */ true,
-            /* premultiplyAlpha = */ false,
-            /* sourceColorSpace = */ HdStTokens->colorSpaceAuto));
+        TfToken(texturePath + "[" + name.GetString() + "]"),
+        std::make_unique<_SubtextureIdType<textureType>>());
 
-    static const HdSamplerParameters envSamplerParameters(
-        HdWrapRepeat, HdWrapClamp, HdWrapClamp, HdMinFilterLinearMipmapLinear, HdMagFilterLinear);
+    const HdSamplerParameters samplerParameters(
+        wrapModeS, wrapModeT, wrapModeR,
+        minFilter, HdMagFilterLinear,
+        HdBorderColorTransparentBlack,
+        /*enableCompare*/false, HdCmpFuncNever,
+        /*maxAnisotropy*/1);
 
-    _domeLightEnvironmentTextureHandle = resourceRegistry->AllocateTextureHandle(
-        textureId,
-        HdStTextureType::Uv,
-        envSamplerParameters,
-        /* targetMemory = */ 0,
-        shared_from_this());
+    HdStTextureHandleSharedPtr const textureHandle =
+        resourceRegistry->AllocateTextureHandle(
+            textureId,
+            textureType,
+            samplerParameters,
+            /* memoryRequest = */ 0,
+            shader);
 
-    _domeLightTextureHandles = {_MakeNamedTextureHandle(_tokens->domeLightIrradiance,
-                                                        resolvedPath,
-                                                        HdWrapRepeat,
-                                                        HdWrapClamp,
-                                                        HdWrapRepeat,
-                                                        HdMinFilterLinear,
-                                                        resourceRegistry,
-                                                        shared_from_this()),
+    return { name,
+             textureType,
+             { textureHandle },
+             name.Hash() };
+}
 
-                                _MakeNamedTextureHandle(_tokens->domeLightPrefilter,
-                                                        resolvedPath,
-                                                        HdWrapRepeat,
-                                                        HdWrapClamp,
-                                                        HdWrapRepeat,
-                                                        HdMinFilterLinearMipmapLinear,
-                                                        resourceRegistry,
-                                                        shared_from_this()),
+}
 
-                                _MakeNamedTextureHandle(_tokens->domeLightBRDF,
-                                                        resolvedPath,
-                                                        HdWrapClamp,
-                                                        HdWrapClamp,
-                                                        HdWrapClamp,
-                                                        HdMinFilterLinear,
-                                                        resourceRegistry,
-                                                        shared_from_this())};
-  }
-  _namedTextureHandles = _domeLightTextureHandles;
+void
+HdStSimpleLightingShader::_CleanupAovBindings()
+{
+    _shadowAovBindings.clear();
+    _shadowTextureHandle.handles.clear();
+}
 
-  // Allocate texture handles for shadow map textures.
-  if (useShadows) {
-    GlfSimpleShadowArrayRefPtr const &shadows = _lightingContext->GetShadows();
-    size_t const prevNumShadowPasses = _shadowAovBindings.size();
+void
+HdStSimpleLightingShader::AllocateTextureHandles(
+    HdRenderIndex const &renderIndex,
+    const SdfPath& graphPath)
+{
+    const std::string &resolvedPath =
+        _GetResolvedDomeLightEnvironmentFilePath(_lightingContext);
+    const bool useShadows = _lightingContext->GetUseShadows();
+    if (resolvedPath.empty()) {
+        _domeLightEnvironmentTextureHandle = nullptr;
+        _domeLightTextureHandles.clear();
+    }
+
+    if (!useShadows) {
+        _CleanupAovBindings();
+    }
+
+    if (resolvedPath.empty() && !useShadows) {
+        _namedTextureHandles.clear();
+        return;
+    }
+
+    bool recomputeDomeLightTextures = !resolvedPath.empty();
+    if (_domeLightEnvironmentTextureHandle) {
+        HdStTextureObjectSharedPtr const &textureObject =
+            _domeLightEnvironmentTextureHandle->GetTextureObject();
+        HdStTextureIdentifier const &textureId =
+            textureObject->GetTextureIdentifier();
+        if (textureId.GetFilePath() == resolvedPath) {
+            // Same environment map, no need to recompute
+            // dome light textures.
+            recomputeDomeLightTextures = false;
+        }
+    }
+
+    // Store render index for render buffer destruction.
+    _renderParam = renderIndex.GetRenderDelegate()->GetRenderParam();
+
+    HdStResourceRegistry * const resourceRegistry =
+        dynamic_cast<HdStResourceRegistry*>(
+            renderIndex.GetResourceRegistry().get());
+    if (!TF_VERIFY(resourceRegistry)) {
+        return;
+    }
+
+    // Allocate texture handles for dome light textures.
+    if (recomputeDomeLightTextures) {
+        _domeLightTextureHandles.clear();
+
+        const HdStTextureIdentifier textureId(
+            TfToken(resolvedPath),
+            std::make_unique<HdStAssetUvSubtextureIdentifier>(
+                /* flipVertically = */ true,
+                /* premultiplyAlpha = */ false,
+                /* sourceColorSpace = */ HdStTokens->colorSpaceAuto));
+
+        static const HdSamplerParameters envSamplerParameters(
+            HdWrapRepeat, HdWrapClamp, HdWrapClamp,
+            HdMinFilterLinearMipmapLinear, HdMagFilterLinear,
+            HdBorderColorTransparentBlack,
+            /*enableCompare*/false, HdCmpFuncNever,
+            /*maxAnisotropy*/1);
+
+        _domeLightEnvironmentTextureHandle =
+            resourceRegistry->AllocateTextureHandle(
+                textureId,
+                HdStTextureType::Uv,
+                envSamplerParameters,
+                /* targetMemory = */ 0,
+                shared_from_this());
+
+        _domeLightTextureHandles = {
+            _MakeNamedTextureHandle<HdStTextureType::Cubemap>(
+                _tokens->domeLightCubemap,
+                resolvedPath,
+                // Wrap modes irrelevant for seamless cubemaps
+                HdWrapClamp, HdWrapClamp, HdWrapClamp,
+                HdMinFilterLinearMipmapLinear,
+                resourceRegistry,
+                shared_from_this()),
+
+            _MakeNamedTextureHandle<HdStTextureType::Cubemap>(
+                _tokens->domeLightIrradiance,
+                resolvedPath,
+                // Wrap modes irrelevant for seamless cubemaps
+                HdWrapClamp, HdWrapClamp, HdWrapClamp,
+                HdMinFilterLinear,
+                resourceRegistry,
+                shared_from_this()),
+
+            _MakeNamedTextureHandle<HdStTextureType::Cubemap>(
+                _tokens->domeLightPrefilter,
+                resolvedPath,
+                // Wrap modes irrelevant for seamless cubemaps
+                HdWrapClamp, HdWrapClamp, HdWrapClamp,
+                HdMinFilterLinearMipmapLinear,
+                resourceRegistry,
+                shared_from_this()),
+
+            _MakeNamedTextureHandle<HdStTextureType::Uv>(
+                _tokens->domeLightBRDF,
+                resolvedPath,
+                HdWrapClamp, HdWrapClamp, HdWrapClamp,
+                HdMinFilterLinear,
+                resourceRegistry,
+                shared_from_this())
+        };
+    }
+    _namedTextureHandles = _domeLightTextureHandles;
+
+    // Allocate texture handles for shadow map textures.
+    if (useShadows) {
+        _AllocateShadowTextures(resourceRegistry, graphPath);
+        _namedTextureHandles.push_back(_shadowTextureHandle);
+    }
+}
+
+void
+HdStSimpleLightingShader::_AllocateShadowTextures(
+        HdStResourceRegistry* const resourceRegistry,
+        const SdfPath& graphPath)
+{
+    GlfSimpleShadowArrayRefPtr const& shadows = 
+        _lightingContext->GetShadows();
     size_t const numShadowPasses = shadows->GetNumShadowMapPasses();
+    _shadowAovBindings.resize(numShadowPasses);
+    _shadowTextureHandle.handles.resize(GetMaxShadows());
+    _shadowBuffers.resize(numShadowPasses);
 
-    if (prevNumShadowPasses < numShadowPasses) {
-      // If increasing number of shadow maps, need to create new
-      // aov bindings and render buffers.
-      _shadowAovBindings.resize(numShadowPasses);
+    for (uint32_t i = 0; i < numShadowPasses; i++) {
+        const GfVec2i dimensions = shadows->GetShadowMapSize(i); 
+        // Skip allocation if buffer already exists and is correct size
+        if (_shadowAovBindings[i].renderBuffer) {
+            const GfVec2i bindingDims{
+                static_cast<int>(
+                    _shadowAovBindings[i].renderBuffer->GetWidth()),
+                static_cast<int>(
+                    _shadowAovBindings[i].renderBuffer->GetHeight())
+            };
+            if (bindingDims == dimensions) {
+                continue;
+            }
+        }
 
-      for (size_t i = prevNumShadowPasses; i < numShadowPasses; i++) {
-        SdfPath const aovId = _GetAovPath(HdAovTokens->depth, i);
-        _shadowAovBuffers.push_back(std::make_unique<HdStRenderBuffer>(resourceRegistry, aovId));
+        _shadowBuffers[i] = 
+            resourceRegistry->AllocateTempRenderBuffer(
+                graphPath,
+                HdFormatFloat32,
+                dimensions,
+                /*multiSampled=*/false,
+                /*depth=*/true);
 
-        HdAovDescriptor aovDesc = HdAovDescriptor(HdFormatFloat32,
-                                                  /*multiSampled*/ false,
-                                                  VtValue(1.f));
+        HdAovDescriptor aovDesc = HdAovDescriptor(HdFormatFloat32, 
+                                                    /*multiSampled*/false,
+                                                    /*c=*/VtValue(1.f));
 
         HdRenderPassAovBinding &binding = _shadowAovBindings[i];
         binding.aovName = HdAovTokens->depth;
         binding.aovSettings = aovDesc.aovSettings;
-        binding.renderBufferId = aovId;
+        binding.renderBufferId = _shadowBuffers[i]->GetBuffer()->GetId();
         binding.clearValue = aovDesc.clearValue;
-        binding.renderBuffer = _shadowAovBuffers.back().get();
-      }
-    }
-    else if (prevNumShadowPasses > numShadowPasses) {
-      // If decreasing number of shadow maps, only need to finalize
-      // and resize.
-      if (_renderParam) {
-        for (size_t i = numShadowPasses; i < prevNumShadowPasses; i++) {
-          _shadowAovBuffers[i]->Finalize(_renderParam);
-        }
-      }
-      _shadowAovBindings.resize(numShadowPasses);
-      _shadowAovBuffers.resize(numShadowPasses);
-    }
+        binding.renderBuffer = _shadowBuffers[i]->GetBuffer();
 
-    for (size_t i = 0; i < numShadowPasses; i++) {
-      _ResizeOrCreateBufferForAov(i);
+        HdSamplerParameters const shadowSamplerParameters{
+            HdWrapClamp, HdWrapClamp, HdWrapClamp,
+            HdMinFilterLinear, HdMagFilterLinear,
+            HdBorderColorOpaqueWhite, /*enableCompare*/true, 
+            HdCmpFuncLEqual, /*maxAnisotropy*/16};
+
+        _shadowTextureHandle.handles[i] =
+            resourceRegistry->AllocateTextureHandle(
+                _shadowBuffers[i]->GetBuffer()->GetTextureIdentifier(false),
+                HdStTextureType::Uv,
+                shadowSamplerParameters,
+                /* memoryRequest = */ 0,
+                shared_from_this());
     }
-
-    if (prevNumShadowPasses < numShadowPasses) {
-      // If increasing number of shadow maps, allocate texture handles
-      // for just-allocated texture objects.
-      HdSamplerParameters const shadowSamplerParameters{HdWrapClamp,
-                                                        HdWrapClamp,
-                                                        HdWrapClamp,
-                                                        HdMinFilterLinear,
-                                                        HdMagFilterLinear,
-                                                        HdBorderColorOpaqueWhite,
-                                                        /*enableCompare*/ true,
-                                                        HdCmpFuncLEqual};
-
-      for (size_t i = prevNumShadowPasses; i < numShadowPasses; i++) {
-        HdStTextureHandleSharedPtr const textureHandle = resourceRegistry->AllocateTextureHandle(
-            _shadowAovBuffers[i]->GetTextureIdentifier(false),
-            HdStTextureType::Uv,
-            shadowSamplerParameters,
-            /* memoryRequest = */ 0,
-            shared_from_this());
-
-        TfToken const shadowTextureName = TfToken(HdStTokens->shadowCompareTextures.GetString() +
-                                                  std::to_string(i));
-        _shadowTextureHandles.push_back(NamedTextureHandle{
-            shadowTextureName, HdStTextureType::Uv, textureHandle, shadowTextureName.Hash()});
-      }
+    if (!_shadowBufferFallback) {
+        _shadowBufferFallback = resourceRegistry->AllocateTempRenderBuffer(
+                graphPath,
+                HdFormatFloat32,
+                GfVec2i(1,1),
+                /*multiSampled=*/false,
+                /*depth=*/true);
     }
-    else if (prevNumShadowPasses > numShadowPasses) {
-      _shadowTextureHandles.resize(numShadowPasses);
+    HdSamplerParameters const fallbackParams{
+            HdWrapClamp, HdWrapClamp, HdWrapClamp,
+            HdMinFilterLinear, HdMagFilterLinear,
+            HdBorderColorOpaqueWhite, /*enableCompare*/true, 
+            HdCmpFuncLEqual, /*maxAnisotropy*/16};
+    for (uint32_t i = numShadowPasses; i < GetMaxShadows(); i++) {
+        _shadowTextureHandle.handles[i] =
+            resourceRegistry->AllocateTextureHandle(
+                _shadowBufferFallback->GetBuffer()->GetTextureIdentifier(false),
+                HdStTextureType::Uv,
+                fallbackParams,
+                /* memoryRequest = */ 0,
+                shared_from_this());    
     }
-  }
-
-  _namedTextureHandles.insert(
-      _namedTextureHandles.end(), _shadowTextureHandles.begin(), _shadowTextureHandles.end());
 }
 
-void HdStSimpleLightingShader::AddResourcesFromTextures(ResourceContext &ctx) const
+void
+HdStSimpleLightingShader::AddResourcesFromTextures(ResourceContext &ctx) const
 {
-  if (!_domeLightEnvironmentTextureHandle) {
-    // No dome lights, bail.
-    return;
-  }
+    if (!_domeLightEnvironmentTextureHandle) {
+        // No dome lights, bail.
+        return;
+    }
 
-  // Non-const weak pointer of this
-  HdStSimpleLightingShaderPtr const thisShader =
-      std::dynamic_pointer_cast<HdStSimpleLightingShader>(
-          std::const_pointer_cast<HdStShaderCode, const HdStShaderCode>(shared_from_this()));
+    // Non-const weak pointer of this
+    HdStSimpleLightingShaderPtr const thisShader =
+        std::dynamic_pointer_cast<HdStSimpleLightingShader>(
+            std::const_pointer_cast<HdStShaderCode, const HdStShaderCode>(
+                shared_from_this()));
 
-  // Irriadiance map computations.
-  ctx.AddComputation(
-      nullptr,
-      std::make_shared<HdSt_DomeLightComputationGPU>(_tokens->domeLightIrradiance, thisShader),
-      HdStComputeQueueZero);
-
-  // Calculate the number of mips for the prefilter texture
-  // Note that the size of the prefilter texture is half the size of the
-  // original Environment Map (srcTextureObject)
-  const HdStUvTextureObject *const srcTextureObject = dynamic_cast<HdStUvTextureObject *>(
-      _domeLightEnvironmentTextureHandle->GetTextureObject().get());
-  if (!TF_VERIFY(srcTextureObject)) {
-    return;
-  }
-  const HgiTexture *const srcTexture = srcTextureObject->GetTexture().Get();
-  if (!srcTexture) {
-    TF_WARN("Invalid texture for dome light environment map at %s",
+    // Calculate the number of mips for the cubemap texture.
+    const auto * const srcTextureObject = 
+        dynamic_cast<HdStAssetUvTextureObject*>(
+            _domeLightEnvironmentTextureHandle->GetTextureObject().get());
+    if (!TF_VERIFY(srcTextureObject)) {
+        return;
+    }
+    const HgiTexture * const srcTexture = srcTextureObject->GetTexture().Get();
+    if (!srcTexture) {
+        TF_WARN(
+            "Invalid texture for dome light environment map at %s",
             srcTextureObject->GetTextureIdentifier().GetFilePath().GetText());
-    return;
-  }
-  const GfVec3i srcDim = srcTexture->GetDescriptor().dimensions;
+        return;
+    }
 
-  const unsigned int numPrefilterLevels = (std::max)(
-      (unsigned int)(std::log2((std::max)(srcDim[0], srcDim[1]))), 1u);
+    const int cubemapDim =
+        HdSt_ComputeDomeLightCubemapWidth(
+            srcTextureObject->GetTextureIdentifier().GetFilePath().GetString(),
+            srcTextureObject->GetTexture()->GetDescriptor(),
+            _domeLightCubemapTargetMemoryMB);
+    const auto numCubemapLevels = (unsigned int)(std::log2(cubemapDim) + 1);
 
-  // Prefilter map computations. mipLevel = 0 allocates texture.
-  for (unsigned int mipLevel = 0; mipLevel < numPrefilterLevels; ++mipLevel) {
-    const float roughness = (numPrefilterLevels == 1) ?
-                                0.f :
-                                (float)mipLevel / (float)(numPrefilterLevels - 1);
-
+    // Cubemap generation from latlong texture.
     ctx.AddComputation(
         nullptr,
         std::make_shared<HdSt_DomeLightComputationGPU>(
-            _tokens->domeLightPrefilter, thisShader, numPrefilterLevels, mipLevel, roughness),
-        HdStComputeQueueZero);
-  }
+            _tokens->domeLightCubemap,
+            /*useCubemapAsSourceTexture =*/false,
+            thisShader,
+            cubemapDim,
+            numCubemapLevels),
+        HdStComputeQueueZero
+    );
 
-  // Brdf map computation
-  ctx.AddComputation(
-      nullptr,
-      std::make_shared<HdSt_DomeLightComputationGPU>(_tokens->domeLightBRDF, thisShader),
-      HdStComputeQueueZero);
+    // BRDF computation.
+    ctx.AddComputation(
+        nullptr,
+        std::make_shared<HdSt_DomeLightComputationGPU>(
+            _tokens->domeLightBRDF,
+            /*useCubemapAsSourceTexture =*/false,
+            thisShader,
+            cubemapDim),
+        HdStComputeQueueZero
+    );
+
+    // Generate mipmaps the for the generated cubemap.
+    ctx.AddComputation(
+        nullptr,
+        std::make_shared<HdSt_DomeLightMipmapComputationGPU>(
+            thisShader),
+        HdStComputeQueueOne
+    );
+
+    // Irradiance map computation.
+    ctx.AddComputation(
+        nullptr,
+        std::make_shared<HdSt_DomeLightComputationGPU>(
+            _tokens->domeLightIrradiance,
+            /*useCubemapAsSourceTexture =*/true,
+            thisShader,
+            cubemapDim),
+        HdStComputeQueueTwo
+    );
+
+    // Note that since the prefilter texture is downsized, it has one less
+    // mip level than the cubemap.
+    const unsigned int numPrefilterLevels = std::max(numCubemapLevels - 1, 1u);
+
+    // Prefilter map computations. mipLevel = 0 allocates texture.
+    for (unsigned int mipLevel = 0; mipLevel < numPrefilterLevels; ++mipLevel) {
+        const float roughness = (numPrefilterLevels == 1) ? 0.f :
+            (float)mipLevel / (float)(numPrefilterLevels - 1);
+
+        ctx.AddComputation(
+            nullptr,
+            std::make_shared<HdSt_DomeLightComputationGPU>(
+                _tokens->domeLightPrefilter,
+                /*useCubemapAsSourceTexture =*/true,
+                thisShader,
+                cubemapDim,
+                numPrefilterLevels,
+                mipLevel,
+                roughness),
+            HdStComputeQueueTwo
+        );
+    }
 }
 
-HdStShaderCode::NamedTextureHandleVector const &HdStSimpleLightingShader::GetNamedTextureHandles()
-    const
+HdStShaderCode::NamedTextureHandleVector const &
+HdStSimpleLightingShader::GetNamedTextureHandles() const
 {
-  return _namedTextureHandles;
+    return _namedTextureHandles;
+}
+
+void 
+HdStSimpleLightingShader::SetDomeLightCubemapTargetMemory(
+    unsigned int targetMemoryMB)
+{
+    if (_domeLightCubemapTargetMemoryMB != targetMemoryMB) {
+        _domeLightCubemapTargetMemoryMB = targetMemoryMB;
+        _domeLightEnvironmentTextureHandle = nullptr;
+        _domeLightTextureHandles.clear();
+    }
+}
+
+void 
+HdStSimpleLightingShader::SetMaxLights(
+    uint32_t maxLights)
+{
+    _maxLights = maxLights;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

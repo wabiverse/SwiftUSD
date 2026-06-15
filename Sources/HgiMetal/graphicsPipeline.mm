@@ -36,20 +36,26 @@ HgiMetalGraphicsPipeline::HgiMetalGraphicsPipeline(
 
 HgiMetalGraphicsPipeline::~HgiMetalGraphicsPipeline()
 {
-#if !__has_feature(objc_arc)
     if (_renderPipelineState) {
+#if !__has_feature(objc_arc)
         [_renderPipelineState release];
+#endif // !__has_feature(objc_arc)
     }
     if (_depthStencilState) {
+#if !__has_feature(objc_arc)
         [_depthStencilState release];
+#endif // !__has_feature(objc_arc)
     }
     if (_vertexDescriptor) {
+#if !__has_feature(objc_arc)
         [_vertexDescriptor release];
+#endif // !__has_feature(objc_arc)
     }
     if (_constantTessFactors) {
+#if !__has_feature(objc_arc)
         [_constantTessFactors release];
-    }
 #endif // !__has_feature(objc_arc)
+    }
 }
 
 void
@@ -298,12 +304,14 @@ HgiMetalGraphicsPipeline::_CreateRenderPipelineState(HgiMetal *hgi)
     }
 
     stateDesc.sampleCount = _descriptor.multiSampleState.sampleCount;
-    if (_descriptor.multiSampleState.alphaToCoverageEnable) {
+    if (_descriptor.multiSampleState.alphaToCoverageEnable &&
+        _descriptor.multiSampleState.sampleCount > HgiSampleCount1) {
         stateDesc.alphaToCoverageEnabled = YES;
     } else {
         stateDesc.alphaToCoverageEnabled = NO;
     }
-    if (_descriptor.multiSampleState.alphaToOneEnable) {
+    if (_descriptor.multiSampleState.alphaToOneEnable &&
+        _descriptor.multiSampleState.sampleCount > HgiSampleCount1) {
         stateDesc.alphaToOneEnabled = YES;
     } else {
         stateDesc.alphaToOneEnabled = NO;
@@ -318,7 +326,7 @@ HgiMetalGraphicsPipeline::_CreateRenderPipelineState(HgiMetal *hgi)
         error:&error];
 #if !__has_feature(objc_arc)
     [stateDesc release];
-#endif // !__has_feature(objc_arc) 
+#endif // !__has_feature(objc_arc)
     
     if (!_renderPipelineState) {
         NSString *err = [error localizedDescription];

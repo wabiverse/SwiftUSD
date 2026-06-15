@@ -7,9 +7,9 @@
 #ifndef PXR_USD_AR_DEFINE_RESOLVER_CONTEXT_H
 #define PXR_USD_AR_DEFINE_RESOLVER_CONTEXT_H
 
+#include "pxr/pxrns.h"
 #include "Ar/api.h"
 #include "Ar/resolverContext.h"
-#include "pxr/pxrns.h"
 
 /// \file ar/defineResolverContext.h
 /// Macros for defining an object for use with ArResolverContext
@@ -24,14 +24,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// declared.
 ///
 #ifdef doxygen
-#  define AR_DECLARE_RESOLVER_CONTEXT(ContextObject)
+#define AR_DECLARE_RESOLVER_CONTEXT(ContextObject)
 #else
-#  define AR_DECLARE_RESOLVER_CONTEXT(context) \
-    template<> struct ArIsContextObject<context> { \
-      static const bool value = true; \
-    }
+#define AR_DECLARE_RESOLVER_CONTEXT(context)           \
+template <>                                            \
+struct ArIsContextObject<context>                      \
+{                                                      \
+    static const bool value = true;                    \
+}
 #endif
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_DEFINE_RESOLVER_CONTEXT_H
+#endif // PXR_USD_AR_DEFINE_RESOLVER_CONTEXT_H

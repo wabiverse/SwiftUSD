@@ -19,125 +19,154 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdConeSchemaTokens, HD_CONE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdConeSchemaTokens,
+    HD_CONE_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdDoubleDataSourceHandle HdConeSchema::GetHeight() const
+HdDoubleDataSourceHandle
+HdConeSchema::GetHeight() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdConeSchemaTokens->height);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdConeSchemaTokens->height);
 }
 
-HdDoubleDataSourceHandle HdConeSchema::GetRadius() const
+HdDoubleDataSourceHandle
+HdConeSchema::GetRadius() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdConeSchemaTokens->radius);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdConeSchemaTokens->radius);
 }
 
-HdTokenDataSourceHandle HdConeSchema::GetAxis() const
+HdTokenDataSourceHandle
+HdConeSchema::GetAxis() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdConeSchemaTokens->axis);
-}
-
-/*static*/
-HdContainerDataSourceHandle HdConeSchema::BuildRetained(const HdDoubleDataSourceHandle &height,
-                                                        const HdDoubleDataSourceHandle &radius,
-                                                        const HdTokenDataSourceHandle &axis)
-{
-  TfToken _names[3];
-  HdDataSourceBaseHandle _values[3];
-
-  size_t _count = 0;
-
-  if (height) {
-    _names[_count] = HdConeSchemaTokens->height;
-    _values[_count++] = height;
-  }
-
-  if (radius) {
-    _names[_count] = HdConeSchemaTokens->radius;
-    _values[_count++] = radius;
-  }
-
-  if (axis) {
-    _names[_count] = HdConeSchemaTokens->axis;
-    _values[_count++] = axis;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
-}
-
-HdConeSchema::Builder &HdConeSchema::Builder::SetHeight(const HdDoubleDataSourceHandle &height)
-{
-  _height = height;
-  return *this;
-}
-
-HdConeSchema::Builder &HdConeSchema::Builder::SetRadius(const HdDoubleDataSourceHandle &radius)
-{
-  _radius = radius;
-  return *this;
-}
-
-HdConeSchema::Builder &HdConeSchema::Builder::SetAxis(const HdTokenDataSourceHandle &axis)
-{
-  _axis = axis;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdConeSchema::Builder::Build()
-{
-  return HdConeSchema::BuildRetained(_height, _radius, _axis);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdConeSchemaTokens->axis);
 }
 
 /*static*/
-HdConeSchema HdConeSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle
+HdConeSchema::BuildRetained(
+        const HdDoubleDataSourceHandle &height,
+        const HdDoubleDataSourceHandle &radius,
+        const HdTokenDataSourceHandle &axis
+)
 {
-  return HdConeSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                                HdConeSchemaTokens->cone)) :
-                                            nullptr);
+    TfToken _names[3];
+    HdDataSourceBaseHandle _values[3];
+
+    size_t _count = 0;
+
+    if (height) {
+        _names[_count] = HdConeSchemaTokens->height;
+        _values[_count++] = height;
+    }
+
+    if (radius) {
+        _names[_count] = HdConeSchemaTokens->radius;
+        _values[_count++] = radius;
+    }
+
+    if (axis) {
+        _names[_count] = HdConeSchemaTokens->axis;
+        _values[_count++] = axis;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdConeSchema::Builder &
+HdConeSchema::Builder::SetHeight(
+    const HdDoubleDataSourceHandle &height)
+{
+    _height = height;
+    return *this;
+}
+
+HdConeSchema::Builder &
+HdConeSchema::Builder::SetRadius(
+    const HdDoubleDataSourceHandle &radius)
+{
+    _radius = radius;
+    return *this;
+}
+
+HdConeSchema::Builder &
+HdConeSchema::Builder::SetAxis(
+    const HdTokenDataSourceHandle &axis)
+{
+    _axis = axis;
+    return *this;
+}
+
+HdContainerDataSourceHandle
+HdConeSchema::Builder::Build()
+{
+    return HdConeSchema::BuildRetained(
+        _height,
+        _radius,
+        _axis
+    );
 }
 
 /*static*/
-const TfToken &HdConeSchema::GetSchemaToken()
+HdConeSchema
+HdConeSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdConeSchemaTokens->cone;
+    return HdConeSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdConeSchemaTokens->cone))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdConeSchema::GetDefaultLocator()
+const TfToken &
+HdConeSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdConeSchemaTokens->cone;
 }
 
 /*static*/
-HdTokenDataSourceHandle HdConeSchema::BuildAxisDataSource(const TfToken &axis)
+const HdDataSourceLocator &
+HdConeSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+}
+
+/*static*/
+HdTokenDataSourceHandle
+HdConeSchema::BuildAxisDataSource(
+    const TfToken &axis)
 {
 
-  if (axis == HdConeSchemaTokens->X) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  if (axis == HdConeSchemaTokens->Y) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  if (axis == HdConeSchemaTokens->Z) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  // fallback for unknown token
-  return HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-}
+    if (axis == HdConeSchemaTokens->X) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    if (axis == HdConeSchemaTokens->Y) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    if (axis == HdConeSchemaTokens->Z) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    // fallback for unknown token
+    return HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

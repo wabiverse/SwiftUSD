@@ -23,11 +23,10 @@
 #include "HgiMetal/shaderProgram.h"
 #include "HgiMetal/texture.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 #include "Tf/getenv.h"
 #include "Tf/registryManager.h"
-#include "Tf/sharedPtrRetainReleaseHelper.h"
 #include "Tf/type.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -80,7 +79,7 @@ HgiMetal::HgiMetal(id<MTLDevice> device)
                 }
             }
         }
-#endif // defined(ARCH_OS_OSX)
+#endif
         if (!_device) {
             _device = MTLCreateSystemDefaultDevice();
         }
@@ -149,6 +148,7 @@ HgiMetal::~HgiMetal()
     [_argEncoderSampler release];
     [_argEncoderTexture release];
 #endif // !__has_feature(objc_arc)
+    
     {
         std::lock_guard<std::mutex> lock(_freeArgMutex);
         while(_freeArgBuffers.size()) {
@@ -158,15 +158,6 @@ HgiMetal::~HgiMetal()
             _freeArgBuffers.pop();
         }
     }
-}
-
-HgiMetal *HgiMetal::CreateHgi()
-{
-  std::shared_ptr<HgiMetal> hgi = std::make_shared<HgiMetal>();
-
-  hgi.reset(dynamic_cast<HgiMetal *>(Hgi::GetPlatformDefaultHgi()));
-
-  return Tf_SharedPtrRetainReleaseHelper<HgiMetal>::Register(hgi);
 }
 
 bool
@@ -219,7 +210,7 @@ HgiMetal::CreateBlitCmds()
 }
 
 HgiTextureHandle
-HgiMetal::CreateTexture(HgiTextureDesc const & desc)
+HgiMetal::_CreateTexture(HgiTextureDesc const & desc)
 {
     return HgiTextureHandle(new HgiMetalTexture(this, desc), GetUniqueId());
 }
@@ -231,12 +222,8 @@ HgiMetal::DestroyTexture(HgiTextureHandle* texHandle)
 }
 
 HgiTextureViewHandle
-HgiMetal::CreateTextureView(HgiTextureViewDesc const & desc)
+HgiMetal::_CreateTextureView(HgiTextureViewDesc const & desc)
 {
-    if (!desc.sourceTexture) {
-        TF_CODING_ERROR("Source texture is null");
-    }
-
     HgiTextureHandle src =
         HgiTextureHandle(new HgiMetalTexture(this, desc), GetUniqueId());
     HgiTextureView* view = new HgiTextureView(desc);
@@ -277,7 +264,7 @@ HgiMetal::DestroySampler(HgiSamplerHandle* smpHandle)
 }
 
 HgiBufferHandle
-HgiMetal::CreateBuffer(HgiBufferDesc const & desc)
+HgiMetal::_CreateBuffer(HgiBufferDesc const & desc)
 {
     return HgiBufferHandle(new HgiMetalBuffer(this, desc), GetUniqueId());
 }
@@ -316,7 +303,7 @@ HgiMetal::DestroyShaderProgram(HgiShaderProgramHandle* shaderProgramHandle)
 
 
 HgiResourceBindingsHandle
-HgiMetal::CreateResourceBindings(HgiResourceBindingsDesc const& desc)
+HgiMetal::_CreateResourceBindings(HgiResourceBindingsDesc const& desc)
 {
     return HgiResourceBindingsHandle(
         new HgiMetalResourceBindings(desc), GetUniqueId());
@@ -396,6 +383,11 @@ HgiMetal::EndFrame()
     }
 
     _pool->Drain();
+}
+
+void
+HgiMetal::GarbageCollect()
+{
 }
 
 id<MTLCommandQueue>
@@ -562,13 +554,3 @@ HgiMetal::_SubmitCmds(HgiCmds* cmds, HgiSubmitWaitType wait)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void HgiMetalRetain(PXR_NS::HgiMetal *hgi)
-{
-  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::HgiMetal>::Retain(hgi);
-}
-
-void HgiMetalRelease(PXR_NS::HgiMetal *hgi)
-{
-  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::HgiMetal>::Release(hgi);
-}

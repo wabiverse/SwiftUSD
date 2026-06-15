@@ -12,17 +12,16 @@
 
 #include "pxr/pxrns.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
 #include "Tf/api.h"
-
-#if __has_include(<boost/python/handle.hpp>)
-#include <boost/python/handle.hpp>
-#include <boost/python/object.hpp>
-#endif // __has_include(<boost/python/handle.hpp>)
-
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/handle.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/object.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <string>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Starts up the python runtime.
@@ -43,12 +42,12 @@ extern void TfPyInitialize();
 ///
 /// Returns zero on success, nonzero on failure.
 TF_API
-extern int TfPyRunSimpleString(const std::string &cmd);
+extern int TfPyRunSimpleString(const std::string & cmd);
 
 /// Runs the given string using PyRun_String().
 ///
 /// \a start is Py_eval_input, Py_single_input or Py_file_input.
-/// \a globals and locals can be dictionaries to use when evaluating the
+/// \a globals and locals can be dictionaries to use when evaluating the 
 ///    string in python. Defaults to reusing globals from main module. If
 ///    only the globals are provided, they will also be used as locals.
 ///
@@ -56,20 +55,20 @@ extern int TfPyRunSimpleString(const std::string &cmd);
 /// setup.
 ///
 /// Callers must hold the GIL before calling; see TfPyLock.  This is true for
-/// any boost::python call, including constructing and destroying the default
+/// any pxr_boost::python call, including constructing and destroying the default
 /// values of \p globals and \p locals.  Holding the GIL will also make it safe
-/// to inspect the returned boost::python::handle.
+/// to inspect the returned pxr_boost::python::handle.
 TF_API
-extern boost::python::handle<> TfPyRunString(
-    const std::string &cmd,
-    int start,
-    boost::python::object const &globals = boost::python::object(),
-    boost::python::object const &locals = boost::python::object());
+extern pxr_boost::python::handle<>
+TfPyRunString(const std::string & cmd, int start,
+              pxr_boost::python::object const &globals = pxr_boost::python::object(),
+              pxr_boost::python::object const &locals = pxr_boost::python::object()
+              );
 
 /// Runs the given file using PyRun_File().
 ///
 /// \a start is Py_eval_input, Py_single_input or Py_file_input.
-/// \a globals and locals can be dictionaries to use when evaluating the
+/// \a globals and locals can be dictionaries to use when evaluating the 
 ///    string in python. Defaults to reusing globals from main module. If
 ///    only the globals are provided, they will also be used as locals.
 ///
@@ -77,18 +76,17 @@ extern boost::python::handle<> TfPyRunString(
 /// setup.
 ///
 /// Callers must hold the GIL before calling; see TfPyLock.  This is true for
-/// any boost::python call, including constructing and destroying the default
+/// any pxr_boost::python call, including constructing and destroying the default
 /// values of \p globals and \p locals.  Holding the GIL will also make it safe
-/// to inspect the returned boost::python::handle.
+/// to inspect the returned pxr_boost::python::handle.
 TF_API
-extern boost::python::handle<> TfPyRunFile(
-    const std::string &filename,
-    int start,
-    boost::python::object const &globals = boost::python::object(),
-    boost::python::object const &locals = boost::python::object());
+extern pxr_boost::python::handle<>
+TfPyRunFile(const std::string &filename, int start,
+            pxr_boost::python::object const &globals = pxr_boost::python::object(),
+            pxr_boost::python::object const &locals = pxr_boost::python::object()
+            );
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#endif  // PXR_BASE_TF_PY_INTERPRETER_H
+#endif // PXR_BASE_TF_PY_INTERPRETER_H

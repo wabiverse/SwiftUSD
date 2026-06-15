@@ -12,34 +12,39 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingRepresentedByAncestorPrimAdapter Adapter;
-  TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  // No factory here, UsdImagingRepresentedByAncestorPrimAdapter is abstract.
+    typedef UsdImagingRepresentedByAncestorPrimAdapter Adapter;
+    TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    // No factory here, UsdImagingRepresentedByAncestorPrimAdapter is abstract.
 }
 
-TfTokenVector UsdImagingRepresentedByAncestorPrimAdapter::GetImagingSubprims(UsdPrim const &prim)
+TfTokenVector
+UsdImagingRepresentedByAncestorPrimAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  return TfTokenVector();
+    return TfTokenVector();
 }
 
-UsdImagingPrimAdapter::PopulationMode UsdImagingRepresentedByAncestorPrimAdapter::
-    GetPopulationMode()
+UsdImagingPrimAdapter::PopulationMode
+UsdImagingRepresentedByAncestorPrimAdapter::GetPopulationMode()
 {
-  return RepresentedByAncestor;
+    return RepresentedByAncestor;
 }
 
-SdfPath UsdImagingRepresentedByAncestorPrimAdapter::Populate(
-    UsdPrim const &prim,
-    UsdImagingIndexProxy *index,
+SdfPath
+UsdImagingRepresentedByAncestorPrimAdapter::Populate(
+    UsdPrim const& prim,
+    UsdImagingIndexProxy* index,
     UsdImagingInstancerContext const *instancerContext)
 {
-  return SdfPath::EmptyPath();
+    return SdfPath::EmptyPath();
 }
 
-HdDirtyBits UsdImagingRepresentedByAncestorPrimAdapter::ProcessPropertyChange(
-    UsdPrim const &prim, SdfPath const &cachePath, TfToken const &propertyName)
+HdDirtyBits
+UsdImagingRepresentedByAncestorPrimAdapter::ProcessPropertyChange(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    TfToken const& propertyName)
 {
-  return HdChangeTracker::Clean;
+    return HdChangeTracker::Clean;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

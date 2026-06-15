@@ -9,9 +9,9 @@
 
 /// \file ar/defaultResolverContext.h
 
+#include "pxr/pxrns.h"
 #include "Ar/api.h"
 #include "Ar/defineResolverContext.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 #include <vector>
@@ -43,42 +43,45 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// // resolution.
 /// \endcode
 ///
-class ArDefaultResolverContext {
- public:
-  /// Default construct a context with no search path.
-  ArDefaultResolverContext() = default;
+class ArDefaultResolverContext
+{
+public:
+    /// Default construct a context with no search path.
+    ArDefaultResolverContext() = default;        
 
-  /// Construct a context with the given \p searchPath.
-  /// Elements in \p searchPath should be absolute paths. If they are not,
-  /// they will be anchored to the current working directory.
-  AR_API ArDefaultResolverContext(const std::vector<std::string> &searchPath);
+    /// Construct a context with the given \p searchPath.
+    /// Elements in \p searchPath should be absolute paths. If they are not,
+    /// they will be anchored to the current working directory.
+    AR_API ArDefaultResolverContext(const std::vector<std::string>& searchPath);
 
-  AR_API bool operator<(const ArDefaultResolverContext &rhs) const;
-  AR_API bool operator==(const ArDefaultResolverContext &rhs) const;
-  AR_API bool operator!=(const ArDefaultResolverContext &rhs) const;
+    AR_API bool operator<(const ArDefaultResolverContext& rhs) const;
+    AR_API bool operator==(const ArDefaultResolverContext& rhs) const;
+    AR_API bool operator!=(const ArDefaultResolverContext& rhs) const;
 
-  /// Return this context's search path.
-  const std::vector<std::string> &GetSearchPath() const
-  {
-    return _searchPath;
-  }
+    /// Return this context's search path.
+    const std::vector<std::string>& GetSearchPath() const
+    {
+        return _searchPath;
+    }
 
-  /// Return a string representation of this context for debugging.
-  AR_API std::string GetAsString() const;
+    /// Return a string representation of this context for debugging.
+    AR_API std::string GetAsString() const;
 
- private:
-  std::vector<std::string> _searchPath;
+private:
+    std::vector<std::string> _searchPath;
 };
 
-AR_API size_t hash_value(const ArDefaultResolverContext &context);
+AR_API size_t 
+hash_value(const ArDefaultResolverContext& context);
 
-inline std::string ArGetDebugString(const ArDefaultResolverContext &context)
+inline std::string 
+ArGetDebugString(const ArDefaultResolverContext& context)
 {
-  return context.GetAsString();
+    return context.GetAsString();
 }
 
 AR_DECLARE_RESOLVER_CONTEXT(ArDefaultResolverContext);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_DEFAULT_RESOLVER_CONTEXT_H
+#endif // PXR_USD_AR_DEFAULT_RESOLVER_CONTEXT_H

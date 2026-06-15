@@ -11,6 +11,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceReporterDataSourceBase::~TraceReporterDataSourceBase() {}
+TraceReporterDataSourceBase::~TraceReporterDataSourceBase()
+{}
 
 PXR_NAMESPACE_CLOSE_SCOPE

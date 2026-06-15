@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HD_ST_SAMPLER_OBJECT_REGISTRY_H
 #define PXR_IMAGING_HD_ST_SAMPLER_OBJECT_REGISTRY_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
 #include <memory>
 #include <vector>
@@ -16,8 +16,10 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdSamplerParameters;
-using HdStTextureObjectSharedPtr = std::shared_ptr<class HdStTextureObject>;
-using HdStSamplerObjectSharedPtr = std::shared_ptr<class HdStSamplerObject>;
+using HdStTextureObjectSharedPtr =
+    std::shared_ptr<class HdStTextureObject>;
+using HdStSamplerObjectSharedPtr =
+    std::shared_ptr<class HdStSamplerObject>;
 class HdStResourceRegistry;
 
 /// \class HdSt_SamplerObjectRegistry
@@ -32,39 +34,41 @@ class HdStResourceRegistry;
 /// around until garbage collection so that clients can safely drop their
 /// shared pointers from different threads.
 ///
-class HdSt_SamplerObjectRegistry final {
- public:
-  HDST_API
-  explicit HdSt_SamplerObjectRegistry(HdStResourceRegistry *registry);
+class HdSt_SamplerObjectRegistry final
+{
+public:
+    HDST_API
+    explicit HdSt_SamplerObjectRegistry(HdStResourceRegistry * registry);
 
-  HDST_API
-  ~HdSt_SamplerObjectRegistry();
+    HDST_API 
+    ~HdSt_SamplerObjectRegistry();
 
-  /// Create new sampler object matching the given texture object.
-  ///
-  /// The associated GPU resource is created immediately and
-  /// the call is not thread-safe.
-  HDST_API
-  HdStSamplerObjectSharedPtr AllocateSampler(HdStTextureObjectSharedPtr const &texture,
-                                             HdSamplerParameters const &samplerParameters);
+    /// Create new sampler object matching the given texture object.
+    ///
+    /// The associated GPU resource is created immediately and
+    /// the call is not thread-safe.
+    HDST_API 
+    HdStSamplerObjectSharedPtr AllocateSampler(
+        HdStTextureObjectSharedPtr const &texture,
+        HdSamplerParameters const &samplerParameters);
 
-  /// Delete samplers no longer used by a client.
-  HDST_API
-  void GarbageCollect();
+    /// Delete samplers no longer used by a client.
+    HDST_API 
+    void GarbageCollect();
 
-  HDST_API
-  void MarkGarbageCollectionNeeded();
+    HDST_API
+    void MarkGarbageCollectionNeeded();
 
-  /// Get resource registry
-  ///
-  HDST_API
-  HdStResourceRegistry *GetResourceRegistry() const;
+    /// Get resource registry
+    ///
+    HDST_API
+    HdStResourceRegistry * GetResourceRegistry() const;
 
- private:
-  std::vector<HdStSamplerObjectSharedPtr> _samplerObjects;
-
-  bool _garbageCollectionNeeded;
-  HdStResourceRegistry *_resourceRegistry;
+private:
+    std::vector<HdStSamplerObjectSharedPtr> _samplerObjects;
+    
+    bool _garbageCollectionNeeded;
+    HdStResourceRegistry *_resourceRegistry;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

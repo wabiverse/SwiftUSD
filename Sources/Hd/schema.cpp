@@ -9,17 +9,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle HdSchema::GetContainer() const
+HdContainerDataSourceHandle
+HdSchema::GetContainer() const
 {
-  return _container;
+    return _container;
 }
 
-bool HdSchema::IsDefined() const
+bool
+HdSchema::IsDefined() const
 {
-  if (_container) {
-    return true;
-  }
-  return false;
+    if (_container) {
+        return true;
+    }
+    return false;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

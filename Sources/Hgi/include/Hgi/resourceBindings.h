@@ -7,6 +7,7 @@
 #ifndef PXR_IMAGING_HGI_RESOURCEBINDINGS_H
 #define PXR_IMAGING_HGI_RESOURCEBINDINGS_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/api.h"
 #include "Hgi/buffer.h"
 #include "Hgi/enums.h"
@@ -14,12 +15,16 @@
 #include "Hgi/sampler.h"
 #include "Hgi/texture.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 #include <vector>
 
+
 PXR_NAMESPACE_OPEN_SCOPE
+
+
+
+
 
 /// \struct HgiBufferBindDesc
 ///
@@ -54,25 +59,30 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///    Whether the buffer binding should be non-const.</li>
 /// </ul>
 ///
-struct HgiBufferBindDesc {
-  HGI_API
-  HgiBufferBindDesc();
+struct HgiBufferBindDesc
+{
+    HGI_API
+    HgiBufferBindDesc();
 
-  HgiBufferHandleVector buffers;
-  std::vector<uint32_t> offsets;
-  std::vector<uint32_t> sizes;
-  HgiBindResourceType resourceType;
-  uint32_t bindingIndex;
-  HgiShaderStage stageUsage;
-  bool writable;
+    HgiBufferHandleVector buffers;
+    std::vector<uint32_t> offsets;
+    std::vector<uint32_t> sizes;
+    HgiBindResourceType resourceType;
+    uint32_t bindingIndex;
+    HgiShaderStage stageUsage;
+    bool writable;
 };
 using HgiBufferBindDescVector = std::vector<HgiBufferBindDesc>;
 
 HGI_API
-bool operator==(const HgiBufferBindDesc &lhs, const HgiBufferBindDesc &rhs);
+bool operator==(
+    const HgiBufferBindDesc& lhs,
+    const HgiBufferBindDesc& rhs);
 
 HGI_API
-inline bool operator!=(const HgiBufferBindDesc &lhs, const HgiBufferBindDesc &rhs);
+bool operator!=(
+    const HgiBufferBindDesc& lhs,
+    const HgiBufferBindDesc& rhs);
 
 /// \struct HgiTextureBindDesc
 ///
@@ -98,24 +108,29 @@ inline bool operator!=(const HgiBufferBindDesc &lhs, const HgiBufferBindDesc &rh
 ///    Whether the texture binding should be non-const.</li>
 /// </ul>
 ///
-struct HgiTextureBindDesc {
-  HGI_API
-  HgiTextureBindDesc();
+struct HgiTextureBindDesc
+{
+    HGI_API
+    HgiTextureBindDesc();
 
-  HgiTextureHandleVector textures;
-  HgiSamplerHandleVector samplers;
-  HgiBindResourceType resourceType;
-  uint32_t bindingIndex;
-  HgiShaderStage stageUsage;
-  bool writable;
+    HgiTextureHandleVector textures;
+    HgiSamplerHandleVector samplers;
+    HgiBindResourceType resourceType;
+    uint32_t bindingIndex;
+    HgiShaderStage stageUsage;
+    bool writable;
 };
 using HgiTextureBindDescVector = std::vector<HgiTextureBindDesc>;
 
 HGI_API
-bool operator==(const HgiTextureBindDesc &lhs, const HgiTextureBindDesc &rhs);
+bool operator==(
+    const HgiTextureBindDesc& lhs,
+    const HgiTextureBindDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiTextureBindDesc &lhs, const HgiTextureBindDesc &rhs);
+bool operator!=(
+    const HgiTextureBindDesc& lhs,
+    const HgiTextureBindDesc& rhs);
 
 /// \struct HgiResourceBindingsDesc
 ///
@@ -128,20 +143,26 @@ bool operator!=(const HgiTextureBindDesc &lhs, const HgiTextureBindDesc &rhs);
 ///   The textures to be bound.</li>
 /// </ul>
 ///
-struct HgiResourceBindingsDesc {
-  HGI_API
-  HgiResourceBindingsDesc();
+struct HgiResourceBindingsDesc
+{
+    HGI_API
+    HgiResourceBindingsDesc();
 
-  std::string debugName;
-  HgiBufferBindDescVector buffers;
-  HgiTextureBindDescVector textures;
+    std::string debugName;
+    HgiBufferBindDescVector buffers;
+    HgiTextureBindDescVector textures;
 };
 
 HGI_API
-bool operator==(const HgiResourceBindingsDesc &lhs, const HgiResourceBindingsDesc &rhs);
+bool operator==(
+    const HgiResourceBindingsDesc& lhs,
+    const HgiResourceBindingsDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiResourceBindingsDesc &lhs, const HgiResourceBindingsDesc &rhs);
+bool operator!=(
+    const HgiResourceBindingsDesc& lhs,
+    const HgiResourceBindingsDesc& rhs);
+
 
 ///
 /// \class HgiResourceBindings
@@ -149,25 +170,26 @@ bool operator!=(const HgiResourceBindingsDesc &lhs, const HgiResourceBindingsDes
 /// Represents a collection of buffers, texture and vertex attributes that will
 /// be used by an cmds object (and pipeline).
 ///
-class HgiResourceBindings {
- public:
-  HGI_API
-  virtual ~HgiResourceBindings();
+class HgiResourceBindings
+{
+public:
+    HGI_API
+    virtual ~HgiResourceBindings();
 
-  /// The descriptor describes the object.
-  HGI_API
-  HgiResourceBindingsDesc const &GetDescriptor() const;
+    /// The descriptor describes the object.
+    HGI_API
+    HgiResourceBindingsDesc const& GetDescriptor() const;
 
- protected:
-  HGI_API
-  HgiResourceBindings(HgiResourceBindingsDesc const &desc);
+protected:
+    HGI_API
+    HgiResourceBindings(HgiResourceBindingsDesc const& desc);
 
-  HgiResourceBindingsDesc _descriptor;
+    HgiResourceBindingsDesc _descriptor;
 
- private:
-  HgiResourceBindings() = delete;
-  HgiResourceBindings &operator=(const HgiResourceBindings &) = delete;
-  HgiResourceBindings(const HgiResourceBindings &) = delete;
+private:
+    HgiResourceBindings() = delete;
+    HgiResourceBindings & operator=(const HgiResourceBindings&) = delete;
+    HgiResourceBindings(const HgiResourceBindings&) = delete;
 };
 
 using HgiResourceBindingsHandle = HgiHandle<HgiResourceBindings>;
@@ -186,19 +208,25 @@ using HgiResourceBindingsHandleVector = std::vector<HgiResourceBindingsHandle>;
 ///   The binding index to which the buffer will be bound.</li>
 /// </ul>
 ///
-struct HgiVertexBufferBinding {
-  HGI_API
-  HgiVertexBufferBinding(HgiBufferHandle const &buffer, uint32_t byteOffset, uint32_t index)
-      : buffer(buffer), byteOffset(byteOffset), index(index)
-  {
-  }
+struct HgiVertexBufferBinding
+{
+    HGI_API
+    HgiVertexBufferBinding(HgiBufferHandle const &buffer,
+                           uint32_t byteOffset,
+                           uint32_t index)
+        : buffer(buffer)
+        , byteOffset(byteOffset)
+        , index(index)
+    {
+    }
 
-  HgiBufferHandle buffer;
-  uint32_t byteOffset;
-  uint32_t index;
+    HgiBufferHandle buffer;
+    uint32_t byteOffset;
+    uint32_t index;
 };
 
 using HgiVertexBufferBindingVector = std::vector<HgiVertexBufferBinding>;
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

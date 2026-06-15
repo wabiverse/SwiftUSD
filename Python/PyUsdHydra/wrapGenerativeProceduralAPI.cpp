@@ -4,124 +4,136 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Usd/schemaBase.h"
 #include "UsdHydra/generativeProceduralAPI.h"
+#include "Usd/schemaBase.h"
 
 #include "Sdf/primSpec.h"
 
+#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "Usd/pyConversions.h"
 
-#include <boost/python.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <string>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
-#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM                                                     \
+    template <class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-static UsdAttribute _CreateProceduralTypeAttr(UsdHydraGenerativeProceduralAPI &self,
-                                              object defaultVal,
-                                              bool writeSparsely)
-{
-  return self.CreateProceduralTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
-                                       writeSparsely);
+        
+static UsdAttribute
+_CreateProceduralTypeAttr(UsdHydraGenerativeProceduralAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateProceduralTypeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateProceduralSystemAttr(UsdHydraGenerativeProceduralAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateProceduralSystemAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
 }
 
-static UsdAttribute _CreateProceduralSystemAttr(UsdHydraGenerativeProceduralAPI &self,
-                                                object defaultVal,
-                                                bool writeSparsely)
+static std::string
+_Repr(const UsdHydraGenerativeProceduralAPI &self)
 {
-  return self.CreateProceduralSystemAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
-                                         writeSparsely);
+    std::string primRepr = TfPyRepr(self.GetPrim());
+    return TfStringPrintf(
+        "UsdHydra.GenerativeProceduralAPI(%s)",
+        primRepr.c_str());
 }
 
-static std::string _Repr(const UsdHydraGenerativeProceduralAPI &self)
+struct UsdHydraGenerativeProceduralAPI_CanApplyResult : 
+    public TfPyAnnotatedBoolResult<std::string>
 {
-  std::string primRepr = TfPyRepr(self.GetPrim());
-  return TfStringPrintf("UsdHydra.GenerativeProceduralAPI(%s)", primRepr.c_str());
-}
-
-struct UsdHydraGenerativeProceduralAPI_CanApplyResult
-    : public TfPyAnnotatedBoolResult<std::string> {
-  UsdHydraGenerativeProceduralAPI_CanApplyResult(bool val, std::string const &msg)
-      : TfPyAnnotatedBoolResult<std::string>(val, msg)
-  {
-  }
+    UsdHydraGenerativeProceduralAPI_CanApplyResult(bool val, std::string const &msg) :
+        TfPyAnnotatedBoolResult<std::string>(val, msg) {}
 };
 
-static UsdHydraGenerativeProceduralAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+static UsdHydraGenerativeProceduralAPI_CanApplyResult
+_WrapCanApply(const UsdPrim& prim)
 {
-  std::string whyNot;
-  bool result = UsdHydraGenerativeProceduralAPI::CanApply(prim, &whyNot);
-  return UsdHydraGenerativeProceduralAPI_CanApplyResult(result, whyNot);
+    std::string whyNot;
+    bool result = UsdHydraGenerativeProceduralAPI::CanApply(prim, &whyNot);
+    return UsdHydraGenerativeProceduralAPI_CanApplyResult(result, whyNot);
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
 void wrapUsdHydraGenerativeProceduralAPI()
 {
-  typedef UsdHydraGenerativeProceduralAPI This;
+    typedef UsdHydraGenerativeProceduralAPI This;
 
-  UsdHydraGenerativeProceduralAPI_CanApplyResult::Wrap<
-      UsdHydraGenerativeProceduralAPI_CanApplyResult>("_CanApplyResult", "whyNot");
+    UsdHydraGenerativeProceduralAPI_CanApplyResult::Wrap<UsdHydraGenerativeProceduralAPI_CanApplyResult>(
+        "_CanApplyResult", "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>> cls("GenerativeProceduralAPI");
+    class_<This, bases<UsdAPISchemaBase> >
+        cls("GenerativeProceduralAPI");
 
-  cls.def(init<UsdPrim>(arg("prim")))
-      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
-      .def(TfTypePythonClass())
+    cls
+        .def(init<UsdPrim>(arg("prim")))
+        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
+        .def(TfTypePythonClass())
 
-      .def("Get", &This::Get, (arg("stage"), arg("path")))
-      .staticmethod("Get")
+        .def("Get", &This::Get, (arg("stage"), arg("path")))
+        .staticmethod("Get")
 
-      .def("CanApply", &_WrapCanApply, (arg("prim")))
-      .staticmethod("CanApply")
+        .def("CanApply", &_WrapCanApply, (arg("prim")))
+        .staticmethod("CanApply")
 
-      .def("Apply", &This::Apply, (arg("prim")))
-      .staticmethod("Apply")
+        .def("Apply", &This::Apply, (arg("prim")))
+        .staticmethod("Apply")
 
-      .def("GetSchemaAttributeNames",
-           &This::GetSchemaAttributeNames,
-           arg("includeInherited") = true,
-           return_value_policy<TfPySequenceToList>())
-      .staticmethod("GetSchemaAttributeNames")
+        .def("GetSchemaAttributeNames",
+             &This::GetSchemaAttributeNames,
+             arg("includeInherited")=true,
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType",
-           (TfType const &(*)())TfType::Find<This>,
-           return_value_policy<return_by_value>())
-      .staticmethod("_GetStaticTfType")
+        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
+             return_value_policy<return_by_value>())
+        .staticmethod("_GetStaticTfType")
 
-      .def(!self)
+        .def(!self)
 
-      .def("GetProceduralTypeAttr", &This::GetProceduralTypeAttr)
-      .def("CreateProceduralTypeAttr",
-           &_CreateProceduralTypeAttr,
-           (arg("defaultValue") = object(), arg("writeSparsely") = false))
+        
+        .def("GetProceduralTypeAttr",
+             &This::GetProceduralTypeAttr)
+        .def("CreateProceduralTypeAttr",
+             &_CreateProceduralTypeAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetProceduralSystemAttr",
+             &This::GetProceduralSystemAttr)
+        .def("CreateProceduralSystemAttr",
+             &_CreateProceduralSystemAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
 
-      .def("GetProceduralSystemAttr", &This::GetProceduralSystemAttr)
-      .def("CreateProceduralSystemAttr",
-           &_CreateProceduralSystemAttr,
-           (arg("defaultValue") = object(), arg("writeSparsely") = false))
+        .def("__repr__", ::_Repr)
+    ;
 
-      .def("__repr__", ::_Repr);
-
-  _CustomWrapCode(cls);
+    _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by
+// Feel free to add custom code below this line, it will be preserved by 
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -132,7 +144,7 @@ void wrapUsdHydraGenerativeProceduralAPI()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-//
+// 
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
@@ -141,6 +153,7 @@ void wrapUsdHydraGenerativeProceduralAPI()
 
 namespace {
 
-WRAP_CUSTOM {}
+WRAP_CUSTOM {
+}
 
-}  // namespace
+}

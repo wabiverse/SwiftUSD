@@ -1,90 +1,11 @@
 #ifndef __PXR_BASE_JS_H__
 #define __PXR_BASE_JS_H__
 
-// js
-#if defined(_WIN32)
-#  include <Js/rapidjson/msinttypes/inttypes.h>
-#  include <Js/rapidjson/msinttypes/stdint.h>
-#endif  // defined(_WIN32)
-#include <Js/rapidjson/allocators.h>
-#include <Js/rapidjson/cursorstreamwrapper.h>
-#include <Js/rapidjson/document.h>
-#include <Js/rapidjson/encodedstream.h>
-#include <Js/rapidjson/encodings.h>
-#include <Js/rapidjson/error/en.h>
-#include <Js/rapidjson/error/error.h>
-#include <Js/rapidjson/filereadstream.h>
-#include <Js/rapidjson/filewritestream.h>
-#include <Js/rapidjson/fwd.h>
-#include <Js/rapidjson/internal/biginteger.h>
-#include <Js/rapidjson/internal/clzll.h>
-#include <Js/rapidjson/internal/diyfp.h>
-#include <Js/rapidjson/internal/dtoa.h>
-#include <Js/rapidjson/internal/ieee754.h>
-#include <Js/rapidjson/internal/itoa.h>
-#include <Js/rapidjson/internal/meta.h>
-#include <Js/rapidjson/internal/pow10.h>
-#include <Js/rapidjson/internal/regex.h>
-#include <Js/rapidjson/internal/stack.h>
-#include <Js/rapidjson/internal/strfunc.h>
-#include <Js/rapidjson/internal/strtod.h>
-#include <Js/rapidjson/internal/swap.h>
-#include <Js/rapidjson/istreamwrapper.h>
-#include <Js/rapidjson/memorybuffer.h>
-#include <Js/rapidjson/memorystream.h>
-#include <Js/rapidjson/ostreamwrapper.h>
-#include <Js/rapidjson/pointer.h>
-#include <Js/rapidjson/prettywriter.h>
-#include <Js/rapidjson/rapidjson.h>
-#include <Js/rapidjson/reader.h>
-#include <Js/rapidjson/schema.h>
-#include <Js/rapidjson/stream.h>
-#include <Js/rapidjson/stringbuffer.h>
-#include <Js/rapidjson/uri.h>
-#include <Js/rapidjson/writer.h>
-
-#include <Js/api.h>
-#include <Js/types.h>
-#include <Js/value.h>
-
-#include <Js/converter.h>
-#include <Js/json.h>
+// Js
 #include <Js/utils.h>
-
-#include <Js/allocators.h>
-#include <Js/biginteger.h>
-#include <Js/clzll.h>
-#include <Js/cursorstreamwrapper.h>
-#include <Js/diyfp.h>
-#include <Js/document.h>
-#include <Js/dtoa.h>
-#include <Js/en.h>
-#include <Js/encodedstream.h>
-#include <Js/encodings.h>
-#include <Js/error.h>
-#include <Js/filereadstream.h>
-#include <Js/filewritestream.h>
-#include <Js/fwd.h>
-#include <Js/ieee754.h>
-#include <Js/istreamwrapper.h>
-#include <Js/itoa.h>
-#include <Js/memorybuffer.h>
-#include <Js/memorystream.h>
-#include <Js/meta.h>
-#include <Js/ostreamwrapper.h>
-#include <Js/pointer.h>
-#include <Js/pow10.h>
-#include <Js/prettywriter.h>
-#include <Js/rapidjson.h>
-#include <Js/reader.h>
-#include <Js/regex.h>
-#include <Js/schema.h>
-#include <Js/stack.h>
-#include <Js/stream.h>
-#include <Js/strfunc.h>
-#include <Js/stringbuffer.h>
-#include <Js/strtod.h>
-#include <Js/swap.h>
-#include <Js/uri.h>
-#include <Js/writer.h>
+#include <Js/types.h>
+#include <Js/converter.h>
+#include <Js/value.h>
+#include <Js/api.h>
+#include <Js/json.h>
 #endif  // __PXR_BASE_JS_H__

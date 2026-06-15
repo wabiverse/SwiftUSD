@@ -23,144 +23,160 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define USDIMAGING_STAGE_SCENE_INDEX_TOKENS (includeUnloadedPrims)
+#define USDIMAGING_STAGE_SCENE_INDEX_TOKENS \
+    (includeUnloadedPrims)                  \
 
-TF_DECLARE_PUBLIC_TOKENS(UsdImagingStageSceneIndexTokens,
-                         USDIMAGING_API,
+TF_DECLARE_PUBLIC_TOKENS(UsdImagingStageSceneIndexTokens, USDIMAGING_API,
                          USDIMAGING_STAGE_SCENE_INDEX_TOKENS);
 
-using UsdImagingPrimAdapterSharedPtr = std::shared_ptr<class UsdImagingPrimAdapter>;
+using UsdImagingPrimAdapterSharedPtr =
+    std::shared_ptr<class UsdImagingPrimAdapter>;
 class UsdImaging_AdapterManager;
 
 TF_DECLARE_REF_PTRS(UsdImagingStageSceneIndex);
 
-class UsdImagingStageSceneIndex : public HdSceneIndexBase {
- public:
-  static UsdImagingStageSceneIndexRefPtr New(
-      HdContainerDataSourceHandle const &inputArgs = nullptr)
-  {
-    return TfCreateRefPtr(new UsdImagingStageSceneIndex(inputArgs));
-  }
+///
+/// A scene index consuming a UsdStage.
+///
+/// This scene index does not perform any transformations such as
+/// flattening visibility or transforms or aggregate native
+/// instances. Use UsdImagingCreateSceneIndices to get a chain
+/// of scene indices to resolve those.
+///
+class UsdImagingStageSceneIndex : public HdSceneIndexBase
+{
+public:
+    static UsdImagingStageSceneIndexRefPtr New(
+                    HdContainerDataSourceHandle const &inputArgs = nullptr) {
+        return TfCreateRefPtr(new UsdImagingStageSceneIndex(inputArgs));
+    }
 
-  USDIMAGING_API
-  ~UsdImagingStageSceneIndex();
+    USDIMAGING_API
+    ~UsdImagingStageSceneIndex();
 
-  // ------------------------------------------------------------------------
-  // Scene index API
+    // ------------------------------------------------------------------------
+    // Scene index API
 
-  USDIMAGING_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    HdSceneIndexPrim GetPrim(const SdfPath & primPath) const override;
 
-  USDIMAGING_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    SdfPathVector GetChildPrimPaths(const SdfPath & primPath) const override;
 
-  // ------------------------------------------------------------------------
-  // App-facing API
+    // ------------------------------------------------------------------------
+    // App-facing API
 
-  // Set the USD stage to pull data from. Note that this will delete all
-  // scene index prims and reset stage global data.
-  USDIMAGING_API
-  void SetStage(UsdStageRefPtr stage);
+    // Set the USD stage to pull data from. Note that this will delete all
+    // scene index prims and reset stage global data.
+    USDIMAGING_API
+    void SetStage(UsdStageRefPtr stage);
 
-  // Set the time, and call PrimsDirtied for any time-varying attributes.
-  //
-  // PrimsDirtied is only called if the time is different from the last call
-  // or forceDirtyingTimeDeps is true.
-  USDIMAGING_API
-  void SetTime(UsdTimeCode time, bool forceDirtyingTimeDeps = false);
+    // Set the time, and call PrimsDirtied for any time-varying attributes.
+    //
+    // PrimsDirtied is only called if the time is different from the last call
+    // or forceDirtyingTimeDeps is true.
+    USDIMAGING_API
+    void SetTime(UsdTimeCode time, bool forceDirtyingTimeDeps = false);
 
-  // Return the current time.
-  USDIMAGING_API
-  UsdTimeCode GetTime() const;
+    // Return the current time.
+    USDIMAGING_API
+    UsdTimeCode GetTime() const;
 
-  // Apply queued stage edits to imaging scene.
-  // If the USD stage is edited while the scene index is pulling from it,
-  // those edits get queued and deferred.  Calling ApplyPendingUpdates will
-  // turn resync requests into PrimsAdded/PrimsRemoved, and property changes
-  // into PrimsDirtied.
-  USDIMAGING_API
-  void ApplyPendingUpdates();
+    // Apply queued stage edits to imaging scene.
+    // If the USD stage is edited while the scene index is pulling from it,
+    // those edits get queued and deferred.  Calling ApplyPendingUpdates will
+    // turn resync requests into PrimsAdded/PrimsRemoved, and property changes
+    // into PrimsDirtied.
+    USDIMAGING_API
+    void ApplyPendingUpdates();
 
- private:
-  USDIMAGING_API
-  UsdImagingStageSceneIndex(HdContainerDataSourceHandle const &inputArgs);
+private:
+    USDIMAGING_API
+    UsdImagingStageSceneIndex(HdContainerDataSourceHandle const &inputArgs);
 
-  Usd_PrimFlagsPredicate _GetPrimPredicate() const;
+    Usd_PrimFlagsPredicate _GetPrimPredicate() const;
 
-  void _ApplyPendingResyncs();
-  void _ComputeDirtiedEntries(const std::map<SdfPath, TfTokenVector> &pathToUsdProperties,
-                              SdfPathVector *primPathsToResync,
-                              UsdImagingPropertyInvalidationType invalidationType,
-                              HdSceneIndexObserver::DirtiedPrimEntries *dirtiedPrims) const;
+    void _ApplyPendingResyncs();
+    void _ComputeDirtiedEntries(
+        const std::map<SdfPath, TfTokenVector> &pathToUsdProperties,
+        SdfPathVector * primPathsToResync,
+        UsdImagingPropertyInvalidationType invalidationType,
+        HdSceneIndexObserver::DirtiedPrimEntries * dirtiedPrims) const;
 
-  class _StageGlobals : public UsdImagingDataSourceStageGlobals {
-   public:
-    // Datasource-facing API
-    void FlagAsTimeVarying(const SdfPath &hydraPath,
-                           const HdDataSourceLocator &locator) const override;
+    class _StageGlobals : public UsdImagingDataSourceStageGlobals
+    {
+    public:
+        // Datasource-facing API
+        void FlagAsTimeVarying(
+            const SdfPath & hydraPath,
+            const HdDataSourceLocator & locator) const override;
 
-    void FlagAsAssetPathDependent(const SdfPath &usdPath) const override;
+        void FlagAsAssetPathDependent(
+            const SdfPath & usdPath) const override;
 
-    UsdTimeCode GetTime() const override;
+        UsdTimeCode GetTime() const override;
 
-    // Scene index-facing API
-    void SetTime(UsdTimeCode time, HdSceneIndexObserver::DirtiedPrimEntries *dirtied);
+        // Scene index-facing API
+        void SetTime(UsdTimeCode time,
+                HdSceneIndexObserver::DirtiedPrimEntries *dirtied);
 
-    void RemoveAssetPathDependentsUnder(const SdfPath &path);
+        void RemoveAssetPathDependentsUnder(const SdfPath &path);
 
-    void InvalidateAssetPathDependentsUnder(
-        const SdfPath &path,
-        std::vector<SdfPath> *primsToInvalidate,
-        std::map<SdfPath, TfTokenVector> *propertiesToInvalidate) const;
+        void InvalidateAssetPathDependentsUnder(
+            const SdfPath &path,
+            std::vector<SdfPath> *primsToInvalidate,
+            std::map<SdfPath, TfTokenVector> *propertiesToInvalidate) const;
 
-    void Clear();
+        void Clear();
 
-   private:
-    struct _PathHashCompare {
-      static bool equal(const SdfPath &a, const SdfPath &b)
-      {
-        return a == b;
-      }
-      static size_t hash(const SdfPath &p)
-      {
-        return hash_value(p);
-      }
+    private:
+        struct _PathHashCompare {
+            static bool equal(const SdfPath &a, const SdfPath &b) {
+                return a == b;
+            }
+            static size_t hash(const SdfPath &p) {
+                return hash_value(p);
+            }
+        };
+        using _VariabilityMap = tbb::concurrent_hash_map<SdfPath,
+                HdDataSourceLocatorSet, _PathHashCompare>;
+        mutable _VariabilityMap _timeVaryingLocators;
+
+        using _AssetPathDependentsSet = std::set<SdfPath>;
+        mutable _AssetPathDependentsSet _assetPathDependents;
+        mutable std::mutex _assetPathDependentsMutex;
+
+        UsdTimeCode _time;
     };
-    using _VariabilityMap =
-        tbb::concurrent_hash_map<SdfPath, HdDataSourceLocatorSet, _PathHashCompare>;
-    mutable _VariabilityMap _timeVaryingLocators;
 
-    using _AssetPathDependentsSet = std::set<SdfPath>;
-    mutable _AssetPathDependentsSet _assetPathDependents;
-    mutable std::mutex _assetPathDependentsMutex;
+    const bool _includeUnloadedPrims;
 
-    UsdTimeCode _time;
-  };
+    UsdStageRefPtr _stage;
+    _StageGlobals _stageGlobals;
 
-  const bool _includeUnloadedPrims;
+    // Population
+    void _Populate();
+    void _PopulateSubtree(UsdPrim subtreeRoot,
+        HdSceneIndexObserver::AddedPrimEntries *addedPrims);
 
-  UsdStageRefPtr _stage;
-  _StageGlobals _stageGlobals;
+    // Edit processing
+    void _OnUsdObjectsChanged(UsdNotice::ObjectsChanged const& notice,
+                              UsdStageWeakPtr const& sender);
+    TfNotice::Key _objectsChangedNoticeKey;
 
-  // Population
-  void _Populate();
-  void _PopulateSubtree(UsdPrim subtreeRoot);
+    // Keep track of populated paths for use in _ApplyPendingResyncs().
+    SdfPathSet _populatedPaths;
 
-  // Edit processing
-  void _OnUsdObjectsChanged(UsdNotice::ObjectsChanged const &notice,
-                            UsdStageWeakPtr const &sender);
-  TfNotice::Key _objectsChangedNoticeKey;
+    // Note: resync paths mean we remove the whole subtree and repopulate.
+    SdfPathVector _usdPrimsToResync;
+    // Property changes get converted into PrimsDirtied messages.
+    std::map<SdfPath, TfTokenVector> _usdPropertiesToUpdate;
+    std::map<SdfPath, TfTokenVector> _usdPropertiesToResync;
 
-  // Note: resync paths mean we remove the whole subtree and repopulate.
-  SdfPathVector _usdPrimsToResync;
-  // Property changes get converted into PrimsDirtied messages.
-  std::map<SdfPath, TfTokenVector> _usdPropertiesToUpdate;
-  std::map<SdfPath, TfTokenVector> _usdPropertiesToResync;
+    using _PrimAdapterPair = std::pair<UsdPrim, UsdImagingPrimAdapterSharedPtr>;
+    _PrimAdapterPair _FindResponsibleAncestor(const UsdPrim &prim) const;
 
-  using _PrimAdapterPair = std::pair<UsdPrim, UsdImagingPrimAdapterSharedPtr>;
-  _PrimAdapterPair _FindResponsibleAncestor(const UsdPrim &prim) const;
-
-  std::unique_ptr<UsdImaging_AdapterManager> const _adapterManager;
+    std::unique_ptr<UsdImaging_AdapterManager> const _adapterManager;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

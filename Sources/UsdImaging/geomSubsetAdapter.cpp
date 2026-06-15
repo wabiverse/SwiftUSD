@@ -40,9 +40,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  using Adapter = UsdImagingGeomSubsetAdapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    using Adapter = UsdImagingGeomSubsetAdapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
+    t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
 }
 
 namespace {
@@ -51,54 +51,63 @@ namespace {
  * @brief Simple data source for converting values of UsdGeomSubset's
  * `elementType` to the corresponding values of HdGeomSubset's `type`.
  */
-class _ElementTypeConversionDataSource : public HdTokenDataSource {
- public:
-  using Time = HdSampledDataSource::Time;
-
-  HD_DECLARE_DATASOURCE(_ElementTypeConversionDataSource);
-
-  VtValue GetValue(const Time shutterOffset) override
-  {
-    return VtValue(GetTypedValue(shutterOffset));
-  }
-
-  TfToken GetTypedValue(const Time shutterOffset) override
-  {
-    if (!_source) {
-      return TfToken();
+class _ElementTypeConversionDataSource
+  : public HdTokenDataSource
+{
+public:
+    using Time = HdSampledDataSource::Time;
+    
+    HD_DECLARE_DATASOURCE(_ElementTypeConversionDataSource);
+    
+    VtValue
+    GetValue(const Time shutterOffset) override
+    {
+        return VtValue(GetTypedValue(shutterOffset));
     }
-
-    // Translate the type token from USD to Hydra.
-    const TfToken type = _source->GetTypedValue(shutterOffset);
-    if (type == UsdGeomTokens->face) {
-      return HdGeomSubsetSchemaTokens->typeFaceSet;
+    
+    TfToken
+    GetTypedValue(const Time shutterOffset) override
+    {
+        if (!_source) {
+            return TfToken();
+        }
+        
+        // Translate the type token from USD to Hydra.
+        const TfToken type = _source->GetTypedValue(shutterOffset);
+        if (type == UsdGeomTokens->face) {
+            return HdGeomSubsetSchemaTokens->typeFaceSet;
+        }
+        if (type == UsdGeomTokens->point) {
+            return HdGeomSubsetSchemaTokens->typePointSet;
+        }
+        // TODO: USD also supports 'edge' and 'tetrahedron' types. These will
+        // be added to Hydra in an upcoming change.
+        TF_WARN("Unsupported GeomSubset type: %s", type.GetText());
+        return TfToken();
     }
-    if (type == UsdGeomTokens->point) {
-      return HdGeomSubsetSchemaTokens->typePointSet;
+    
+    bool
+    GetContributingSampleTimesForInterval(
+        const Time startTime,
+        const Time endTime,
+        std::vector<Time>* sampleTimes) override
+    {
+        if (!_source) {
+            return false;
+        }
+        return _source->GetContributingSampleTimesForInterval(
+            startTime, endTime, sampleTimes);
     }
-    // TODO: USD also supports 'edge' and 'tetrahedron' types. These will
-    // be added to Hydra in an upcoming change.
-    TF_WARN("Unsupported GeomSubset type: %s", type.GetText());
-    return TfToken();
-  }
-
-  bool GetContributingSampleTimesForInterval(const Time startTime,
-                                             const Time endTime,
-                                             std::vector<Time> *sampleTimes) override
-  {
-    if (!_source) {
-      return false;
-    }
-    return _source->GetContributingSampleTimesForInterval(startTime, endTime, sampleTimes);
-  }
-
- private:
-  _ElementTypeConversionDataSource(const HdTokenDataSourceHandle &source) : _source(source) {}
-
-  HdTokenDataSourceHandle _source;
+    
+private:
+    _ElementTypeConversionDataSource(const HdTokenDataSourceHandle& source)
+      : _source(source)
+    { }
+    
+    HdTokenDataSourceHandle _source;
 };
 
-}  // anonymous namespace
+} // anonymous namespace
 
 UsdImagingGeomSubsetAdapter::~UsdImagingGeomSubsetAdapter() = default;
 
@@ -106,80 +115,95 @@ UsdImagingGeomSubsetAdapter::~UsdImagingGeomSubsetAdapter() = default;
 /// Scene Index Support
 // ---------------------------------------------------------------------- //
 
-TfTokenVector UsdImagingGeomSubsetAdapter::GetImagingSubprims(const UsdPrim &prim)
+TfTokenVector
+UsdImagingGeomSubsetAdapter::GetImagingSubprims(const UsdPrim& prim)
 {
-  return {TfToken()};
+    return { TfToken() };
 }
 
-TfToken UsdImagingGeomSubsetAdapter::GetImagingSubprimType(const UsdPrim &prim,
-                                                           const TfToken &subprim)
+TfToken
+UsdImagingGeomSubsetAdapter::GetImagingSubprimType(
+    const UsdPrim& prim,
+    const TfToken& subprim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->geomSubset;
-  }
-  return TfToken();
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->geomSubset;
+    }
+    return TfToken();
 }
 
-HdContainerDataSourceHandle UsdImagingGeomSubsetAdapter::GetImagingSubprimData(
-    const UsdPrim &prim,
-    const TfToken &subprim,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
+HdContainerDataSourceHandle
+UsdImagingGeomSubsetAdapter::GetImagingSubprimData(
+    const UsdPrim& prim,
+    const TfToken& subprim,
+    const UsdImagingDataSourceStageGlobals& stageGlobals)
 {
-  if (subprim.IsEmpty()) {
-    UsdGeomSubset subset(prim);
-    return HdOverlayContainerDataSource::New(
-        HdRetainedContainerDataSource::New(
-            HdGeomSubsetSchema::GetSchemaToken(),
-            HdGeomSubsetSchema::Builder()
-                .SetIndices(UsdImagingDataSourceAttribute<VtIntArray>::New(subset.GetIndicesAttr(),
-                                                                           stageGlobals))
-                .SetType(_ElementTypeConversionDataSource::New(
-                    UsdImagingDataSourceAttribute<TfToken>::New(subset.GetElementTypeAttr(),
-                                                                stageGlobals)))
-                .Build()),
-        // The geomSubset must also be a prim so it can
-        // pick up existing material binding handling.
-        UsdImagingDataSourcePrim::New(prim.GetPath(), prim, stageGlobals));
-  }
-  return nullptr;
+    if (subprim.IsEmpty()) {
+        UsdGeomSubset subset(prim);
+        return HdOverlayContainerDataSource::New(
+            HdRetainedContainerDataSource::New(
+                HdGeomSubsetSchema::GetSchemaToken(),
+                HdGeomSubsetSchema::Builder()
+                    .SetIndices(UsdImagingDataSourceAttribute<VtIntArray>::New(
+                        subset.GetIndicesAttr(), stageGlobals))
+                    .SetType(_ElementTypeConversionDataSource::New(
+                        UsdImagingDataSourceAttribute<TfToken>::New(
+                            subset.GetElementTypeAttr(), stageGlobals)))
+                    .Build()),
+            // The geomSubset must also be a prim so it can
+            // pick up existing material binding handling.
+            UsdImagingDataSourcePrim::New(
+                prim.GetPath(),
+                prim,
+                stageGlobals)
+        );
+    }
+    return nullptr;
 }
 
-HdDataSourceLocatorSet UsdImagingGeomSubsetAdapter::InvalidateImagingSubprim(
-    const UsdPrim &prim,
-    const TfToken &subprim,
-    const TfTokenVector &properties,
+HdDataSourceLocatorSet
+UsdImagingGeomSubsetAdapter::InvalidateImagingSubprim(
+    const UsdPrim& prim,
+    const TfToken& subprim,
+    const TfTokenVector& properties,
     UsdImagingPropertyInvalidationType invalidationType)
 {
-  HdDataSourceLocatorSet locators;
-  for (const TfToken &name : properties) {
-    if (name == UsdGeomTokens->indices) {
-      locators.insert(HdDataSourceLocator(HdGeomSubsetSchemaTokens->indices));
+    HdDataSourceLocatorSet locators;
+    for (const TfToken& name : properties) {
+        if (name == UsdGeomTokens->indices) {
+            locators.insert(
+                HdDataSourceLocator(HdGeomSubsetSchemaTokens->indices));
+        } else if (name == UsdGeomTokens->elementType) {
+            locators.insert(
+                HdDataSourceLocator(HdGeomSubsetSchemaTokens->type));
+        }
     }
-    else if (name == UsdGeomTokens->elementType) {
-      locators.insert(HdDataSourceLocator(HdGeomSubsetSchemaTokens->type));
-    }
-  }
-  locators.insert(
-      UsdImagingDataSourcePrim::Invalidate(prim, subprim, properties, invalidationType));
-  return locators;
+    locators.insert(
+        UsdImagingDataSourcePrim::Invalidate(
+            prim, subprim, properties, invalidationType));
+    return locators;
 }
 
 // ---------------------------------------------------------------------- //
 /// Overrides for Pure Virtual Legacy Methods
 // ---------------------------------------------------------------------- //
 
-SdfPath UsdImagingGeomSubsetAdapter::Populate(const UsdPrim &prim,
-                                              UsdImagingIndexProxy *index,
-                                              const UsdImagingInstancerContext *instancerCtx)
+SdfPath
+UsdImagingGeomSubsetAdapter::Populate(
+    const UsdPrim& prim,
+    UsdImagingIndexProxy* index,
+    const UsdImagingInstancerContext* instancerCtx)
 {
-  return SdfPath::EmptyPath();
+    return SdfPath::EmptyPath();
 }
 
-HdDirtyBits UsdImagingGeomSubsetAdapter::ProcessPropertyChange(const UsdPrim &prim,
-                                                               const SdfPath &cachePath,
-                                                               const TfToken &propertyName)
+HdDirtyBits
+UsdImagingGeomSubsetAdapter::ProcessPropertyChange(
+    const UsdPrim& prim,
+    const SdfPath& cachePath,
+    const TfToken& propertyName)
 {
-  return HdChangeTracker::Clean;
+    return HdChangeTracker::Clean;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

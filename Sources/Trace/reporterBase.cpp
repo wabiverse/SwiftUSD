@@ -7,45 +7,49 @@
 
 #include "Trace/reporterBase.h"
 
+#include "pxr/pxrns.h"
 #include "Trace/collector.h"
 #include "Trace/serialization.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceReporterBase::TraceReporterBase(DataSourcePtr dataSource) : _dataSource(std::move(dataSource))
+TraceReporterBase::TraceReporterBase(DataSourcePtr dataSource)
+    : _dataSource(std::move(dataSource))
 {
 }
 
-bool TraceReporterBase::SerializeProcessedCollections(std::ostream &ostr) const
+bool TraceReporterBase::SerializeProcessedCollections(std::ostream& ostr) const
 {
-  std::vector<CollectionPtr> collections;
-  for (const CollectionPtr &col : _processedCollections) {
-    collections.push_back(col);
-  }
-  return TraceSerialization::Write(ostr, collections);
+    std::vector<CollectionPtr> collections;
+    for (const CollectionPtr& col : _processedCollections) {
+        collections.push_back(col);
+    }
+    return TraceSerialization::Write(ostr, collections);
 }
 
-TraceReporterBase::~TraceReporterBase() {}
-
-void TraceReporterBase::_Clear()
+TraceReporterBase::~TraceReporterBase()
 {
-  _processedCollections.clear();
-  if (_dataSource) {
-    _dataSource->Clear();
-  }
 }
 
-void TraceReporterBase::_Update()
+void
+TraceReporterBase::_Clear()
 {
-  if (!_dataSource)
-    return;
+    _processedCollections.clear();
+    if (_dataSource) {
+        _dataSource->Clear();
+    }
+}
 
-  std::vector<CollectionPtr> data = _dataSource->ConsumeData();
-  for (const CollectionPtr &collection : data) {
-    _ProcessCollection(collection);
-    _processedCollections.push_back(collection);
-  }
+void
+TraceReporterBase::_Update()
+{
+    if (!_dataSource) return;
+
+    std::vector<CollectionPtr> data = _dataSource->ConsumeData();
+    for (const CollectionPtr& collection : data) {
+        _ProcessCollection(collection);
+        _processedCollections.push_back(collection);
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -6,13 +6,14 @@
 //
 #include "pxr/pxrns.h"
 
-#include "HdSt/meshTopology.h"
 #include "HdSt/triangulate.h"
+#include "HdSt/meshTopology.h"
 
 #include "Hd/meshUtil.h"
 #include "Hd/perfLog.h"
 #include "Hd/tokens.h"
 #include "Hd/vtBufferSource.h"
+
 
 #include "Gf/vec3i.h"
 
@@ -24,102 +25,128 @@ HdSt_TriangleIndexBuilderComputation::HdSt_TriangleIndexBuilderComputation(
 {
 }
 
-void HdSt_TriangleIndexBuilderComputation::GetBufferSpecs(HdBufferSpecVector *specs) const
+void
+HdSt_TriangleIndexBuilderComputation::GetBufferSpecs(
+    HdBufferSpecVector *specs) const
 {
-  specs->emplace_back(HdTokens->indices, HdTupleType{HdTypeInt32Vec3, 1});
-  // triangles don't support ptex indexing (at least for now).
-  specs->emplace_back(HdTokens->primitiveParam, HdTupleType{HdTypeInt32, 1});
-  // 1 edge index per triangle
-  specs->emplace_back(HdTokens->edgeIndices, HdTupleType{HdTypeInt32, 1});
+    specs->emplace_back(HdTokens->indices, HdTupleType{HdTypeInt32Vec3, 1});
+    // triangles don't support ptex indexing (at least for now).
+    specs->emplace_back(HdTokens->primitiveParam,
+                        HdTupleType{HdTypeInt32, 1});
+    // 1 edge index per triangle
+    specs->emplace_back(HdTokens->edgeIndices,
+                        HdTupleType{HdTypeInt32, 1});
 }
 
-bool HdSt_TriangleIndexBuilderComputation::Resolve()
+bool
+HdSt_TriangleIndexBuilderComputation::Resolve()
 {
-  if (!_TryLock())
-    return false;
+    if (!_TryLock()) return false;
 
-  HD_TRACE_FUNCTION();
+    HD_TRACE_FUNCTION();
 
-  VtVec3iArray trianglesFaceVertexIndices;
-  VtIntArray primitiveParam;
-  VtIntArray trianglesEdgeIndices;
+    VtVec3iArray trianglesFaceVertexIndices;
+    VtIntArray primitiveParam;
+    VtIntArray trianglesEdgeIndices;
 
-  HdMeshUtil meshUtil(_topology, _id);
-  meshUtil.ComputeTriangleIndices(
-      &trianglesFaceVertexIndices, &primitiveParam, &trianglesEdgeIndices);
+    HdMeshUtil meshUtil(_topology, _id);
+    meshUtil.ComputeTriangleIndices(
+            &trianglesFaceVertexIndices,
+            &primitiveParam,
+            &trianglesEdgeIndices);
 
-  _SetResult(
-      std::make_shared<HdVtBufferSource>(HdTokens->indices, VtValue(trianglesFaceVertexIndices)));
+    _SetResult(std::make_shared<HdVtBufferSource>(
+                       HdTokens->indices,
+                       VtValue(trianglesFaceVertexIndices)));
 
-  _primitiveParam.reset(new HdVtBufferSource(HdTokens->primitiveParam, VtValue(primitiveParam)));
+    _primitiveParam.reset(new HdVtBufferSource(
+                              HdTokens->primitiveParam,
+                              VtValue(primitiveParam)));
 
-  _trianglesEdgeIndices.reset(
-      new HdVtBufferSource(HdTokens->edgeIndices, VtValue(trianglesEdgeIndices)));
+    _trianglesEdgeIndices.reset(new HdVtBufferSource(
+                                   HdTokens->edgeIndices,
+                                   VtValue(trianglesEdgeIndices)));
 
-  _SetResolved();
-  return true;
+    _SetResolved();
+    return true;
 }
 
-bool HdSt_TriangleIndexBuilderComputation::HasChainedBuffer() const
+bool
+HdSt_TriangleIndexBuilderComputation::HasChainedBuffer() const
 {
-  return true;
+    return true;
 }
 
-HdBufferSourceSharedPtrVector HdSt_TriangleIndexBuilderComputation::GetChainedBuffers() const
+HdBufferSourceSharedPtrVector
+HdSt_TriangleIndexBuilderComputation::GetChainedBuffers() const
 {
-  return {_primitiveParam, _trianglesEdgeIndices};
+    return { _primitiveParam, _trianglesEdgeIndices };
 }
 
-bool HdSt_TriangleIndexBuilderComputation::_CheckValid() const
+bool
+HdSt_TriangleIndexBuilderComputation::_CheckValid() const
 {
-  return true;
+    return true;
 }
 
 // ---------------------------------------------------------------------------
 
 HdSt_TriangulateFaceVaryingComputation::HdSt_TriangulateFaceVaryingComputation(
-    HdSt_MeshTopology *topology, HdBufferSourceSharedPtr const &source, SdfPath const &id)
+    HdSt_MeshTopology *topology,
+    HdBufferSourceSharedPtr const &source,
+    SdfPath const &id)
     : _id(id), _topology(topology), _source(source)
 {
 }
 
-bool HdSt_TriangulateFaceVaryingComputation::Resolve()
+bool
+HdSt_TriangulateFaceVaryingComputation::Resolve()
 {
-  if (!TF_VERIFY(_source))
-    return false;
-  if (!_source->IsResolved())
-    return false;
+    if (!TF_VERIFY(_source)) return false;
+    if (!_source->IsResolved()) return false;
 
-  if (!_TryLock())
-    return false;
+    if (!_TryLock()) return false;
 
-  HD_TRACE_FUNCTION();
-  HD_PERF_COUNTER_INCR(HdPerfTokens->triangulateFaceVarying);
+    HD_TRACE_FUNCTION();
+    HD_PERF_COUNTER_INCR(HdPerfTokens->triangulateFaceVarying);
 
-  VtValue result;
-  HdMeshUtil meshUtil(_topology, _id);
-  if (meshUtil.ComputeTriangulatedFaceVaryingPrimvar(
-          _source->GetData(), _source->GetNumElements(), _source->GetTupleType().type, &result))
-  {
-    _SetResult(std::make_shared<HdVtBufferSource>(_source->GetName(), result));
-  }
-  else {
-    _SetResult(_source);
-  }
+    VtValue result;
+    HdMeshUtil meshUtil{_topology, _id};
+    const HdMeshComputationResult status =
+        meshUtil.ComputeTriangulatedFaceVaryingPrimvar(
+            _source->GetData(),
+            _source->GetNumElements(),
+            _source->GetTupleType().type,
+            &result);
+    switch (status) {
+    case HdMeshComputationResult::Error:
+        TF_CODING_ERROR("[%s] Could not triangulate face-varying data.",
+            _source->GetName().GetText());
+        break;
+    case HdMeshComputationResult::Success:
+        _SetResult(std::make_shared<HdVtBufferSource>(_source->GetName(),
+            result));
+        break;
+    case HdMeshComputationResult::Unchanged:
+        _SetResult(_source);
+        break;
+    }
 
-  _SetResolved();
-  return true;
+    _SetResolved();
+    return true;
 }
 
-void HdSt_TriangulateFaceVaryingComputation::GetBufferSpecs(HdBufferSpecVector *specs) const
+void
+HdSt_TriangulateFaceVaryingComputation::GetBufferSpecs(HdBufferSpecVector *specs) const
 {
-  // produces same spec buffer as source
-  _source->GetBufferSpecs(specs);
+    // produces same spec buffer as source
+    _source->GetBufferSpecs(specs);
 }
 
-bool HdSt_TriangulateFaceVaryingComputation::_CheckValid() const
+bool
+HdSt_TriangulateFaceVaryingComputation::_CheckValid() const
 {
-  return (_source->IsValid());
+    return (_source->IsValid());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

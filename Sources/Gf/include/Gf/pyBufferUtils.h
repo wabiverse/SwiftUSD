@@ -7,9 +7,10 @@
 #ifndef PXR_BASE_GF_PY_BUFFER_UTILS_H
 #define PXR_BASE_GF_PY_BUFFER_UTILS_H
 
-#include "Gf/api.h"
 #include "pxr/pxrns.h"
+#include "Gf/api.h"
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 ////////////////////////////////////////////////////////////////////////
@@ -17,8 +18,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // This function template is explicitly instantiated for T =
 //    bool, [unsigned] (char, short, int, long), half, float, and double.
-template<class T> char *Gf_GetPyBufferFmtFor();
+template <class T>
+char *Gf_GetPyBufferFmtFor();
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif  // PXR_BASE_GF_PY_BUFFER_UTILS_H
+#endif // PXR_BASE_GF_PY_BUFFER_UTILS_H

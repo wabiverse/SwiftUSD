@@ -32,74 +32,99 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_MATERIAL_NODE_PARAMETER_SCHEMA_TOKENS (value)(colorSpace)
+#define HD_MATERIAL_NODE_PARAMETER_SCHEMA_TOKENS \
+    (value) \
+    (colorSpace) \
+    (typeName) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialNodeParameterSchemaTokens,
-                         HD_API,
-                         HD_MATERIAL_NODE_PARAMETER_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialNodeParameterSchemaTokens, HD_API,
+    HD_MATERIAL_NODE_PARAMETER_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialNodeParameterSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdMaterialNodeParameterSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdMaterialNodeParameterSchema
+///
+/// The MaterialNodeParameter schema defines the value data source for the
+/// parameter.
+///
+class HdMaterialNodeParameterSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdMaterialNodeParameterSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdSampledDataSourceHandle GetValue() const;
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  HdTokenDataSourceHandle GetColorSpace() const;
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(const HdSampledDataSourceHandle &value,
-                                                   const HdTokenDataSourceHandle &colorSpace);
-
-  /// \class HdMaterialNodeParameterSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetValue(const HdSampledDataSourceHandle &value);
+    HdSampledDataSourceHandle GetValue() const;
+
     HD_API
-    Builder &SetColorSpace(const HdTokenDataSourceHandle &colorSpace);
+    HdTokenDataSourceHandle GetColorSpace() const;
 
-    /// Returns a container data source containing the members set thus far.
     HD_API
-    HdContainerDataSourceHandle Build();
+    HdTokenDataSourceHandle GetTypeName() const; 
 
-   private:
-    HdSampledDataSourceHandle _value;
-    HdTokenDataSourceHandle _colorSpace;
-  };
+    /// @} 
 
-  /// @}
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdSampledDataSourceHandle &value,
+        const HdTokenDataSourceHandle &colorSpace,
+        const HdTokenDataSourceHandle &typeName
+    );
+
+    /// \class HdMaterialNodeParameterSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetValue(
+            const HdSampledDataSourceHandle &value);
+        HD_API
+        Builder &SetColorSpace(
+            const HdTokenDataSourceHandle &colorSpace);
+        HD_API
+        Builder &SetTypeName(
+            const HdTokenDataSourceHandle &typeName);
+
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdSampledDataSourceHandle _value;
+        HdTokenDataSourceHandle _colorSpace;
+        HdTokenDataSourceHandle _typeName;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

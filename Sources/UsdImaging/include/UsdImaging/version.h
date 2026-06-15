@@ -11,6 +11,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
+
 // Version 3 -- add support for nested instancers in InsertInstancer.
 // Version 4 -- Populate returns SdfPath, HdxSelectionInstanceMap.
 // Version 5 -- GetPathForInstanceIndex returns absoluteInstanceIndex.
@@ -37,9 +39,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Version 19 - UsdImagingPrimAdapter::InvalidateImagingSubprim takes
 //              invalidationType as argument.
 // Version 20 - Adding UsdImagingCreateSceneIndices.
+// Version 21 - Removes UsdImagingDirectMaterialBindingsSchema and
+//              UsdImagingCollectionMaterial BindingsSchema in favor of
+//              UsdImagingMaterialBindingsSchema and
+//              UsdImagingMaterialBindingSchema.
+// Version 22 - Deprecates UsdImagingPrimAdapter::_GetShaderSourceTypes
+//              in favor of added UsdImagingPrimAdapter::_GetShadingSystems
+// Version 23 - UsdImagingDataSourceMaterial constructor gets USDIMAGING_API
 
-#define USD_IMAGING_API_VERSION 20
+#define USD_IMAGING_API_VERSION 23
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_VERSION_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_VERSION_H

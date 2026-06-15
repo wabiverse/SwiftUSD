@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HD_ST_EXT_COMP_GPU_COMPUTATION_H
 #define PXR_IMAGING_HD_ST_EXT_COMP_GPU_COMPUTATION_H
 
+#include "pxr/pxrns.h"
 #include "HdSt/api.h"
 #include "HdSt/computation.h"
 #include "HdSt/extCompGpuComputationResource.h"
-#include "pxr/pxrns.h"
 
 #include "Hd/bufferSource.h"
 
@@ -23,13 +23,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 class HdSceneDelegate;
 class HdExtComputation;
-using HdStGLSLProgramSharedPtr = std::shared_ptr<class HdStGLSLProgram>;
+using HdStGLSLProgramSharedPtr= std::shared_ptr<class HdStGLSLProgram>;
 using HdExtComputationPrimvarDescriptorVector =
     std::vector<struct HdExtComputationPrimvarDescriptor>;
 
-using HdStExtCompGpuComputationSharedPtr = std::shared_ptr<class HdStExtCompGpuComputation>;
+using HdStExtCompGpuComputationSharedPtr = 
+    std::shared_ptr<class HdStExtCompGpuComputation>;
+
 
 /// \class HdStExtCompGpuComputation
 /// A Computation that represents a GPU implementation of a ExtComputation.
@@ -40,7 +43,7 @@ using HdStExtCompGpuComputationSharedPtr = std::shared_ptr<class HdStExtCompGpuC
 /// Execute phase of HdResourceRegistry::Commit.
 ///
 /// The computation is performed in three stages by three companion classes:
-///
+/// 
 /// 1. Input HdBuffersources are committed into the input HdBufferArrayRange
 /// during the Resolve phase of the HdResourceRegistry::Commit processing.
 ///
@@ -55,101 +58,107 @@ using HdStExtCompGpuComputationSharedPtr = std::shared_ptr<class HdStExtCompGpuC
 /// HdBufferArrayRange given in Execute. The destination HdBufferArrayRange is
 /// allocated by the owning HdRprim that registers the computation with the
 /// HdResourceRegistry by calling HdResourceRegistry::AddComputation.
-///
+/// 
 /// \see HdStExtCompGpuComputationResource
 /// \see HdRprim
 /// \see HdStComputation
 /// \see HdResourceRegistry
 /// \see HdExtComputation
 /// \see HdBufferArrayRange
-class HdStExtCompGpuComputation final : public HdStComputation {
- public:
-  /// Constructs a new GPU ExtComputation computation.
-  /// resource provides the set of input data and kernel to execute this
-  /// computation.
-  /// compPrimvars identifies the primvar data being computed
-  ///
-  /// dispatchCount specifies the number of kernel invocations to execute.
-  /// elementCount specifies the number of elements to allocate for output.
-  HdStExtCompGpuComputation(SdfPath const &id,
-                            HdStExtCompGpuComputationResourceSharedPtr const &resource,
-                            HdExtComputationPrimvarDescriptorVector const &compPrimvars,
-                            int dispatchCount,
-                            int elementCount);
+class HdStExtCompGpuComputation final : public HdStComputation
+{
+public:
+    /// Constructs a new GPU ExtComputation computation.
+    /// resource provides the set of input data and kernel to execute this
+    /// computation.
+    /// compPrimvars identifies the primvar data being computed
+    ///
+    /// dispatchCount specifies the number of kernel invocations to execute.
+    /// elementCount specifies the number of elements to allocate for output.
+    HdStExtCompGpuComputation(
+            SdfPath const &id,
+            HdStExtCompGpuComputationResourceSharedPtr const &resource,
+            HdExtComputationPrimvarDescriptorVector const &compPrimvars,
+            int dispatchCount,
+            int elementCount);
 
-  /// Creates a GPU computation implementing the given abstract computation.
-  /// When created this allocates HdStExtCompGpuComputationResource.
-  /// Nothing is assigned GPU resources unless the source is subsequently
-  /// added to the hdResourceRegistry and the registry is committed.
-  ///
-  /// This delayed allocation allow Rprims to share computed primvar data and
-  /// avoid duplicate allocations GPU resources for computation inputs and
-  /// outputs.
-  ///
-  /// \param[in] sceneDelegate the delegate to pull scene inputs from.
-  /// \param[in] sourceComp the abstract computation in the HdRenderIndex
-  /// this instance actually implements.
-  /// \param[in] compPrimvars identifies the primvar data being computed.
-  /// \see HdExtComputation
-  HDST_API
-  static HdStExtCompGpuComputationSharedPtr CreateGpuComputation(
-      HdSceneDelegate *sceneDelegate,
-      HdExtComputation const *sourceComp,
-      HdExtComputationPrimvarDescriptorVector const &compPrimvars);
+    /// Creates a GPU computation implementing the given abstract computation.
+    /// When created this allocates HdStExtCompGpuComputationResource.
+    /// Nothing is assigned GPU resources unless the source is subsequently
+    /// added to the hdResourceRegistry and the registry is committed.
+    /// 
+    /// This delayed allocation allow Rprims to share computed primvar data and
+    /// avoid duplicate allocations GPU resources for computation inputs and
+    /// outputs.
+    ///
+    /// \param[in] sceneDelegate the delegate to pull scene inputs from.
+    /// \param[in] sourceComp the abstract computation in the HdRenderIndex
+    /// this instance actually implements.
+    /// \param[in] compPrimvars identifies the primvar data being computed.
+    /// \see HdExtComputation
+    HDST_API
+    static HdStExtCompGpuComputationSharedPtr
+    CreateGpuComputation(
+        HdSceneDelegate *sceneDelegate,
+        HdExtComputation const *sourceComp,
+        HdExtComputationPrimvarDescriptorVector const &compPrimvars);
 
-  HDST_API
-  ~HdStExtCompGpuComputation() override;
+    HDST_API
+    ~HdStExtCompGpuComputation() override;
 
-  /// Adds the output buffer specs generated by this computation to the
-  /// passed in vector of buffer specs.
-  /// \param[out] specs the vector of HdBufferSpec to add this computation
-  /// output buffer layout requirements to.
-  HDST_API
-  void GetBufferSpecs(HdBufferSpecVector *specs) const override;
+    /// Adds the output buffer specs generated by this computation to the
+    /// passed in vector of buffer specs.
+    /// \param[out] specs the vector of HdBufferSpec to add this computation
+    /// output buffer layout requirements to.
+    HDST_API
+    void GetBufferSpecs(HdBufferSpecVector *specs) const override;
 
-  /// Executes the computation on the GPU.
-  /// Called by HdResourceRegistry::Commit with the HdBufferArrayRange given
-  /// to the HdResourceRegistry when the computation was added to the
-  /// registry.
-  /// \param[inout] range the buffer array range to save the computation
-  /// result to.
-  /// \param[in] resourceRegistry the registry that is current committing
-  /// resources to the GPU.
-  HDST_API
-  void Execute(HdBufferArrayRangeSharedPtr const &range,
-               HdResourceRegistry *resourceRegistry) override;
+    /// Executes the computation on the GPU.
+    /// Called by HdResourceRegistry::Commit with the HdBufferArrayRange given
+    /// to the HdResourceRegistry when the computation was added to the
+    /// registry.
+    /// \param[inout] range the buffer array range to save the computation
+    /// result to.
+    /// \param[in] resourceRegistry the registry that is current committing
+    /// resources to the GPU.
+    HDST_API
+    void Execute(HdBufferArrayRangeSharedPtr const &range,
+                 HdResourceRegistry *resourceRegistry) override;
 
-  /// Gets the number of GPU kernel invocations to execute.
-  /// It can be useful for this to be different than the number of output
-  /// elements, e.g. to run a per-curve kernel computing multiple points
-  /// per-curve.
-  HDST_API
-  int GetDispatchCount() const;
+    /// Gets the number of GPU kernel invocations to execute.
+    /// It can be useful for this to be different than the number of output
+    /// elements, e.g. to run a per-curve kernel computing multiple points
+    /// per-curve.
+    HDST_API
+    int GetDispatchCount() const;
 
-  /// Gets the number of elements in the output primvar.
-  /// The number of elements produced by the computation must be known before
-  /// doing the computation. The allocation of GPU resources needs to know
-  /// the size to allocate before the kernel can run.
-  HDST_API
-  int GetNumOutputElements() const override;
+    /// Gets the number of elements in the output primvar.
+    /// The number of elements produced by the computation must be known before
+    /// doing the computation. The allocation of GPU resources needs to know
+    /// the size to allocate before the kernel can run.
+    HDST_API
+    int GetNumOutputElements() const override;
+    
+    /// Gets the shared GPU resource holder for the computation.
+    HDST_API
+    HdStExtCompGpuComputationResourceSharedPtr const &GetResource() const;
 
-  /// Gets the shared GPU resource holder for the computation.
-  HDST_API
-  HdStExtCompGpuComputationResourceSharedPtr const &GetResource() const;
+private:
+    SdfPath                                      _id;
+    HdStExtCompGpuComputationResourceSharedPtr   _resource;
+    HdExtComputationPrimvarDescriptorVector      _compPrimvars;
+    int                                          _dispatchCount;
+    int                                          _elementCount;
 
- private:
-  SdfPath _id;
-  HdStExtCompGpuComputationResourceSharedPtr _resource;
-  HdExtComputationPrimvarDescriptorVector _compPrimvars;
-  int _dispatchCount;
-  int _elementCount;
-
-  HdStExtCompGpuComputation() = delete;
-  HdStExtCompGpuComputation(const HdStExtCompGpuComputation &) = delete;
-  HdStExtCompGpuComputation &operator=(const HdStExtCompGpuComputation &) = delete;
+    HdStExtCompGpuComputation() = delete;
+    HdStExtCompGpuComputation(
+        const HdStExtCompGpuComputation &) = delete;
+    HdStExtCompGpuComputation &operator = (
+        const HdStExtCompGpuComputation &) = delete;
 };
 
-/// Obtains a set of ExtComputation primvar source computations needed for this
+
+/// Obtains a set of ExtComputation primvar source computations needed for this 
 /// Rprim.
 ///
 /// The list of computed primvar descriptors for an interpolation mode
@@ -167,7 +176,7 @@ class HdStExtCompGpuComputation final : public HdStComputation {
 /// expected the primvar will be downloaded)  Additional sources that
 /// should be associated with BARs but do not otherwise need to be scheduled
 /// for commit will be returned in reserveOnlySources.
-///
+/// 
 /// The computation may also need to add sources that are resolved against
 /// internal BARs that are not to be associated with the primvar BAR. Those
 /// are returned in the separateComputationSources vector.
@@ -177,13 +186,14 @@ HDST_API
 void HdSt_GetExtComputationPrimvarsComputations(
     const SdfPath &id,
     HdSceneDelegate *sceneDelegate,
-    HdExtComputationPrimvarDescriptorVector const &allCompPrimvars,
+    HdExtComputationPrimvarDescriptorVector const& allCompPrimvars,
     HdDirtyBits dirtyBits,
     HdBufferSourceSharedPtrVector *sources,
     HdBufferSourceSharedPtrVector *reserveOnlySources,
     HdBufferSourceSharedPtrVector *separateComputationSources,
     HdStComputationComputeQueuePairVector *computations);
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_EXT_COMP_GPU_COMPUTATION_H
+#endif // PXR_IMAGING_HD_ST_EXT_COMP_GPU_COMPUTATION_H

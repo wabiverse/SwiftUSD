@@ -6,56 +6,59 @@
 //
 #include "Trace/serialization.h"
 
-#include "Trace/jsonSerialization.h"
 #include "pxr/pxrns.h"
+#include "Trace/jsonSerialization.h"
 
-#include "Js/json.h"
 #include "Tf/scopeDescription.h"
+#include "Js/json.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool TraceSerialization::Write(std::ostream &ostr,
-                               const std::shared_ptr<TraceCollection> &collection)
+bool 
+TraceSerialization::Write(
+    std::ostream& ostr, const std::shared_ptr<TraceCollection>& collection) 
 {
-  if (!collection) {
-    return false;
-  }
-  return Write(ostr, std::vector<std::shared_ptr<TraceCollection>>{collection});
-}
-
-bool TraceSerialization::Write(std::ostream &ostr,
-                               const std::vector<std::shared_ptr<TraceCollection>> &collections)
-{
-  JsValue colVal;
-  if (collections.empty()) {
-    return false;
-  }
-  {
-    TF_DESCRIBE_SCOPE("Writing JSON");
-    JsWriter js(ostr);
-    Trace_JSONSerialization::WriteCollectionsToJSON(js, collections);
-    return true;
-  }
-  return false;
-}
-
-std::unique_ptr<TraceCollection> TraceSerialization::Read(std::istream &istr,
-                                                          std::string *errorStr)
-{
-  JsParseError error;
-  JsValue value = JsParseStream(istr, &error);
-  if (value.IsNull()) {
-    if (errorStr) {
-      *errorStr = TfStringPrintf(
-          "Error parsing JSON\n"
-          "line: %d, col: %d ->\n\t%s.\n",
-          error.line,
-          error.column,
-          error.reason.c_str());
+    if (!collection) {
+        return false;
     }
-    return nullptr;
-  }
-  return Trace_JSONSerialization::CollectionFromJSON(value);
+    return Write(
+        ostr, std::vector<std::shared_ptr<TraceCollection>>{collection});
+}
+
+bool
+TraceSerialization::Write(
+    std::ostream& ostr,
+    const std::vector<std::shared_ptr<TraceCollection>>& collections)
+{
+    JsValue colVal;
+    if (collections.empty()) {
+        return false;
+    }
+    {
+        TF_DESCRIBE_SCOPE("Writing JSON");
+        JsWriter js(ostr);
+        Trace_JSONSerialization::WriteCollectionsToJSON(js, collections);
+        return true;
+    }
+    return false;
+}
+
+std::unique_ptr<TraceCollection>
+TraceSerialization::Read(std::istream& istr, std::string* errorStr)
+{
+    JsParseError error;
+    JsValue value = JsParseStream(istr, errorStr ? &error : nullptr);
+    if (value.IsNull()) {
+        if (errorStr) {
+            *errorStr = TfStringPrintf("Error parsing JSON\n"
+                "line: %d, col: %d ->\n\t%s.\n",
+                error.line, error.column,
+                error.reason.c_str());
+        }
+        return nullptr;
+    }
+
+    return Trace_JSONSerialization::CollectionFromJSON(std::move(value));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

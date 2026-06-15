@@ -7,10 +7,10 @@
 #ifndef PXR_IMAGING_HD_VOLUME_H
 #define PXR_IMAGING_HD_VOLUME_H
 
-#include "Hd/api.h"
-#include "Hd/rprim.h"
-#include "Hd/version.h"
 #include "pxr/pxrns.h"
+#include "Hd/api.h"
+#include "Hd/version.h"
+#include "Hd/rprim.h"
 
 #include <vector>
 
@@ -22,16 +22,17 @@ using HdVolumePtrConstVector = std::vector<class HdVolume const *>;
 ///
 /// Hd schema for a renderable volume primitive.
 ///
-class HdVolume : public HdRprim {
- public:
-  HD_API
-  HdVolume(SdfPath const &id);
+class HdVolume : public HdRprim
+{
+public:
+    HD_API
+    HdVolume(SdfPath const& id);
 
-  HD_API
-  ~HdVolume() override;
+    HD_API
+    ~HdVolume() override;
 
-  HD_API
-  TfTokenVector const &GetBuiltinPrimvarNames() const override;
+    HD_API
+    TfTokenVector const & GetBuiltinPrimvarNames() const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

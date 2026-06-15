@@ -10,20 +10,20 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/declarePtrs.h"
+#include "Trace/api.h"
+#include "Trace/event.h"
+#include "Trace/eventNode.h"
+#include "Trace/threads.h"
 #include "Tf/refBase.h"
 #include "Tf/refPtr.h"
 #include "Tf/token.h"
 #include "Tf/weakBase.h"
 #include "Tf/weakPtr.h"
-#include "Trace/api.h"
-#include "Trace/event.h"
-#include "Trace/eventNode.h"
-#include "Trace/threads.h"
+#include "Tf/declarePtrs.h"
 
 #include <functional>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,85 +34,84 @@ TF_DECLARE_WEAK_AND_REF_PTRS(TraceEventTree);
 ////////////////////////////////////////////////////////////////////////////////
 /// \class TraceEventTree
 ///
-/// This class contains a timeline call tree and a map of counters to their
+/// This class contains a timeline call tree and a map of counters to their 
 /// values over time.
 ///
 ///
 class TraceEventTree : public TfRefBase, public TfWeakBase {
- public:
-  using CounterValues = std::vector<std::pair<TraceEvent::TimeStamp, double>>;
-  using CounterValuesMap = std::unordered_map<TfToken, CounterValues, TfToken::HashFunctor>;
-  using CounterMap = std::unordered_map<TfToken, double, TfToken::HashFunctor>;
+public:
+    using CounterValues = std::vector<std::pair<TraceEvent::TimeStamp, double>>;
+    using CounterValuesMap =
+        std::unordered_map<TfToken, CounterValues, TfToken::HashFunctor>;
+    using CounterMap =
+        std::unordered_map<TfToken, double, TfToken::HashFunctor>;
 
-  using MarkerValues = std::vector<std::pair<TraceEvent::TimeStamp, TraceThreadId>>;
-  using MarkerValuesMap = std::unordered_map<TfToken, MarkerValues, TfToken::HashFunctor>;
+    using MarkerValues = std::vector<std::pair<TraceEvent::TimeStamp, TraceThreadId>>;
+    using MarkerValuesMap =
+        std::unordered_map<TfToken, MarkerValues, TfToken::HashFunctor>;
 
-  /// Creates a new TraceEventTree instance from the data in \p collection
-  /// and \p initialCounterValues.
-  TRACE_API static TraceEventTreeRefPtr New(const TraceCollection &collection,
-                                            const CounterMap *initialCounterValues = nullptr);
+    /// Creates a new TraceEventTree instance from the data in \p collection 
+    /// and \p initialCounterValues.
+    TRACE_API static TraceEventTreeRefPtr New(
+        const TraceCollection& collection,
+        const CounterMap* initialCounterValues = nullptr);
 
-  static TraceEventTreeRefPtr New()
-  {
-    return TfCreateRefPtr(new TraceEventTree(TraceEventNode::New()));
-  }
+    static TraceEventTreeRefPtr New() {
+        return TfCreateRefPtr( 
+            new TraceEventTree(TraceEventNode::New()));
+    }
 
-  static TraceEventTreeRefPtr New(TraceEventNodeRefPtr root,
-                                  CounterValuesMap counters,
-                                  MarkerValuesMap markers)
-  {
-    return TfCreateRefPtr(new TraceEventTree(root, std::move(counters), std::move(markers)));
-  }
+    static TraceEventTreeRefPtr New(
+            TraceEventNodeRefPtr root, 
+            CounterValuesMap counters,
+            MarkerValuesMap markers) {
+        return TfCreateRefPtr( 
+            new TraceEventTree(root, std::move(counters), std::move(markers)));
+    }
 
-  /// Returns the root node of the tree.
-  const TraceEventNodeRefPtr &GetRoot() const
-  {
-    return _root;
-  }
+    /// Returns the root node of the tree.
+    const TraceEventNodeRefPtr& GetRoot() const { return _root; }
 
-  /// Returns the map of counter values.
-  const CounterValuesMap &GetCounters() const
-  {
-    return _counters;
-  }
+    /// Returns the map of counter values.
+    const CounterValuesMap& GetCounters() const { return _counters; }
 
-  /// Returns the map of markers values.
-  const MarkerValuesMap &GetMarkers() const
-  {
-    return _markers;
-  }
+    /// Returns the map of markers values.
+    const MarkerValuesMap& GetMarkers() const { return _markers; }
 
-  /// Return the final value of the counters in the report.
-  CounterMap GetFinalCounterValues() const;
+    /// Return the final value of the counters in the report.
+    CounterMap GetFinalCounterValues() const;
 
-  /// Writes a JSON object representing the data in the call tree that
-  /// conforms to the Chrome Trace format.
-  using ExtraFieldFn = std::function<void(JsWriter &)>;
-  TRACE_API void WriteChromeTraceObject(JsWriter &writer,
-                                        ExtraFieldFn extraFields = ExtraFieldFn()) const;
+    /// Writes a JSON object representing the data in the call tree that 
+    /// conforms to the Chrome Trace format.
+    using ExtraFieldFn = std::function<void(JsWriter&)>;
+    TRACE_API void WriteChromeTraceObject(
+        JsWriter& writer, ExtraFieldFn extraFields = ExtraFieldFn()) const;
 
-  /// Adds the contexts of \p tree to this tree.
-  TRACE_API void Merge(const TraceEventTreeRefPtr &tree);
+    /// Adds the contexts of \p tree to this tree.
+    TRACE_API void Merge(const TraceEventTreeRefPtr& tree);
 
-  /// Adds the data from \p collection to this tree.
-  TRACE_API TraceEventTreeRefPtr Add(const TraceCollection &collection);
+    /// Adds the data from \p collection to this tree.
+    TRACE_API TraceEventTreeRefPtr Add(const TraceCollection& collection);
 
- private:
-  TraceEventTree(TraceEventNodeRefPtr root) : _root(root) {}
+private:
+    TraceEventTree(TraceEventNodeRefPtr root)
+        : _root(root) {}
 
-  TraceEventTree(TraceEventNodeRefPtr root, CounterValuesMap counters, MarkerValuesMap markers)
-      : _root(root), _counters(std::move(counters)), _markers(std::move(markers))
-  {
-  }
+    TraceEventTree(  TraceEventNodeRefPtr root, 
+                            CounterValuesMap counters,
+                            MarkerValuesMap markers)
+        : _root(root)
+        , _counters(std::move(counters))
+        , _markers(std::move(markers)) {}
 
-  // Root of the call tree.
-  TraceEventNodeRefPtr _root;
-  // Counter data of the trace.
-  CounterValuesMap _counters;
-  // Marker data of the trace.
-  MarkerValuesMap _markers;
+    // Root of the call tree.
+    TraceEventNodeRefPtr _root;
+    // Counter data of the trace.
+    CounterValuesMap _counters;
+    // Marker data of the trace.
+    MarkerValuesMap _markers;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TRACE_EVENT_TREE_H
+#endif // PXR_BASE_TRACE_EVENT_TREE_H

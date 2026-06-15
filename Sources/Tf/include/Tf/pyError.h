@@ -12,15 +12,14 @@
 
 #include "pxr/pxrns.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
 #include "Tf/api.h"
 #include "Tf/errorMark.h"
 
-#if __has_include(<boost/python/default_call_policies.hpp>)
-#include <boost/python/default_call_policies.hpp>
-#endif // __has_include(<boost/python/default_call_policies.hpp>)
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/default_call_policies.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Converts any \a TfError objects in \a m into python exceptions.  User code
@@ -46,57 +45,50 @@ void TfPyConvertPythonExceptionToTfErrors();
 /// required for wrapped functions and methods that do not appear directly in an
 /// extension module.  For instance, the map and sequence proxy objects use
 /// this, since they are created on the fly.
-template<typename Base = boost::python::default_call_policies> struct TfPyRaiseOnError : Base {
- public:
-  // This call policy provides a customized argument_package.  We need to do
-  // this to store the TfErrorMark that we use to collect TfErrors that
-  // occurred during the call and convert them to a python exception at the
-  // end.  It doesn't work to do this in the precall() and postcall()
-  // because if the call itself throws a c++ exception, the postcall() isn't
-  // executed and we can't destroy the TfErrorMark, leaving it dangling.
-  // Using the argument_package solves this since it is a local variable it
-  // will be destroyed whether or not the call throws.  This is not really a
-  // publicly documented boost.python feature, however.  :-/
-  template<class BaseArgs> struct ErrorMarkAndArgs {
-    /* implicit */ ErrorMarkAndArgs(BaseArgs base_) : base(base_) {}
-    operator const BaseArgs &() const
-    {
-      return base;
-    }
-    operator BaseArgs &()
-    {
-      return base;
-    }
-    BaseArgs base;
-    TfErrorMark errorMark;
-  };
-  typedef ErrorMarkAndArgs<typename Base::argument_package> argument_package;
+template <typename Base = pxr_boost::python::default_call_policies>
+struct TfPyRaiseOnError : Base
+{
+  public:
 
-  /// Default constructor.
-  TfPyRaiseOnError() {}
+    // This call policy provides a customized argument_package.  We need to do
+    // this to store the TfErrorMark that we use to collect TfErrors that
+    // occurred during the call and convert them to a python exception at the
+    // end.  It doesn't work to do this in the precall() and postcall()
+    // because if the call itself throws a c++ exception, the postcall() isn't
+    // executed and we can't destroy the TfErrorMark, leaving it dangling.
+    // Using the argument_package solves this since it is a local variable it
+    // will be destroyed whether or not the call throws.  This is not really a
+    // publicly documented boost.python feature, however.  :-/
+    template <class BaseArgs>
+    struct ErrorMarkAndArgs {
+        /* implicit */ErrorMarkAndArgs(BaseArgs base_) : base(base_) {}
+        operator const BaseArgs &() const { return base; }
+        operator BaseArgs &() { return base; }
+        BaseArgs base;
+        TfErrorMark errorMark;
+    };
+    typedef ErrorMarkAndArgs<typename Base::argument_package> argument_package;
 
-  // Only accept our argument_package type, since we must ensure that we're
-  // using it so we track a TfErrorMark.
-  bool precall(argument_package const &a)
-  {
-    return Base::precall(a);
-  }
+    /// Default constructor.
+    TfPyRaiseOnError() {}
 
-  // Only accept our argument_package type, since we must ensure that we're
-  // using it so we track a TfErrorMark.
-  PyObject *postcall(argument_package const &a, PyObject *result)
-  {
-    result = Base::postcall(a, result);
-    if (result && TfPyConvertTfErrorsToPythonException(a.errorMark)) {
-      Py_DECREF(result);
-      result = NULL;
+    // Only accept our argument_package type, since we must ensure that we're
+    // using it so we track a TfErrorMark.
+    bool precall(argument_package const &a) { return Base::precall(a); }
+
+    // Only accept our argument_package type, since we must ensure that we're
+    // using it so we track a TfErrorMark.
+    PyObject *postcall(argument_package const &a, PyObject *result) {
+        result = Base::postcall(a, result);
+        if (result && TfPyConvertTfErrorsToPythonException(a.errorMark)) {
+            Py_DECREF(result);
+            result = NULL;
+        }
+        return result;
     }
-    return result;
-  }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#endif  // PXR_BASE_TF_PY_ERROR_H
+#endif // PXR_BASE_TF_PY_ERROR_H

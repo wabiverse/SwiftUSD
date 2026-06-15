@@ -11,123 +11,157 @@
 #include "HgiGL/conversions.h"
 #include "HgiGL/device.h"
 #include "HgiGL/diagnostic.h"
-#include "HgiGL/graphicsPipeline.h"
 #include "HgiGL/ops.h"
+#include "HgiGL/graphicsPipeline.h"
+#include "HgiGL/scopedStateHolder.h"
 #include "HgiGL/resourceBindings.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLComputeCmds::HgiGLComputeCmds(HgiGLDevice *device, HgiComputeCmdsDesc const &)
-    : HgiComputeCmds(), _pushStack(0), _localWorkGroupSize(GfVec3i(1, 1, 1))
+HgiGLComputeCmds::HgiGLComputeCmds(
+    HgiGLDevice* device,
+    HgiComputeCmdsDesc const&)
+    : HgiComputeCmds()
+    , _pushStack(0)
+    , _localWorkGroupSize(GfVec3i(1, 1, 1))
 {
 }
 
 HgiGLComputeCmds::~HgiGLComputeCmds() = default;
 
-void HgiGLComputeCmds::BindPipeline(HgiComputePipelineHandle pipeline)
+void
+HgiGLComputeCmds::BindPipeline(HgiComputePipelineHandle pipeline)
 {
-  _ops.push_back(HgiGLOps::BindPipeline(pipeline));
+    _ops.push_back( HgiGLOps::BindPipeline(pipeline) );
 
-  // Get and store local work group size from shader function desc
-  const HgiShaderFunctionHandleVector shaderFunctionsHandles =
-      pipeline.Get()->GetDescriptor().shaderProgram.Get()->GetDescriptor().shaderFunctions;
+    // Get and store local work group size from shader function desc
+    const HgiShaderFunctionHandleVector shaderFunctionsHandles = 
+        pipeline.Get()->GetDescriptor().shaderProgram.Get()->GetDescriptor().
+            shaderFunctions;
 
-  for (const auto &handle : shaderFunctionsHandles) {
-    const HgiShaderFunctionDesc &shaderDesc = handle.Get()->GetDescriptor();
-    if (shaderDesc.shaderStage == HgiShaderStageCompute) {
-      if (shaderDesc.computeDescriptor.localSize[0] > 0 &&
-          shaderDesc.computeDescriptor.localSize[1] > 0 &&
-          shaderDesc.computeDescriptor.localSize[2] > 0)
-      {
-        _localWorkGroupSize = shaderDesc.computeDescriptor.localSize;
-      }
+    for (const auto &handle : shaderFunctionsHandles) {
+        const HgiShaderFunctionDesc &shaderDesc = handle.Get()->GetDescriptor();
+        if (shaderDesc.shaderStage == HgiShaderStageCompute) {
+            if (shaderDesc.computeDescriptor.localSize[0] > 0 && 
+                shaderDesc.computeDescriptor.localSize[1] > 0 &&
+                shaderDesc.computeDescriptor.localSize[2] > 0) {
+                _localWorkGroupSize = shaderDesc.computeDescriptor.localSize;
+            }
+        }
     }
-  }
 }
 
-void HgiGLComputeCmds::BindResources(HgiResourceBindingsHandle res)
+void
+HgiGLComputeCmds::BindResources(HgiResourceBindingsHandle res)
 {
-  _ops.push_back(HgiGLOps::BindResources(res));
+    _ops.push_back( HgiGLOps::BindResources(res) );
 }
 
-void HgiGLComputeCmds::SetConstantValues(HgiComputePipelineHandle pipeline,
-                                         uint32_t bindIndex,
-                                         uint32_t byteSize,
-                                         const void *data)
+void
+HgiGLComputeCmds::SetConstantValues(
+    HgiComputePipelineHandle pipeline,
+    uint32_t bindIndex,
+    uint32_t byteSize,
+    const void* data)
 {
-  _ops.push_back(HgiGLOps::SetConstantValues(pipeline, bindIndex, byteSize, data));
+    _ops.push_back(
+        HgiGLOps::SetConstantValues(
+            pipeline,
+            bindIndex,
+            byteSize,
+            data)
+        );
 }
 
-void HgiGLComputeCmds::Dispatch(int dimX, int dimY)
+void
+HgiGLComputeCmds::Dispatch(int dimX, int dimY)
 {
-  const int threadsPerGroupX = _localWorkGroupSize[0];
-  const int threadsPerGroupY = _localWorkGroupSize[1];
-  int numWorkGroupsX = (dimX + (threadsPerGroupX - 1)) / threadsPerGroupX;
-  int numWorkGroupsY = (dimY + (threadsPerGroupY - 1)) / threadsPerGroupY;
+    const int threadsPerGroupX = _localWorkGroupSize[0];
+    const int threadsPerGroupY = _localWorkGroupSize[1];
+    int numWorkGroupsX = (dimX + (threadsPerGroupX - 1)) / threadsPerGroupX;
+    int numWorkGroupsY = (dimY + (threadsPerGroupY - 1)) / threadsPerGroupY;
 
-  // Determine device's num compute work group limits
-  int maxNumWorkGroups[2] = {0, 0};
-  glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &maxNumWorkGroups[0]);
-  glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &maxNumWorkGroups[1]);
+    // Determine device's num compute work group limits
+    int maxNumWorkGroups[2] = { 0, 0 };
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &maxNumWorkGroups[0]);
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &maxNumWorkGroups[1]);
 
-  if (numWorkGroupsX > maxNumWorkGroups[0]) {
-    TF_WARN(
-        "Max number of work group available from device is %i, larger "
-        "than %i",
-        maxNumWorkGroups[0],
-        numWorkGroupsX);
-    numWorkGroupsX = maxNumWorkGroups[0];
-  }
-  if (numWorkGroupsY > maxNumWorkGroups[1]) {
-    TF_WARN(
-        "Max number of work group available from device is %i, larger "
-        "than %i",
-        maxNumWorkGroups[1],
-        numWorkGroupsY);
-    numWorkGroupsY = maxNumWorkGroups[1];
-  }
+    if (numWorkGroupsX > maxNumWorkGroups[0]) {
+        TF_WARN("Max number of work group available from device is %i, larger "
+                "than %i", maxNumWorkGroups[0], numWorkGroupsX);
+        numWorkGroupsX = maxNumWorkGroups[0];
+    }
+    if (numWorkGroupsY > maxNumWorkGroups[1]) {
+        TF_WARN("Max number of work group available from device is %i, larger "
+                "than %i", maxNumWorkGroups[1], numWorkGroupsY);
+        numWorkGroupsY = maxNumWorkGroups[1];
+    }
 
-  _ops.push_back(HgiGLOps::Dispatch(numWorkGroupsX, numWorkGroupsY));
+    _ops.push_back(
+        HgiGLOps::Dispatch(numWorkGroupsX, numWorkGroupsY)
+        );
 }
 
-void HgiGLComputeCmds::PushDebugGroup(const char *label)
+void
+HgiGLComputeCmds::PushDebugGroup(
+        const char* label,
+        const GfVec4f& color)
 {
-  if (HgiGLDebugEnabled()) {
-    _pushStack++;
-    _ops.push_back(HgiGLOps::PushDebugGroup(label));
-  }
+    if (HgiGLDebugEnabled()) {
+        _pushStack++;
+        _ops.push_back( HgiGLOps::PushDebugGroup(label) );
+    }
 }
 
-void HgiGLComputeCmds::PopDebugGroup()
+void
+HgiGLComputeCmds::PopDebugGroup()
 {
-  if (HgiGLDebugEnabled()) {
-    _pushStack--;
-    _ops.push_back(HgiGLOps::PopDebugGroup());
-  }
+    if (HgiGLDebugEnabled()) {
+        _pushStack--;
+        _ops.push_back( HgiGLOps::PopDebugGroup() );
+    }
 }
 
-void HgiGLComputeCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
+void
+HgiGLComputeCmds::InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color)
 {
-  _ops.push_back(HgiGLOps::InsertMemoryBarrier(barrier));
+    if (HgiGLDebugEnabled()) {
+        _ops.push_back( HgiGLOps::InsertDebugMarker(label) );
+    }
 }
 
-HgiComputeDispatch HgiGLComputeCmds::GetDispatchMethod() const
+void
+HgiGLComputeCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 {
-  return HgiComputeDispatchSerial;
+    _ops.push_back( HgiGLOps::InsertMemoryBarrier(barrier) );
 }
 
-bool HgiGLComputeCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
+HgiComputeDispatch
+HgiGLComputeCmds::GetDispatchMethod() const
 {
-  if (_ops.empty()) {
-    return false;
-  }
+    return HgiComputeDispatchSerial;
+}
 
-  TF_VERIFY(_pushStack == 0, "Push and PopDebugGroup do not even out");
+bool
+HgiGLComputeCmds::_Submit(Hgi* hgi, HgiSubmitWaitType wait)
+{
+    if (_ops.empty()) {
+        return false;
+    }
 
-  HgiGL *hgiGL = static_cast<HgiGL *>(hgi);
-  HgiGLDevice *device = hgiGL->GetPrimaryDevice();
-  device->SubmitOps(_ops);
-  return true;
+    TF_VERIFY(_pushStack==0, "Push and PopDebugGroup do not even out");
+
+    // Capture OpenGL state before executing the 'ops' and restore it when this
+    // function ends. We do this defensively because parts of our pipeline may
+    // not set and restore all relevant gl state.
+    HgiGL_ScopedStateHolder openglStateGuard;
+
+    HgiGL* hgiGL = static_cast<HgiGL*>(hgi);
+    HgiGLDevice* device = hgiGL->GetPrimaryDevice();
+    device->SubmitOps(_ops);
+    return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

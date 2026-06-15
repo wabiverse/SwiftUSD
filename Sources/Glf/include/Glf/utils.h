@@ -9,10 +9,10 @@
 
 /// \file glf/utils.h
 
-#include "Garch/glApi.h"
-#include "Glf/api.h"
-#include "Hio/types.h"
 #include "pxr/pxrns.h"
+#include "Glf/api.h"
+#include "Garch/glApi.h"
+#include "Hio/types.h"
 
 #include <string>
 
@@ -22,16 +22,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Returns the number of elements (channels) in a given GL enum format.
 ///
-/// Supported formats are : GL_DEPTH_COMPONENT, GL_COLOR_INDEX, GL_ALPHA,
+/// Supported formats are : GL_DEPTH_COMPONENT, GL_COLOR_INDEX, GL_ALPHA, 
 /// GL_RED, GL_LUMINANCE, GL_RG, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGBA
-GLF_API
+GLF_API 
 int GlfGetNumElements(GLenum format);
 
 /// Byte size of a GL type.
 ///
 /// Returns the size in bytes of a given GL type.
 ///
-/// Supported types are : GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT,
+/// Supported types are : GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, 
 /// GL_SHORT, GL_FLOAT, GL_DOUBLE
 GLF_API
 int GlfGetElementSize(GLenum type);
@@ -40,20 +40,21 @@ int GlfGetElementSize(GLenum type);
 ///
 /// Returns the HioFormat for the given GL format and GL type
 ///
-/// Supported formats are : GL_DEPTH_COMPONENT, GL_COLOR_INDEX, GL_ALPHA,
+/// Supported formats are : GL_DEPTH_COMPONENT, GL_COLOR_INDEX, GL_ALPHA, 
 /// GL_RED, GL_LUMINANCE, GL_RG, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGBA
 ///
-/// Supported types are : GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT,
+/// Supported types are : GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, 
 /// GL_SHORT, GL_FLOAT, GL_DOUBLE
 GLF_API
 HioFormat GlfGetHioFormat(GLenum glFormat, GLenum glType, bool isSRGB);
+
 
 /// Checks the valitidy of a GL framebuffer
 ///
 /// True if the currently bound GL framebuffer is valid and can be bound
 /// or returns the cause of the problem
 GLF_API
-bool GlfCheckGLFrameBufferStatus(GLuint target, std::string *reason);
+bool GlfCheckGLFrameBufferStatus(GLuint target, std::string * reason);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

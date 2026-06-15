@@ -19,61 +19,71 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCollectionsSchemaTokens, HD_COLLECTIONS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCollectionsSchemaTokens,
+    HD_COLLECTIONS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-TfTokenVector HdCollectionsSchema::GetCollectionNames() const
+TfTokenVector
+HdCollectionsSchema::GetCollectionNames() const
 {
-  if (_container) {
-    return _container->GetNames();
-  }
-  else {
-    return {};
-  }
+    if (_container) {
+        return _container->GetNames();
+    } else {
+        return {};
+    }
 }
 
-HdCollectionSchema HdCollectionsSchema::GetCollection(const TfToken &name) const
+HdCollectionSchema
+HdCollectionsSchema::GetCollection(const TfToken &name) const
 {
-  return HdCollectionSchema(_GetTypedDataSource<HdContainerDataSource>(name));
-}
-
-/*static*/
-HdContainerDataSourceHandle HdCollectionsSchema::BuildRetained(
-    const size_t count, const TfToken *const names, const HdDataSourceBaseHandle *const values)
-{
-  return HdRetainedContainerDataSource::New(count, names, values);
+    return HdCollectionSchema(
+        _GetTypedDataSource<HdContainerDataSource>(name));
 }
 
 /*static*/
-HdCollectionsSchema HdCollectionsSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle
+HdCollectionsSchema::BuildRetained(
+    const size_t count,
+    const TfToken * const names,
+    const HdDataSourceBaseHandle * const values)
 {
-  return HdCollectionsSchema(fromParentContainer ?
-                                 HdContainerDataSource::Cast(fromParentContainer->Get(
-                                     HdCollectionsSchemaTokens->collections)) :
-                                 nullptr);
+    return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-const TfToken &HdCollectionsSchema::GetSchemaToken()
+HdCollectionsSchema
+HdCollectionsSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdCollectionsSchemaTokens->collections;
+    return HdCollectionsSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdCollectionsSchemaTokens->collections))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdCollectionsSchema::GetDefaultLocator()
+const TfToken &
+HdCollectionsSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdCollectionsSchemaTokens->collections;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdCollectionsSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

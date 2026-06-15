@@ -7,11 +7,12 @@
 #ifndef PXR_IMAGING_HD_ST_PACKAGE_H
 #define PXR_IMAGING_HD_ST_PACKAGE_H
 
+#include "pxr/pxrns.h"
 #include "HdSt/api.h"
 #include "Tf/token.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 HDST_API
 TfToken HdStPackageComputeShader();
@@ -47,7 +48,7 @@ HDST_API
 TfToken HdStPackageSimpleLightingShader();
 
 HDST_API
-TfToken HdStPackageWidgetShader();
+TfToken HdStPackageOverlayShader();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

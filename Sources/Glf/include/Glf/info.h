@@ -9,18 +9,19 @@
 
 /// \file glf/info.h
 
-#include "Glf/api.h"
 #include "pxr/pxrns.h"
+#include "Glf/api.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// Tests for GL extension support.
 ///
 /// Returns \c true if each extension name listed in \a extensions
 /// is supported by the current GL context.
 GLF_API
-bool GlfHasExtensions(std::string const &extensions);
+bool GlfHasExtensions(std::string const & extensions);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

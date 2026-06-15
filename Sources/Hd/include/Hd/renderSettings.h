@@ -9,15 +9,23 @@
 
 #include "Hd/api.h"
 #include "Hd/bprim.h"
-#include "pxr/pxrns.h"
+#include "Hd/types.h"
+
+#include "Sdf/path.h"
 
 #include "Gf/range2f.h"
-#include "Gf/vec2d.h"
 #include "Gf/vec2f.h"
 #include "Gf/vec2i.h"
+#include "Tf/token.h"
 #include "Vt/array.h"
 #include "Vt/dictionary.h"
+#include "Vt/value.h"
 
+#include "pxr/pxrns.h"
+
+#include <cstddef>
+#include <ostream>
+#include <string>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -47,146 +55,190 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \sa HdRenderSettingsSchema for querying locators and building container
 ///     data sources when using scene indices.
 ///
-class HdRenderSettings : public HdBprim {
- public:
-  // Change tracking for HdRenderSettings.
-  enum DirtyBits : HdDirtyBits {
-    Clean = 0,
-    DirtyActive = 1 << 1,
-    DirtyNamespacedSettings = 1 << 2,
-    DirtyRenderProducts = 1 << 3,
-    DirtyIncludedPurposes = 1 << 4,
-    DirtyMaterialBindingPurposes = 1 << 5,
-    DirtyRenderingColorSpace = 1 << 6,
-    DirtyShutterInterval = 1 << 7,
-    DirtyFrameNumber = 1 << 8,
-    AllDirty = DirtyActive | DirtyNamespacedSettings | DirtyRenderProducts |
-               DirtyIncludedPurposes | DirtyMaterialBindingPurposes | DirtyRenderingColorSpace |
-               DirtyShutterInterval | DirtyFrameNumber
-  };
-
-  // Parameters that may be queried and invalidated.
-  //
-  // \note This mirrors UsdRender except that the render products and vars
-  //       are "flattened out" similar to UsdRenderSpec.
-  struct RenderProduct {
-    struct RenderVar {
-      SdfPath varPath;
-      TfToken dataType;
-      std::string sourceName;
-      TfToken sourceType;
-      VtDictionary namespacedSettings;
+class HdRenderSettings : public HdBprim
+{
+public:
+    // Change tracking for HdRenderSettings.
+    enum DirtyBits : HdDirtyBits {
+        Clean                        = 0,
+        DirtyActive                  = 1 << 1,
+        DirtyNamespacedSettings      = 1 << 2,
+        DirtyRenderProducts          = 1 << 3,
+        DirtyIncludedPurposes        = 1 << 4,
+        DirtyMaterialBindingPurposes = 1 << 5,
+        DirtyRenderingColorSpace     = 1 << 6,
+        DirtyUnionedSamplingInterval = 1 << 7,
+        DirtyFrameNumber             = 1 << 8,
+        DirtyCamera                  = 1 << 9,
+        DirtyDisableDepthOfField     = 1 << 10,
+        DirtyDisableMotionBlur       = 1 << 11,
+        AllDirty                     =    DirtyActive
+                                        | DirtyNamespacedSettings
+                                        | DirtyRenderProducts
+                                        | DirtyIncludedPurposes
+                                        | DirtyMaterialBindingPurposes
+                                        | DirtyRenderingColorSpace
+                                        | DirtyUnionedSamplingInterval
+                                        | DirtyFrameNumber
+                                        | DirtyCamera
+                                        | DirtyDisableDepthOfField
+                                        | DirtyDisableMotionBlur
     };
 
-    /// Identification & output information
+    HD_API
+    static std::string
+    StringifyDirtyBits(HdDirtyBits dirtyBits);
+
+    // Parameters that may be queried and invalidated.
     //
-    // Path to product prim in scene description.
-    SdfPath productPath;
-    // The type of product, ex: "raster".
-    TfToken type;
-    // The name of the product, which uniquely identifies it.
-    TfToken name;
-    // The pixel resolution of the product.
-    GfVec2i resolution = GfVec2i(0);
-    // The render vars that the product is comprised of.
-    std::vector<RenderVar> renderVars;
+    // \note This mirrors UsdRender except that the render products and vars
+    //       are "flattened out" similar to UsdRenderSpec.
+    struct RenderProduct {
+        struct RenderVar {
+            SdfPath varPath;
+            TfToken dataType;
+            std::string sourceName;
+            TfToken sourceType;
+            VtDictionary namespacedSettings;
+        };
 
-    /// Camera and framing
-    //
-    // Path to the camera to use for this product.
-    SdfPath cameraPath;
-    // The pixel aspect ratio as adjusted by aspectRatioConformPolicy.
-    float pixelAspectRatio;
-    // The policy that was applied to conform aspect ratio
-    // mismatches between the aperture and image.
-    TfToken aspectRatioConformPolicy;
-    // The camera aperture size as adjusted by aspectRatioConformPolicy.
-    GfVec2f apertureSize = GfVec2f(0);
-    // The data window, in NDC terms relative to the aperture.
-    // (0,0) corresponds to bottom-left and (1,1) corresponds to
-    // top-right.  Note that the data window can partially cover
-    // or extend beyond the unit range, for representing overscan
-    // or cropped renders.
-    GfRange2f dataWindowNDC;
+        /// Identification & output information
+        //
+        // Path to product prim in scene description.
+        SdfPath productPath;
+        // The type of product, ex: "raster".
+        TfToken type;
+        // The name of the product, which uniquely identifies it.
+        TfToken name;
+        // The pixel resolution of the product.
+        GfVec2i resolution = GfVec2i(0);
+        // The render vars that the product is comprised of.
+        std::vector<RenderVar> renderVars;
 
-    /// Settings overrides
-    //
-    bool disableMotionBlur;
-    bool disableDepthOfField;
-    VtDictionary namespacedSettings;
-  };
+        /// Camera and framing
+        //
+        // Path to the camera to use for this product.
+        SdfPath cameraPath;
+        // The pixel aspect ratio as adjusted by aspectRatioConformPolicy.
+        float pixelAspectRatio;
+        // The policy that was applied to conform aspect ratio
+        // mismatches between the aperture and image.
+        TfToken aspectRatioConformPolicy;
+        // The camera aperture size as adjusted by aspectRatioConformPolicy.
+        GfVec2f apertureSize = GfVec2f(0);
+        // The data window, in NDC terms relative to the aperture.
+        // (0,0) corresponds to bottom-left and (1,1) corresponds to
+        // top-right.  Note that the data window can partially cover
+        // or extend beyond the unit range, for representing overscan
+        // or cropped renders.
+        GfRange2f dataWindowNDC;
 
-  using RenderProducts = std::vector<RenderProduct>;
-  using NamespacedSettings = VtDictionary;
+        /// Settings overrides
+        //
+        bool disableMotionBlur;
+        bool disableDepthOfField;
+        VtDictionary namespacedSettings;
+    };
 
-  HD_API
-  ~HdRenderSettings() override;
+    using RenderProducts = std::vector<RenderProduct>;
+    using NamespacedSettings = VtDictionary;
 
-  // ------------------------------------------------------------------------
-  // Public API
-  // ------------------------------------------------------------------------
-  HD_API
-  bool IsActive() const;
+    HD_API
+    ~HdRenderSettings() override;
 
-  HD_API
-  bool IsValid() const;
+    // ------------------------------------------------------------------------
+    // Public API
+    // ------------------------------------------------------------------------
+    HD_API
+    bool IsActive() const;
 
-  HD_API
-  const NamespacedSettings &GetNamespacedSettings() const;
+    HD_API
+    bool IsValid() const;
 
-  HD_API
-  const RenderProducts &GetRenderProducts() const;
+    HD_API
+    const NamespacedSettings& GetNamespacedSettings() const;
 
-  HD_API
-  const VtArray<TfToken> &GetIncludedPurposes() const;
+    HD_API
+    const RenderProducts& GetRenderProducts() const;
 
-  HD_API
-  const VtArray<TfToken> &GetMaterialBindingPurposes() const;
+    HD_API
+    const VtArray<TfToken>& GetIncludedPurposes() const;
 
-  HD_API
-  const TfToken &GetRenderingColorSpace() const;
+    HD_API
+    const VtArray<TfToken>& GetMaterialBindingPurposes() const;
 
-  // XXX Using VtValue in a std::optional (C++17) sense.
-  HD_API
-  const VtValue &GetShutterInterval() const;
+    HD_API
+    const TfToken& GetRenderingColorSpace() const;
 
-  // ------------------------------------------------------------------------
-  // Satisfying HdBprim
-  // ------------------------------------------------------------------------
-  HD_API
-  void Sync(HdSceneDelegate *sceneDelegate,
-            HdRenderParam *renderParam,
-            HdDirtyBits *dirtyBits) override final;
+    // XXX: Using VtValue in a std::optional (C++17) sense.
+    HD_API
+    const VtValue& GetUnionedSamplingInterval() const;
 
-  HD_API
-  HdDirtyBits GetInitialDirtyBitsMask() const override;
+    // XXX: Using VtValue in a std::optional (C++17) sense.
+    HD_API
+    const VtValue& GetCamera() const;
 
- protected:
-  HD_API
-  HdRenderSettings(SdfPath const &id);
+    HD_API
+    bool GetDisableDepthOfField() const;
 
-  // ------------------------------------------------------------------------
-  // Virtual API
-  // ------------------------------------------------------------------------
-  // This is called during Sync after dirty processing and before clearing the
-  // dirty bits.
-  virtual void _Sync(HdSceneDelegate *sceneDelegate,
-                     HdRenderParam *renderParam,
-                     const HdDirtyBits *dirtyBits);
+    HD_API
+    bool GetDisableMotionBlur() const;
 
- private:
-  // Class cannot be default constructed or copied.
-  HdRenderSettings() = delete;
-  HdRenderSettings(const HdRenderSettings &) = delete;
-  HdRenderSettings &operator=(const HdRenderSettings &) = delete;
+    /// Returns whether the render products were invalidated since the last
+    /// time this function was called.
+    ///
+    /// \note Due to the lack of fine-grained invalidation in the dirty bits
+    ///       above, *any* change to to the targeted product(s) and their
+    ///       associated render var(s) would mark the products are dirty.
+    ///
+    HD_API
+    bool GetAndResetHasDirtyProducts();
 
-  bool _active;
-  NamespacedSettings _namespacedSettings;
-  RenderProducts _products;
-  VtArray<TfToken> _includedPurposes;
-  VtArray<TfToken> _materialBindingPurposes;
-  TfToken _renderingColorSpace;
-  VtValue _vShutterInterval;
+    // ------------------------------------------------------------------------
+    // Satisfying HdBprim
+    // ------------------------------------------------------------------------
+    HD_API
+    void
+    Sync(HdSceneDelegate *sceneDelegate,
+         HdRenderParam *renderParam,
+         HdDirtyBits *dirtyBits) final;
+
+    HD_API
+    HdDirtyBits
+    GetInitialDirtyBitsMask() const override;
+
+protected:
+    HD_API
+    HdRenderSettings(SdfPath const& id);
+
+    // ------------------------------------------------------------------------
+    // Virtual API
+    // ------------------------------------------------------------------------
+    // This is called during Sync after dirty processing and before clearing the
+    // dirty bits.
+    virtual void
+    _Sync(HdSceneDelegate *sceneDelegate,
+          HdRenderParam *renderParam,
+          const HdDirtyBits *dirtyBits);
+
+
+private:
+    // Class cannot be default constructed or copied.
+    HdRenderSettings()                                     = delete;
+    HdRenderSettings(const HdRenderSettings &)             = delete;
+    HdRenderSettings &operator =(const HdRenderSettings &) = delete;
+
+    bool _active;
+    bool _dirtyProducts;
+    NamespacedSettings _namespacedSettings;
+    RenderProducts _products;
+    VtArray<TfToken> _includedPurposes;
+    VtArray<TfToken> _materialBindingPurposes;
+    TfToken _renderingColorSpace;
+    VtValue _vUnionedSamplingInterval;
+    VtValue _vCamera;
+    bool _disableDepthOfField;
+    bool _disableMotionBlur;
 };
 
 // VtValue requirements
@@ -194,24 +246,27 @@ HD_API
 size_t hash_value(HdRenderSettings::RenderProduct const &rp);
 
 HD_API
-std::ostream &operator<<(std::ostream &out, const HdRenderSettings::RenderProduct &);
+std::ostream& operator<<(
+    std::ostream& out, const HdRenderSettings::RenderProduct&);
 
 HD_API
-bool operator==(const HdRenderSettings::RenderProduct &lhs,
-                const HdRenderSettings::RenderProduct &rhs);
+bool operator==(const HdRenderSettings::RenderProduct& lhs,
+                const HdRenderSettings::RenderProduct& rhs);
 HD_API
-bool operator!=(const HdRenderSettings::RenderProduct &lhs,
-                const HdRenderSettings::RenderProduct &rhs);
+bool operator!=(const HdRenderSettings::RenderProduct& lhs,
+                const HdRenderSettings::RenderProduct& rhs);
 HD_API
-std::ostream &operator<<(std::ostream &out, const HdRenderSettings::RenderProduct::RenderVar &);
+std::ostream& operator<<(
+    std::ostream& out, const HdRenderSettings::RenderProduct::RenderVar&);
 
 HD_API
-bool operator==(const HdRenderSettings::RenderProduct::RenderVar &lhs,
-                const HdRenderSettings::RenderProduct::RenderVar &rhs);
+bool operator==(const HdRenderSettings::RenderProduct::RenderVar& lhs,
+                const HdRenderSettings::RenderProduct::RenderVar& rhs);
 HD_API
-bool operator!=(const HdRenderSettings::RenderProduct::RenderVar &lhs,
-                const HdRenderSettings::RenderProduct::RenderVar &rhs);
+bool operator!=(const HdRenderSettings::RenderProduct::RenderVar& lhs,
+                const HdRenderSettings::RenderProduct::RenderVar& rhs);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_RENDER_SETTINGS_H
+#endif // PXR_IMAGING_HD_RENDER_SETTINGS_H

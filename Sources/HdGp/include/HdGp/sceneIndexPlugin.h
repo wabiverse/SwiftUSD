@@ -7,35 +7,50 @@
 #ifndef PXR_IMAGING_HD_GP_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HD_GP_SCENE_INDEX_PLUGIN_H
 
+#include "pxr/pxrns.h"
+#include "HdGp/api.h"
+#include "Tf/envSetting.h"
 #include "Hd/sceneIndexPlugin.h"
 #include "Hd/sceneIndexPluginRegistry.h"
-#include "Tf/envSetting.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+HDGP_API
 extern TfEnvSetting<bool> HDGP_INCLUDE_DEFAULT_RESOLVER;
 
 /// \class HdGpSceneIndexPlugin
-///
-/// HdGpSceneIndexPlugin provides HdSceneIndexPluginRegistry access to
+/// 
+/// HdGpSceneIndexPlugin provides HdSceneIndexPluginRegistry access to 
 /// instantiate HdGpGenerativeProceduralResolvingSceneIndex either directly
 /// or automatically via RegisterSceneIndexForRenderer.
 ///
-class HdGpSceneIndexPlugin : public HdSceneIndexPlugin {
- public:
-  static const HdSceneIndexPluginRegistry::InsertionPhase GetInsertionPhase()
-  {
-    // XXX Until we have a better way to declare ordering/dependencies b/w
-    //     scene index plugins, allow plugins to run before and after this
-    //     plugin (i.e., don't use 0).
-    return 2;
-  }
+class HdGpSceneIndexPlugin : public HdSceneIndexPlugin
+{
+public:
+    static const HdSceneIndexPluginRegistry::InsertionPhase
+    GetInsertionPhase()
+    {
+        // XXX Until we have a better way to declare ordering/dependencies b/w
+        //     scene index plugins, allow plugins to run before and after this
+        //     plugin (i.e., don't use 0).
+        return 2;
+    }
 
-  HdGpSceneIndexPlugin();
+    HDGP_API
+    HdGpSceneIndexPlugin();
 
- protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
-                                           const HdContainerDataSourceHandle &inputArgs) override;
+protected:
+    HdSceneIndexBaseRefPtr _AppendSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputScene,
+        const HdContainerDataSourceHandle &inputArgs) override;
+    
+    bool _IsEnabled(
+        const HdContainerDataSourceHandle &inputArgs) const override;
+
+private:
+    HdSceneIndexBaseRefPtr _AppendProceduralResolvingSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputScene,
+        const HdContainerDataSourceHandle &inputArgs);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HDSI_PINNED_CURVE_EXPANDING_SCENE_INDEX_H
 #define PXR_IMAGING_HDSI_PINNED_CURVE_EXPANDING_SCENE_INDEX_H
 
-#include "Hd/filteringSceneIndex.h"
 #include "HdSi/api.h"
+#include "Hd/filteringSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,35 +35,42 @@ TF_DECLARE_WEAK_AND_REF_PTRS(HdsiPinnedCurveExpandingSceneIndex);
 /// \note This scene index does not convert indexed curves (i.e., with authored
 ///       curve indices) into non-indexed curves.
 ///
-class HdsiPinnedCurveExpandingSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  HDSI_API
-  static HdsiPinnedCurveExpandingSceneIndexRefPtr New(
-      const HdSceneIndexBaseRefPtr &inputSceneIndex);
+class HdsiPinnedCurveExpandingSceneIndex :
+    public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    HDSI_API
+    static HdsiPinnedCurveExpandingSceneIndexRefPtr
+    New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  HDSI_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override final;
+    HDSI_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override final;
 
-  HDSI_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override final;
+    HDSI_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override final;
 
- protected:
-  HDSI_API
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override final;
+protected:
+    HDSI_API
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override final;
 
-  HDSI_API
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override final;
+    HDSI_API
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override final;
 
-  HDSI_API
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override final;
+    HDSI_API
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override final;
 
-  HDSI_API
-  HdsiPinnedCurveExpandingSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+    HDSI_API
+    HdsiPinnedCurveExpandingSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputSceneIndex);
+
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDSI_PINNED_CURVE_EXPANDING_SCENE_INDEX_H
+#endif //PXR_IMAGING_HDSI_PINNED_CURVE_EXPANDING_SCENE_INDEX_H

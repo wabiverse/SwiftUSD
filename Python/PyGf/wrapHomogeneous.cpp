@@ -4,23 +4,25 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Gf/homogeneous.h"
 #include "pxr/pxrns.h"
-
-using namespace boost::python;
+#include "Gf/homogeneous.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 void wrapHomogeneous()
-{
-  def("GetHomogenized", (GfVec4d(*)(const GfVec4d &))GfGetHomogenized);
-  def("GetHomogenized", (GfVec4f(*)(const GfVec4f &))GfGetHomogenized);
+{    
+    def("GetHomogenized", (GfVec4d (*)(const GfVec4d &)) GfGetHomogenized);
+    def("GetHomogenized", (GfVec4f (*)(const GfVec4f &)) GfGetHomogenized);
 
-  def("HomogeneousCross", (GfVec4d(*)(const GfVec4d &, const GfVec4d &))GfHomogeneousCross);
-  def("HomogeneousCross", (GfVec4f(*)(const GfVec4f &, const GfVec4f &))GfHomogeneousCross);
+    def("HomogeneousCross", (GfVec4d (*)(const GfVec4d &, const GfVec4d &)) GfHomogeneousCross);
+    def("HomogeneousCross", (GfVec4f (*)(const GfVec4f &, const GfVec4f &)) GfHomogeneousCross);
 
-  def("Project", (GfVec3d(*)(const GfVec4d &))GfProject);
-  def("Project", (GfVec3f(*)(const GfVec4f &))GfProject);
+    def("Project", (GfVec3d (*)(const GfVec4d &)) GfProject);
+    def("Project", (GfVec3f (*)(const GfVec4f &)) GfProject);
 }

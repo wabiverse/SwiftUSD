@@ -18,12 +18,16 @@ class PcpPrimIndex;
 
 /// Accumulate and print statistics about the contents of \p cache to
 /// \p out.
-void Pcp_PrintCacheStatistics(const PcpCache *cache, std::ostream &out);
+void
+Pcp_PrintCacheStatistics(
+    const PcpCache* cache, std::ostream& out);
 
 /// Accumulate and print statistics about the contents of \p primIndex to
 /// \p out.
-void Pcp_PrintPrimIndexStatistics(const PcpPrimIndex &primIndex, std::ostream &out);
+void
+Pcp_PrintPrimIndexStatistics(
+    const PcpPrimIndex& primIndex, std::ostream& out);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_PCP_STATISTICS_H
+#endif // PXR_USD_PCP_STATISTICS_H

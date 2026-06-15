@@ -13,105 +13,120 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<GlfTexture>();
+    TfType::Define<GlfTexture>();
 }
 
 TF_DEFINE_PUBLIC_TOKENS(GlfTextureTokens, GLF_TEXTURE_TOKENS);
 
-static size_t _TextureMemoryAllocated = 0;
-static size_t _TextureContentsID = 0;
+static size_t _TextureMemoryAllocated=0;
+static size_t _TextureContentsID=0;
 
-static size_t _GetNewContentsID()
+static size_t
+_GetNewContentsID()
 {
-  return ++_TextureContentsID;
+    return ++_TextureContentsID;
 }
 
-GlfTexture::GlfTexture()
-    : _memoryUsed(0),
-      _memoryRequested(INT_MAX),
-      _contentsID(_GetNewContentsID()),
-      _originLocation(HioImage::OriginUpperLeft)
+GlfTexture::GlfTexture( )
+    : _memoryUsed(0)
+    , _memoryRequested(INT_MAX)
+    , _contentsID(_GetNewContentsID())
+    , _originLocation(HioImage::OriginUpperLeft)
 {
 }
 
 GlfTexture::GlfTexture(HioImage::ImageOriginLocation originLocation)
-    : _memoryUsed(0),
-      _memoryRequested(INT_MAX),
-      _contentsID(_GetNewContentsID()),
-      _originLocation(originLocation)
+    : _memoryUsed(0)
+    , _memoryRequested(INT_MAX)
+    , _contentsID(_GetNewContentsID())
+    , _originLocation(originLocation)
 {
 }
 
-GlfTexture::~GlfTexture()
+GlfTexture::~GlfTexture( )
 {
-  _TextureMemoryAllocated -= _memoryUsed;
+    _TextureMemoryAllocated-=_memoryUsed;
 }
 
-size_t GlfTexture::GetMemoryRequested() const
+size_t
+GlfTexture::GetMemoryRequested( ) const
 {
-  return _memoryRequested;
+    return _memoryRequested;
 }
 
-void GlfTexture::SetMemoryRequested(size_t targetMemory)
+void
+GlfTexture::SetMemoryRequested(size_t targetMemory)
 {
-  if (_memoryRequested != targetMemory) {
-    _memoryRequested = targetMemory;
-    _OnMemoryRequestedDirty();
-  }
+    if (_memoryRequested != targetMemory) {
+        _memoryRequested = targetMemory;
+        _OnMemoryRequestedDirty();
+    }
 }
 
-void GlfTexture::_OnMemoryRequestedDirty()
+void
+GlfTexture::_OnMemoryRequestedDirty()
 {
-  // do nothing in base class
+    // do nothing in base class
 }
 
-size_t GlfTexture::GetMemoryUsed() const
+size_t 
+GlfTexture::GetMemoryUsed( ) const 
 {
-  return _memoryUsed;
+    return _memoryUsed;
 }
 
-void GlfTexture::_SetMemoryUsed(size_t s)
+void
+GlfTexture::_SetMemoryUsed( size_t s ) 
 {
-  _TextureMemoryAllocated += s - _memoryUsed;
+    _TextureMemoryAllocated += s - _memoryUsed;
 
-  _memoryUsed = s;
+    _memoryUsed = s;        
 }
 
-bool GlfTexture::IsMinFilterSupported(GLenum filter)
+bool
+GlfTexture::IsMinFilterSupported(GLenum filter)
 {
-  return true;
+    return true;
 }
 
-bool GlfTexture::IsMagFilterSupported(GLenum filter)
+bool
+GlfTexture::IsMagFilterSupported(GLenum filter)
 {
-  return true;
+    return true;
 }
 
-size_t GlfTexture::GetTextureMemoryAllocated()
+size_t 
+GlfTexture::GetTextureMemoryAllocated()
 {
-  return _TextureMemoryAllocated;
+    return _TextureMemoryAllocated;
 }
 
-size_t GlfTexture::GetContentsID() const
+size_t
+GlfTexture::GetContentsID() const
 {
-  return _contentsID;
+    return _contentsID;
 }
 
-void GlfTexture::_UpdateContentsID()
+void
+GlfTexture::_UpdateContentsID()
 {
-  _contentsID = _GetNewContentsID();
+    _contentsID = _GetNewContentsID();
 }
 
-HioImage::ImageOriginLocation GlfTexture::GetOriginLocation() const
+HioImage::ImageOriginLocation 
+GlfTexture::GetOriginLocation() const
 {
-  return _originLocation;
+    return _originLocation;
 }
 
-bool GlfTexture::IsOriginLowerLeft() const
+bool
+GlfTexture::IsOriginLowerLeft() const
 {
-  return _originLocation == HioImage::OriginLowerLeft;
+    return _originLocation == HioImage::OriginLowerLeft;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

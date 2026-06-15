@@ -1,19 +1,19 @@
 {
-  "Plugins": [
-    {
-      "Type": "library",
-      "Name": "SdrOsl",
-      "Root": ".",
-      "LibraryPath": "",
-      "ResourcePath": ".",
-      "Info": {
-        "Types": {
-          "SdrOslParserPlugin": {
-            "bases": ["NdrParserPlugin"],
-            "displayName": "OSL Node Parser"
-          }
+    "Plugins": [
+        {
+            "Type": "library",
+            "Name": "sdrOsl",
+            "Root": ".",
+            "LibraryPath": "",
+            "ResourcePath": ".",
+            "Info": {
+                "Types": {
+                    "SdrOslParserPlugin" : {
+                        "bases": ["SdrParserPlugin"],
+                        "displayName": "OSL Node Parser"
+                    }
+                }
+            }
         }
-      }
-    }
-  ]
+    ]
 }

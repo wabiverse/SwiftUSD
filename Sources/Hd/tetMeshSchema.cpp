@@ -19,106 +19,127 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdTetMeshSchemaTokens, HD_TET_MESH_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdTetMeshSchemaTokens,
+    HD_TET_MESH_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdTetMeshTopologySchema HdTetMeshSchema::GetTopology() const
+HdTetMeshTopologySchema
+HdTetMeshSchema::GetTopology() const
 {
-  return HdTetMeshTopologySchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdTetMeshSchemaTokens->topology));
+    return HdTetMeshTopologySchema(_GetTypedDataSource<HdContainerDataSource>(
+        HdTetMeshSchemaTokens->topology));
 }
 
-HdBoolDataSourceHandle HdTetMeshSchema::GetDoubleSided() const
+HdBoolDataSourceHandle
+HdTetMeshSchema::GetDoubleSided() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdTetMeshSchemaTokens->doubleSided);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdTetMeshSchemaTokens->doubleSided);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdTetMeshSchema::BuildRetained(
-    const HdContainerDataSourceHandle &topology, const HdBoolDataSourceHandle &doubleSided)
+HdContainerDataSourceHandle
+HdTetMeshSchema::BuildRetained(
+        const HdContainerDataSourceHandle &topology,
+        const HdBoolDataSourceHandle &doubleSided
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (topology) {
-    _names[_count] = HdTetMeshSchemaTokens->topology;
-    _values[_count++] = topology;
-  }
+    if (topology) {
+        _names[_count] = HdTetMeshSchemaTokens->topology;
+        _values[_count++] = topology;
+    }
 
-  if (doubleSided) {
-    _names[_count] = HdTetMeshSchemaTokens->doubleSided;
-    _values[_count++] = doubleSided;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (doubleSided) {
+        _names[_count] = HdTetMeshSchemaTokens->doubleSided;
+        _values[_count++] = doubleSided;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdTetMeshSchema::Builder &HdTetMeshSchema::Builder::SetTopology(
+HdTetMeshSchema::Builder &
+HdTetMeshSchema::Builder::SetTopology(
     const HdContainerDataSourceHandle &topology)
 {
-  _topology = topology;
-  return *this;
+    _topology = topology;
+    return *this;
 }
 
-HdTetMeshSchema::Builder &HdTetMeshSchema::Builder::SetDoubleSided(
+HdTetMeshSchema::Builder &
+HdTetMeshSchema::Builder::SetDoubleSided(
     const HdBoolDataSourceHandle &doubleSided)
 {
-  _doubleSided = doubleSided;
-  return *this;
+    _doubleSided = doubleSided;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdTetMeshSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdTetMeshSchema::Builder::Build()
 {
-  return HdTetMeshSchema::BuildRetained(_topology, _doubleSided);
-}
-
-/*static*/
-HdTetMeshSchema HdTetMeshSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdTetMeshSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(HdTetMeshSchemaTokens->tetMesh)) :
-          nullptr);
+    return HdTetMeshSchema::BuildRetained(
+        _topology,
+        _doubleSided
+    );
 }
 
 /*static*/
-const TfToken &HdTetMeshSchema::GetSchemaToken()
+HdTetMeshSchema
+HdTetMeshSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdTetMeshSchemaTokens->tetMesh;
+    return HdTetMeshSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdTetMeshSchemaTokens->tetMesh))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdTetMeshSchema::GetDefaultLocator()
+const TfToken &
+HdTetMeshSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdTetMeshSchemaTokens->tetMesh;
+}
+
+/*static*/
+const HdDataSourceLocator &
+HdTetMeshSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdTetMeshSchema::GetTopologyLocator()
+const HdDataSourceLocator &
+HdTetMeshSchema::GetTopologyLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdTetMeshSchemaTokens->topology);
-  return locator;
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdTetMeshSchemaTokens->topology);
+    return locator;
 }
 
 /* static */
-const HdDataSourceLocator &HdTetMeshSchema::GetDoubleSidedLocator()
+const HdDataSourceLocator &
+HdTetMeshSchema::GetDoubleSidedLocator()
 {
-  static const HdDataSourceLocator locator = GetDefaultLocator().Append(
-      HdTetMeshSchemaTokens->doubleSided);
-  return locator;
-}
+    static const HdDataSourceLocator locator =
+        GetDefaultLocator().Append(
+            HdTetMeshSchemaTokens->doubleSided);
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

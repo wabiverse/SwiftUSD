@@ -6,35 +6,44 @@
 //
 #include "pxr/pxrns.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/scope.hpp>
-#include <boost/python/tuple.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/scope.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/tuple.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "Tf/pyResultConversions.h"
 
-#include "UsdShade/shader.h"
 #include "UsdShade/shaderDefUtils.h"
-
-using namespace boost::python;
+#include "UsdShade/shader.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 void wrapUsdShadeShaderDefUtils()
 {
-  scope thisScope = class_<UsdShadeShaderDefUtils>("ShaderDefUtils", no_init)
-                        .def("GetNodeDiscoveryResults",
-                             &UsdShadeShaderDefUtils::GetNodeDiscoveryResults,
-                             (arg("shaderDef"), arg("sourceUri")),
-                             return_value_policy<TfPySequenceToList>())
-                        .staticmethod("GetNodeDiscoveryResults")
-                        .def("GetShaderProperties",
-                             &UsdShadeShaderDefUtils::GetShaderProperties,
-                             arg("shaderDef"),
-                             return_value_policy<TfPySequenceToList>())
-                        .staticmethod("GetShaderProperties")
-                        .def("GetPrimvarNamesMetadataString",
-                             &UsdShadeShaderDefUtils::GetPrimvarNamesMetadataString,
-                             (arg("metadata"), arg("shaderDef")))
-                        .staticmethod("GetPrimvarNamesMetadataString");
+    scope thisScope = class_<UsdShadeShaderDefUtils>("ShaderDefUtils", no_init)
+        .def("GetDiscoveryResults", 
+             &UsdShadeShaderDefUtils::GetDiscoveryResults,
+             (arg("shaderDef"), arg("sourceUri")),
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetDiscoveryResults")
+        .def("GetProperties", 
+             &UsdShadeShaderDefUtils::GetProperties,
+             arg("shaderDef"),
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetProperties")
+        .def("GetPrimvarNamesMetadataString", 
+             &UsdShadeShaderDefUtils::GetPrimvarNamesMetadataString,
+             (arg("metadata"), arg("shaderDef")))
+        .staticmethod("GetPrimvarNamesMetadataString")
+    ;
 }

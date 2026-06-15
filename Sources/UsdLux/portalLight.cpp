@@ -8,132 +8,147 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/assetPath.h"
 #include "Sdf/types.h"
+#include "Sdf/assetPath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdLuxPortalLight, TfType::Bases<UsdLuxBoundableLightBase>>();
-
-  // Register the usd prim typename as an alias under UsdSchemaBase. This
-  // enables one to call
-  // TfType::Find<UsdSchemaBase>().FindDerivedByName("PortalLight")
-  // to find TfType<UsdLuxPortalLight>, which is how IsA queries are
-  // answered.
-  TfType::AddAlias<UsdSchemaBase, UsdLuxPortalLight>("PortalLight");
+    TfType::Define<UsdLuxPortalLight,
+        TfType::Bases< UsdLuxBoundableLightBase > >();
+    
+    // Register the usd prim typename as an alias under UsdSchemaBase. This
+    // enables one to call
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("PortalLight")
+    // to find TfType<UsdLuxPortalLight>, which is how IsA queries are
+    // answered.
+    TfType::AddAlias<UsdSchemaBase, UsdLuxPortalLight>("PortalLight");
 }
 
 /* virtual */
-UsdLuxPortalLight::~UsdLuxPortalLight() {}
-
-/* static */
-UsdLuxPortalLight UsdLuxPortalLight::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdLuxPortalLight::~UsdLuxPortalLight()
 {
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdLuxPortalLight();
-  }
-  return UsdLuxPortalLight(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdLuxPortalLight UsdLuxPortalLight::Define(const UsdStagePtr &stage, const SdfPath &path)
+UsdLuxPortalLight
+UsdLuxPortalLight::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  static TfToken usdPrimTypeName("PortalLight");
-  if (!stage) {
-    TF_CODING_ERROR("Invalid stage");
-    return UsdLuxPortalLight();
-  }
-  return UsdLuxPortalLight(stage->DefinePrim(path, usdPrimTypeName));
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdLuxPortalLight();
+    }
+    return UsdLuxPortalLight(stage->GetPrimAtPath(path));
+}
+
+/* static */
+UsdLuxPortalLight
+UsdLuxPortalLight::Define(
+    const UsdStagePtr &stage, const SdfPath &path)
+{
+    static TfToken usdPrimTypeName("PortalLight");
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdLuxPortalLight();
+    }
+    return UsdLuxPortalLight(
+        stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdLuxPortalLight::_GetSchemaKind() const
 {
-  return UsdLuxPortalLight::schemaKind;
+    return UsdLuxPortalLight::schemaKind;
 }
 
 /* static */
-const TfType &UsdLuxPortalLight::_GetStaticTfType()
+const TfType &
+UsdLuxPortalLight::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdLuxPortalLight>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdLuxPortalLight>();
+    return tfType;
 }
 
 /* static */
-bool UsdLuxPortalLight::_IsTypedSchema()
+bool 
+UsdLuxPortalLight::_IsTypedSchema()
 {
-  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-  return isTyped;
+    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+    return isTyped;
 }
 
 /* virtual */
-const TfType &UsdLuxPortalLight::_GetTfType() const
+const TfType &
+UsdLuxPortalLight::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
-UsdAttribute UsdLuxPortalLight::GetWidthAttr() const
+UsdAttribute
+UsdLuxPortalLight::GetWidthAttr() const
 {
-  return GetPrim().GetAttribute(UsdLuxTokens->inputsWidth);
+    return GetPrim().GetAttribute(UsdLuxTokens->inputsWidth);
 }
 
-UsdAttribute UsdLuxPortalLight::CreateWidthAttr(VtValue const &defaultValue,
-                                                bool writeSparsely) const
+UsdAttribute
+UsdLuxPortalLight::CreateWidthAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsWidth,
-                                    SdfValueTypeNames->Float,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsWidth,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
-UsdAttribute UsdLuxPortalLight::GetHeightAttr() const
+UsdAttribute
+UsdLuxPortalLight::GetHeightAttr() const
 {
-  return GetPrim().GetAttribute(UsdLuxTokens->inputsHeight);
+    return GetPrim().GetAttribute(UsdLuxTokens->inputsHeight);
 }
 
-UsdAttribute UsdLuxPortalLight::CreateHeightAttr(VtValue const &defaultValue,
-                                                 bool writeSparsely) const
+UsdAttribute
+UsdLuxPortalLight::CreateHeightAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsHeight,
-                                    SdfValueTypeNames->Float,
-                                    /* custom = */ false,
-                                    SdfVariabilityVarying,
-                                    defaultValue,
-                                    writeSparsely);
+    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsHeight,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
-                                                       const TfTokenVector &right)
+static inline TfTokenVector
+_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 {
-  TfTokenVector result;
-  result.reserve(left.size() + right.size());
-  result.insert(result.end(), left.begin(), left.end());
-  result.insert(result.end(), right.begin(), right.end());
-  return result;
+    TfTokenVector result;
+    result.reserve(left.size() + right.size());
+    result.insert(result.end(), left.begin(), left.end());
+    result.insert(result.end(), right.begin(), right.end());
+    return result;
 }
-}  // namespace
+}
 
 /*static*/
-const TfTokenVector &UsdLuxPortalLight::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector&
+UsdLuxPortalLight::GetSchemaAttributeNames(bool includeInherited)
 {
-  static TfTokenVector localNames = {
-      UsdLuxTokens->inputsWidth,
-      UsdLuxTokens->inputsHeight,
-  };
-  static TfTokenVector allNames = _ConcatenateAttributeNames(
-      UsdLuxBoundableLightBase::GetSchemaAttributeNames(true), localNames);
+    static TfTokenVector localNames = {
+        UsdLuxTokens->inputsWidth,
+        UsdLuxTokens->inputsHeight,
+    };
+    static TfTokenVector allNames =
+        _ConcatenateAttributeNames(
+            UsdLuxBoundableLightBase::GetSchemaAttributeNames(true),
+            localNames);
 
-  if (includeInherited)
-    return allNames;
-  else
-    return localNames;
+    if (includeInherited)
+        return allNames;
+    else
+        return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -151,55 +166,58 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static bool _ComputeLocalExtent(const float width, const float height, VtVec3fArray *extent)
+static bool
+_ComputeLocalExtent(const float width, const float height, VtVec3fArray *extent)
 {
-  if (!extent) {
-    return false;
-  }
+    if (!extent) {
+        return false;
+    }
 
-  extent->resize(2);
-  (*extent)[1] = GfVec3f(width * 0.5f, height * 0.5f, 0.0f);
-  (*extent)[0] = -(*extent)[1];
-  return true;
+    extent->resize(2);
+    (*extent)[1] = GfVec3f(width * 0.5f, height * 0.5f, 0.0f);
+    (*extent)[0] = -(*extent)[1];
+    return true;
 }
 
-static bool _ComputeExtent(const UsdGeomBoundable &boundable,
-                           const UsdTimeCode &time,
-                           const GfMatrix4d *transform,
-                           VtVec3fArray *extent)
+static bool 
+_ComputeExtent(
+    const UsdGeomBoundable &boundable,
+    const UsdTimeCode &time,
+    const GfMatrix4d *transform,
+    VtVec3fArray *extent)
 {
-  const UsdLuxPortalLight light(boundable);
-  if (!TF_VERIFY(light)) {
-    return false;
-  }
+    const UsdLuxPortalLight light(boundable);
+    if (!TF_VERIFY(light)) {
+        return false;
+    }
 
-  float width;
-  if (!light.GetWidthAttr().Get(&width, time)) {
-    return false;
-  }
+    float width;
+    if (!light.GetWidthAttr().Get(&width, time)) {
+        return false;
+    }
 
-  float height;
-  if (!light.GetHeightAttr().Get(&height, time)) {
-    return false;
-  }
+    float height;
+    if (!light.GetHeightAttr().Get(&height, time)) {
+        return false;
+    }
 
-  if (!_ComputeLocalExtent(width, height, extent)) {
-    return false;
-  }
+    if (!_ComputeLocalExtent(width, height, extent)) {
+        return false;
+    }
 
-  if (transform) {
-    GfBBox3d bbox(GfRange3d((*extent)[0], (*extent)[1]), *transform);
-    GfRange3d range = bbox.ComputeAlignedRange();
-    (*extent)[0] = GfVec3f(range.GetMin());
-    (*extent)[1] = GfVec3f(range.GetMax());
-  }
+    if (transform) {
+        GfBBox3d bbox(GfRange3d((*extent)[0], (*extent)[1]), *transform);
+        GfRange3d range = bbox.ComputeAlignedRange();
+        (*extent)[0] = GfVec3f(range.GetMin());
+        (*extent)[1] = GfVec3f(range.GetMax());
+    }
 
-  return true;
+    return true;
 }
 
 TF_REGISTRY_FUNCTION(UsdGeomBoundable)
 {
-  UsdGeomRegisterComputeExtentFunction<UsdLuxPortalLight>(_ComputeExtent);
+    UsdGeomRegisterComputeExtentFunction<UsdLuxPortalLight>(_ComputeExtent);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

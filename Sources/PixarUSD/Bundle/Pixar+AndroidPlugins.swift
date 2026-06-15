@@ -90,7 +90,7 @@
       }
 
       /* Register each directory with the plug registry. */
-      var plugPaths = Pixar.PlugRegistry.PlugPathsVector()
+      var plugPaths = Overlay.MakeStringVector()
       for (dirname, _) in Pixar.Bundler.embeddedPluginInfo
       {
         let dirPath = pxrRoot + "/" + dirname

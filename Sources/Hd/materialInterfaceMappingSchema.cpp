@@ -19,7 +19,7 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 #include "Hd/materialNetworkSchema.h"
@@ -29,78 +29,93 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdMaterialInterfaceMappingSchemaTokens,
-                        HD_MATERIAL_INTERFACE_MAPPING_SCHEMA_TOKENS);
+    HD_MATERIAL_INTERFACE_MAPPING_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 
-HdDataSourceLocator HdMaterialInterfaceMappingSchema::BuildNetworkRelativeLocator()
+HdDataSourceLocator
+HdMaterialInterfaceMappingSchema::BuildNetworkRelativeLocator()
 {
-  HdTokenDataSourceHandle nodePathDs = GetNodePath();
-  if (!nodePathDs) {
-    return HdDataSourceLocator();
-  }
+    HdTokenDataSourceHandle nodePathDs = GetNodePath();
+    if (!nodePathDs) {
+        return HdDataSourceLocator();
+    }
 
-  HdTokenDataSourceHandle inputNameDs = GetInputName();
-  if (!inputNameDs) {
-    return HdDataSourceLocator();
-  }
+    HdTokenDataSourceHandle inputNameDs = GetInputName();
+    if (!inputNameDs) {
+        return HdDataSourceLocator();
+    }
 
-  return HdDataSourceLocator(HdMaterialNetworkSchemaTokens->nodes,
-                             nodePathDs->GetTypedValue(0.0f),
-                             HdMaterialNodeSchemaTokens->parameters,
-                             inputNameDs->GetTypedValue(0.0f));
+    return HdDataSourceLocator(
+        HdMaterialNetworkSchemaTokens->nodes,
+        nodePathDs->GetTypedValue(0.0f),
+        HdMaterialNodeSchemaTokens->parameters,
+        inputNameDs->GetTypedValue(0.0f));
 }
 
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdTokenDataSourceHandle HdMaterialInterfaceMappingSchema::GetNodePath() const
+HdTokenDataSourceHandle
+HdMaterialInterfaceMappingSchema::GetNodePath() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdMaterialInterfaceMappingSchemaTokens->nodePath);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdMaterialInterfaceMappingSchemaTokens->nodePath);
 }
 
-HdTokenDataSourceHandle HdMaterialInterfaceMappingSchema::GetInputName() const
+HdTokenDataSourceHandle
+HdMaterialInterfaceMappingSchema::GetInputName() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdMaterialInterfaceMappingSchemaTokens->inputName);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdMaterialInterfaceMappingSchemaTokens->inputName);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdMaterialInterfaceMappingSchema::BuildRetained(
-    const HdTokenDataSourceHandle &nodePath, const HdTokenDataSourceHandle &inputName)
+HdContainerDataSourceHandle
+HdMaterialInterfaceMappingSchema::BuildRetained(
+        const HdTokenDataSourceHandle &nodePath,
+        const HdTokenDataSourceHandle &inputName
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (nodePath) {
-    _names[_count] = HdMaterialInterfaceMappingSchemaTokens->nodePath;
-    _values[_count++] = nodePath;
-  }
+    if (nodePath) {
+        _names[_count] = HdMaterialInterfaceMappingSchemaTokens->nodePath;
+        _values[_count++] = nodePath;
+    }
 
-  if (inputName) {
-    _names[_count] = HdMaterialInterfaceMappingSchemaTokens->inputName;
-    _values[_count++] = inputName;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (inputName) {
+        _names[_count] = HdMaterialInterfaceMappingSchemaTokens->inputName;
+        _values[_count++] = inputName;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdMaterialInterfaceMappingSchema::Builder &HdMaterialInterfaceMappingSchema::Builder::SetNodePath(
+HdMaterialInterfaceMappingSchema::Builder &
+HdMaterialInterfaceMappingSchema::Builder::SetNodePath(
     const HdTokenDataSourceHandle &nodePath)
 {
-  _nodePath = nodePath;
-  return *this;
+    _nodePath = nodePath;
+    return *this;
 }
 
-HdMaterialInterfaceMappingSchema::Builder &HdMaterialInterfaceMappingSchema::Builder::SetInputName(
+HdMaterialInterfaceMappingSchema::Builder &
+HdMaterialInterfaceMappingSchema::Builder::SetInputName(
     const HdTokenDataSourceHandle &inputName)
 {
-  _inputName = inputName;
-  return *this;
+    _inputName = inputName;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdMaterialInterfaceMappingSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdMaterialInterfaceMappingSchema::Builder::Build()
 {
-  return HdMaterialInterfaceMappingSchema::BuildRetained(_nodePath, _inputName);
-}
+    return HdMaterialInterfaceMappingSchema::BuildRetained(
+        _nodePath,
+        _inputName
+    );
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

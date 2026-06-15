@@ -7,385 +7,427 @@
 ///
 /// \file js/value.cpp
 
+#include "pxr/pxrns.h"
 #include "Js/value.h"
 #include "Tf/diagnostic.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
-#include "pxr/pxrns.h"
-
-#include <variant>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-/// \struct Js_Null
-/// A sentinel type held by default constructed JsValue objects, which
-/// corresponds to JSON 'null'.
-struct Js_Null {
-  bool operator==(const Js_Null &v) const
-  {
-    return true;
-  }
-  bool operator!=(const Js_Null &v) const
-  {
-    return false;
-  }
-};
+// Variant type index that specifies a uint64_t value is held.
+//
+// This relies on the position of _JsNull and uint64_t in the variant
+// type declaration, as well as the value of NullType in the Type enum.
+static const size_t _UInt64Type = JsValue::NullType + 1;
 
-// Wrapper around std::unique_ptr that should always be
-// dereferencable and whose equality is determined by
-// its held object. This is needed to make JsObject
-// and JsArray (which hold JsValues) holdable by JsValue
-template<typename T> class Js_Wrapper final {
- public:
-  // Js_Wrapper should never by null, so disallow
-  // defualt construction
-  Js_Wrapper() = delete;
+// Compile-time mapping between a type held by JsValue::_Holder and the
+// corresponding JsValue::Type enum value.
+template <typename T>
+static constexpr JsValue::Type _EnumValueForType = {};
+template <>
+constexpr JsValue::Type _EnumValueForType<JsObject> = JsValue::ObjectType;
+template <>
+constexpr JsValue::Type _EnumValueForType<JsArray> = JsValue::ArrayType;
+template <>
+constexpr JsValue::Type _EnumValueForType<std::string> = JsValue::StringType;
 
-  // Copy semantics are not necessary as the _Holder
-  // type is not copyable
-  Js_Wrapper(const Js_Wrapper &) = delete;
-  Js_Wrapper &operator=(const Js_Wrapper &) = delete;
-
-  Js_Wrapper(Js_Wrapper &&) = default;
-  Js_Wrapper &operator=(Js_Wrapper &&) = default;
-  ~Js_Wrapper() = default;
-
-  explicit Js_Wrapper(const T &wrapped) : _ptr(std::make_unique<T>(wrapped)) {}
-  explicit Js_Wrapper(T &&wrapped) : _ptr(std::make_unique<T>(std::move(wrapped))) {}
-
-  const T &Get() const
-  {
-    return *_ptr;
-  }
-
-  bool operator==(const Js_Wrapper &other) const
-  {
-    return Get() == other.Get();
-  }
-
-  bool operator!=(const Js_Wrapper &other) const
-  {
-    return Get() != other.Get();
-  }
-
- private:
-  std::unique_ptr<T> _ptr;
-};
-
-using Js_ObjectWrapper = Js_Wrapper<JsObject>;
-using Js_ArrayWrapper = Js_Wrapper<JsArray>;
-
-/// \struct JsValue::_Holder
-/// Private holder class used to abstract away how a value is stored
-/// internally in JsValue objects.
-struct JsValue::_Holder {
-  // The order these types are defined in the variant is important. See the
-  // comments in the implementation of IsUInt64 for details.
-  using Variant = std::variant<Js_ObjectWrapper,
-                               Js_ArrayWrapper,
-                               std::string,
-                               bool,
-                               int64_t,
-                               double,
-                               Js_Null,
-                               uint64_t>;
-
-  _Holder() : value(Js_Null()), type(JsValue::NullType) {}
-  _Holder(const JsObject &value) : value(Js_ObjectWrapper(value)), type(JsValue::ObjectType) {}
-  _Holder(JsObject &&value) : value(Js_ObjectWrapper(std::move(value))), type(JsValue::ObjectType)
-  {
-  }
-  _Holder(const JsArray &value) : value(Js_ArrayWrapper(value)), type(JsValue::ArrayType) {}
-  _Holder(JsArray &&value) : value(Js_ArrayWrapper(std::move(value))), type(JsValue::ArrayType) {}
-  _Holder(const char *value) : value(std::string(value)), type(JsValue::StringType) {}
-  _Holder(const std::string &value) : value(value), type(JsValue::StringType) {}
-  _Holder(std::string &&value) : value(std::move(value)), type(JsValue::StringType) {}
-  _Holder(bool value) : value(value), type(JsValue::BoolType) {}
-  _Holder(int value) : value(static_cast<int64_t>(value)), type(JsValue::IntType) {}
-  _Holder(int64_t value) : value(value), type(JsValue::IntType) {}
-  _Holder(uint64_t value) : value(value), type(JsValue::IntType) {}
-  _Holder(double value) : value(value), type(JsValue::RealType) {}
-
-  // _Holder is not copyable
-  _Holder(const _Holder &) = delete;
-  _Holder &operator=(const _Holder &) = delete;
-
-  Variant value;
-  JsValue::Type type;
-};
-
-static std::string _GetTypeName(const JsValue::Type &t)
-{
-  switch (t) {
-    case JsValue::ObjectType:
-      return "object";
-    case JsValue::ArrayType:
-      return "array";
-    case JsValue::StringType:
-      return "string";
-    case JsValue::BoolType:
-      return "bool";
-    case JsValue::IntType:
-      return "int";
-    case JsValue::RealType:
-      return "real";
-    case JsValue::NullType:
-      return "null";
-    default:
-      return "unknown";
-  };
+namespace {
+template <enum JsValue::Type EnumValue>
+struct _TypeForEnumValue;
+template <>
+struct _TypeForEnumValue<JsValue::ObjectType> { using type = JsObject; };
+template <>
+struct _TypeForEnumValue<JsValue::ArrayType> { using type = JsArray; };
+template <>
+struct _TypeForEnumValue<JsValue::StringType> { using type = std::string; };
 }
 
-JsValue::JsValue() : _holder(new _Holder)
+/// Helper to reference count larger value types.
+template <typename T>
+struct JsValue::_Holder : _HolderBase<_EnumValueForType<T>>
 {
-  // Do Nothing.
-}
+    using Base = _HolderBase<_EnumValueForType<T>>;
+    using BasePtr = TfDelegatedCountPtr<Base>;
 
-JsValue::JsValue(const JsObject &value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(JsObject &&value) : _holder(new _Holder(std::move(value)))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(const JsArray &value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(JsArray &&value) : _holder(new _Holder(std::move(value)))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(const char *value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(const std::string &value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(std::string &&value) : _holder(new _Holder(std::move(value)))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(bool value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(int value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(int64_t value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(uint64_t value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-JsValue::JsValue(double value) : _holder(new _Holder(value))
-{
-  // Do Nothing.
-}
-
-static bool _CheckType(const JsValue::Type &heldType,
-                       const JsValue::Type &requestedType,
-                       std::string *whyNot)
-{
-  if (heldType != requestedType) {
-    if (whyNot) {
-      *whyNot = TfStringPrintf("Attempt to get %s from value holding %s",
-                               _GetTypeName(requestedType).c_str(),
-                               _GetTypeName(heldType).c_str());
+    template <typename... Args>
+    static BasePtr New(Args&& ...args) {
+        return BasePtr(
+            TfDelegatedCountDoNotIncrementTag,
+            new _Holder<T>(std::forward<Args>(args)...));
     }
-    return false;
-  }
-  return true;
+
+    template <typename... Ts>
+    static const T& UncheckedGet(const std::variant<Ts...>& value) {
+        return UncheckedGet(*std::get_if<BasePtr>(&value));
+    }
+
+    static const T& UncheckedGet(const BasePtr& ptr) {
+        const _Holder& holder = static_cast<const _Holder&>(*ptr);
+        return holder._value;
+    }
+
+private:
+    explicit _Holder(T&& value) : _value(std::move(value)) {}
+    explicit _Holder(const T& value) : _value(value) {}
+
+private:
+    T _value;
+};
+
+template <enum JsValue::Type EnumValue>
+void
+JsValue::_HolderBase<EnumValue>::_Delete(const _HolderBase *h) noexcept
+{
+    using T = typename _TypeForEnumValue<EnumValue>::type;
+    delete static_cast<const _Holder<T>*>(h);
+}
+template struct JsValue::_HolderBase<JsValue::ObjectType>;
+template struct JsValue::_HolderBase<JsValue::ArrayType>;
+template struct JsValue::_HolderBase<JsValue::StringType>;
+
+static std::string
+_GetTypeName(const size_t t)
+{
+    switch (t) {
+    case JsValue::ObjectType: return "object";
+    case JsValue::ArrayType:  return "array";
+    case JsValue::StringType: return "string";
+    case JsValue::BoolType:   return "bool";
+    case JsValue::IntType:    return "int";
+    case JsValue::RealType:   return "real";
+    case JsValue::NullType:   return "null";
+    case _UInt64Type:         return "int";
+    default:                  return "unknown";
+    };
 }
 
-const JsObject &JsValue::GetJsObject() const
+JsValue::JsValue()
+    : _value(_JsNull())
 {
-  static TfStaticData<JsObject> _emptyObject;
-
-  std::string whyNot;
-  if (!_CheckType(_holder->type, ObjectType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return *_emptyObject;
-  }
-
-  return std::get<Js_ObjectWrapper>(_holder->value).Get();
+    // Do Nothing.
 }
 
-const JsArray &JsValue::GetJsArray() const
+JsValue::JsValue(const JsObject& value)
+    : _value(_Holder<JsObject>::New(value))
 {
-  static TfStaticData<JsArray> _emptyArray;
-
-  std::string whyNot;
-  if (!_CheckType(_holder->type, ArrayType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return *_emptyArray;
-  }
-
-  return std::get<Js_ArrayWrapper>(_holder->value).Get();
+    // Do Nothing.
 }
 
-const std::string &JsValue::GetString() const
+JsValue::JsValue(JsObject&& value)
+    : _value(_Holder<JsObject>::New(std::move(value)))
 {
-  static TfStaticData<std::string> _emptyString;
-
-  std::string whyNot;
-  if (!_CheckType(_holder->type, StringType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return *_emptyString;
-  }
-
-  return std::get<std::string>(_holder->value);
+    // Do Nothing.
 }
 
-bool JsValue::GetBool() const
+JsValue::JsValue(const JsArray& value)
+    : _value(_Holder<JsArray>::New(value))
 {
-  std::string whyNot;
-  if (!_CheckType(_holder->type, BoolType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return false;
-  }
-
-  return std::get<bool>(_holder->value);
+    // Do Nothing.
 }
 
-int JsValue::GetInt() const
+JsValue::JsValue(JsArray&& value)
+    : _value(_Holder<JsArray>::New(std::move(value)))
 {
-  std::string whyNot;
-  if (!_CheckType(_holder->type, IntType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return 0;
-  }
-
-  return static_cast<int>(GetInt64());
+    // Do Nothing.
 }
 
-int64_t JsValue::GetInt64() const
+JsValue::JsValue(const char* value)
+    : _value(_Holder<std::string>::New(value))
 {
-  std::string whyNot;
-  if (!_CheckType(_holder->type, IntType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return 0;
-  }
-
-  if (IsUInt64())
-    return static_cast<int64_t>(GetUInt64());
-
-  return std::get<int64_t>(_holder->value);
+    // Do Nothing.
 }
 
-uint64_t JsValue::GetUInt64() const
+JsValue::JsValue(const std::string& value)
+    : _value(_Holder<std::string>::New(value))
 {
-  std::string whyNot;
-  if (!_CheckType(_holder->type, IntType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return 0;
-  }
-
-  if (!IsUInt64())
-    return static_cast<uint64_t>(GetInt64());
-
-  return std::get<uint64_t>(_holder->value);
+    // Do Nothing.
 }
 
-double JsValue::GetReal() const
+JsValue::JsValue(std::string&& value)
+    : _value(_Holder<std::string>::New(std::move(value)))
 {
-  if (_holder->type == IntType) {
-    return IsUInt64() ? static_cast<double>(GetUInt64()) : static_cast<double>(GetInt64());
-  }
-
-  std::string whyNot;
-  if (!_CheckType(_holder->type, RealType, &whyNot)) {
-    TF_CODING_ERROR(whyNot);
-    return 0;
-  }
-
-  return std::get<double>(_holder->value);
+    // Do Nothing.
 }
 
-JsValue::Type JsValue::GetType() const
+JsValue::JsValue(bool value)
+    : _value(value)
 {
-  return _holder->type;
+    // Do Nothing.
 }
 
-std::string JsValue::GetTypeName() const
+JsValue::JsValue(int value)
+    : _value(static_cast<int64_t>(value))
 {
-  return _GetTypeName(_holder->type);
+    // Do Nothing.
 }
 
-bool JsValue::IsObject() const
+JsValue::JsValue(int64_t value)
+    : _value(value)
 {
-  return _holder->type == ObjectType;
+    // Do Nothing.
 }
 
-bool JsValue::IsArray() const
+JsValue::JsValue(uint64_t value)
+    : _value(value)
 {
-  return _holder->type == ArrayType;
+    // Do Nothing.
 }
 
-bool JsValue::IsString() const
+JsValue::JsValue(double value)
+    : _value(value)
 {
-  return _holder->type == StringType;
+    // Do Nothing.
 }
 
-bool JsValue::IsBool() const
+static JsValue::Type
+_GetTypeFromIndex(
+    size_t typeIndex)
 {
-  return _holder->type == BoolType;
+    return (typeIndex == _UInt64Type)
+        ? JsValue::IntType
+        : static_cast<JsValue::Type>(typeIndex);
 }
 
-bool JsValue::IsInt() const
+static bool
+_CheckType(
+    const size_t heldTypeIndex,
+    const JsValue::Type requestedType,
+    std::string* whyNot)
 {
-  return _holder->type == IntType;
+    const JsValue::Type heldType = _GetTypeFromIndex(heldTypeIndex);
+    if (heldType != requestedType) {
+        if (whyNot) {
+            *whyNot = TfStringPrintf(
+                "Attempt to get %s from value holding %s",
+                _GetTypeName(requestedType).c_str(),
+                _GetTypeName(heldType).c_str());
+        }
+        return false;
+    }
+    return true;
 }
 
-bool JsValue::IsReal() const
+const JsObject&
+JsValue::GetJsObject() const
 {
-  return _holder->type == RealType;
+    std::string whyNot;
+    if (!_CheckType(_value.index(), ObjectType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        static TfStaticData<JsObject> _emptyObject;
+        return *_emptyObject;
+    }
+
+    return _Holder<JsObject>::UncheckedGet(_value);
 }
 
-bool JsValue::IsUInt64() const
+const JsArray&
+JsValue::GetJsArray() const
 {
-  // This relies on the position of Js_Null and uint64_t in the variant
-  // type declaration, as well as the value of NullType in the Type enum.
-  // This is how json_spirit itself determines whether the type is uint64_t.
-  return _holder->value.index() == (NullType + 1);
+    std::string whyNot;
+    if (!_CheckType(_value.index(), ArrayType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        static TfStaticData<JsArray> _emptyArray;
+        return *_emptyArray;
+    }
+
+    return _Holder<JsArray>::UncheckedGet(_value);
 }
 
-bool JsValue::IsNull() const
+const std::string&
+JsValue::GetString() const
 {
-  return _holder->type == NullType;
+    std::string whyNot;
+    if (!_CheckType(_value.index(), StringType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        static TfStaticData<std::string> _emptyString;
+        return *_emptyString;
+    }
+
+    return _Holder<std::string>::UncheckedGet(_value);
+}
+
+bool
+JsValue::GetBool() const
+{
+    std::string whyNot;
+    if (!_CheckType(_value.index(), BoolType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        return false;
+    }
+
+    return std::get<bool>(_value);
+}
+
+int
+JsValue::GetInt() const
+{
+    std::string whyNot;
+    if (!_CheckType(_value.index(), IntType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        return 0;
+    }
+
+    return static_cast<int>(GetInt64());
+}
+
+int64_t
+JsValue::GetInt64() const
+{
+    std::string whyNot;
+    if (!_CheckType(_value.index(), IntType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        return 0;
+    }
+
+    if (IsUInt64())
+        return static_cast<int64_t>(GetUInt64());
+
+    return std::get<int64_t>(_value);
+}
+
+uint64_t
+JsValue::GetUInt64() const
+{
+    std::string whyNot;
+    if (!_CheckType(_value.index(), IntType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        return 0;
+    }
+
+    if (!IsUInt64())
+        return static_cast<uint64_t>(GetInt64());
+
+    return std::get<uint64_t>(_value);
+}
+
+double
+JsValue::GetReal() const
+{
+    if (_GetTypeFromIndex(_value.index()) == IntType) {
+        return IsUInt64() ?
+            static_cast<double>(GetUInt64()) :
+            static_cast<double>(GetInt64());
+    }
+
+    std::string whyNot;
+    if (!_CheckType(_value.index(), RealType, &whyNot)) {
+        TF_CODING_ERROR(whyNot);
+        return 0;
+    }
+
+    return std::get<double>(_value);
+}
+
+JsValue::Type
+JsValue::GetType() const
+{
+    return _GetTypeFromIndex(_value.index());
+}
+
+std::string
+JsValue::GetTypeName() const
+{
+    return _GetTypeName(_value.index());
+}
+
+bool
+JsValue::IsObject() const
+{
+    return _value.index() == ObjectType;
+}
+
+bool
+JsValue::IsArray() const
+{
+    return _value.index() == ArrayType;
+}
+
+bool
+JsValue::IsString() const
+{
+    return _value.index() == StringType;
+}
+
+bool
+JsValue::IsBool() const
+{
+    return _value.index() == BoolType;
+}
+
+bool
+JsValue::IsInt() const
+{
+    const size_t index = _value.index();
+    return index == IntType || index == _UInt64Type;
+}
+
+bool
+JsValue::IsReal() const
+{
+    return _value.index() == RealType;
+}
+
+bool
+JsValue::IsUInt64() const
+{
+    return _value.index() == _UInt64Type;
+}
+
+bool
+JsValue::IsNull() const
+{
+    return _value.index() == NullType;
 }
 
 JsValue::operator bool() const
 {
-  return !IsNull();
+    return !IsNull();
 }
 
-bool JsValue::operator==(const JsValue &other) const
+// Visitor that compares a variant's value with the value held by another
+// JsValue.
+struct JsValue::_IsValueEqualVisitor
 {
-  return _holder->type == other._holder->type && _holder->value == other._holder->value;
+    template <enum Type EnumValue>
+    using BasePtr = TfDelegatedCountPtr<_HolderBase<EnumValue>>;
+
+    // Overload for types held indirectly via _Holder.
+    template <enum Type EnumValue>
+    bool operator()(
+        const BasePtr<EnumValue>& lhs,
+        const BasePtr<EnumValue>& rhs) const {
+        using T = typename _TypeForEnumValue<EnumValue>::type;
+        return _Holder<T>::UncheckedGet(lhs) == _Holder<T>::UncheckedGet(rhs);
+    }
+
+    // Overload for comparing the same type.
+    template <typename T>
+    bool operator()(const T& lhs, const T& rhs) const {
+        return lhs == rhs;
+    }
+
+    // Different types never compare equal.
+    //
+    // Implicitly, this means that values holding mathematically equal numbers
+    // may compare not equal depending on the C++ type used to hold the value,
+    // i.e. 1.0 vs 1L vs 1UL.
+    template <typename T, typename U>
+    bool operator()(const T&, const U&) const {
+        return false;
+    }
+};
+
+bool
+JsValue::operator==(const JsValue& other) const
+{
+    return std::visit(_IsValueEqualVisitor{}, _value, other._value);
 }
 
-bool JsValue::operator!=(const JsValue &other) const
+bool
+JsValue::operator!=(const JsValue& other) const
 {
-  return !(*this == other);
+    return !(*this == other);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -7,115 +7,136 @@
 
 #include "pxr/pxrns.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
 
-#  include "Tf/diagnosticLite.h"
-#  include "Tf/pyLock.h"
+#include "Tf/pyLock.h"
+#include "Tf/diagnosticLite.h"
+
+#include <exception>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfPyLock::TfPyLock() : _acquired(false), _allowingThreads(false)
+TfPyLock::TfPyLock()
+    : _acquired(false)
+    , _allowingThreads(false)
 {
-  // Acquire the lock on construction
-  Acquire();
+    // Acquire the lock on construction
+    Acquire();
 }
 
-TfPyLock::TfPyLock(_UnlockedTag) : _acquired(false), _allowingThreads(false)
+TfPyLock::TfPyLock(_UnlockedTag)
+    : _acquired(false)
+    , _allowingThreads(false)
 {
-  // Do not acquire the lock.
+    // Do not acquire the lock.
 }
 
 TfPyLock::~TfPyLock()
 {
-  // Restore thread state if it's been saved to allow other threads.
-  if (_allowingThreads)
-    EndAllowThreads();
+    // Restore thread state if it's been saved to allow other threads.
+    if (_allowingThreads)
+        EndAllowThreads();
 
-  // Release the lock if we have it
-  if (_acquired)
-    Release();
+    // Release the lock if we have it
+    if (_acquired)
+        Release();
 }
 
-void TfPyLock::Acquire()
+void
+TfPyLock::Acquire()
 {
-  // If already acquired, emit a warning and do nothing
-  if (_acquired) {
-    TF_WARN("Cannot recursively acquire a TfPyLock.");
-    return;
-  }
+    // If already acquired, emit a warning and do nothing
+    if (_acquired) {
+        TF_WARN("Cannot recursively acquire a TfPyLock.");
+        return;
+    }
 
-  if (!Py_IsInitialized())
-    return;
+    if (!Py_IsInitialized())
+        return;
 
-  // Acquire the GIL and swap in our thread state
-  _gilState = PyGILState_Ensure();
-  _acquired = true;
+    // Acquire the GIL and swap in our thread state
+    _gilState = PyGILState_Ensure();
+    _acquired = true;
 }
 
-void TfPyLock::Release()
+void
+TfPyLock::Release()
 {
-  // If not acquired, emit a warning and do nothing
-  if (!_acquired) {
-    if (Py_IsInitialized())
-      TF_WARN("Cannot release a TfPyLock that is not acquired.\n");
-    return;
-  }
+    // If not acquired, emit a warning and do nothing
+    if (!_acquired) {
+        if (Py_IsInitialized())
+            TF_WARN("Cannot release a TfPyLock that is not acquired.\n");
+        return;
+    }
 
-  // If allowing threads, emit a warning and do nothing
-  if (_allowingThreads) {
-    TF_WARN("Cannot release a TfPyLock that is allowing threads.\n");
-    return;
-  }
+    // If allowing threads, emit a warning and do nothing
+    if (_allowingThreads) {
+        TF_WARN("Cannot release a TfPyLock that is allowing threads.\n");
+        return;
+    }
 
-  // Release the GIL and restore the previous thread state
-  PyGILState_Release(_gilState);
-  _acquired = false;
+    // Release the GIL and restore the previous thread state
+    PyGILState_Release(_gilState);
+    _acquired = false;
 }
 
-void TfPyLock::BeginAllowThreads()
+void
+TfPyLock::BeginAllowThreads()
 {
-  // If already allowing threads, emit a warning and do nothing
-  if (_allowingThreads) {
-    TF_WARN("Cannot recursively allow threads on a TfPyLock.\n");
-    return;
-  }
+    // If already allowing threads, emit a warning and do nothing
+    if (_allowingThreads) {
+        TF_WARN("Cannot recursively allow threads on a TfPyLock.\n");
+        return;
+    }
 
-  // If not acquired, emit a warning and do nothing
-  if (!_acquired) {
-    if (Py_IsInitialized())
-      TF_WARN(
-          "Cannot allow threads on a TfPyLock that is not "
-          "acquired.\n");
-    return;
-  }
+    // If not acquired, emit a warning and do nothing
+    if (!_acquired) {
+        if (Py_IsInitialized())
+            TF_WARN("Cannot allow threads on a TfPyLock that is not "
+                    "acquired.\n");
+        return;
+    }
 
-  // Save the thread state locally.
-  _savedState = PyEval_SaveThread();
-  _allowingThreads = true;
+    // Save the thread state locally.
+    _savedState = PyEval_SaveThread();
+    _allowingThreads = true;
 }
 
-void TfPyLock::EndAllowThreads()
+void
+TfPyLock::EndAllowThreads()
 {
-  // If not allowing threads, emit a warning and do nothing
-  if (!_allowingThreads) {
-    TF_WARN(
-        "Cannot end allowing threads on a TfPyLock that is not "
-        "currently allowing threads.\n");
-    return;
-  }
+    // If not allowing threads, emit a warning and do nothing
+    if (!_allowingThreads) {
+        TF_WARN("Cannot end allowing threads on a TfPyLock that is not "
+                "currently allowing threads.\n");
+        return;
+    }
 
-  PyEval_RestoreThread(_savedState);
-  _allowingThreads = false;
+    // In case of an exception, it's possible that some non-exception-safe GIL
+    // code has failed to restore it to the unlocked state.  If we see that it's
+    // locked just complain and continue.
+    if (ARCH_UNLIKELY(PyGILState_Check())) {
+        char const * const exceptionMsg = std::uncaught_exceptions()
+            ? "during exception unwinding " : "";
+        TF_WARN("GIL corruption detected %s- this thread holds the GIL in "
+                "EndAllowThreads despite releasing it in an earlier call "
+                "to BeginAllowThreads.", exceptionMsg);
+    }
+    else {
+        PyEval_RestoreThread(_savedState);
+    }
+    _allowingThreads = false;
 }
 
-TfPyEnsureGILUnlockedObj::TfPyEnsureGILUnlockedObj() : _lock(TfPyLock::_ConstructUnlocked)
+TfPyEnsureGILUnlockedObj::TfPyEnsureGILUnlockedObj()
+    : _lock(TfPyLock::_ConstructUnlocked)
 {
-  if (PyGILState_Check()) {
-    _lock.Acquire();
-    _lock.BeginAllowThreads();
-  }
+    if (PyGILState_Check()) {
+        _lock.Acquire();
+        _lock.BeginAllowThreads();
+    }        
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED

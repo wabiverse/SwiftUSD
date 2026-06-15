@@ -1,37 +1,20 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H
 #define PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H
 
 ///\file work/withScopedParallelism.h
 
-#include "Tf/pyLock.h"
+#include "pxr/pxrns.h"
 #include "Work/api.h"
 #include "Work/dispatcher.h"
-#include <pxr/pxrns.h>
+#include "Work/impl.h"
+#include "Tf/pyLock.h"
 
-#include <OneTBB/tbb/task_arena.h>
 
 #include <utility>
 
@@ -102,6 +85,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///     }
 ///     return *accessor.first;
 /// }
+/// \endcode
 ///
 /// This limits parallelism by only a small degree.  It's only the waiting
 /// thread that restricts the tasks it can take to the protected scope: all
@@ -111,15 +95,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ensures the GIL is released before invoking \p fn.  If this function
 /// released the GIL, it reacquires it before returning.
 ///
-template<class Fn> auto WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL = true)
+template <class Fn>
+auto
+WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL=true)
 {
-  if (dropPythonGIL) {
-    TF_PY_ALLOW_THREADS_IN_SCOPE();
-    return tbb::this_task_arena::isolate(std::forward<Fn>(fn));
-  }
-  else {
-    return tbb::this_task_arena::isolate(std::forward<Fn>(fn));
-  }
+    PXR_WORK_IMPL_NAMESPACE_USING_DIRECTIVE;
+
+    if (dropPythonGIL) {
+        TF_PY_ALLOW_THREADS_IN_SCOPE();
+        return WorkImpl_WithScopedParallelism(std::forward<Fn>(fn));
+    }
+    return WorkImpl_WithScopedParallelism(std::forward<Fn>(fn));
 }
 
 /// Similar to WorkWithScopedParallelism(), but pass a WorkDispatcher instance
@@ -128,17 +114,18 @@ template<class Fn> auto WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL = 
 /// before the scoped parallelism ends, call WorkDispatcher::Wait() on the
 /// dispatcher instance.  The \p dropPythonGIL argument has the same meaning as
 /// it does for WorkWithScopedParallelism().
-template<class Fn> auto WorkWithScopedDispatcher(Fn &&fn, bool dropPythonGIL = true)
+template <class Fn>
+auto
+WorkWithScopedDispatcher(Fn &&fn, bool dropPythonGIL=true)
 {
-  return WorkWithScopedParallelism(
-      [&fn]() {
+    return WorkWithScopedParallelism([&fn]() {
         WorkDispatcher dispatcher;
         return std::forward<Fn>(fn)(dispatcher);
         // dispatcher's destructor invokes Wait() here.
-      },
-      dropPythonGIL);
+    }, dropPythonGIL);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H
+#endif // PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H
+

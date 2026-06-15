@@ -12,18 +12,27 @@
 /// A collection of private helper utilities to support instancing
 /// functionality.
 
+#include "pxr/pxrns.h"
 #include "Pcp/composeSite.h"
 #include "Pcp/node_Iterator.h"
 #include "Pcp/primIndex.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+/// Helper function to determine whether the given prim index should
+/// be considered for instancing. If this returns false, then
+/// Pcp_PrimIndexIsInstanceable will return false for the same prim index.
+bool
+Pcp_InstancingIsEnabled(
+    const PcpPrimIndex& primIndex);
 
 /// Helper function to determine whether the given prim index is
 /// instanceable. An instanceable prim index must have instanceable
 /// nodes and must have been tagged so that the composed value of
 /// the metadata field 'instance' is true.
-bool Pcp_PrimIndexIsInstanceable(const PcpPrimIndex &primIndex);
+bool
+Pcp_PrimIndexIsInstanceable(
+    const PcpPrimIndex& primIndex);
 
 /// Helper function for traversing a prim index in strong-to-weak
 /// order while identifying instanceable nodes. This function passes
@@ -40,8 +49,11 @@ bool Pcp_PrimIndexIsInstanceable(const PcpPrimIndex &primIndex);
 /// If the Visit function returns false, traversal will be pruned at that
 /// node and none of the node's children will be visited.
 ///
-template<class Visitor>
-void Pcp_TraverseInstanceableStrongToWeak(const PcpPrimIndex &primIndex, Visitor *visitor);
+template <class Visitor>
+void 
+Pcp_TraverseInstanceableStrongToWeak(
+    const PcpPrimIndex& primIndex,
+    Visitor* visitor);
 
 /// Helper function for traversing a prim index in weak-to-strong
 /// order while identifying instanceable nodes. This function passes
@@ -55,129 +67,134 @@ void Pcp_TraverseInstanceableStrongToWeak(const PcpPrimIndex &primIndex, Visitor
 ///     { ... }
 /// }
 ///
-template<class Visitor>
-void Pcp_TraverseInstanceableWeakToStrong(const PcpPrimIndex &primIndex, Visitor *visitor);
+template <class Visitor>
+void 
+Pcp_TraverseInstanceableWeakToStrong(
+    const PcpPrimIndex& primIndex, 
+    Visitor* visitor);
 
 // Implementation ----------------------------------------
 
-inline bool Pcp_ChildNodeIsInstanceable(const PcpNodeRef &node, bool *hasAnyDirectArcsInNodeChain)
+inline bool
+Pcp_ChildNodeIsInstanceable(
+    const PcpNodeRef& node)
 {
-  // Non-ancestral nodes are instanceable: they represent a direct
-  // composition arc to a portion of scenegraph that could be shared
-  // with other prim indexes, as long as the other criteria laid out
-  // in PcpInstanceKey are met. But there may also be ancestral nodes that
-  // exist in the graph because they were composed in a subtree of direct
-  // arc to a subroot path. These nodes are also instanceable as they are
-  // considered part of the direct arc that brought them in. This is why we
-  // keep track of and check whether there are any direct arcs in the node's
-  // chain up to the root node when determining if a node is instanceable.
-  *hasAnyDirectArcsInNodeChain = *hasAnyDirectArcsInNodeChain || !node.IsDueToAncestor();
-
-  // If a node has no specs, we do not consider it instanceable since
-  // it has no opinions to contribute to the prim index. In particular,
-  // this allows prim indexes with implied arcs in different layer stacks
-  // that have no overrides to still be considered equivalent for sharing.
-  return *hasAnyDirectArcsInNodeChain && node.HasSpecs();
+    // Non-ancestral nodes are instanceable: they represent a direct
+    // composition arc to a portion of scenegraph that could be shared
+    // with other prim indexes, as long as the other criteria laid out
+    // in PcpInstanceKey are met. But there may also be ancestral nodes that 
+    // exist in the graph because they were composed in a subtree of direct 
+    // arc to a subroot path. These nodes are also instanceable as they are 
+    // considered part of the direct arc that brought them in. This is why we 
+    // check whether there are any direct arcs in the node's chain up to the
+    // root node when determining if a node is instanceable.
+    //
+    // If a node has no specs or cannot contribute specs, it is not instanceable
+    // since it has no opinions to contribute to the prim index. In particular,
+    // this allows prim indexes with implied arcs in different layer stacks
+    // that have no overrides to still be considered equivalent for sharing.
+    return node.HasTransitiveDirectDependency() && 
+        node.CanContributeSpecs() && node.HasSpecs();
 }
 
-inline bool Pcp_ChildNodeIsDirectOrInDirectArcSubtree(const PcpNodeRef &node)
+inline bool 
+Pcp_ChildNodeIsDirectOrInDirectArcSubtree(
+    const PcpNodeRef& node)
 {
-  if (node.IsRootNode() || !node.IsDueToAncestor()) {
-    return true;
-  }
-  for (PcpNodeRef parent = node.GetParentNode(); !parent.IsRootNode();
-       parent = parent.GetParentNode())
-  {
-    if (!parent.IsDueToAncestor()) {
-      return true;
+    return node.IsRootNode() || node.HasTransitiveDirectDependency();
+}
+
+inline bool
+Pcp_ChildNodeInstanceableChanged(
+    const PcpNodeRef& node)
+{
+    return Pcp_ChildNodeIsDirectOrInDirectArcSubtree(node) &&
+        (PcpComposeSiteHasSpecs(node) != node.HasSpecs());
+}
+
+template <class Visitor>
+inline void
+Pcp_TraverseInstanceableStrongToWeakHelper(
+    const PcpNodeRef& node,
+    Visitor* visitor)
+{
+    // If the node is culled, the entire subtree rooted at this node
+    // does not contribute to the prim index, so we can prune the 
+    // traversal.
+    if (node.IsCulled()) {
+        return;
     }
-  }
-  return false;
+
+    const bool isInstanceable = Pcp_ChildNodeIsInstanceable(node);
+    if (!visitor->Visit(node, isInstanceable)) {
+        return;
+    }
+
+    TF_FOR_ALL(childIt, Pcp_GetChildrenRange(node)) {
+        const PcpNodeRef& childNode = *childIt;
+        Pcp_TraverseInstanceableStrongToWeakHelper(childNode, visitor);
+    }
 }
 
-inline bool Pcp_ChildNodeInstanceableChanged(const PcpNodeRef &node)
+template <class Visitor>
+inline void 
+Pcp_TraverseInstanceableStrongToWeak(
+    const PcpPrimIndex& primIndex,
+    Visitor* visitor)
 {
-  return Pcp_ChildNodeIsDirectOrInDirectArcSubtree(node) &&
-         (PcpComposeSiteHasPrimSpecs(node) != node.HasSpecs());
+    const PcpNodeRef& rootNode = primIndex.GetRootNode();
+    if (!visitor->Visit(rootNode, /* nodeIsInstanceable = */ false)) {
+        return;
+    }
+
+    TF_FOR_ALL(childIt, Pcp_GetChildrenRange(rootNode)) {
+        const PcpNodeRef& childNode = *childIt;
+        Pcp_TraverseInstanceableStrongToWeakHelper(childNode, visitor);
+    }
 }
 
-template<class Visitor>
-inline void Pcp_TraverseInstanceableStrongToWeakHelper(const PcpNodeRef &node,
-                                                       Visitor *visitor,
-                                                       bool hasAnyDirectArcsInNodeChain)
+template <class Visitor>
+inline void
+Pcp_TraverseInstanceableWeakToStrongHelper(
+    const PcpNodeRef& node,
+    Visitor* visitor)
 {
-  // If the node is culled, the entire subtree rooted at this node
-  // does not contribute to the prim index, so we can prune the
-  // traversal.
-  if (node.IsCulled()) {
-    return;
-  }
+    // If the node is culled, the entire subtree rooted at this node
+    // does not contribute to the prim index, so we can prune the 
+    // traversal.
+    if (node.IsCulled()) {
+        return;
+    }
 
-  const bool isInstanceable = Pcp_ChildNodeIsInstanceable(node, &hasAnyDirectArcsInNodeChain);
-  if (!visitor->Visit(node, isInstanceable)) {
-    return;
-  }
+    const bool isInstanceable = Pcp_ChildNodeIsInstanceable(node);
 
-  TF_FOR_ALL(childIt, Pcp_GetChildrenRange(node))
-  {
-    const PcpNodeRef &childNode = *childIt;
-    Pcp_TraverseInstanceableStrongToWeakHelper(childNode, visitor, hasAnyDirectArcsInNodeChain);
-  }
+    TF_REVERSE_FOR_ALL(childIt, Pcp_GetChildrenRange(node)) {
+        const PcpNodeRef& childNode = *childIt;
+        Pcp_TraverseInstanceableWeakToStrongHelper(childNode, visitor);
+    }
+
+    visitor->Visit(node, isInstanceable);
 }
 
-template<class Visitor>
-inline void Pcp_TraverseInstanceableStrongToWeak(const PcpPrimIndex &primIndex, Visitor *visitor)
+template <class Visitor>
+inline void 
+Pcp_TraverseInstanceableWeakToStrong(
+    const PcpNodeRef &subtreeRootNode,
+    Visitor* visitor)
 {
-  const PcpNodeRef &rootNode = primIndex.GetRootNode();
-  if (!visitor->Visit(rootNode, /* nodeIsInstanceable = */ false)) {
-    return;
-  }
+    if (subtreeRootNode.IsRootNode()) {
+        TF_REVERSE_FOR_ALL(childIt, Pcp_GetChildrenRange(subtreeRootNode)) {
+            const PcpNodeRef& childNode = *childIt;
+            Pcp_TraverseInstanceableWeakToStrongHelper(childNode, visitor);
+        }
 
-  TF_FOR_ALL(childIt, Pcp_GetChildrenRange(rootNode))
-  {
-    const PcpNodeRef &childNode = *childIt;
-    Pcp_TraverseInstanceableStrongToWeakHelper(
-        childNode, visitor, /* hasAnyDirectArcsInNodeChain = */ false);
-  }
+        visitor->Visit(subtreeRootNode, /* nodeIsInstanceable = */ false);
+    } else {
+        Pcp_TraverseInstanceableWeakToStrongHelper(subtreeRootNode, visitor);
+    }
 }
 
-template<class Visitor>
-inline void Pcp_TraverseInstanceableWeakToStrongHelper(const PcpNodeRef &node,
-                                                       Visitor *visitor,
-                                                       bool hasAnyDirectArcsInNodeChain)
-{
-  // If the node is culled, the entire subtree rooted at this node
-  // does not contribute to the prim index, so we can prune the
-  // traversal.
-  if (node.IsCulled()) {
-    return;
-  }
-
-  const bool isInstanceable = Pcp_ChildNodeIsInstanceable(node, &hasAnyDirectArcsInNodeChain);
-
-  TF_REVERSE_FOR_ALL(childIt, Pcp_GetChildrenRange(node))
-  {
-    const PcpNodeRef &childNode = *childIt;
-    Pcp_TraverseInstanceableWeakToStrongHelper(childNode, visitor, hasAnyDirectArcsInNodeChain);
-  }
-
-  visitor->Visit(node, isInstanceable);
-}
-
-template<class Visitor>
-inline void Pcp_TraverseInstanceableWeakToStrong(const PcpPrimIndex &primIndex, Visitor *visitor)
-{
-  const PcpNodeRef &rootNode = primIndex.GetRootNode();
-  TF_REVERSE_FOR_ALL(childIt, Pcp_GetChildrenRange(rootNode))
-  {
-    const PcpNodeRef &childNode = *childIt;
-    Pcp_TraverseInstanceableWeakToStrongHelper(
-        childNode, visitor, /* hasAnyDirectArcsInNodeChain = */ false);
-  }
-
-  visitor->Visit(rootNode, /* nodeIsInstanceable = */ false);
-}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_PCP_INSTANCING_H
+#endif // PXR_USD_PCP_INSTANCING_H

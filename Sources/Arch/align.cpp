@@ -4,16 +4,16 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Arch/align.h"
 #include "Arch/defines.h"
 #include "Arch/error.h"
-#include "pxr/pxrns.h"
 
 #if defined(ARCH_OS_IPHONE)
 #elif defined(ARCH_OS_DARWIN)
-#  include <sys/malloc.h>
+#   include <sys/malloc.h>
 #else
-#  include <malloc.h>
+#   include <malloc.h>
 #endif /* defined(ARCH_OS_IPHONE) */
 
 #include <cstdlib>
@@ -21,38 +21,38 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Aligned memory allocation.
-void *ArchAlignedAlloc(size_t alignment, size_t size)
+void *
+ArchAlignedAlloc(size_t alignment, size_t size)
 {
-#if defined(ARCH_OS_DARWIN) || \
-    (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
-  // alignment must be >= sizeof(void*)
-  if (alignment < sizeof(void *)) {
-    alignment = sizeof(void *);
-  }
+#if defined(ARCH_OS_DARWIN) || (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
+    // alignment must be >= sizeof(void*)
+    if (alignment < sizeof(void*)) {
+        alignment = sizeof(void*);
+    }
 
-  void *pointer;
-  if (posix_memalign(&pointer, alignment, size) == 0) {
-    return pointer;
-  }
+    void *pointer;
+    if (posix_memalign(&pointer, alignment, size) == 0) {
+        return pointer;
+    }
 
-  return nullptr;
+    return nullptr;
 #elif defined(ARCH_OS_WINDOWS)
-  return _aligned_malloc(size, alignment);
+    return _aligned_malloc(size, alignment);
 #else
-  return aligned_alloc(alignment, size);
+    return aligned_alloc(alignment, size);
 #endif
 }
 
 /// Free memory allocated by ArchAlignedAlloc.
-void ArchAlignedFree(void *ptr)
+void
+ArchAlignedFree(void* ptr)
 {
-#if defined(ARCH_OS_DARWIN) || \
-    (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
-  free(ptr);
+#if defined(ARCH_OS_DARWIN) || (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
+    free(ptr);
 #elif defined(ARCH_OS_WINDOWS)
-  _aligned_free(ptr);
+    _aligned_free(ptr);
 #else
-  free(ptr);
+    free(ptr);
 #endif
 }
 

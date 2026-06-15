@@ -9,32 +9,37 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 UsdImagingDataSourceRelationship::UsdImagingDataSourceRelationship(
-    const UsdRelationship &usdRel, const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : _usdRel(usdRel), _stageGlobals(stageGlobals)
+        const UsdRelationship &usdRel,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
+: _usdRel(usdRel)
+, _stageGlobals(stageGlobals)
+{}
+
+VtValue
+UsdImagingDataSourceRelationship::GetValue(
+        HdSampledDataSource::Time shutterOffset)
 {
+    return VtValue(GetTypedValue(shutterOffset));
 }
 
-VtValue UsdImagingDataSourceRelationship::GetValue(HdSampledDataSource::Time shutterOffset)
+VtArray<SdfPath>
+UsdImagingDataSourceRelationship::GetTypedValue(
+        HdSampledDataSource::Time shutterOffset)
 {
-  return VtValue(GetTypedValue(shutterOffset));
+    SdfPathVector paths;
+    _usdRel.GetForwardedTargets(&paths);
+    VtArray<SdfPath> vtPaths(paths.begin(), paths.end());
+    return vtPaths;
 }
 
-VtArray<SdfPath> UsdImagingDataSourceRelationship::GetTypedValue(
-    HdSampledDataSource::Time shutterOffset)
+bool
+UsdImagingDataSourceRelationship::GetContributingSampleTimesForInterval(
+        HdSampledDataSource::Time startTime,
+        HdSampledDataSource::Time endTime,
+        std::vector<HdSampledDataSource::Time> *outSampleTimes)
 {
-  SdfPathVector paths;
-  _usdRel.GetForwardedTargets(&paths);
-  VtArray<SdfPath> vtPaths(paths.begin(), paths.end());
-  return vtPaths;
-}
-
-bool UsdImagingDataSourceRelationship::GetContributingSampleTimesForInterval(
-    HdSampledDataSource::Time startTime,
-    HdSampledDataSource::Time endTime,
-    std::vector<HdSampledDataSource::Time> *outSampleTimes)
-{
-  // Relationships are constant across time in USD.
-  return false;
+    // Relationships are constant across time in USD.
+    return false;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

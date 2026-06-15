@@ -6,9 +6,9 @@
 #ifndef PXR_USD_IMAGING_USD_IMAGING_RENDER_SETTINGS_FLATTENING_SCENE_INDEX_H
 #define PXR_USD_IMAGING_USD_IMAGING_RENDER_SETTINGS_FLATTENING_SCENE_INDEX_H
 
-#include "Hd/filteringSceneIndex.h"
-#include "UsdImaging/api.h"
 #include "pxr/pxrns.h"
+#include "UsdImaging/api.h"
+#include "Hd/filteringSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -22,30 +22,35 @@ TF_DECLARE_REF_PTRS(UsdImagingRenderSettingsFlatteningSceneIndex);
 /// notices are forwarded back to appropriate locators on the flattened data
 /// source.
 ///
-class UsdImagingRenderSettingsFlatteningSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  USDIMAGING_API
-  static UsdImagingRenderSettingsFlatteningSceneIndexRefPtr New(
-      const HdSceneIndexBaseRefPtr &inputSceneIndex);
+class UsdImagingRenderSettingsFlatteningSceneIndex : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    USDIMAGING_API
+    static UsdImagingRenderSettingsFlatteningSceneIndexRefPtr
+    New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  USDIMAGING_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
-  USDIMAGING_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
- protected:
-  UsdImagingRenderSettingsFlatteningSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+protected:
+    UsdImagingRenderSettingsFlatteningSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_RENDER_SETTINGS_FLATTENING_SCENE_INDEX_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_RENDER_SETTINGS_FLATTENING_SCENE_INDEX_H

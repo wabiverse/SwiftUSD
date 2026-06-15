@@ -5,22 +5,21 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Gf/size2.h"
 #include "Tf/type.h"
-#include "pxr/pxrns.h"
 
 #include <ostream>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-  TfType::Define<GfSize2>();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<GfSize2>();
 }
 
-std::ostream &operator<<(std::ostream &o, GfSize2 const &v)
-{
-  return o << "( " << v._vec[0] << " " << v._vec[1] << " )";
+
+std::ostream &operator<<(std::ostream &o, GfSize2 const &v) {
+    return o << "( " << v._vec[0] << " " << v._vec[1] << " )";
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

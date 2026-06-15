@@ -9,15 +9,16 @@
 
 /// \file glf/uniformBlock.h
 
-#include "Garch/glApi.h"
+#include "pxr/pxrns.h"
 #include "Glf/api.h"
+#include "Garch/glApi.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/refBase.h"
 #include "Tf/weakBase.h"
-#include "pxr/pxrns.h"
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 TF_DECLARE_WEAK_AND_REF_PTRS(GlfUniformBlock);
 TF_DECLARE_WEAK_PTRS(GlfBindingMap);
@@ -27,32 +28,35 @@ TF_DECLARE_WEAK_PTRS(GlfBindingMap);
 /// Manages a GL uniform buffer object.
 ///
 class GlfUniformBlock : public TfRefBase, public TfWeakBase {
- public:
-  /// Returns a new instance.
-  GLF_API
-  static GlfUniformBlockRefPtr New(char const *label = nullptr);
+public:
 
-  GLF_API
-  virtual ~GlfUniformBlock();
+    /// Returns a new instance.
+    GLF_API
+    static GlfUniformBlockRefPtr New(char const *label = nullptr);
 
-  /// Binds the uniform buffer using a bindingMap and identifier.
-  GLF_API
-  void Bind(GlfBindingMapPtr const &bindingMap, std::string const &identifier);
+    GLF_API
+    virtual ~GlfUniformBlock();
 
-  /// Updates the content of the uniform buffer. If the size
-  /// is different, the buffer will be reallocated.
-  GLF_API
-  void Update(const void *data, int size);
+    /// Binds the uniform buffer using a bindingMap and identifier.
+    GLF_API
+    void Bind(GlfBindingMapPtr const & bindingMap,
+              std::string const & identifier);
 
- protected:
-  GLF_API
-  GlfUniformBlock(char const *label);
+    /// Updates the content of the uniform buffer. If the size
+    /// is different, the buffer will be reallocated.
+    GLF_API
+    void Update(const void *data, int size);
+    
+protected:
+    GLF_API
+    GlfUniformBlock(char const *label);
 
- private:
-  GLuint _buffer;
-  int _size;
-  std::string _debugLabel;
+private:
+    GLuint _buffer;
+    int _size;
+    std::string _debugLabel;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

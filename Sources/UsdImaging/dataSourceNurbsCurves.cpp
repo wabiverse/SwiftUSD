@@ -10,8 +10,8 @@
 
 #include "UsdGeom/nurbsCurves.h"
 
-#include "Hd/nurbsCurvesSchema.h"
 #include "Hd/overlayContainerDataSource.h"
+#include "Hd/nurbsCurvesSchema.h"
 #include "Hd/primvarsSchema.h"
 #include "Hd/retainedDataSource.h"
 #include "Hd/tokens.h"
@@ -20,110 +20,130 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 
-std::vector<UsdImagingDataSourceMapped::AttributeMapping> _GetAttributeMappings()
+std::vector<UsdImagingDataSourceMapped::PropertyMapping>
+_GetPropertyMappings()
 {
-  std::vector<UsdImagingDataSourceMapped::AttributeMapping> result;
+    std::vector<UsdImagingDataSourceMapped::PropertyMapping> result;
 
-  for (const TfToken &usdName : UsdGeomNurbsCurves::GetSchemaAttributeNames(
-           /* includeInherited = */ false))
-  {
-    if (usdName == UsdGeomTokens->pointWeights) {
-      // Suppress pointWeights from UsdGeomNurbsCurves (which is a custom
-      // primvar we process in the prim source below).
-      continue;
+    for (const TfToken &usdName :
+             UsdGeomNurbsCurves::GetSchemaAttributeNames(
+                 /* includeInherited = */ false)) {
+        if (usdName == UsdGeomTokens->pointWeights) {
+            // Suppress pointWeights from UsdGeomNurbsCurves (which is a custom
+            // primvar we process in the prim source below).
+            continue;
+        }
+        result.push_back(
+            UsdImagingDataSourceMapped::AttributeMapping{
+                { usdName, HdDataSourceLocator(usdName) }
+            });
     }
-    result.push_back({usdName, HdDataSourceLocator(usdName)});
-  }
 
-  for (const TfToken &usdName : UsdGeomCurves::GetSchemaAttributeNames(
-           /* includeInherited = */ false))
-  {
-    if (usdName == UsdGeomTokens->widths) {
-      // Suppress widths from UsdGeomCurves (which is a custom
-      // primvar that UsdImagingDataSourceGprim gives us).
-      continue;
+    for (const TfToken &usdName :
+             UsdGeomCurves::GetSchemaAttributeNames(
+                 /* includeInherited = */ false)) {
+        if (usdName == UsdGeomTokens->widths) {
+            // Suppress widths from UsdGeomCurves (which is a custom
+            // primvar that UsdImagingDataSourceGprim gives us).
+            continue;
+        }
+        result.push_back(
+            UsdImagingDataSourceMapped::AttributeMapping{
+                { usdName, HdDataSourceLocator(usdName) }
+            });
     }
-    result.push_back({usdName, HdDataSourceLocator(usdName)});
-  }
 
-  return result;
+    return result;
 }
 
-const UsdImagingDataSourceMapped::AttributeMappings &_GetMappings()
+const UsdImagingDataSourceMapped::PropertyMappings &
+_GetMappings() {
+    static const UsdImagingDataSourceMapped::PropertyMappings result(
+        _GetPropertyMappings(), HdNurbsCurvesSchema::GetDefaultLocator());
+    return result;
+}
+
+const UsdImagingDataSourceCustomPrimvars::Mappings &
+_GetCustomPrimvarMappings(const UsdPrim &usdPrim)
 {
-  static const UsdImagingDataSourceMapped::AttributeMappings result(
-      _GetAttributeMappings(), HdNurbsCurvesSchema::GetDefaultLocator());
-  return result;
+    static const TfToken &hdPrimvarName = UsdGeomTokens->pointWeights;
+
+    static const UsdImagingDataSourceCustomPrimvars::Mappings mappings = {
+        { hdPrimvarName, UsdGeomTokens->pointWeights },
+    };
+
+    return mappings;
 }
 
-const UsdImagingDataSourceCustomPrimvars::Mappings &_GetCustomPrimvarMappings(
-    const UsdPrim &usdPrim)
-{
-  static const TfToken &hdPrimvarName = UsdGeomTokens->pointWeights;
-
-  static const UsdImagingDataSourceCustomPrimvars::Mappings mappings = {
-      {hdPrimvarName, UsdGeomTokens->pointWeights},
-  };
-
-  return mappings;
 }
-
-}  // namespace
 
 // ----------------------------------------------------------------------------
 
 UsdImagingDataSourceNurbsCurvesPrim::UsdImagingDataSourceNurbsCurvesPrim(
-    const SdfPath &sceneIndexPath,
-    UsdPrim usdPrim,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
     : UsdImagingDataSourceGprim(sceneIndexPath, usdPrim, stageGlobals)
 {
 }
 
-TfTokenVector UsdImagingDataSourceNurbsCurvesPrim::GetNames()
+TfTokenVector 
+UsdImagingDataSourceNurbsCurvesPrim::GetNames()
 {
-  TfTokenVector result = UsdImagingDataSourceGprim::GetNames();
-  result.push_back(HdNurbsCurvesSchema::GetSchemaToken());
-  return result;
+    TfTokenVector result = UsdImagingDataSourceGprim::GetNames();
+    result.push_back(HdNurbsCurvesSchema::GetSchemaToken());
+    return result;
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourceNurbsCurvesPrim::Get(const TfToken &name)
+HdDataSourceBaseHandle 
+UsdImagingDataSourceNurbsCurvesPrim::Get(const TfToken & name)
 {
-  if (name == HdNurbsCurvesSchema::GetSchemaToken()) {
-    return UsdImagingDataSourceMapped::New(
-        _GetUsdPrim(), _GetSceneIndexPath(), _GetMappings(), _GetStageGlobals());
-  }
+    if (name == HdNurbsCurvesSchema::GetSchemaToken()) {
+        return
+            UsdImagingDataSourceMapped::New(
+                _GetUsdPrim(),
+                _GetSceneIndexPath(),
+                _GetMappings(),
+                _GetStageGlobals());
+    }
 
-  if (name == HdPrimvarsSchema::GetSchemaToken()) {
-    return HdOverlayContainerDataSource::New(
-        HdContainerDataSource::Cast(UsdImagingDataSourceGprim::Get(name)),
-        UsdImagingDataSourceCustomPrimvars::New(_GetSceneIndexPath(),
-                                                _GetUsdPrim(),
-                                                _GetCustomPrimvarMappings(_GetUsdPrim()),
-                                                _GetStageGlobals()));
-  }
+    if (name == HdPrimvarsSchema::GetSchemaToken()) {
+        return
+            HdOverlayContainerDataSource::New(
+                HdContainerDataSource::Cast(
+                    UsdImagingDataSourceGprim::Get(name)),
+                UsdImagingDataSourceCustomPrimvars::New(
+                    _GetSceneIndexPath(),
+                    _GetUsdPrim(),
+                    _GetCustomPrimvarMappings(_GetUsdPrim()),
+                    _GetStageGlobals()));
+    }
 
-  return UsdImagingDataSourceGprim::Get(name);
+    return UsdImagingDataSourceGprim::Get(name);
 }
 
-HdDataSourceLocatorSet UsdImagingDataSourceNurbsCurvesPrim::Invalidate(
-    UsdPrim const &prim,
+HdDataSourceLocatorSet
+UsdImagingDataSourceNurbsCurvesPrim::Invalidate(
+    UsdPrim const& prim,
     const TfToken &subprim,
     const TfTokenVector &properties,
     const UsdImagingPropertyInvalidationType invalidationType)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  HdDataSourceLocatorSet locators = UsdImagingDataSourceMapped::Invalidate(properties,
-                                                                           _GetMappings());
+    HdDataSourceLocatorSet locators =
+        UsdImagingDataSourceMapped::Invalidate(
+            properties, _GetMappings());
+    
+    locators.insert(
+        UsdImagingDataSourceGprim::Invalidate(
+            prim, subprim, properties, invalidationType));
 
-  locators.insert(
-      UsdImagingDataSourceGprim::Invalidate(prim, subprim, properties, invalidationType));
+    locators.insert(
+        UsdImagingDataSourceCustomPrimvars::Invalidate(
+            properties, _GetCustomPrimvarMappings(prim)));
 
-  locators.insert(
-      UsdImagingDataSourceCustomPrimvars::Invalidate(properties, _GetCustomPrimvarMappings(prim)));
-
-  return locators;
+    return locators;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

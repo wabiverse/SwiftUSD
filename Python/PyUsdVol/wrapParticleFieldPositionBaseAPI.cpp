@@ -1,0 +1,131 @@
+//
+// Copyright 2016 Pixar
+//
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
+//
+#include "UsdVol/particleFieldPositionBaseAPI.h"
+#include "Usd/schemaBase.h"
+
+#include "Sdf/primSpec.h"
+
+#include "Usd/pyConversions.h"
+#include "Tf/pyAnnotatedBoolResult.h"
+#include "Tf/pyContainerConversions.h"
+#include "Tf/pyResultConversions.h"
+#include "Tf/pyUtils.h"
+#include "Tf/wrapTypeHelpers.h"
+
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+
+#include <string>
+
+PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
+
+namespace {
+
+#define WRAP_CUSTOM                                                     \
+    template <class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+
+static std::string
+_Repr(const UsdVolParticleFieldPositionBaseAPI &self)
+{
+    std::string primRepr = TfPyRepr(self.GetPrim());
+    return TfStringPrintf(
+        "UsdVol.ParticleFieldPositionBaseAPI(%s)",
+        primRepr.c_str());
+}
+
+struct UsdVolParticleFieldPositionBaseAPI_CanApplyResult : 
+    public TfPyAnnotatedBoolResult<std::string>
+{
+    UsdVolParticleFieldPositionBaseAPI_CanApplyResult(bool val, std::string const &msg) :
+        TfPyAnnotatedBoolResult<std::string>(val, msg) {}
+};
+
+static UsdVolParticleFieldPositionBaseAPI_CanApplyResult
+_WrapCanApply(const UsdPrim& prim)
+{
+    std::string whyNot;
+    bool result = UsdVolParticleFieldPositionBaseAPI::CanApply(prim, &whyNot);
+    return UsdVolParticleFieldPositionBaseAPI_CanApplyResult(result, whyNot);
+}
+
+} // anonymous namespace
+
+void wrapUsdVolParticleFieldPositionBaseAPI()
+{
+    typedef UsdVolParticleFieldPositionBaseAPI This;
+
+    UsdVolParticleFieldPositionBaseAPI_CanApplyResult::Wrap<UsdVolParticleFieldPositionBaseAPI_CanApplyResult>(
+        "_CanApplyResult", "whyNot");
+
+    class_<This, bases<UsdAPISchemaBase> >
+        cls("ParticleFieldPositionBaseAPI");
+
+    cls
+        .def(init<UsdPrim>(arg("prim")))
+        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
+        .def(TfTypePythonClass())
+
+        .def("Get", &This::Get, (arg("stage"), arg("path")))
+        .staticmethod("Get")
+
+        .def("CanApply", &_WrapCanApply, (arg("prim")))
+        .staticmethod("CanApply")
+
+        .def("Apply", &This::Apply, (arg("prim")))
+        .staticmethod("Apply")
+
+        .def("GetSchemaAttributeNames",
+             &This::GetSchemaAttributeNames,
+             arg("includeInherited")=true,
+             return_value_policy<TfPySequenceToList>())
+        .staticmethod("GetSchemaAttributeNames")
+
+        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
+             return_value_policy<return_by_value>())
+        .staticmethod("_GetStaticTfType")
+
+        .def(!self)
+
+
+        .def("__repr__", ::_Repr)
+    ;
+
+    _CustomWrapCode(cls);
+}
+
+// ===================================================================== //
+// Feel free to add custom code below this line, it will be preserved by 
+// the code generator.  The entry point for your custom code should look
+// minimally like the following:
+//
+// WRAP_CUSTOM {
+//     _class
+//         .def("MyCustomMethod", ...)
+//     ;
+// }
+//
+// Of course any other ancillary or support code may be provided.
+// 
+// Just remember to wrap code in the appropriate delimiters:
+// 'namespace {', '}'.
+//
+// ===================================================================== //
+// --(BEGIN CUSTOM CODE)--
+
+namespace {
+
+WRAP_CUSTOM {
+}
+
+}

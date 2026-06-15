@@ -12,8 +12,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 UsdImagingDataSourceAttributeColorSpace::UsdImagingDataSourceAttributeColorSpace(
     const UsdAttribute &usdAttr)
-    : _usdAttr(usdAttr)
+    :  _usdAttr(usdAttr)
 {
 }
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

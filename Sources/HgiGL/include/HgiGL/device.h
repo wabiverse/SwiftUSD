@@ -8,9 +8,6 @@
 #define PXR_IMAGING_HGIGL_DEVICE_H
 
 #include "pxr/pxrns.h"
-
-#include "Arch/swiftInterop.h"
-
 #include "Hgi/graphicsCmdsDesc.h"
 #include "HgiGL/api.h"
 #include "HgiGL/contextArena.h"
@@ -30,44 +27,49 @@ class HgiGraphicsCmdDesc;
 ///       See notes in hgiGL/hgi.h
 ///
 class HgiGLDevice final {
- public:
-  HGIGL_API
-  HgiGLDevice();
+public:
+    HGIGL_API
+    HgiGLDevice();
 
-  HGIGL_API
-  ~HgiGLDevice();
+    HGIGL_API
+    ~HgiGLDevice();
 
-  /// Execute the provided functions / ops. This will emit the GL calls.
-  HGIGL_API
-  void SubmitOps(HgiGLOpsVector const &ops);
+    /// Execute the provided functions / ops. This will emit the GL calls.
+    HGIGL_API
+    void SubmitOps(HgiGLOpsVector const& ops);
 
-  /// Sets the active arena to use when submitting commands. This is used
-  /// for management of resources tied to a GL context such as FBOs.
-  /// The default arena is used if a valid handle isn't provided.
-  HGIGL_API
-  void SetCurrentArena(HgiGLContextArenaHandle const &arenaHandle);
+    /// Sets the active arena to use when submitting commands. This is used
+    /// for management of resources tied to a GL context such as FBOs.
+    /// The default arena is used if a valid handle isn't provided.
+    HGIGL_API
+    void SetCurrentArena(HgiGLContextArenaHandle const& arenaHandle);
+ 
+    /// Returns a framebuffer object id that is managed by the active arena.
+    HGIGL_API
+    uint32_t AcquireFramebuffer(
+        HgiGraphicsCmdsDesc const& desc,
+        bool resolved = false);
+    
+    /// Garbage collect resources in the active arena.
+    HGIGL_API
+    void GarbageCollect();
 
-  /// Returns a framebuffer object id that is managed by the active arena.
-  HGIGL_API
-  uint32_t AcquireFramebuffer(HgiGraphicsCmdsDesc const &desc, bool resolved = false);
+private:
+    HgiGLContextArena const * _GetArena() const;
+    HgiGLContextArena * _GetArena();
 
-  /// Garbage collect resources in the active arena.
-  HGIGL_API
-  void GarbageCollect();
+    HgiGLDevice & operator=(const HgiGLDevice&) = delete;
+    HgiGLDevice(const HgiGLDevice&) = delete;
 
- private:
-  HgiGLContextArena const *_GetArena() const;
-  HgiGLContextArena *_GetArena();
+    friend std::ofstream& operator<<(
+        std::ofstream& out,
+        const HgiGLDevice& dev);
 
-  HgiGLDevice &operator=(const HgiGLDevice &) = delete;
-  HgiGLDevice(const HgiGLDevice &) = delete;
+    // The default arena is used in the absence of a user provided arena.
+    HgiGLContextArena _defaultArena;
+    HgiGLContextArena *_activeArena;
+};
 
-  friend std::ofstream &operator<<(std::ofstream &out, const HgiGLDevice &dev);
-
-  // The default arena is used in the absence of a user provided arena.
-  HgiGLContextArena _defaultArena;
-  HgiGLContextArena *_activeArena;
-} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

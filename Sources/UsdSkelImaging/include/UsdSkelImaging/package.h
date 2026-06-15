@@ -7,9 +7,9 @@
 #ifndef PXR_USD_IMAGING_USD_SKEL_IMAGING_PACKAGE_H
 #define PXR_USD_IMAGING_USD_SKEL_IMAGING_PACKAGE_H
 
-#include "Tf/token.h"
-#include "UsdSkelImaging/api.h"
 #include "pxr/pxrns.h"
+#include "UsdSkelImaging/api.h"
+#include "Tf/token.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -18,4 +18,4 @@ TfToken UsdSkelImagingPackageSkinningShader();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_SKEL_IMAGING_PACKAGE_H
+#endif // PXR_USD_IMAGING_USD_SKEL_IMAGING_PACKAGE_H

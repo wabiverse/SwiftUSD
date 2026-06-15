@@ -13,46 +13,56 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingDiskLightAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingDiskLightAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingDiskLightAdapter::~UsdImagingDiskLightAdapter() {}
-
-TfTokenVector UsdImagingDiskLightAdapter::GetImagingSubprims(UsdPrim const &prim)
+UsdImagingDiskLightAdapter::~UsdImagingDiskLightAdapter() 
 {
-  return {TfToken()};
 }
 
-TfToken UsdImagingDiskLightAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                          TfToken const &subprim)
+TfTokenVector
+UsdImagingDiskLightAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->diskLight;
-  }
-
-  return TfToken();
+    return { TfToken() };
 }
 
-bool UsdImagingDiskLightAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+TfToken
+UsdImagingDiskLightAdapter::GetImagingSubprimType(
+    UsdPrim const& prim, TfToken const& subprim)
 {
-  return UsdImagingLightAdapter::IsEnabledSceneLights() &&
-         index->IsSprimTypeSupported(HdPrimTypeTokens->diskLight);
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->diskLight;
+    }
+
+    return TfToken();
 }
 
-SdfPath UsdImagingDiskLightAdapter::Populate(UsdPrim const &prim,
-                                             UsdImagingIndexProxy *index,
-                                             UsdImagingInstancerContext const *instancerContext)
+bool
+UsdImagingDiskLightAdapter::IsSupported(UsdImagingIndexProxy const* index) const
 {
-  return _AddSprim(HdPrimTypeTokens->diskLight, prim, index, instancerContext);
+    return UsdImagingLightAdapter::IsEnabledSceneLights() &&
+           index->IsSprimTypeSupported(HdPrimTypeTokens->diskLight);
 }
 
-void UsdImagingDiskLightAdapter::_RemovePrim(SdfPath const &cachePath, UsdImagingIndexProxy *index)
+SdfPath
+UsdImagingDiskLightAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
 {
-  _RemoveSprim(HdPrimTypeTokens->diskLight, cachePath, index);
+    return _AddSprim(HdPrimTypeTokens->diskLight, prim, index, instancerContext);
 }
+
+void
+UsdImagingDiskLightAdapter::_RemovePrim(SdfPath const& cachePath,
+                                         UsdImagingIndexProxy* index)
+{
+    _RemoveSprim(HdPrimTypeTokens->diskLight, cachePath, index);
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

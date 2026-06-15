@@ -13,7 +13,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<HdGpGenerativeProceduralPlugin>();
+    TfType::Define<HdGpGenerativeProceduralPlugin>();
 }
 
 HdGpGenerativeProceduralPlugin::HdGpGenerativeProceduralPlugin() = default;
@@ -31,11 +31,12 @@ HdGpGenerativeProceduralPlugin::HdGpGenerativeProceduralPlugin() = default;
 // in this compilation unit.
 HdGpGenerativeProceduralPlugin::~HdGpGenerativeProceduralPlugin() = default;
 
+
 /* virtual */
-HdGpGenerativeProcedural *HdGpGenerativeProceduralPlugin::Construct(
-    const SdfPath &proceduralPrimPath)
+HdGpGenerativeProcedural *
+HdGpGenerativeProceduralPlugin::Construct(const SdfPath &proceduralPrimPath)
 {
-  return nullptr;
+    return nullptr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

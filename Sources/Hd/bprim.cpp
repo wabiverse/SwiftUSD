@@ -8,10 +8,17 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdBprim::HdBprim(SdfPath const &id) : _id(id) {}
+HdBprim::HdBprim(SdfPath const &id)
+ : _id(id)
+{
+}
 
 HdBprim::~HdBprim() = default;
 
-void HdBprim::Finalize(HdRenderParam *renderParam) {}
+void
+HdBprim::Finalize(HdRenderParam *renderParam)
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

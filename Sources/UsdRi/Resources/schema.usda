@@ -2,15 +2,15 @@
 (
     "This file describes the USD RenderMan Interface (UsdRi) schemata for code generation."
     subLayers = [
-        @Usd/schema.usda@,
-        @UsdShade/schema.usda@,
+        @usd/schema.usda@,
+        @usdShade/schema.usda@,
     ]
 )
 
 def "GLOBAL" (
     customData = {
-        string libraryName      = "UsdRi"
-        string libraryPath      = "UsdRi"
+        string libraryName      = "usdRi"
+        string libraryPath      = "pxr/usd/usdRi"
         # string libraryPrefix  = "UsdRi"
         # string tokensPrefix   = "UsdRi"
         # dictionary libraryTokens = {}
@@ -79,7 +79,7 @@ class "StatementsAPI" (
     """ 
     customData = {
         string extraIncludes = """
-#include "UsdGeom/primvarsAPI.h"
+#include "pxr/usd/usdGeom/primvarsAPI.h"
 """
     }
 ) {
@@ -99,9 +99,9 @@ class "RiMaterialAPI" (
         # We want the class name to be UsdRiMaterialAPI
         string className = "MaterialAPI"    
         string extraIncludes = """
-#include "UsdShade/input.h"
-#include "UsdShade/output.h"
-#include "UsdShade/material.h"
+#include "pxr/usd/usdShade/input.h"
+#include "pxr/usd/usdShade/output.h"
+#include "pxr/usd/usdShade/material.h"
 """
     }
 ) {
@@ -154,47 +154,4 @@ class "RiSplineAPI" (
         string className = "SplineAPI"
     }
 ) {
-}
-
-
-########################################################################
-# Render API
-
-class "RiRenderPassAPI" (
-    inherits = </APISchemaBase>
-    doc = """
-    RiRenderPassAPI is an API schema that provides a mechanism
-    to set certain Ri statements on each prim in a collection,
-    for a given RenderPass prim.
-
-    \\anchor usdRi_cameraVisibility
-    The objects that are relevant to the render is specified via the 
-    cameraVisibility collection (UsdCollectionAPI) and can be accessed via 
-    GetCameraVisibilityCollectionAPI(). Each prim in the collection will have
-    ri:visible:camera set to 1.  By default everything in the scene should be 
-    visible to camera, so this collection sets includeRoot to 1.
-
-    \\anchor usdRi_matte
-    The objects that are relevant to the render is specified via the 
-    matte collection (UsdCollectionAPI) and can be accessed via 
-    GetMatteCollectionAPI().  Each prim in the collection will have
-    ri:matte set to 1.  By default everything in the scene should render
-    normally, so this collection sets includeRoot to 0.
-    """
-    customData = {
-        string className = "RenderPassAPI"
-        token[] apiSchemaAutoApplyTo = ["RenderPass"]
-        token[] apiSchemaCanOnlyApplyTo = ["RenderPass"]
-        string extraIncludes = """
-#include "Usd/collectionAPI.h" """
-    }
-    prepend apiSchemas = [
-    "CollectionAPI:matte", "CollectionAPI:cameraVisibility"]
-) {
-
-    uniform bool collection:cameraVisibility:includeRoot = 1 (
-        customData = {
-            bool apiSchemaOverride = true
-        }
-    )
 }

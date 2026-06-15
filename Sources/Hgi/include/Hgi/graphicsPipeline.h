@@ -7,6 +7,7 @@
 #ifndef PXR_IMAGING_HGI_GRAPHICS_PIPELINE_H
 #define PXR_IMAGING_HGI_GRAPHICS_PIPELINE_H
 
+#include "pxr/pxrns.h"
 #include "Hgi/api.h"
 #include "Hgi/attachmentDesc.h"
 #include "Hgi/enums.h"
@@ -14,7 +15,6 @@
 #include "Hgi/resourceBindings.h"
 #include "Hgi/shaderProgram.h"
 #include "Hgi/types.h"
-#include "pxr/pxrns.h"
 
 #include "Gf/vec2f.h"
 
@@ -22,6 +22,7 @@
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \struct HgiVertexAttributeDesc
 ///
@@ -36,21 +37,27 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///    The location of the attribute in the shader. layout(location = X)</li>
 /// </ul>
 ///
-struct HgiVertexAttributeDesc {
-  HGI_API
-  HgiVertexAttributeDesc();
+struct HgiVertexAttributeDesc
+{
+    HGI_API
+    HgiVertexAttributeDesc();
 
-  HgiFormat format;
-  uint32_t offset;
-  uint32_t shaderBindLocation;
+    HgiFormat format;
+    uint32_t offset;
+    uint32_t shaderBindLocation;
 };
 using HgiVertexAttributeDescVector = std::vector<HgiVertexAttributeDesc>;
 
 HGI_API
-bool operator==(const HgiVertexAttributeDesc &lhs, const HgiVertexAttributeDesc &rhs);
+bool operator==(
+    const HgiVertexAttributeDesc& lhs,
+    const HgiVertexAttributeDesc& rhs);
 
 HGI_API
-inline bool operator!=(const HgiVertexAttributeDesc &lhs, const HgiVertexAttributeDesc &rhs);
+bool operator!=(
+    const HgiVertexAttributeDesc& lhs,
+    const HgiVertexAttributeDesc& rhs);
+
 
 /// \struct HgiVertexBufferDesc
 ///
@@ -67,22 +74,28 @@ inline bool operator!=(const HgiVertexAttributeDesc &lhs, const HgiVertexAttribu
 ///   The byte size of a vertex (distance between two vertices).</li>
 /// </ul>
 ///
-struct HgiVertexBufferDesc {
-  HGI_API
-  HgiVertexBufferDesc();
+struct HgiVertexBufferDesc
+{
+    HGI_API
+    HgiVertexBufferDesc();
 
-  uint32_t bindingIndex;
-  HgiVertexAttributeDescVector vertexAttributes;
-  HgiVertexBufferStepFunction vertexStepFunction;
-  uint32_t vertexStride;
+    uint32_t bindingIndex;
+    HgiVertexAttributeDescVector vertexAttributes;
+    HgiVertexBufferStepFunction vertexStepFunction;
+    uint32_t vertexStride;
 };
 using HgiVertexBufferDescVector = std::vector<HgiVertexBufferDesc>;
 
 HGI_API
-bool operator==(const HgiVertexBufferDesc &lhs, const HgiVertexBufferDesc &rhs);
+bool operator==(
+    const HgiVertexBufferDesc& lhs,
+    const HgiVertexBufferDesc& rhs);
 
 HGI_API
-inline bool operator!=(const HgiVertexBufferDesc &lhs, const HgiVertexBufferDesc &rhs);
+inline bool operator!=(
+    const HgiVertexBufferDesc& lhs,
+    const HgiVertexBufferDesc& rhs);
+
 
 /// \struct HgiMultiSampleState
 ///
@@ -90,7 +103,7 @@ inline bool operator!=(const HgiVertexBufferDesc &lhs, const HgiVertexBufferDesc
 ///
 /// <ul>
 /// <li>multiSampleEnable:
-///   When enabled and sampleCount and attachments match and allow for it, use
+///   When enabled and sampleCount and attachments match and allow for it, use 
 ///   multi-sampling.</li>
 /// <li>alphaToCoverageEnable:
 ///   Fragment's color.a determines coverage (screen door transparency).</li>
@@ -102,21 +115,27 @@ inline bool operator!=(const HgiVertexBufferDesc &lhs, const HgiVertexBufferDesc
 ///   The number of samples for each fragment. Must match attachments</li>
 /// </ul>
 ///
-struct HgiMultiSampleState {
-  HGI_API
-  HgiMultiSampleState();
+struct HgiMultiSampleState
+{
+    HGI_API
+    HgiMultiSampleState();
 
-  bool multiSampleEnable;
-  bool alphaToCoverageEnable;
-  bool alphaToOneEnable;
-  HgiSampleCount sampleCount;
+    bool multiSampleEnable;
+    bool alphaToCoverageEnable;
+    bool alphaToOneEnable;
+    HgiSampleCount sampleCount;
 };
 
 HGI_API
-bool operator==(const HgiMultiSampleState &lhs, const HgiMultiSampleState &rhs);
+bool operator==(
+    const HgiMultiSampleState& lhs,
+    const HgiMultiSampleState& rhs);
 
 HGI_API
-bool operator!=(const HgiMultiSampleState &lhs, const HgiMultiSampleState &rhs);
+bool operator!=(
+    const HgiMultiSampleState& lhs,
+    const HgiMultiSampleState& rhs);
+
 
 /// \struct HgiRasterizationState
 ///
@@ -145,26 +164,31 @@ bool operator!=(const HgiMultiSampleState &lhs, const HgiMultiSampleState &rhs);
 ///   The number of user-defined clip distances.</li>
 /// </ul>
 ///
-struct HgiRasterizationState {
-  HGI_API
-  HgiRasterizationState();
+struct HgiRasterizationState
+{
+    HGI_API
+    HgiRasterizationState();
 
-  HgiPolygonMode polygonMode;
-  float lineWidth;
-  HgiCullMode cullMode;
-  HgiWinding winding;
-  bool rasterizerEnabled;
-  bool depthClampEnabled;
-  GfVec2f depthRange;
-  bool conservativeRaster;
-  size_t numClipDistances;
+    HgiPolygonMode polygonMode;
+    float lineWidth;
+    HgiCullMode cullMode;
+    HgiWinding winding;
+    bool rasterizerEnabled;
+    bool depthClampEnabled;
+    GfVec2f depthRange;
+    bool conservativeRaster;
+    size_t numClipDistances;
 };
 
 HGI_API
-bool operator==(const HgiRasterizationState &lhs, const HgiRasterizationState &rhs);
+bool operator==(
+    const HgiRasterizationState& lhs,
+    const HgiRasterizationState& rhs);
 
 HGI_API
-bool operator!=(const HgiRasterizationState &lhs, const HgiRasterizationState &rhs);
+bool operator!=(
+    const HgiRasterizationState& lhs,
+    const HgiRasterizationState& rhs);
 
 /// \struct HgiStencilState
 ///
@@ -189,24 +213,29 @@ bool operator!=(const HgiRasterizationState &lhs, const HgiRasterizationState &r
 ///   The mask applied when writing to the stencil buffer.</li>
 /// </ul>
 ///
-struct HgiStencilState {
-  HGI_API
-  HgiStencilState();
+struct HgiStencilState
+{
+    HGI_API
+    HgiStencilState();
 
-  HgiCompareFunction compareFn;
-  uint32_t referenceValue;
-  HgiStencilOp stencilFailOp;
-  HgiStencilOp depthFailOp;
-  HgiStencilOp depthStencilPassOp;
-  uint32_t readMask;
-  uint32_t writeMask;
+    HgiCompareFunction compareFn;
+    uint32_t referenceValue;
+    HgiStencilOp stencilFailOp;
+    HgiStencilOp depthFailOp;
+    HgiStencilOp depthStencilPassOp;
+    uint32_t readMask;
+    uint32_t writeMask;
 };
 
 HGI_API
-bool operator==(const HgiStencilState &lhs, const HgiStencilState &rhs);
+bool operator==(
+    const HgiStencilState& lhs,
+    const HgiStencilState& rhs);
 
 HGI_API
-bool operator!=(const HgiStencilState &lhs, const HgiStencilState &rhs);
+bool operator!=(
+    const HgiStencilState& lhs,
+    const HgiStencilState& rhs);
 
 /// \struct HgiDepthStencilState
 ///
@@ -237,28 +266,33 @@ bool operator!=(const HgiStencilState &lhs, const HgiStencilState &rhs);
 ///   Stencil operation for back faces.</li>
 /// </ul>
 ///
-struct HgiDepthStencilState {
-  HGI_API
-  HgiDepthStencilState();
+struct HgiDepthStencilState
+{
+    HGI_API
+    HgiDepthStencilState();
 
-  bool depthTestEnabled;
-  bool depthWriteEnabled;
-  HgiCompareFunction depthCompareFn;
+    bool depthTestEnabled;
+    bool depthWriteEnabled;
+    HgiCompareFunction depthCompareFn;
 
-  bool depthBiasEnabled;
-  float depthBiasConstantFactor;
-  float depthBiasSlopeFactor;
+    bool depthBiasEnabled;
+    float depthBiasConstantFactor;
+    float depthBiasSlopeFactor;
 
-  bool stencilTestEnabled;
-  HgiStencilState stencilFront;
-  HgiStencilState stencilBack;
+    bool stencilTestEnabled;
+    HgiStencilState stencilFront;
+    HgiStencilState stencilBack;
 };
 
 HGI_API
-bool operator==(const HgiDepthStencilState &lhs, const HgiDepthStencilState &rhs);
+bool operator==(
+    const HgiDepthStencilState& lhs,
+    const HgiDepthStencilState& rhs);
 
 HGI_API
-bool operator!=(const HgiDepthStencilState &lhs, const HgiDepthStencilState &rhs);
+bool operator!=(
+    const HgiDepthStencilState& lhs,
+    const HgiDepthStencilState& rhs);
 
 /// \struct HgiGraphicsShaderConstantsDesc
 ///
@@ -272,27 +306,30 @@ bool operator!=(const HgiDepthStencilState &lhs, const HgiDepthStencilState &rhs
 /// </ul>
 ///
 struct HgiGraphicsShaderConstantsDesc {
-  HGI_API
-  HgiGraphicsShaderConstantsDesc();
+    HGI_API
+    HgiGraphicsShaderConstantsDesc();
 
-  uint32_t byteSize;
-  HgiShaderStage stageUsage;
+    uint32_t byteSize;
+    HgiShaderStage stageUsage;
 };
 
 HGI_API
-bool operator==(const HgiGraphicsShaderConstantsDesc &lhs,
-                const HgiGraphicsShaderConstantsDesc &rhs);
+bool operator==(
+    const HgiGraphicsShaderConstantsDesc& lhs,
+    const HgiGraphicsShaderConstantsDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiGraphicsShaderConstantsDesc &lhs,
-                const HgiGraphicsShaderConstantsDesc &rhs);
+bool operator!=(
+    const HgiGraphicsShaderConstantsDesc& lhs,
+    const HgiGraphicsShaderConstantsDesc& rhs);
 
-struct HgiTessellationLevel {
-  HGI_API
-  HgiTessellationLevel();
+struct HgiTessellationLevel
+{
+    HGI_API
+    HgiTessellationLevel();
 
-  float innerTessLevel[2];
-  float outerTessLevel[4];
+    float innerTessLevel[2];
+    float outerTessLevel[4];
 };
 
 /// \struct HgiTessellationState
@@ -308,18 +345,27 @@ struct HgiTessellationLevel {
 ///   The fallback tessellation levels.</li>
 /// </ul>
 ///
-struct HgiTessellationState {
-  enum PatchType { Triangle, Quad, Isoline };
+struct HgiTessellationState
+{
+    enum PatchType {
+        Triangle,
+        Quad,
+        Isoline
+    };
 
-  enum TessFactorMode { Constant, TessControl, TessVertex };
+    enum TessFactorMode {
+        Constant,
+        TessControl,
+        TessVertex
+    };
 
-  HGI_API
-  HgiTessellationState();
+    HGI_API
+    HgiTessellationState();
 
-  PatchType patchType;
-  int primitiveIndexSize;
-  TessFactorMode tessFactorMode = TessFactorMode::Constant;
-  HgiTessellationLevel tessellationLevel;
+    PatchType patchType;
+    int primitiveIndexSize;
+    TessFactorMode tessFactorMode = TessFactorMode::Constant;
+    HgiTessellationLevel tessellationLevel;
 };
 
 /// \struct HgiGraphicsPipelineDesc
@@ -353,29 +399,35 @@ struct HgiTessellationState {
 ///   Describes the tessellation state.</li>
 /// </ul>
 ///
-struct HgiGraphicsPipelineDesc {
-  HGI_API
-  HgiGraphicsPipelineDesc();
+struct HgiGraphicsPipelineDesc
+{
+    HGI_API
+    HgiGraphicsPipelineDesc();
 
-  std::string debugName;
-  HgiPrimitiveType primitiveType;
-  HgiShaderProgramHandle shaderProgram;
-  HgiDepthStencilState depthState;
-  HgiMultiSampleState multiSampleState;
-  HgiRasterizationState rasterizationState;
-  HgiVertexBufferDescVector vertexBuffers;
-  HgiAttachmentDescVector colorAttachmentDescs;
-  HgiAttachmentDesc depthAttachmentDesc;
-  bool resolveAttachments;
-  HgiGraphicsShaderConstantsDesc shaderConstantsDesc;
-  HgiTessellationState tessellationState;
+    std::string debugName;
+    HgiPrimitiveType primitiveType;
+    HgiShaderProgramHandle shaderProgram;
+    HgiDepthStencilState depthState;
+    HgiMultiSampleState multiSampleState;
+    HgiRasterizationState rasterizationState;
+    HgiVertexBufferDescVector vertexBuffers;
+    HgiAttachmentDescVector colorAttachmentDescs;
+    HgiAttachmentDesc depthAttachmentDesc;
+    bool resolveAttachments;
+    HgiGraphicsShaderConstantsDesc shaderConstantsDesc;
+    HgiTessellationState tessellationState;
 };
 
 HGI_API
-bool operator==(const HgiGraphicsPipelineDesc &lhs, const HgiGraphicsPipelineDesc &rhs);
+bool operator==(
+    const HgiGraphicsPipelineDesc& lhs,
+    const HgiGraphicsPipelineDesc& rhs);
 
 HGI_API
-bool operator!=(const HgiGraphicsPipelineDesc &lhs, const HgiGraphicsPipelineDesc &rhs);
+bool operator!=(
+    const HgiGraphicsPipelineDesc& lhs,
+    const HgiGraphicsPipelineDesc& rhs);
+
 
 ///
 /// \class HgiGraphicsPipeline
@@ -387,29 +439,31 @@ bool operator!=(const HgiGraphicsPipelineDesc &lhs, const HgiGraphicsPipelineDes
 /// To the client (HdSt) pipeline resources are referred to via
 /// opaque, stateless handles (HgiPipelineHandle).
 ///
-class HgiGraphicsPipeline {
- public:
-  HGI_API
-  virtual ~HgiGraphicsPipeline();
+class HgiGraphicsPipeline
+{
+public:
+    HGI_API
+    virtual ~HgiGraphicsPipeline();
 
-  /// The descriptor describes the object.
-  HGI_API
-  HgiGraphicsPipelineDesc const &GetDescriptor() const;
+    /// The descriptor describes the object.
+    HGI_API
+    HgiGraphicsPipelineDesc const& GetDescriptor() const;
 
- protected:
-  HGI_API
-  HgiGraphicsPipeline(HgiGraphicsPipelineDesc const &desc);
+protected:
+    HGI_API
+    HgiGraphicsPipeline(HgiGraphicsPipelineDesc const& desc);
 
-  HgiGraphicsPipelineDesc _descriptor;
+    HgiGraphicsPipelineDesc _descriptor;
 
- private:
-  HgiGraphicsPipeline() = delete;
-  HgiGraphicsPipeline &operator=(const HgiGraphicsPipeline &) = delete;
-  HgiGraphicsPipeline(const HgiGraphicsPipeline &) = delete;
+private:
+    HgiGraphicsPipeline() = delete;
+    HgiGraphicsPipeline & operator=(const HgiGraphicsPipeline&) = delete;
+    HgiGraphicsPipeline(const HgiGraphicsPipeline&) = delete;
 };
 
 using HgiGraphicsPipelineHandle = HgiHandle<HgiGraphicsPipeline>;
 using HgiGraphicsPipelineHandleVector = std::vector<HgiGraphicsPipelineHandle>;
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

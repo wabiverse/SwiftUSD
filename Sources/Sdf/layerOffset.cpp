@@ -7,10 +7,10 @@
 ///
 /// LayerOffset.cpp
 
-#include "Sdf/layerOffset.h"
-#include "Gf/gfMath.h"
-#include "Sdf/timeCode.h"
 #include "pxr/pxrns.h"
+#include "Sdf/layerOffset.h"
+#include "Sdf/timeCode.h"
+#include "Gf/math.h"
 
 #include "Tf/hash.h"
 #include "Tf/type.h"
@@ -24,97 +24,102 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-  TfType::Define<SdfLayerOffset>();
-  TfType::Define<std::vector<SdfLayerOffset>>();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<SdfLayerOffset>();
+    TfType::Define<std::vector<SdfLayerOffset>>();
 }
 
-bool SdfLayerOffset::IsIdentity() const
+bool
+SdfLayerOffset::IsValid() const
 {
-  // Construct a static instance to avoid a default construction on every call
-  // to SdfLayerOffset::IsIdentity().
-  static SdfLayerOffset identityOffset;
-
-  // Use operator==() for fuzzy compare (i.e. GfIsClose).
-  return *this == identityOffset;
-}
-
-SdfLayerOffset::SdfLayerOffset(double offset, double scale) : _offset(offset), _scale(scale) {}
-
-bool SdfLayerOffset::IsValid() const
-{
-  return std::isfinite(_offset) && std::isfinite(_scale);
+    return std::isfinite(_offset) && std::isfinite(_scale);
 }
 
 SdfLayerOffset SdfLayerOffset::GetInverse() const
 {
-  if (IsIdentity()) {
-    return *this;
-  }
+    if (IsIdentity()) {
+        return *this;
+    }
 
-  double newScale;
-  if (_scale != 0.0) {
-    newScale = 1.0 / _scale;
-  }
-  else {
-    newScale = std::numeric_limits<double>::infinity();
-  }
-  return SdfLayerOffset(-_offset * newScale, newScale);
+    double newScale;
+    if (_scale != 0.0) {
+        newScale = 1.0 / _scale;
+    } else {
+        newScale = std::numeric_limits<double>::infinity();
+    }
+    return SdfLayerOffset( -_offset * newScale, newScale );
 }
 
-SdfLayerOffset SdfLayerOffset::operator*(const SdfLayerOffset &rhs) const
+SdfLayerOffset
+SdfLayerOffset::operator*(const SdfLayerOffset &rhs) const
 {
-  return SdfLayerOffset(_scale * rhs._offset + _offset, _scale * rhs._scale);
+    return SdfLayerOffset( _scale * rhs._offset + _offset,
+                           _scale * rhs._scale );
 }
 
-double SdfLayerOffset::operator*(double rhs) const
+double
+SdfLayerOffset::operator*(double rhs) const
 {
-  return (rhs * _scale + _offset);
+    return ( rhs * _scale + _offset );
 }
 
-SdfTimeCode SdfLayerOffset::operator*(const SdfTimeCode &rhs) const
+SdfTimeCode
+SdfLayerOffset::operator*(const SdfTimeCode &rhs) const
 {
-  return SdfTimeCode((*this) * double(rhs));
+    return SdfTimeCode( (*this) * double(rhs) );
 }
 
-bool SdfLayerOffset::operator==(const SdfLayerOffset &rhs) const
+bool
+SdfLayerOffset::operator==(const SdfLayerOffset &rhs) const
 {
-  // Use EPSILON so that 0 == -0, for example.
-  return (!IsValid() && !rhs.IsValid()) ||
-         (GfIsClose(_offset, rhs._offset, EPSILON) && GfIsClose(_scale, rhs._scale, EPSILON));
+    const bool lhsIsValid = IsValid();
+    const bool rhsIsValid = rhs.IsValid();
+
+    if (lhsIsValid && rhsIsValid) {
+        return
+            GfIsClose(_offset, rhs._offset, EPSILON) &&
+            GfIsClose(_scale, rhs._scale, EPSILON);
+    }
+    return !lhsIsValid && !rhsIsValid;
 }
 
-bool SdfLayerOffset::operator<(const SdfLayerOffset &rhs) const
+bool
+SdfLayerOffset::operator<(const SdfLayerOffset &rhs) const
 {
-  if (!IsValid()) {
-    return false;
-  }
-  if (!rhs.IsValid()) {
-    return true;
-  }
-  if (GfIsClose(_scale, rhs._scale, EPSILON)) {
-    if (GfIsClose(_offset, rhs._offset, EPSILON)) {
-      return false;
+    if (!IsValid()) {
+        return false;
+    }
+    if (!rhs.IsValid()) {
+        return true;
+    }
+    if (GfIsClose(_scale, rhs._scale, EPSILON)) {
+        if (GfIsClose(_offset, rhs._offset, EPSILON)) {
+            return false;
+        }
+        else {
+            return _offset < rhs._offset;
+        }
     }
     else {
-      return _offset < rhs._offset;
+        return _scale < rhs._scale;
     }
-  }
-  else {
-    return _scale < rhs._scale;
-  }
 }
 
-size_t SdfLayerOffset::GetHash() const
+size_t
+SdfLayerOffset::GetHash() const
 {
-  return TfHash::Combine(_offset, _scale);
+    return TfHash::Combine(
+        _offset,
+        _scale
+    );
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfLayerOffset &layerOffset)
+std::ostream & operator<<( std::ostream &out,
+                           const SdfLayerOffset &layerOffset )
 {
-  return out << "SdfLayerOffset(" << layerOffset.GetOffset() << ", " << layerOffset.GetScale()
-             << ")";
+    return out << "SdfLayerOffset("
+        << layerOffset.GetOffset() << ", "
+        << layerOffset.GetScale() << ")";
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

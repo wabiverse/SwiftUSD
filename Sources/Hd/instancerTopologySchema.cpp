@@ -19,192 +19,215 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdInstancerTopologySchemaTokens, HD_INSTANCER_TOPOLOGY_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdInstancerTopologySchemaTokens,
+    HD_INSTANCER_TOPOLOGY_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 
-VtArray<int> HdInstancerTopologySchema::ComputeInstanceIndicesForProto(SdfPath const &path)
+VtArray<int>
+HdInstancerTopologySchema::ComputeInstanceIndicesForProto(SdfPath const &path)
 {
-  TRACE_FUNCTION();
+    TRACE_FUNCTION();
 
-  VtArray<int> result;
-  VtArray<int> matchingPrototypes;
+    VtArray<int> result;
+    VtArray<int> matchingPrototypes;
 
-  // If we can't get the instance indices datasource, not much point...
-  HdIntArrayVectorSchema indicesSchema = GetInstanceIndices();
-  if (!indicesSchema) {
-    return result;
-  }
-
-  // Map from path -> matchingPrototypes.
-  VtArray<SdfPath> prototypes;
-  if (HdPathArrayDataSourceHandle protoDs = GetPrototypes()) {
-    prototypes = protoDs->GetTypedValue(0);
-  }
-
-  for (size_t i = 0; i < prototypes.size(); ++i) {
-    if (path.HasPrefix(prototypes.AsConst()[i])) {
-      matchingPrototypes.push_back(int(i));
-    }
-  }
-
-  VtArray<bool> mask;
-  if (HdBoolArrayDataSourceHandle maskDs = GetMask()) {
-    mask = maskDs->GetTypedValue(0);
-  }
-
-  // Map from matchingPrototypes -> instanceIndices, taking mask into account.
-  for (int protoIndex : matchingPrototypes) {
-    VtArray<int> instanceIndices;
-    if (HdIntArrayDataSourceHandle indicesDs = indicesSchema.GetElement(protoIndex)) {
-      instanceIndices = indicesDs->GetTypedValue(0);
+    // If we can't get the instance indices datasource, not much point...
+    HdIntArrayVectorSchema indicesSchema = GetInstanceIndices();
+    if (!indicesSchema) {
+        return result;
     }
 
-    // If mask is empty, we can just copy or append the array...
-    if (mask.empty() && result.empty()) {
-      result = instanceIndices;
+    // Map from path -> matchingPrototypes.
+    VtArray<SdfPath> prototypes;
+    if (HdPathArrayDataSourceHandle protoDs = GetPrototypes()) {
+        prototypes = protoDs->GetTypedValue(0);
     }
-    else if (mask.empty()) {
-      size_t oldSize = result.size();
-      size_t iiSize = instanceIndices.size();
-      // Note: we call result.data() here to break buffer sharing.
-      result.data();
-      result.resize(oldSize + iiSize);
-      for (size_t i = 0; i < iiSize; ++i) {
-        result[oldSize + i] = instanceIndices[i];
-      }
-    }
-    else {
-      for (int instanceIndex : instanceIndices) {
-        if (instanceIndex >= static_cast<int>(mask.size()) || mask[instanceIndex]) {
-          result.push_back(instanceIndex);
+
+    for (size_t i = 0; i < prototypes.size(); ++i) {
+        if (path.HasPrefix(prototypes.AsConst()[i])) {
+            matchingPrototypes.push_back(int(i));
         }
-      }
     }
-  }
-  return result;
+
+    VtArray<bool> mask;
+    if (HdBoolArrayDataSourceHandle maskDs = GetMask()) {
+        mask = maskDs->GetTypedValue(0);
+    }
+
+    // Map from matchingPrototypes -> instanceIndices, taking mask into account.
+    for (int protoIndex : matchingPrototypes) {
+        VtArray<int> instanceIndices;
+        if (HdIntArrayDataSourceHandle indicesDs =
+                indicesSchema.GetElement(protoIndex)) {
+            instanceIndices = indicesDs->GetTypedValue(0);
+        }
+
+        // If mask is empty, we can just copy or append the array...
+        if (mask.empty() && result.empty()) {
+            result = instanceIndices;
+        } else if (mask.empty()) {
+            size_t oldSize = result.size();
+            size_t iiSize = instanceIndices.size();
+            // Note: we call result.data() here to break buffer sharing.
+            result.data();
+            result.resize(oldSize + iiSize);
+            for (size_t i = 0; i < iiSize; ++i) {
+                result[oldSize + i] = instanceIndices[i];
+            }
+        } else {
+            for (int instanceIndex : instanceIndices) {
+                if (instanceIndex >= static_cast<int>(mask.size()) ||
+                        mask[instanceIndex]) {
+                    result.push_back(instanceIndex);
+                }
+            }
+        }
+    }
+    return result;
 }
 
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathArrayDataSourceHandle HdInstancerTopologySchema::GetPrototypes() const
+HdPathArrayDataSourceHandle
+HdInstancerTopologySchema::GetPrototypes() const
 {
-  return _GetTypedDataSource<HdPathArrayDataSource>(HdInstancerTopologySchemaTokens->prototypes);
+    return _GetTypedDataSource<HdPathArrayDataSource>(
+        HdInstancerTopologySchemaTokens->prototypes);
 }
 
-HdIntArrayVectorSchema HdInstancerTopologySchema::GetInstanceIndices() const
+HdIntArrayVectorSchema
+HdInstancerTopologySchema::GetInstanceIndices() const
 {
-  return HdIntArrayVectorSchema(
-      _GetTypedDataSource<HdVectorDataSource>(HdInstancerTopologySchemaTokens->instanceIndices));
+    return HdIntArrayVectorSchema(_GetTypedDataSource<HdVectorDataSource>(
+        HdInstancerTopologySchemaTokens->instanceIndices));
 }
 
-HdBoolArrayDataSourceHandle HdInstancerTopologySchema::GetMask() const
+HdBoolArrayDataSourceHandle
+HdInstancerTopologySchema::GetMask() const
 {
-  return _GetTypedDataSource<HdBoolArrayDataSource>(HdInstancerTopologySchemaTokens->mask);
+    return _GetTypedDataSource<HdBoolArrayDataSource>(
+        HdInstancerTopologySchemaTokens->mask);
 }
 
-HdPathArrayDataSourceHandle HdInstancerTopologySchema::GetInstanceLocations() const
+HdPathArrayDataSourceHandle
+HdInstancerTopologySchema::GetInstanceLocations() const
 {
-  return _GetTypedDataSource<HdPathArrayDataSource>(
-      HdInstancerTopologySchemaTokens->instanceLocations);
+    return _GetTypedDataSource<HdPathArrayDataSource>(
+        HdInstancerTopologySchemaTokens->instanceLocations);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdInstancerTopologySchema::BuildRetained(
-    const HdPathArrayDataSourceHandle &prototypes,
-    const HdVectorDataSourceHandle &instanceIndices,
-    const HdBoolArrayDataSourceHandle &mask,
-    const HdPathArrayDataSourceHandle &instanceLocations)
+HdContainerDataSourceHandle
+HdInstancerTopologySchema::BuildRetained(
+        const HdPathArrayDataSourceHandle &prototypes,
+        const HdVectorDataSourceHandle &instanceIndices,
+        const HdBoolArrayDataSourceHandle &mask,
+        const HdPathArrayDataSourceHandle &instanceLocations
+)
 {
-  TfToken _names[4];
-  HdDataSourceBaseHandle _values[4];
+    TfToken _names[4];
+    HdDataSourceBaseHandle _values[4];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (prototypes) {
-    _names[_count] = HdInstancerTopologySchemaTokens->prototypes;
-    _values[_count++] = prototypes;
-  }
+    if (prototypes) {
+        _names[_count] = HdInstancerTopologySchemaTokens->prototypes;
+        _values[_count++] = prototypes;
+    }
 
-  if (instanceIndices) {
-    _names[_count] = HdInstancerTopologySchemaTokens->instanceIndices;
-    _values[_count++] = instanceIndices;
-  }
+    if (instanceIndices) {
+        _names[_count] = HdInstancerTopologySchemaTokens->instanceIndices;
+        _values[_count++] = instanceIndices;
+    }
 
-  if (mask) {
-    _names[_count] = HdInstancerTopologySchemaTokens->mask;
-    _values[_count++] = mask;
-  }
+    if (mask) {
+        _names[_count] = HdInstancerTopologySchemaTokens->mask;
+        _values[_count++] = mask;
+    }
 
-  if (instanceLocations) {
-    _names[_count] = HdInstancerTopologySchemaTokens->instanceLocations;
-    _values[_count++] = instanceLocations;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (instanceLocations) {
+        _names[_count] = HdInstancerTopologySchemaTokens->instanceLocations;
+        _values[_count++] = instanceLocations;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdInstancerTopologySchema::Builder &HdInstancerTopologySchema::Builder::SetPrototypes(
+HdInstancerTopologySchema::Builder &
+HdInstancerTopologySchema::Builder::SetPrototypes(
     const HdPathArrayDataSourceHandle &prototypes)
 {
-  _prototypes = prototypes;
-  return *this;
+    _prototypes = prototypes;
+    return *this;
 }
 
-HdInstancerTopologySchema::Builder &HdInstancerTopologySchema::Builder::SetInstanceIndices(
+HdInstancerTopologySchema::Builder &
+HdInstancerTopologySchema::Builder::SetInstanceIndices(
     const HdVectorDataSourceHandle &instanceIndices)
 {
-  _instanceIndices = instanceIndices;
-  return *this;
+    _instanceIndices = instanceIndices;
+    return *this;
 }
 
-HdInstancerTopologySchema::Builder &HdInstancerTopologySchema::Builder::SetMask(
+HdInstancerTopologySchema::Builder &
+HdInstancerTopologySchema::Builder::SetMask(
     const HdBoolArrayDataSourceHandle &mask)
 {
-  _mask = mask;
-  return *this;
+    _mask = mask;
+    return *this;
 }
 
-HdInstancerTopologySchema::Builder &HdInstancerTopologySchema::Builder::SetInstanceLocations(
+HdInstancerTopologySchema::Builder &
+HdInstancerTopologySchema::Builder::SetInstanceLocations(
     const HdPathArrayDataSourceHandle &instanceLocations)
 {
-  _instanceLocations = instanceLocations;
-  return *this;
+    _instanceLocations = instanceLocations;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdInstancerTopologySchema::Builder::Build()
+HdContainerDataSourceHandle
+HdInstancerTopologySchema::Builder::Build()
 {
-  return HdInstancerTopologySchema::BuildRetained(
-      _prototypes, _instanceIndices, _mask, _instanceLocations);
-}
-
-/*static*/
-HdInstancerTopologySchema HdInstancerTopologySchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdInstancerTopologySchema(fromParentContainer ?
-                                       HdContainerDataSource::Cast(fromParentContainer->Get(
-                                           HdInstancerTopologySchemaTokens->instancerTopology)) :
-                                       nullptr);
+    return HdInstancerTopologySchema::BuildRetained(
+        _prototypes,
+        _instanceIndices,
+        _mask,
+        _instanceLocations
+    );
 }
 
 /*static*/
-const TfToken &HdInstancerTopologySchema::GetSchemaToken()
+HdInstancerTopologySchema
+HdInstancerTopologySchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdInstancerTopologySchemaTokens->instancerTopology;
+    return HdInstancerTopologySchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdInstancerTopologySchemaTokens->instancerTopology))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdInstancerTopologySchema::GetDefaultLocator()
+const TfToken &
+HdInstancerTopologySchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdInstancerTopologySchemaTokens->instancerTopology;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdInstancerTopologySchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

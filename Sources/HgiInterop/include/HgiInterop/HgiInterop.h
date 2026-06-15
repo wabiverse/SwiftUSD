@@ -2,10 +2,8 @@
 #define __PXR_IMAGING_HGIINTEROP_H__
 
 // HgiInterop
-#include <HgiInterop/api.h>
-#include <HgiInterop/hgiInteropImpl.h>
-#include <HgiInterop/metal.h>
+#include <HgiInterop/hgiinteropImpl.h>
 #include <HgiInterop/opengl.h>
-#include <HgiInterop/vulkan.h>
-
+#include <HgiInterop/api.h>
+#include <HgiInterop/metal.h>
 #endif  // __PXR_IMAGING_HGIINTEROP_H__

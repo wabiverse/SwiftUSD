@@ -6,37 +6,73 @@
 //
 #include "UsdImaging/flattenedDataSourceProviders.h"
 
-#include "UsdImaging/directMaterialBindingsSchema.h"
-#include "UsdImaging/flattenedDirectMaterialBindingsDataSourceProvider.h"
 #include "UsdImaging/flattenedGeomModelDataSourceProvider.h"
+#include "UsdImaging/flattenedMaterialBindingsDataSourceProvider.h"
 #include "UsdImaging/geomModelSchema.h"
+#include "UsdImaging/materialBindingsSchema.h"
 #include "UsdImaging/modelSchema.h"
+#include "UsdImaging/sceneIndexPlugin.h"
 
 #include "Hd/flattenedDataSourceProviders.h"
 #include "Hd/flattenedOverlayDataSourceProvider.h"
 #include "Hd/overlayContainerDataSource.h"
 #include "Hd/retainedDataSource.h"
 
+#include "Trace/trace.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle UsdImagingFlattenedDataSourceProviders()
+static
+HdContainerDataSourceHandle
+_UsdFlattenedDataSourceProviders()
 {
-  using namespace HdMakeDataSourceContainingFlattenedDataSourceProvider;
+    using namespace HdMakeDataSourceContainingFlattenedDataSourceProvider;
 
-  static HdContainerDataSourceHandle const result = HdOverlayContainerDataSource::New(
-      {HdRetainedContainerDataSource::New(
-           UsdImagingDirectMaterialBindingsSchema::GetSchemaToken(),
-           Make<UsdImagingFlattenedDirectMaterialBindingsDataSourceProvider>()),
+    return
+        HdRetainedContainerDataSource::New(
+            UsdImagingMaterialBindingsSchema::GetSchemaToken(),
+            Make<UsdImagingFlattenedMaterialBindingsDataSourceProvider>(),
 
-       HdRetainedContainerDataSource::New(UsdImagingGeomModelSchema::GetSchemaToken(),
-                                          Make<UsdImagingFlattenedGeomModelDataSourceProvider>()),
+            UsdImagingGeomModelSchema::GetSchemaToken(),
+            Make<UsdImagingFlattenedGeomModelDataSourceProvider>(),
 
-       HdRetainedContainerDataSource::New(UsdImagingModelSchema::GetSchemaToken(),
-                                          Make<HdFlattenedOverlayDataSourceProvider>()),
+            UsdImagingModelSchema::GetSchemaToken(),
+            Make<HdFlattenedOverlayDataSourceProvider>());
+}
 
-       HdFlattenedDataSourceProviders()});
+static
+HdContainerDataSourceHandle
+_FlattenedDataSourceProviders()
+{
+    TRACE_FUNCTION();
+    
+    std::vector<HdContainerDataSourceHandle> result;
 
-  return result;
+    // Usd-specific flattening
+    result.push_back(_UsdFlattenedDataSourceProviders());
+
+    // Flattening from UsdImaging scene index plugins.
+    for (const UsdImagingSceneIndexPluginUniquePtr &sceneIndexPlugin :
+             UsdImagingSceneIndexPlugin::GetAllSceneIndexPlugins()) {
+        if (HdContainerDataSourceHandle ds =
+                sceneIndexPlugin->FlattenedDataSourceProviders()) {
+            result.push_back(std::move(ds));
+        }
+    }
+
+    // Basic flattening from Hydra.
+    result.push_back(HdFlattenedDataSourceProviders());
+
+    return HdOverlayContainerDataSource::New(result.size(), result.data());
+}
+
+
+HdContainerDataSourceHandle
+UsdImagingFlattenedDataSourceProviders()
+{
+    static HdContainerDataSourceHandle const result =
+        _FlattenedDataSourceProviders();
+    return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

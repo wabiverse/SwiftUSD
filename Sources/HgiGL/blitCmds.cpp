@@ -6,7 +6,6 @@
 //
 #include "Garch/glApi.h"
 
-#include "Hgi/blitCmdsOps.h"
 #include "HgiGL/blitCmds.h"
 #include "HgiGL/buffer.h"
 #include "HgiGL/conversions.h"
@@ -16,96 +15,129 @@
 #include "HgiGL/ops.h"
 #include "HgiGL/scopedStateHolder.h"
 #include "HgiGL/texture.h"
+#include "Hgi/blitCmdsOps.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLBlitCmds::HgiGLBlitCmds() : HgiBlitCmds(), _pushStack(0) {}
+HgiGLBlitCmds::HgiGLBlitCmds()
+    : HgiBlitCmds()
+    , _pushStack(0)
+{
+}
 
 HgiGLBlitCmds::~HgiGLBlitCmds() = default;
 
-void HgiGLBlitCmds::PushDebugGroup(const char *label)
+void
+HgiGLBlitCmds::PushDebugGroup(
+        const char* label,
+        const GfVec4f& color)
 {
-  if (HgiGLDebugEnabled()) {
-    _pushStack++;
-    _ops.push_back(HgiGLOps::PushDebugGroup(label));
-  }
+    if (HgiGLDebugEnabled()) {
+        _pushStack++;
+        _ops.push_back( HgiGLOps::PushDebugGroup(label) );
+    }
 }
 
-void HgiGLBlitCmds::PopDebugGroup()
+void
+HgiGLBlitCmds::PopDebugGroup()
 {
-  if (HgiGLDebugEnabled()) {
-    _pushStack--;
-    _ops.push_back(HgiGLOps::PopDebugGroup());
-  }
+    if (HgiGLDebugEnabled()) {
+        _pushStack--;
+        TF_VERIFY(_pushStack >= 0, "Push and PopDebugGroup do not even out");
+        _ops.push_back( HgiGLOps::PopDebugGroup() );
+    }
 }
 
-void HgiGLBlitCmds::CopyTextureGpuToCpu(HgiTextureGpuToCpuOp const &copyOp)
+void
+HgiGLBlitCmds::InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color)
 {
-  _ops.push_back(HgiGLOps::CopyTextureGpuToCpu(copyOp));
+    if (HgiGLDebugEnabled()) {
+        _ops.push_back( HgiGLOps::InsertDebugMarker(label) );
+    }
 }
 
-void HgiGLBlitCmds::CopyTextureCpuToGpu(HgiTextureCpuToGpuOp const &copyOp)
+void
+HgiGLBlitCmds::CopyTextureGpuToCpu(
+    HgiTextureGpuToCpuOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::CopyTextureCpuToGpu(copyOp));
+    _ops.push_back( HgiGLOps::CopyTextureGpuToCpu(copyOp) );
 }
 
-void HgiGLBlitCmds::CopyBufferGpuToGpu(HgiBufferGpuToGpuOp const &copyOp)
+void
+HgiGLBlitCmds::CopyTextureCpuToGpu(HgiTextureCpuToGpuOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::CopyBufferGpuToGpu(copyOp));
+    _ops.push_back( HgiGLOps::CopyTextureCpuToGpu(copyOp) );
 }
 
-void HgiGLBlitCmds::CopyBufferCpuToGpu(HgiBufferCpuToGpuOp const &copyOp)
+void
+HgiGLBlitCmds::CopyBufferGpuToGpu(
+    HgiBufferGpuToGpuOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::CopyBufferCpuToGpu(copyOp));
+    _ops.push_back( HgiGLOps::CopyBufferGpuToGpu(copyOp) );
 }
 
-void HgiGLBlitCmds::CopyBufferGpuToCpu(HgiBufferGpuToCpuOp const &copyOp)
+void 
+HgiGLBlitCmds::CopyBufferCpuToGpu(HgiBufferCpuToGpuOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::CopyBufferGpuToCpu(copyOp));
+    _ops.push_back( HgiGLOps::CopyBufferCpuToGpu(copyOp) );
 }
 
-void HgiGLBlitCmds::CopyTextureToBuffer(HgiTextureToBufferOp const &copyOp)
+void
+HgiGLBlitCmds::CopyBufferGpuToCpu(HgiBufferGpuToCpuOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::CopyTextureToBuffer(copyOp));
+    _ops.push_back( HgiGLOps::CopyBufferGpuToCpu(copyOp) );
 }
 
-void HgiGLBlitCmds::CopyBufferToTexture(HgiBufferToTextureOp const &copyOp)
+void
+HgiGLBlitCmds::CopyTextureToBuffer(HgiTextureToBufferOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::CopyBufferToTexture(copyOp));
+    _ops.push_back( HgiGLOps::CopyTextureToBuffer(copyOp) );
 }
 
-void HgiGLBlitCmds::FillBuffer(HgiBufferHandle const &buffer, uint8_t value)
+void
+HgiGLBlitCmds::CopyBufferToTexture(HgiBufferToTextureOp const& copyOp)
 {
-  _ops.push_back(HgiGLOps::FillBuffer(buffer, value));
+    _ops.push_back( HgiGLOps::CopyBufferToTexture(copyOp) );
 }
 
-void HgiGLBlitCmds::GenerateMipMaps(HgiTextureHandle const &texture)
+void
+HgiGLBlitCmds::FillBuffer(HgiBufferHandle const& buffer, uint8_t value)
 {
-  _ops.push_back(HgiGLOps::GenerateMipMaps(texture));
+    _ops.push_back( HgiGLOps::FillBuffer(buffer, value) );
 }
 
-void HgiGLBlitCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
+void
+HgiGLBlitCmds::GenerateMipMaps(HgiTextureHandle const& texture)
 {
-  _ops.push_back(HgiGLOps::InsertMemoryBarrier(barrier));
+    _ops.push_back( HgiGLOps::GenerateMipMaps(texture) );
 }
 
-bool HgiGLBlitCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
+void
+HgiGLBlitCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 {
-  if (_ops.empty()) {
-    return false;
-  }
+    _ops.push_back( HgiGLOps::InsertMemoryBarrier(barrier) );
+}
 
-  TF_VERIFY(_pushStack == 0, "Push and PopDebugGroup do not even out");
+bool
+HgiGLBlitCmds::_Submit(Hgi* hgi, HgiSubmitWaitType wait)
+{
+    if (_ops.empty()) {
+        return false;
+    }
 
-  // Capture OpenGL state before executing the 'ops' and restore it when this
-  // function ends. We do this defensively because parts of our pipeline may
-  // not set and restore all relevant gl state.
-  HgiGL_ScopedStateHolder openglStateGuard;
+    TF_VERIFY(_pushStack==0, "Push and PopDebugGroup do not even out");
 
-  HgiGL *hgiGL = static_cast<HgiGL *>(hgi);
-  HgiGLDevice *device = hgiGL->GetPrimaryDevice();
-  device->SubmitOps(_ops);
-  return true;
+    // Capture OpenGL state before executing the 'ops' and restore it when this
+    // function ends. We do this defensively because parts of our pipeline may
+    // not set and restore all relevant gl state.
+    HgiGL_ScopedStateHolder openglStateGuard;
+
+    HgiGL* hgiGL = static_cast<HgiGL*>(hgi);
+    HgiGLDevice* device = hgiGL->GetPrimaryDevice();
+    device->SubmitOps(_ops);
+    return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

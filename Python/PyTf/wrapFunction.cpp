@@ -5,26 +5,25 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Tf/pyFunction.h"
 #include "Tf/pyObjWrapper.h"
-#include "pxr/pxrns.h"
 
-#include <boost/python/object.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/object.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <string>
 
-using namespace boost;
-
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapFunction()
-{
-  TfPyFunctionFromPython<void()>();
-  TfPyFunctionFromPython<bool()>();
-  TfPyFunctionFromPython<int()>();
-  TfPyFunctionFromPython<long()>();
-  TfPyFunctionFromPython<double()>();
-  TfPyFunctionFromPython<std::string()>();
-  TfPyFunctionFromPython<python::object()>();
-  TfPyFunctionFromPython<TfPyObjWrapper()>();
+void wrapFunction() {
+    TfPyFunctionFromPython<void ()>();
+    TfPyFunctionFromPython<bool ()>();
+    TfPyFunctionFromPython<int ()>();
+    TfPyFunctionFromPython<long ()>();
+    TfPyFunctionFromPython<double ()>();
+    TfPyFunctionFromPython<std::string ()>();
+    TfPyFunctionFromPython<pxr_boost::python::object ()>();
+    TfPyFunctionFromPython<TfPyObjWrapper ()>();
 }

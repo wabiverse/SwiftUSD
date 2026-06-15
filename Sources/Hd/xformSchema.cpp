@@ -19,86 +19,107 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdXformSchemaTokens, HD_XFORM_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdXformSchemaTokens,
+    HD_XFORM_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdMatrixDataSourceHandle HdXformSchema::GetMatrix() const
+HdMatrixDataSourceHandle
+HdXformSchema::GetMatrix() const
 {
-  return _GetTypedDataSource<HdMatrixDataSource>(HdXformSchemaTokens->matrix);
+    return _GetTypedDataSource<HdMatrixDataSource>(
+        HdXformSchemaTokens->matrix);
 }
 
-HdBoolDataSourceHandle HdXformSchema::GetResetXformStack() const
+HdBoolDataSourceHandle
+HdXformSchema::GetResetXformStack() const
 {
-  return _GetTypedDataSource<HdBoolDataSource>(HdXformSchemaTokens->resetXformStack);
+    return _GetTypedDataSource<HdBoolDataSource>(
+        HdXformSchemaTokens->resetXformStack);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdXformSchema::BuildRetained(
-    const HdMatrixDataSourceHandle &matrix, const HdBoolDataSourceHandle &resetXformStack)
+HdContainerDataSourceHandle
+HdXformSchema::BuildRetained(
+        const HdMatrixDataSourceHandle &matrix,
+        const HdBoolDataSourceHandle &resetXformStack
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (matrix) {
-    _names[_count] = HdXformSchemaTokens->matrix;
-    _values[_count++] = matrix;
-  }
+    if (matrix) {
+        _names[_count] = HdXformSchemaTokens->matrix;
+        _values[_count++] = matrix;
+    }
 
-  if (resetXformStack) {
-    _names[_count] = HdXformSchemaTokens->resetXformStack;
-    _values[_count++] = resetXformStack;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (resetXformStack) {
+        _names[_count] = HdXformSchemaTokens->resetXformStack;
+        _values[_count++] = resetXformStack;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdXformSchema::Builder &HdXformSchema::Builder::SetMatrix(const HdMatrixDataSourceHandle &matrix)
+HdXformSchema::Builder &
+HdXformSchema::Builder::SetMatrix(
+    const HdMatrixDataSourceHandle &matrix)
 {
-  _matrix = matrix;
-  return *this;
+    _matrix = matrix;
+    return *this;
 }
 
-HdXformSchema::Builder &HdXformSchema::Builder::SetResetXformStack(
+HdXformSchema::Builder &
+HdXformSchema::Builder::SetResetXformStack(
     const HdBoolDataSourceHandle &resetXformStack)
 {
-  _resetXformStack = resetXformStack;
-  return *this;
+    _resetXformStack = resetXformStack;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdXformSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdXformSchema::Builder::Build()
 {
-  return HdXformSchema::BuildRetained(_matrix, _resetXformStack);
-}
-
-/*static*/
-HdXformSchema HdXformSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
-{
-  return HdXformSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                                 HdXformSchemaTokens->xform)) :
-                                             nullptr);
+    return HdXformSchema::BuildRetained(
+        _matrix,
+        _resetXformStack
+    );
 }
 
 /*static*/
-const TfToken &HdXformSchema::GetSchemaToken()
+HdXformSchema
+HdXformSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdXformSchemaTokens->xform;
+    return HdXformSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdXformSchemaTokens->xform))
+        : nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &HdXformSchema::GetDefaultLocator()
+const TfToken &
+HdXformSchema::GetSchemaToken()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    return HdXformSchemaTokens->xform;
 }
+
+/*static*/
+const HdDataSourceLocator &
+HdXformSchema::GetDefaultLocator()
+{
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

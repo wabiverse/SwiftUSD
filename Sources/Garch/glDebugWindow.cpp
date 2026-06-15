@@ -6,82 +6,105 @@
 //
 
 #include "Garch/glDebugWindow.h"
-#include "Arch/defines.h"
 #include "Garch/glPlatformDebugContext.h"
+#include "Arch/defines.h"
 
 #if defined(ARCH_OS_LINUX)
-#  include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
-#elif defined(ARCH_OS_DARWIN) && defined(ARCH_OS_OSX)
-#  include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
+#include "Garch/glPlatformDebugWindowGLX.h"
+#elif defined(ARCH_OS_DARWIN)
+#include "Garch/glPlatformDebugWindowDarwin.h"
 #elif defined(ARCH_OS_WINDOWS)
-#  include "Garch/GarchWindows/glPlatformDebugWindowWindows.h"
+#include "Garch/glPlatformDebugWindowWindows.h"
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#if defined(ARCH_OS_DARWIN) && !defined(ARCH_OS_OSX)
-
-/* nothing to implement for non-macOS darwin platforms. */
-
-#else
-
 GarchGLDebugWindow::GarchGLDebugWindow(const char *title, int width, int height)
-    : _title(title), _width(width), _height(height)
+    : _title(title)
+    , _width(width)
+    , _height(height)
 {
-  _private = new Garch_GLPlatformDebugWindow(this);
+    _private = new Garch_GLPlatformDebugWindow(this);
 }
 
 GarchGLDebugWindow::~GarchGLDebugWindow()
 {
-  delete _private;
+    delete _private;
 }
 
-void GarchGLDebugWindow::Init()
+void
+GarchGLDebugWindow::Init()
 {
-  _private->Init(_title.c_str(), _width, _height);
+    _private->Init(_title.c_str(), _width, _height);
 }
 
-void GarchGLDebugWindow::Run()
+void
+GarchGLDebugWindow::Run()
 {
-  _private->Run();
+    _private->Run();
 }
 
-void GarchGLDebugWindow::ExitApp()
+void
+GarchGLDebugWindow::ExitApp()
 {
-  _private->ExitApp();
+    _private->ExitApp();
 }
 
 /* virtual */
-void GarchGLDebugWindow::OnInitializeGL() {}
-
-/* virtual */
-void GarchGLDebugWindow::OnUninitializeGL() {}
-
-/* virtual */
-void GarchGLDebugWindow::OnResize(int w, int h)
+void
+GarchGLDebugWindow::OnInitializeGL()
 {
-  _width = w;
-  _height = h;
 }
 
 /* virtual */
-void GarchGLDebugWindow::OnIdle() {}
+void
+GarchGLDebugWindow::OnUninitializeGL()
+{
+}
 
 /* virtual */
-void GarchGLDebugWindow::OnPaintGL() {}
+void
+GarchGLDebugWindow::OnResize(int w, int h)
+{
+    _width = w;
+    _height = h;
+}
 
 /* virtual */
-void GarchGLDebugWindow::OnKeyRelease(int key) {}
+void
+GarchGLDebugWindow::OnIdle()
+{
+}
 
 /* virtual */
-void GarchGLDebugWindow::OnMousePress(int button, int x, int y, int modKeys) {}
+void
+GarchGLDebugWindow::OnPaintGL()
+{
+}
 
 /* virtual */
-void GarchGLDebugWindow::OnMouseRelease(int button, int x, int y, int modKeys) {}
+void
+GarchGLDebugWindow::OnKeyRelease(int key)
+{
+}
 
 /* virtual */
-void GarchGLDebugWindow::OnMouseMove(int x, int y, int modKeys) {}
+void
+GarchGLDebugWindow::OnMousePress(int button, int x, int y, int modKeys)
+{
+}
 
-#endif
+/* virtual */
+void
+GarchGLDebugWindow::OnMouseRelease(int button, int x, int y, int modKeys)
+{
+}
+
+/* virtual */
+void
+GarchGLDebugWindow::OnMouseMove(int x, int y, int modKeys)
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

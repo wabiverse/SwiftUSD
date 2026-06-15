@@ -11,7 +11,9 @@
 
 #include "HgiGL/api.h"
 
+
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 using HgiTextureHandle = HgiHandle<class HgiTexture>;
 
@@ -20,38 +22,40 @@ using HgiTextureHandle = HgiHandle<class HgiTexture>;
 ///
 /// OpenGL implementation of HgiSampler
 ///
-class HgiGLSampler final : public HgiSampler {
- public:
-  HGIGL_API
-  ~HgiGLSampler() override;
+class HgiGLSampler final : public HgiSampler
+{
+public:
+    HGIGL_API
+    ~HgiGLSampler() override;
 
-  HGIGL_API
-  uint64_t GetRawResource() const override;
+    HGIGL_API
+    uint64_t GetRawResource() const override;
 
-  /// Returns the gl resource id of the sampler.
-  HGIGL_API
-  uint32_t GetSamplerId() const;
+    /// Returns the gl resource id of the sampler.
+    HGIGL_API
+    uint32_t GetSamplerId() const;
 
-  /// Returns the bindless gpu handle (caller must verify extension support)
-  HGIGL_API
-  uint64_t GetBindlessHandle(HgiTextureHandle const &textureHandle);
+    /// Returns the bindless gpu handle (caller must verify extension support)
+    HGIGL_API
+    uint64_t GetBindlessHandle(HgiTextureHandle const &textureHandle);
 
- protected:
-  friend class HgiGL;
+protected:
+    friend class HgiGL;
 
-  HGIGL_API
-  HgiGLSampler(HgiSamplerDesc const &desc);
+    HGIGL_API
+    HgiGLSampler(HgiSamplerDesc const& desc);
 
- private:
-  HgiGLSampler() = delete;
-  HgiGLSampler &operator=(const HgiGLSampler &) = delete;
-  HgiGLSampler(const HgiGLSampler &) = delete;
+private:
+    HgiGLSampler() = delete;
+    HgiGLSampler & operator=(const HgiGLSampler&) = delete;
+    HgiGLSampler(const HgiGLSampler&) = delete;
 
- private:
-  uint32_t _samplerId;
-  uint32_t _bindlessTextureId;
-  uint64_t _bindlessHandle;
+private:
+    uint32_t _samplerId;
+    uint32_t _bindlessTextureId;
+    uint64_t _bindlessHandle;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

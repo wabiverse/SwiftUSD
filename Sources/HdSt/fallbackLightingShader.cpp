@@ -16,58 +16,67 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 HdSt_FallbackLightingShader::HdSt_FallbackLightingShader()
 {
-  _glslfx.reset(new HioGlslfx(HdStPackageFallbackLightingShader()));
+    _glslfx.reset(new HioGlslfx(HdStPackageFallbackLightingShader()));
 }
 
 HdSt_FallbackLightingShader::~HdSt_FallbackLightingShader()
 {
-  // nothing
+    // nothing
 }
 
 /* virtual */
-HdSt_FallbackLightingShader::ID HdSt_FallbackLightingShader::ComputeHash() const
+HdSt_FallbackLightingShader::ID
+HdSt_FallbackLightingShader::ComputeHash() const
 {
-  TfToken glslfxFile = HdStPackageFallbackLightingShader();
+    TfToken glslfxFile = HdStPackageFallbackLightingShader();
 
-  size_t hash = glslfxFile.Hash();
+    size_t hash = glslfxFile.Hash();
 
-  return (ID)hash;
+    return (ID)hash;
 }
 
 /* virtual */
-std::string HdSt_FallbackLightingShader::GetSource(TfToken const &shaderStageKey) const
+std::string
+HdSt_FallbackLightingShader::GetSource(TfToken const &shaderStageKey) const
 {
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  return _glslfx->GetSource(shaderStageKey);
+    return _glslfx->GetSource(shaderStageKey);
 }
 
 /* virtual */
-void HdSt_FallbackLightingShader::SetCamera(GfMatrix4d const &worldToViewMatrix,
+void
+HdSt_FallbackLightingShader::SetCamera(GfMatrix4d const &worldToViewMatrix,
                                             GfMatrix4d const &projectionMatrix)
 {
-  // nothing
+    // nothing
 }
 
-void HdSt_FallbackLightingShader::BindResources(const int program,
-                                                HdSt_ResourceBinder const &binder)
+void
+HdSt_FallbackLightingShader::BindResources(const int program,
+                                           HdSt_ResourceBinder const &binder)
 {
-  // nothing
+    // nothing
 }
 
-void HdSt_FallbackLightingShader::UnbindResources(const int program,
-                                                  HdSt_ResourceBinder const &binder)
+void
+HdSt_FallbackLightingShader::UnbindResources(const int program,
+                                             HdSt_ResourceBinder const &binder)
 {
-  // nothing
+    // nothing
 }
 
 /*virtual*/
-void HdSt_FallbackLightingShader::AddBindings(HdStBindingRequestVector *customBindings)
+void
+HdSt_FallbackLightingShader::AddBindings(
+    HdStBindingRequestVector *customBindings)
 {
-  // no-op
+    // no-op
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

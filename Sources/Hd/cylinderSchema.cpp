@@ -19,166 +19,198 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCylinderSchemaTokens, HD_CYLINDER_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCylinderSchemaTokens,
+    HD_CYLINDER_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdDoubleDataSourceHandle HdCylinderSchema::GetHeight() const
+HdDoubleDataSourceHandle
+HdCylinderSchema::GetHeight() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCylinderSchemaTokens->height);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCylinderSchemaTokens->height);
 }
 
-HdDoubleDataSourceHandle HdCylinderSchema::GetRadius() const
+HdDoubleDataSourceHandle
+HdCylinderSchema::GetRadius() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCylinderSchemaTokens->radius);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCylinderSchemaTokens->radius);
 }
 
-HdDoubleDataSourceHandle HdCylinderSchema::GetRadiusTop() const
+HdDoubleDataSourceHandle
+HdCylinderSchema::GetRadiusTop() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCylinderSchemaTokens->radiusTop);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCylinderSchemaTokens->radiusTop);
 }
 
-HdDoubleDataSourceHandle HdCylinderSchema::GetRadiusBottom() const
+HdDoubleDataSourceHandle
+HdCylinderSchema::GetRadiusBottom() const
 {
-  return _GetTypedDataSource<HdDoubleDataSource>(HdCylinderSchemaTokens->radiusBottom);
+    return _GetTypedDataSource<HdDoubleDataSource>(
+        HdCylinderSchemaTokens->radiusBottom);
 }
 
-HdTokenDataSourceHandle HdCylinderSchema::GetAxis() const
+HdTokenDataSourceHandle
+HdCylinderSchema::GetAxis() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdCylinderSchemaTokens->axis);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdCylinderSchemaTokens->axis);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdCylinderSchema::BuildRetained(
-    const HdDoubleDataSourceHandle &height,
-    const HdDoubleDataSourceHandle &radius,
-    const HdDoubleDataSourceHandle &radiusTop,
-    const HdDoubleDataSourceHandle &radiusBottom,
-    const HdTokenDataSourceHandle &axis)
+HdContainerDataSourceHandle
+HdCylinderSchema::BuildRetained(
+        const HdDoubleDataSourceHandle &height,
+        const HdDoubleDataSourceHandle &radius,
+        const HdDoubleDataSourceHandle &radiusTop,
+        const HdDoubleDataSourceHandle &radiusBottom,
+        const HdTokenDataSourceHandle &axis
+)
 {
-  TfToken _names[5];
-  HdDataSourceBaseHandle _values[5];
+    TfToken _names[5];
+    HdDataSourceBaseHandle _values[5];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (height) {
-    _names[_count] = HdCylinderSchemaTokens->height;
-    _values[_count++] = height;
-  }
+    if (height) {
+        _names[_count] = HdCylinderSchemaTokens->height;
+        _values[_count++] = height;
+    }
 
-  if (radius) {
-    _names[_count] = HdCylinderSchemaTokens->radius;
-    _values[_count++] = radius;
-  }
+    if (radius) {
+        _names[_count] = HdCylinderSchemaTokens->radius;
+        _values[_count++] = radius;
+    }
 
-  if (radiusTop) {
-    _names[_count] = HdCylinderSchemaTokens->radiusTop;
-    _values[_count++] = radiusTop;
-  }
+    if (radiusTop) {
+        _names[_count] = HdCylinderSchemaTokens->radiusTop;
+        _values[_count++] = radiusTop;
+    }
 
-  if (radiusBottom) {
-    _names[_count] = HdCylinderSchemaTokens->radiusBottom;
-    _values[_count++] = radiusBottom;
-  }
+    if (radiusBottom) {
+        _names[_count] = HdCylinderSchemaTokens->radiusBottom;
+        _values[_count++] = radiusBottom;
+    }
 
-  if (axis) {
-    _names[_count] = HdCylinderSchemaTokens->axis;
-    _values[_count++] = axis;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (axis) {
+        _names[_count] = HdCylinderSchemaTokens->axis;
+        _values[_count++] = axis;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdCylinderSchema::Builder &HdCylinderSchema::Builder::SetHeight(
+HdCylinderSchema::Builder &
+HdCylinderSchema::Builder::SetHeight(
     const HdDoubleDataSourceHandle &height)
 {
-  _height = height;
-  return *this;
+    _height = height;
+    return *this;
 }
 
-HdCylinderSchema::Builder &HdCylinderSchema::Builder::SetRadius(
+HdCylinderSchema::Builder &
+HdCylinderSchema::Builder::SetRadius(
     const HdDoubleDataSourceHandle &radius)
 {
-  _radius = radius;
-  return *this;
+    _radius = radius;
+    return *this;
 }
 
-HdCylinderSchema::Builder &HdCylinderSchema::Builder::SetRadiusTop(
+HdCylinderSchema::Builder &
+HdCylinderSchema::Builder::SetRadiusTop(
     const HdDoubleDataSourceHandle &radiusTop)
 {
-  _radiusTop = radiusTop;
-  return *this;
+    _radiusTop = radiusTop;
+    return *this;
 }
 
-HdCylinderSchema::Builder &HdCylinderSchema::Builder::SetRadiusBottom(
+HdCylinderSchema::Builder &
+HdCylinderSchema::Builder::SetRadiusBottom(
     const HdDoubleDataSourceHandle &radiusBottom)
 {
-  _radiusBottom = radiusBottom;
-  return *this;
+    _radiusBottom = radiusBottom;
+    return *this;
 }
 
-HdCylinderSchema::Builder &HdCylinderSchema::Builder::SetAxis(const HdTokenDataSourceHandle &axis)
+HdCylinderSchema::Builder &
+HdCylinderSchema::Builder::SetAxis(
+    const HdTokenDataSourceHandle &axis)
 {
-  _axis = axis;
-  return *this;
+    _axis = axis;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdCylinderSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdCylinderSchema::Builder::Build()
 {
-  return HdCylinderSchema::BuildRetained(_height, _radius, _radiusTop, _radiusBottom, _axis);
+    return HdCylinderSchema::BuildRetained(
+        _height,
+        _radius,
+        _radiusTop,
+        _radiusBottom,
+        _axis
+    );
 }
 
 /*static*/
-HdCylinderSchema HdCylinderSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdCylinderSchema
+HdCylinderSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdCylinderSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(HdCylinderSchemaTokens->cylinder)) :
-          nullptr);
+    return HdCylinderSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdCylinderSchemaTokens->cylinder))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdCylinderSchema::GetSchemaToken()
+const TfToken &
+HdCylinderSchema::GetSchemaToken()
 {
-  return HdCylinderSchemaTokens->cylinder;
+    return HdCylinderSchemaTokens->cylinder;
 }
 
 /*static*/
-const HdDataSourceLocator &HdCylinderSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdCylinderSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /*static*/
-HdTokenDataSourceHandle HdCylinderSchema::BuildAxisDataSource(const TfToken &axis)
+HdTokenDataSourceHandle
+HdCylinderSchema::BuildAxisDataSource(
+    const TfToken &axis)
 {
 
-  if (axis == HdCylinderSchemaTokens->X) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  if (axis == HdCylinderSchemaTokens->Y) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  if (axis == HdCylinderSchemaTokens->Z) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-    return ds;
-  }
-  // fallback for unknown token
-  return HdRetainedTypedSampledDataSource<TfToken>::New(axis);
-}
+    if (axis == HdCylinderSchemaTokens->X) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    if (axis == HdCylinderSchemaTokens->Y) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    if (axis == HdCylinderSchemaTokens->Z) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+        return ds;
+    }
+    // fallback for unknown token
+    return HdRetainedTypedSampledDataSource<TfToken>::New(axis);
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

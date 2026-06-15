@@ -14,13 +14,15 @@
 
 #include "UsdRender/product.h"
 
+
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  using Adapter = UsdImagingRenderProductAdapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    using Adapter = UsdImagingRenderProductAdapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
 UsdImagingRenderProductAdapter::~UsdImagingRenderProductAdapter() = default;
@@ -29,44 +31,50 @@ UsdImagingRenderProductAdapter::~UsdImagingRenderProductAdapter() = default;
 // 2.0 Prim adapter API
 // -------------------------------------------------------------------------- //
 
-TfTokenVector UsdImagingRenderProductAdapter::GetImagingSubprims(UsdPrim const &prim)
+TfTokenVector
+UsdImagingRenderProductAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  return {TfToken()};
+    return { TfToken() };
 }
 
-TfToken UsdImagingRenderProductAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                              TfToken const &subprim)
+TfToken
+UsdImagingRenderProductAdapter::GetImagingSubprimType(
+    UsdPrim const& prim,
+    TfToken const& subprim)
 {
-  if (subprim.IsEmpty()) {
-    return HdRenderProductSchemaTokens->renderProduct;
-  }
-  return TfToken();
+    if (subprim.IsEmpty()) {
+        return HdRenderProductSchemaTokens->renderProduct;
+    }
+    return TfToken();
 }
 
-HdContainerDataSourceHandle UsdImagingRenderProductAdapter::GetImagingSubprimData(
-    UsdPrim const &prim,
-    TfToken const &subprim,
+HdContainerDataSourceHandle
+UsdImagingRenderProductAdapter::GetImagingSubprimData(
+    UsdPrim const& prim,
+    TfToken const& subprim,
     const UsdImagingDataSourceStageGlobals &stageGlobals)
 {
-  if (subprim.IsEmpty()) {
-    return UsdImagingDataSourceRenderProductPrim::New(prim.GetPath(), prim, stageGlobals);
-  }
+    if (subprim.IsEmpty()) {
+        return UsdImagingDataSourceRenderProductPrim::New(
+                    prim.GetPath(), prim, stageGlobals);
+    }
 
-  return nullptr;
+    return nullptr;
 }
 
-HdDataSourceLocatorSet UsdImagingRenderProductAdapter::InvalidateImagingSubprim(
-    UsdPrim const &prim,
-    TfToken const &subprim,
-    TfTokenVector const &properties,
+HdDataSourceLocatorSet
+UsdImagingRenderProductAdapter::InvalidateImagingSubprim(
+    UsdPrim const& prim,
+    TfToken const& subprim,
+    TfTokenVector const& properties,
     const UsdImagingPropertyInvalidationType invalidationType)
 {
-  if (subprim.IsEmpty()) {
-    return UsdImagingDataSourceRenderProductPrim::Invalidate(
-        prim, subprim, properties, invalidationType);
-  }
+    if (subprim.IsEmpty()) {
+        return UsdImagingDataSourceRenderProductPrim::Invalidate(
+            prim, subprim, properties, invalidationType);
+    }
 
-  return HdDataSourceLocatorSet();
+    return HdDataSourceLocatorSet();
 }
 
 // -------------------------------------------------------------------------- //
@@ -77,65 +85,79 @@ HdDataSourceLocatorSet UsdImagingRenderProductAdapter::InvalidateImagingSubprim(
 //       targeted products and vars.
 // -------------------------------------------------------------------------- //
 
-bool UsdImagingRenderProductAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+bool
+UsdImagingRenderProductAdapter::IsSupported(
+    UsdImagingIndexProxy const* index) const
 {
-  // Since we flatten products and vars into the targeting settings prim, 1.0
-  // render delegates won't typically support render product prims as such.
-  // Return true to supress warnings that the prim type isn't supported.
-  return true;
+    // Since we flatten products and vars into the targeting settings prim, 1.0
+    // render delegates won't typically support render product prims as such.
+    // Return true to supress warnings that the prim type isn't supported.
+    return true;
 }
 
-SdfPath UsdImagingRenderProductAdapter::Populate(
-    UsdPrim const &prim,
-    UsdImagingIndexProxy *index,
-    UsdImagingInstancerContext const *instancerContext)
+SdfPath
+UsdImagingRenderProductAdapter::Populate(
+    UsdPrim const& prim, 
+    UsdImagingIndexProxy* index,
+    UsdImagingInstancerContext const* instancerContext)
 {
-  return SdfPath::EmptyPath();
+    return SdfPath::EmptyPath();
 }
 
-void UsdImagingRenderProductAdapter::_RemovePrim(SdfPath const &cachePath,
-                                                 UsdImagingIndexProxy *index)
-{
-}
-
-void UsdImagingRenderProductAdapter::TrackVariability(
-    UsdPrim const &prim,
-    SdfPath const &cachePath,
-    HdDirtyBits *timeVaryingBits,
-    UsdImagingInstancerContext const *instancerContext) const
+void
+UsdImagingRenderProductAdapter::_RemovePrim(
+    SdfPath const& cachePath,
+    UsdImagingIndexProxy* index)
 {
 }
 
-void UsdImagingRenderProductAdapter::UpdateForTime(
-    UsdPrim const &prim,
-    SdfPath const &cachePath,
+void 
+UsdImagingRenderProductAdapter::TrackVariability(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    HdDirtyBits* timeVaryingBits,
+    UsdImagingInstancerContext const* instancerContext) const
+{
+}
+
+void 
+UsdImagingRenderProductAdapter::UpdateForTime(
+    UsdPrim const& prim,
+    SdfPath const& cachePath, 
     UsdTimeCode time,
     HdDirtyBits requestedBits,
-    UsdImagingInstancerContext const *instancerContext) const
+    UsdImagingInstancerContext const* 
+    instancerContext) const
 {
 }
 
-HdDirtyBits UsdImagingRenderProductAdapter::ProcessPropertyChange(UsdPrim const &prim,
-                                                                  SdfPath const &cachePath,
-                                                                  TfToken const &propertyName)
+HdDirtyBits
+UsdImagingRenderProductAdapter::ProcessPropertyChange(
+    UsdPrim const& prim,
+    SdfPath const& cachePath, 
+    TfToken const& propertyName)
 {
-  return HdChangeTracker::Clean;
+    return HdChangeTracker::Clean;
 }
 
-void UsdImagingRenderProductAdapter::MarkDirty(UsdPrim const &prim,
-                                               SdfPath const &cachePath,
-                                               HdDirtyBits dirty,
-                                               UsdImagingIndexProxy *index)
+void
+UsdImagingRenderProductAdapter::MarkDirty(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    HdDirtyBits dirty,
+    UsdImagingIndexProxy* index)
 {
 }
 
-VtValue UsdImagingRenderProductAdapter::Get(UsdPrim const &prim,
-                                            SdfPath const &cachePath,
-                                            TfToken const &key,
-                                            UsdTimeCode time,
-                                            VtIntArray *outIndices) const
+VtValue
+UsdImagingRenderProductAdapter::Get(
+    UsdPrim const& prim,
+    SdfPath const& cachePath,
+    TfToken const& key,
+    UsdTimeCode time,
+    VtIntArray *outIndices) const
 {
-  return VtValue();
+    return VtValue();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

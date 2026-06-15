@@ -10,23 +10,27 @@
 #include "Tf/pyModuleNotice.h"
 #include "Tf/pyNoticeWrapper.h"
 
-#include <boost/python/return_by_value.hpp>
-#include <boost/python/return_value_policy.hpp>
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/return_by_value.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/return_value_policy.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
 TF_INSTANTIATE_NOTICE_WRAPPER(TfPyModuleWasLoaded, TfNotice);
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapPyModuleNotice()
-{
+void wrapPyModuleNotice() {
 
-  TfPyNoticeWrapper<TfPyModuleWasLoaded, TfNotice>::Wrap("PyModuleWasLoaded")
-      .def("name",
-           make_function(&TfPyModuleWasLoaded::GetName, return_value_policy<return_by_value>()));
+    TfPyNoticeWrapper<TfPyModuleWasLoaded, TfNotice>::Wrap("PyModuleWasLoaded")
+        .def("name", make_function(&TfPyModuleWasLoaded::GetName,
+                                   return_value_policy<return_by_value>()))
+        ;
 }

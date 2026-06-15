@@ -33,145 +33,191 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(END CUSTOM CODE: Declares)--
 
 #define USD_IMAGING_USD_PRIM_INFO_SCHEMA_TOKENS \
-  (__usdPrimInfo)(niPrototypePath)( \
-      isNiPrototype)(specifier)(piPropagatedPrototypes)(isLoaded)(def)(over)((class_, "class"))
+    (__usdPrimInfo) \
+    (specifier) \
+    (typeName) \
+    (isLoaded) \
+    (apiSchemas) \
+    (kind) \
+    (niPrototypePath) \
+    (isNiPrototype) \
+    (piPropagatedPrototypes) \
+    (def) \
+    (over) \
+    ((class_, "class")) \
 
-TF_DECLARE_PUBLIC_TOKENS(UsdImagingUsdPrimInfoSchemaTokens,
-                         USDIMAGING_API,
-                         USD_IMAGING_USD_PRIM_INFO_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(UsdImagingUsdPrimInfoSchemaTokens, USDIMAGING_API,
+    USD_IMAGING_USD_PRIM_INFO_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class UsdImagingUsdPrimInfoSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  UsdImagingUsdPrimInfoSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+class UsdImagingUsdPrimInfoSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "__usdPrimInfo" from the parent container and constructs a
-  /// UsdImagingUsdPrimInfoSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  USDIMAGING_API
-  static UsdImagingUsdPrimInfoSchema GetFromParent(
-      const HdContainerDataSourceHandle &fromParentContainer);
+    UsdImagingUsdPrimInfoSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
-
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
-
-  /// \name Member accessor
-  /// @{
-
-  USDIMAGING_API
-  HdPathDataSourceHandle GetNiPrototypePath() const;
-
-  USDIMAGING_API
-  HdBoolDataSourceHandle GetIsNiPrototype() const;
-
-  USDIMAGING_API
-  HdTokenDataSourceHandle GetSpecifier() const;
-
-  USDIMAGING_API
-  HdContainerDataSourceHandle GetPiPropagatedPrototypes() const;
-
-  USDIMAGING_API
-  HdBoolDataSourceHandle GetIsLoaded() const;
-
-  /// @}
-
-  /// \name Schema location
-  /// @{
-
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  USDIMAGING_API
-  static const TfToken &GetSchemaToken();
-
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  USDIMAGING_API
-  static const HdDataSourceLocator &GetDefaultLocator();
-
-  /// @}
-
-  /// \name Data source locators for members
-  ///
-  /// The following methods return an HdDataSourceLocator (relative to the
-  /// prim-level data source) where the data source for a member can be found.
-  ///
-  /// This is often useful for checking intersection against the
-  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-  /// @{
-
-  /// Prim-level relative data source locator to locate niPrototypePath.
-  USDIMAGING_API
-  static const HdDataSourceLocator &GetNiPrototypePathLocator();
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  USDIMAGING_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdPathDataSourceHandle &niPrototypePath,
-      const HdBoolDataSourceHandle &isNiPrototype,
-      const HdTokenDataSourceHandle &specifier,
-      const HdContainerDataSourceHandle &piPropagatedPrototypes,
-      const HdBoolDataSourceHandle &isLoaded);
-
-  /// \class UsdImagingUsdPrimInfoSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
+    /// Retrieves a container data source with the schema's default name token
+    /// "__usdPrimInfo" from the parent container and constructs a
+    /// UsdImagingUsdPrimInfoSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
     USDIMAGING_API
-    Builder &SetNiPrototypePath(const HdPathDataSourceHandle &niPrototypePath);
-    USDIMAGING_API
-    Builder &SetIsNiPrototype(const HdBoolDataSourceHandle &isNiPrototype);
-    USDIMAGING_API
-    Builder &SetSpecifier(const HdTokenDataSourceHandle &specifier);
-    USDIMAGING_API
-    Builder &SetPiPropagatedPrototypes(const HdContainerDataSourceHandle &piPropagatedPrototypes);
-    USDIMAGING_API
-    Builder &SetIsLoaded(const HdBoolDataSourceHandle &isLoaded);
+    static UsdImagingUsdPrimInfoSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Returns a container data source containing the members set thus far.
+    /// @}
+
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
+
+    /// \name Member accessor
+    /// @{
+
     USDIMAGING_API
-    HdContainerDataSourceHandle Build();
+    HdTokenDataSourceHandle GetSpecifier() const;
 
-   private:
-    HdPathDataSourceHandle _niPrototypePath;
-    HdBoolDataSourceHandle _isNiPrototype;
-    HdTokenDataSourceHandle _specifier;
-    HdContainerDataSourceHandle _piPropagatedPrototypes;
-    HdBoolDataSourceHandle _isLoaded;
-  };
+    USDIMAGING_API
+    HdTokenDataSourceHandle GetTypeName() const;
 
-  /// Returns token data source for use as specifier value.
-  ///
-  /// The following values will be stored statically and reused for future
-  /// calls:
-  /// - UsdImagingUsdPrimInfoSchemaTokens->def
-  /// - UsdImagingUsdPrimInfoSchemaTokens->over
-  /// - UsdImagingUsdPrimInfoSchemaTokens->class_
-  USDIMAGING_API
-  static HdTokenDataSourceHandle BuildSpecifierDataSource(const TfToken &specifier);
+    USDIMAGING_API
+    HdBoolDataSourceHandle GetIsLoaded() const;
 
-  /// @}
+    USDIMAGING_API
+    HdTokenArrayDataSourceHandle GetApiSchemas() const;
+
+    USDIMAGING_API
+    HdTokenDataSourceHandle GetKind() const;
+
+    USDIMAGING_API
+    HdPathDataSourceHandle GetNiPrototypePath() const;
+
+    USDIMAGING_API
+    HdBoolDataSourceHandle GetIsNiPrototype() const;
+
+    USDIMAGING_API
+    HdContainerDataSourceHandle GetPiPropagatedPrototypes() const; 
+
+    /// @}
+
+    /// \name Schema location
+    /// @{
+
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    USDIMAGING_API
+    static const TfToken &GetSchemaToken();
+
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    USDIMAGING_API
+    static const HdDataSourceLocator &GetDefaultLocator();
+
+    /// @}
+
+    /// \name Data source locators for members
+    ///
+    /// The following methods return an HdDataSourceLocator (relative to the
+    /// prim-level data source) where the data source for a member can be found.
+    ///
+    /// This is often useful for checking intersection against the
+    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+    /// @{
+
+    /// Prim-level relative data source locator to locate niPrototypePath.
+    USDIMAGING_API
+    static const HdDataSourceLocator &GetNiPrototypePathLocator();
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    USDIMAGING_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdTokenDataSourceHandle &specifier,
+        const HdTokenDataSourceHandle &typeName,
+        const HdBoolDataSourceHandle &isLoaded,
+        const HdTokenArrayDataSourceHandle &apiSchemas,
+        const HdTokenDataSourceHandle &kind,
+        const HdPathDataSourceHandle &niPrototypePath,
+        const HdBoolDataSourceHandle &isNiPrototype,
+        const HdContainerDataSourceHandle &piPropagatedPrototypes
+    );
+
+    /// \class UsdImagingUsdPrimInfoSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        USDIMAGING_API
+        Builder &SetSpecifier(
+            const HdTokenDataSourceHandle &specifier);
+        USDIMAGING_API
+        Builder &SetTypeName(
+            const HdTokenDataSourceHandle &typeName);
+        USDIMAGING_API
+        Builder &SetIsLoaded(
+            const HdBoolDataSourceHandle &isLoaded);
+        USDIMAGING_API
+        Builder &SetApiSchemas(
+            const HdTokenArrayDataSourceHandle &apiSchemas);
+        USDIMAGING_API
+        Builder &SetKind(
+            const HdTokenDataSourceHandle &kind);
+        USDIMAGING_API
+        Builder &SetNiPrototypePath(
+            const HdPathDataSourceHandle &niPrototypePath);
+        USDIMAGING_API
+        Builder &SetIsNiPrototype(
+            const HdBoolDataSourceHandle &isNiPrototype);
+        USDIMAGING_API
+        Builder &SetPiPropagatedPrototypes(
+            const HdContainerDataSourceHandle &piPropagatedPrototypes);
+
+        /// Returns a container data source containing the members set thus far.
+        USDIMAGING_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdTokenDataSourceHandle _specifier;
+        HdTokenDataSourceHandle _typeName;
+        HdBoolDataSourceHandle _isLoaded;
+        HdTokenArrayDataSourceHandle _apiSchemas;
+        HdTokenDataSourceHandle _kind;
+        HdPathDataSourceHandle _niPrototypePath;
+        HdBoolDataSourceHandle _isNiPrototype;
+        HdContainerDataSourceHandle _piPropagatedPrototypes;
+
+    };
+
+    /// Returns token data source for use as specifier value.
+    ///
+    /// The following values will be stored statically and reused for future
+    /// calls:
+    /// - UsdImagingUsdPrimInfoSchemaTokens->def
+    /// - UsdImagingUsdPrimInfoSchemaTokens->over
+    /// - UsdImagingUsdPrimInfoSchemaTokens->class_
+    USDIMAGING_API
+    static HdTokenDataSourceHandle BuildSpecifierDataSource(
+        const TfToken &specifier);
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

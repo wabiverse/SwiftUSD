@@ -33,113 +33,127 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(END CUSTOM CODE: Declares)--
 
 #define USD_IMAGING_MODEL_SCHEMA_TOKENS \
-  (model)(modelPath)(assetIdentifier)(assetName)(assetVersion)
+    (model) \
+    (modelPath) \
+    (assetIdentifier) \
+    (assetName) \
+    (assetVersion) \
 
-TF_DECLARE_PUBLIC_TOKENS(UsdImagingModelSchemaTokens,
-                         USDIMAGING_API,
-                         USD_IMAGING_MODEL_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(UsdImagingModelSchemaTokens, USDIMAGING_API,
+    USD_IMAGING_MODEL_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class UsdImagingModelSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  UsdImagingModelSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+class UsdImagingModelSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "model" from the parent container and constructs a
-  /// UsdImagingModelSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  USDIMAGING_API
-  static UsdImagingModelSchema GetFromParent(
-      const HdContainerDataSourceHandle &fromParentContainer);
+    UsdImagingModelSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// @}
-
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
-
-  /// \name Member accessor
-  /// @{
-
-  USDIMAGING_API
-  HdPathDataSourceHandle GetModelPath() const;
-
-  USDIMAGING_API
-  HdAssetPathDataSourceHandle GetAssetIdentifier() const;
-
-  USDIMAGING_API
-  HdStringDataSourceHandle GetAssetName() const;
-
-  USDIMAGING_API
-  HdStringDataSourceHandle GetAssetVersion() const;
-
-  /// @}
-
-  /// \name Schema location
-  /// @{
-
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  USDIMAGING_API
-  static const TfToken &GetSchemaToken();
-
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  USDIMAGING_API
-  static const HdDataSourceLocator &GetDefaultLocator();
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  USDIMAGING_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdPathDataSourceHandle &modelPath,
-      const HdAssetPathDataSourceHandle &assetIdentifier,
-      const HdStringDataSourceHandle &assetName,
-      const HdStringDataSourceHandle &assetVersion);
-
-  /// \class UsdImagingModelSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
+    /// Retrieves a container data source with the schema's default name token
+    /// "model" from the parent container and constructs a
+    /// UsdImagingModelSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
     USDIMAGING_API
-    Builder &SetModelPath(const HdPathDataSourceHandle &modelPath);
-    USDIMAGING_API
-    Builder &SetAssetIdentifier(const HdAssetPathDataSourceHandle &assetIdentifier);
-    USDIMAGING_API
-    Builder &SetAssetName(const HdStringDataSourceHandle &assetName);
-    USDIMAGING_API
-    Builder &SetAssetVersion(const HdStringDataSourceHandle &assetVersion);
+    static UsdImagingModelSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Returns a container data source containing the members set thus far.
+    /// @}
+
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
+
+    /// \name Member accessor
+    /// @{
+
     USDIMAGING_API
-    HdContainerDataSourceHandle Build();
+    HdPathDataSourceHandle GetModelPath() const;
 
-   private:
-    HdPathDataSourceHandle _modelPath;
-    HdAssetPathDataSourceHandle _assetIdentifier;
-    HdStringDataSourceHandle _assetName;
-    HdStringDataSourceHandle _assetVersion;
-  };
+    USDIMAGING_API
+    HdAssetPathDataSourceHandle GetAssetIdentifier() const;
 
-  /// @}
+    USDIMAGING_API
+    HdStringDataSourceHandle GetAssetName() const;
+
+    USDIMAGING_API
+    HdStringDataSourceHandle GetAssetVersion() const; 
+
+    /// @}
+
+    /// \name Schema location
+    /// @{
+
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    USDIMAGING_API
+    static const TfToken &GetSchemaToken();
+
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    USDIMAGING_API
+    static const HdDataSourceLocator &GetDefaultLocator();
+
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
+    USDIMAGING_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdPathDataSourceHandle &modelPath,
+        const HdAssetPathDataSourceHandle &assetIdentifier,
+        const HdStringDataSourceHandle &assetName,
+        const HdStringDataSourceHandle &assetVersion
+    );
+
+    /// \class UsdImagingModelSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        USDIMAGING_API
+        Builder &SetModelPath(
+            const HdPathDataSourceHandle &modelPath);
+        USDIMAGING_API
+        Builder &SetAssetIdentifier(
+            const HdAssetPathDataSourceHandle &assetIdentifier);
+        USDIMAGING_API
+        Builder &SetAssetName(
+            const HdStringDataSourceHandle &assetName);
+        USDIMAGING_API
+        Builder &SetAssetVersion(
+            const HdStringDataSourceHandle &assetVersion);
+
+        /// Returns a container data source containing the members set thus far.
+        USDIMAGING_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdPathDataSourceHandle _modelPath;
+        HdAssetPathDataSourceHandle _assetIdentifier;
+        HdStringDataSourceHandle _assetName;
+        HdStringDataSourceHandle _assetVersion;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

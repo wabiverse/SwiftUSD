@@ -5,55 +5,57 @@
 // https://openusd.org/license.
 //
 
-#include "Pcp/pyUtils.h"
 #include "pxr/pxrns.h"
+#include "Pcp/pyUtils.h"
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-using namespace boost::python;
+#if PXR_PYTHON_SUPPORT_ENABLED
 using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-// Given a python object and a pointer to a variable,
+using namespace pxr_boost::python;
+
+// Given a python object and a pointer to a variable, 
 // attempts to extract a value of the variable's type out of the object
 // If successful, returns the pointer; otherwise returns null
-template<typename T> static T *_ExtractValue(object &pyObject, T *varPtr)
+template <typename T>
+static T*
+_ExtractValue(object &pyObject, T* varPtr)
 {
-  extract<T> extractor(pyObject);
-  if (extractor.check()) {
-    *varPtr = extractor();
-    return varPtr;
-  }
-  else {
-    return NULL;
-  }
+    extract<T> extractor(pyObject);
+    if (extractor.check()) {
+        *varPtr = extractor();
+        return varPtr;
+    } else {
+        return NULL;
+    }
 }
 
-bool PcpVariantFallbackMapFromPython(const dict &d, PcpVariantFallbackMap *result)
+bool
+PcpVariantFallbackMapFromPython( const dict& d,
+                                 PcpVariantFallbackMap *result)
 {
-  object iterItems = d.items();
-  for (int i = 0; i < len(iterItems); ++i) {
-    object key = iterItems[i][0];
-    object value = iterItems[i][1];
-    std::string k;
-    std::vector<std::string> v;
-
-    if (!_ExtractValue(key, &k)) {
-      TF_CODING_ERROR("unrecognized type for PcpVariantFallbackMap key");
-      return false;
+    object iterItems = d.items();
+    for (int i = 0; i < len(iterItems); ++i) {
+        object key = iterItems[i][0];
+        object value = iterItems[i][1];
+        std::string k;
+        std::vector<std::string> v;
+        
+        if (!_ExtractValue(key, &k)) {
+            TF_CODING_ERROR("unrecognized type for PcpVariantFallbackMap key");
+            return false;
+        }
+        if (!_ExtractValue(value, &v)) {
+            TF_CODING_ERROR("unrecognized type for PcpVariantFallbackMap val");
+            return false;
+        }
+        if (!k.empty() && !v.empty()) { 
+            (*result)[k] = v;
+        }
     }
-    if (!_ExtractValue(value, &v)) {
-      TF_CODING_ERROR("unrecognized type for PcpVariantFallbackMap val");
-      return false;
-    }
-    if (!k.empty() && !v.empty()) {
-      (*result)[k] = v;
-    }
-  }
-  return true;
+    return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+#endif // PXR_PYTHON_SUPPORT_ENABLED

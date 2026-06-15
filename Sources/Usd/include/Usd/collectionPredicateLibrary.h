@@ -74,8 +74,10 @@ using UsdObjectPredicateLibrary = SdfPredicateLibrary<UsdObject>;
 ///     prim, return false.
 ///
 USD_API
-UsdObjectPredicateLibrary const &UsdGetCollectionPredicateLibrary();
+UsdObjectPredicateLibrary const &
+UsdGetCollectionPredicateLibrary();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_COLLECTION_PREDICATE_LIBRARY_H
+#endif // PXR_USD_USD_COLLECTION_PREDICATE_LIBRARY_H
+

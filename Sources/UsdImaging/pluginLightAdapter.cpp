@@ -13,47 +13,57 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingPluginLightAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingPluginLightAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingPluginLightAdapter::~UsdImagingPluginLightAdapter() {}
-
-TfTokenVector UsdImagingPluginLightAdapter::GetImagingSubprims(UsdPrim const &prim)
+UsdImagingPluginLightAdapter::~UsdImagingPluginLightAdapter() 
 {
-  return {TfToken()};
 }
 
-TfToken UsdImagingPluginLightAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                            TfToken const &subprim)
+TfTokenVector
+UsdImagingPluginLightAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->pluginLight;
-  }
-
-  return TfToken();
+    return { TfToken() };
 }
 
-bool UsdImagingPluginLightAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+TfToken
+UsdImagingPluginLightAdapter::GetImagingSubprimType(
+    UsdPrim const& prim,
+    TfToken const& subprim)
 {
-  return UsdImagingLightAdapter::IsEnabledSceneLights() &&
-         index->IsSprimTypeSupported(HdPrimTypeTokens->pluginLight);
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->pluginLight;
+    }
+
+    return TfToken();
 }
 
-SdfPath UsdImagingPluginLightAdapter::Populate(UsdPrim const &prim,
-                                               UsdImagingIndexProxy *index,
-                                               UsdImagingInstancerContext const *instancerContext)
+bool
+UsdImagingPluginLightAdapter::IsSupported(
+        UsdImagingIndexProxy const* index) const
 {
-  return _AddSprim(HdPrimTypeTokens->pluginLight, prim, index, instancerContext);
+    return UsdImagingLightAdapter::IsEnabledSceneLights() &&
+          index->IsSprimTypeSupported(HdPrimTypeTokens->pluginLight);
 }
 
-void UsdImagingPluginLightAdapter::_RemovePrim(SdfPath const &cachePath,
-                                               UsdImagingIndexProxy *index)
+SdfPath
+UsdImagingPluginLightAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
 {
-  _RemoveSprim(HdPrimTypeTokens->pluginLight, cachePath, index);
+    return _AddSprim(HdPrimTypeTokens->pluginLight, prim, index, instancerContext);
+}
+
+void
+UsdImagingPluginLightAdapter::_RemovePrim(SdfPath const& cachePath,
+                                         UsdImagingIndexProxy* index)
+{
+    _RemoveSprim(HdPrimTypeTokens->pluginLight, cachePath, index);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

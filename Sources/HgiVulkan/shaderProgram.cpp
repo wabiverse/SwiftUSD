@@ -9,50 +9,61 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiVulkanShaderProgram::HgiVulkanShaderProgram(HgiVulkanDevice *device,
-                                               HgiShaderProgramDesc const &desc)
-    : HgiShaderProgram(desc), _device(device), _inflightBits(0)
+
+HgiVulkanShaderProgram::HgiVulkanShaderProgram(
+    HgiVulkanDevice* device,
+    HgiShaderProgramDesc const& desc)
+    : HgiShaderProgram(desc)
+    , _device(device)
+    , _inflightBits(0)
 {
 }
 
-bool HgiVulkanShaderProgram::IsValid() const
+bool
+HgiVulkanShaderProgram::IsValid() const
 {
-  return true;
+    return true;
 }
 
-std::string const &HgiVulkanShaderProgram::GetCompileErrors()
+std::string const&
+HgiVulkanShaderProgram::GetCompileErrors()
 {
-  static const std::string empty;
-  return empty;
+    static const std::string empty;
+    return empty;
 }
 
-size_t HgiVulkanShaderProgram::GetByteSizeOfResource() const
+size_t
+HgiVulkanShaderProgram::GetByteSizeOfResource() const
 {
-  size_t byteSize = 0;
-  for (HgiShaderFunctionHandle const &fn : _descriptor.shaderFunctions) {
-    byteSize += fn->GetByteSizeOfResource();
-  }
-  return byteSize;
+    size_t  byteSize = 0;
+    for (HgiShaderFunctionHandle const& fn : _descriptor.shaderFunctions) {
+        byteSize += fn->GetByteSizeOfResource();
+    }
+    return byteSize;
 }
 
-uint64_t HgiVulkanShaderProgram::GetRawResource() const
+uint64_t
+HgiVulkanShaderProgram::GetRawResource() const
 {
-  return 0;  // No vulkan resource for programs
+    return 0; // No vulkan resource for programs
 }
 
-HgiShaderFunctionHandleVector const &HgiVulkanShaderProgram::GetShaderFunctions() const
+HgiShaderFunctionHandleVector const&
+HgiVulkanShaderProgram::GetShaderFunctions() const
 {
-  return _descriptor.shaderFunctions;
+    return _descriptor.shaderFunctions;
 }
 
-HgiVulkanDevice *HgiVulkanShaderProgram::GetDevice() const
+HgiVulkanDevice*
+HgiVulkanShaderProgram::GetDevice() const
 {
-  return _device;
+    return _device;
 }
 
-uint64_t &HgiVulkanShaderProgram::GetInflightBits()
+uint64_t &
+HgiVulkanShaderProgram::GetInflightBits()
 {
-  return _inflightBits;
+    return _inflightBits;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

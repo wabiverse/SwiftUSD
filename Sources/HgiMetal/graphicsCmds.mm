@@ -112,15 +112,9 @@ HgiMetalGraphicsCmds::HgiMetalGraphicsCmds(
             hasClear = true;
         }
         
-        if (@available(macos 100.100, ios 8.0, *)) {
-            metalColorAttachment.loadAction = MTLLoadActionLoad;
-        }
-        else {
-            metalColorAttachment.loadAction =
+        metalColorAttachment.loadAction =
                 HgiMetalConversions::GetAttachmentLoadOp(
                     hgiColorAttachment.loadOp);
-        }
-
         metalColorAttachment.storeAction =
             HgiMetalConversions::GetAttachmentStoreOp(
                 hgiColorAttachment.storeOp);
@@ -239,13 +233,15 @@ HgiMetalGraphicsCmds::HgiMetalGraphicsCmds(
 HgiMetalGraphicsCmds::~HgiMetalGraphicsCmds()
 {
     TF_VERIFY(_encoders.empty(), "Encoder created, but never commited.");
-
+    
 #if !__has_feature(objc_arc)
     [_renderPassDescriptor release];
-    if (_debugLabel) {
-        [_debugLabel release];
-    }
 #endif // !__has_feature(objc_arc)
+    if (_debugLabel) {
+#if !__has_feature(objc_arc)
+        [_debugLabel release];
+#endif // !__has_feature(objc_arc)
+    }
 }
 
 void
@@ -405,7 +401,7 @@ HgiMetalGraphicsCmds::_SyncArgumentBuffer()
             [_argumentBuffer didModifyRange:{0, _argumentBuffer.length}];
             ARCH_PRAGMA_POP
         }
-#endif // defined(ARCH_OS_OSX)
+#endif
         _argumentBuffer = nil;
     }
 }
@@ -773,7 +769,9 @@ HgiMetalGraphicsCmds::DrawIndexedIndirect(
 }
 
 void
-HgiMetalGraphicsCmds::PushDebugGroup(const char* label)
+HgiMetalGraphicsCmds::PushDebugGroup(
+        const char* label,
+        const GfVec4f& color)
 {
     if (!HgiMetalDebugEnabled()) {
         return;
@@ -807,15 +805,32 @@ HgiMetalGraphicsCmds::PopDebugGroup()
 }
 
 void
+HgiMetalGraphicsCmds::InsertDebugMarker(
+        const char* label,
+        const GfVec4f& color)
+{
+    if (!HgiMetalDebugEnabled()) {
+        return;
+    }
+
+    if (_parallelEncoder) {
+        HGIMETAL_DEBUG_INSERT_DEBUG_MARKER(_parallelEncoder, label)
+    }
+    else if (!_encoders.empty()) {
+        HGIMETAL_DEBUG_INSERT_DEBUG_MARKER(GetEncoder(), label)
+    }
+}
+
+void
 HgiMetalGraphicsCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 {
     TF_VERIFY(barrier==HgiMemoryBarrierAll, "Unknown barrier");
     
     // Apple Silicon only support memory barriers between vertex stages after
     // macOS 12.3.
-    // For iOS we may want to introduce an alternative path.
+    // For iOS we may want to introduce an alternative path
 #if defined(ARCH_OS_OSX)
-    if (@available(macOS 12.3, ios 16.0, *)) {
+    if (@available(macOS 12.3, ios 16.0,  *)) {
         MTLBarrierScope scope = MTLBarrierScopeBuffers;
         MTLRenderStages srcStages = MTLRenderStageVertex;
         MTLRenderStages dstStages = MTLRenderStageVertex;
@@ -826,7 +841,7 @@ HgiMetalGraphicsCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
                                beforeStages:dstStages];
         }
     }
-#endif // defined(ARCH_OS_OSX)
+#endif
 }
 
 static

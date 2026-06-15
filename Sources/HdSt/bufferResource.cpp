@@ -9,20 +9,28 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 HdStBufferResource::HdStBufferResource(TfToken const &role,
                                        HdTupleType tupleType,
                                        int offset,
                                        int stride)
-    : _size(0), _role(role), _tupleType(tupleType), _offset(offset), _stride(stride)
+    : _size(0)
+    , _role(role)
+    , _tupleType(tupleType)
+    , _offset(offset)
+    , _stride(stride)
 {
 }
 
 HdStBufferResource::~HdStBufferResource() = default;
 
-void HdStBufferResource::SetAllocation(HgiBufferHandle const &handle, size_t size)
+void
+HdStBufferResource::SetAllocation(HgiBufferHandle const &handle, size_t size)
 {
-  _handle = handle;
-  _size = size;
+    _handle = handle;
+    _size = size;
 }
 
+
 PXR_NAMESPACE_CLOSE_SCOPE
+

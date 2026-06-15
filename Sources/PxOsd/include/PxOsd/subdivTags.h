@@ -9,14 +9,15 @@
 
 /// \file pxOsd/subdivTags.h
 
-#include "PxOsd/api.h"
-#include "Tf/token.h"
-#include "Vt/array.h"
 #include "pxr/pxrns.h"
+#include "PxOsd/api.h"
+#include "Vt/array.h"
+#include "Tf/token.h"
 
 #include <iosfwd>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \class PxOsdSubdivTags
 ///
@@ -24,178 +25,168 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class PxOsdSubdivTags {
 
- public:
-  PxOsdSubdivTags() = default;
-  PxOsdSubdivTags(PxOsdSubdivTags const &) = default;
-  PxOsdSubdivTags(PxOsdSubdivTags &&) = default;
-  PxOsdSubdivTags &operator=(PxOsdSubdivTags const &) = default;
-  PxOsdSubdivTags &operator=(PxOsdSubdivTags &&) = default;
+public:
 
-  PxOsdSubdivTags(const TfToken &vertexInterpolationRule,
-                  const TfToken &faceVaryingInterpolationRule,
-                  const TfToken &creaseMethod,
-                  const TfToken &triangleSubdivision,
-                  const VtIntArray &creaseIndices,
-                  const VtIntArray &creaseLengths,
-                  const VtFloatArray &creaseWeights,
-                  const VtIntArray &cornerIndices,
-                  const VtFloatArray &cornerWeights)
-      : _vtxInterpolationRule(vertexInterpolationRule),
-        _fvarInterpolationRule(faceVaryingInterpolationRule),
-        _creaseMethod(creaseMethod),
-        _trianglesSubdivision(triangleSubdivision),
-        _creaseIndices(creaseIndices),
-        _creaseLengths(creaseLengths),
-        _creaseWeights(creaseWeights),
-        _cornerIndices(cornerIndices),
-        _cornerWeights(cornerWeights)
-  {
-  }
+    PxOsdSubdivTags() = default;
+    PxOsdSubdivTags(PxOsdSubdivTags const&) = default;
+    PxOsdSubdivTags(PxOsdSubdivTags&&) = default;
+    PxOsdSubdivTags& operator=(PxOsdSubdivTags const&) = default;
+    PxOsdSubdivTags& operator=(PxOsdSubdivTags&&) = default;
 
-  /// Returns the vertex boundary interpolation rule
-  TfToken GetVertexInterpolationRule() const
-  {
-    return _vtxInterpolationRule;
-  }
+    PxOsdSubdivTags(
+        const TfToken& vertexInterpolationRule,
+        const TfToken& faceVaryingInterpolationRule,
+        const TfToken& creaseMethod,
+        const TfToken& triangleSubdivision,
+        const VtIntArray& creaseIndices,
+        const VtIntArray& creaseLengths,
+        const VtFloatArray& creaseWeights,
+        const VtIntArray& cornerIndices,
+        const VtFloatArray& cornerWeights)
+        : _vtxInterpolationRule(vertexInterpolationRule)
+        , _fvarInterpolationRule(faceVaryingInterpolationRule)
+        , _creaseMethod(creaseMethod)
+        , _trianglesSubdivision(triangleSubdivision)
+        , _creaseIndices(creaseIndices)
+        , _creaseLengths(creaseLengths)
+        , _creaseWeights(creaseWeights)
+        , _cornerIndices(cornerIndices)
+        , _cornerWeights(cornerWeights) {}
 
-  /// Set the vertex boundary interpolation rule
-  void SetVertexInterpolationRule(TfToken vtxInterp)
-  {
-    _vtxInterpolationRule = vtxInterp;
-  }
+    /// Returns the vertex boundary interpolation rule
+    TfToken GetVertexInterpolationRule() const {
+        return _vtxInterpolationRule;
+    }
 
-  /// Returns the face-varying boundary interpolation rule
-  TfToken GetFaceVaryingInterpolationRule() const
-  {
-    return _fvarInterpolationRule;
-  }
+    /// Set the vertex boundary interpolation rule
+    void SetVertexInterpolationRule(TfToken vtxInterp) {
+        _vtxInterpolationRule = vtxInterp;
+    }
 
-  /// Set the face-varying boundary interpolation rule
-  void SetFaceVaryingInterpolationRule(TfToken fvarInterp)
-  {
-    _fvarInterpolationRule = fvarInterp;
-  }
+    /// Returns the face-varying boundary interpolation rule
+    TfToken GetFaceVaryingInterpolationRule() const {
+        return _fvarInterpolationRule;
+    }
 
-  /// Returns the creasing method
-  TfToken GetCreaseMethod() const
-  {
-    return _creaseMethod;
-  }
+    /// Set the face-varying boundary interpolation rule
+    void SetFaceVaryingInterpolationRule(TfToken fvarInterp) {
+       _fvarInterpolationRule = fvarInterp;
+    }
 
-  /// Set the creasing method
-  void SetCreaseMethod(TfToken creaseMethod)
-  {
-    _creaseMethod = creaseMethod;
-  }
+    /// Returns the creasing method
+    TfToken GetCreaseMethod() const {
+        return _creaseMethod;
+    }
 
-  /// Returns the triangle subdivision method
-  TfToken GetTriangleSubdivision() const
-  {
-    return _trianglesSubdivision;
-  }
+    /// Set the creasing method
+    void SetCreaseMethod(TfToken creaseMethod) {
+        _creaseMethod = creaseMethod;
+    }
 
-  /// Set the triangle subdivision method
-  void SetTriangleSubdivision(TfToken triangleSubdivision)
-  {
-    _trianglesSubdivision = triangleSubdivision;
-  }
+    /// Returns the triangle subdivision method
+    TfToken GetTriangleSubdivision() const {
+        return _trianglesSubdivision;
+    }
 
-  ///
-  /// \name Crease
-  /// @{
+    /// Set the triangle subdivision method
+    void SetTriangleSubdivision(TfToken triangleSubdivision) {
+        _trianglesSubdivision = triangleSubdivision;
+    }
 
-  /// Returns the edge crease indices
-  VtIntArray const &GetCreaseIndices() const
-  {
-    return _creaseIndices;
-  }
 
-  /// Set the edge crease indices
-  void SetCreaseIndices(VtIntArray const &creaseIndices)
-  {
-    _creaseIndices = creaseIndices;
-  }
+    ///
+    /// \name Crease
+    /// @{
 
-  /// Returns the edge crease loop lengths
-  VtIntArray const &GetCreaseLengths() const
-  {
-    return _creaseLengths;
-  }
+    /// Returns the edge crease indices
+    VtIntArray const &GetCreaseIndices() const {
+        return _creaseIndices;
+    }
 
-  /// Set the edge crease loop lengths
-  void SetCreaseLengths(VtIntArray const &creaseLengths)
-  {
-    _creaseLengths = creaseLengths;
-  }
+    /// Set the edge crease indices
+    void SetCreaseIndices(VtIntArray const &creaseIndices) {
+        _creaseIndices = creaseIndices;
+    }
 
-  /// Returns the edge crease weights
-  VtFloatArray const &GetCreaseWeights() const
-  {
-    return _creaseWeights;
-  }
+    /// Returns the edge crease loop lengths
+    VtIntArray const &GetCreaseLengths() const {
+        return _creaseLengths;
+    }
 
-  /// Set the edge crease weights
-  void SetCreaseWeights(VtFloatArray const &creaseWeights)
-  {
-    _creaseWeights = creaseWeights;
-  }
-  /// @}
+    /// Set the edge crease loop lengths
+    void SetCreaseLengths(VtIntArray const &creaseLengths) {
+        _creaseLengths = creaseLengths;
+    }
 
-  ///
-  /// \name Corner
-  /// @{
+    /// Returns the edge crease weights
+    VtFloatArray const &GetCreaseWeights() const {
+        return _creaseWeights;
+    }
 
-  /// Returns the edge corner indices
-  VtIntArray const &GetCornerIndices() const
-  {
-    return _cornerIndices;
-  }
+    /// Set the edge crease weights
+    void SetCreaseWeights(VtFloatArray const &creaseWeights) {
+        _creaseWeights = creaseWeights;
+    }
+    /// @}
 
-  /// Set the edge corner indices
-  void SetCornerIndices(VtIntArray const &cornerIndices)
-  {
-    _cornerIndices = cornerIndices;
-  }
 
-  /// Returns the edge corner weights
-  VtFloatArray const &GetCornerWeights() const
-  {
-    return _cornerWeights;
-  }
+    ///
+    /// \name Corner
+    /// @{
 
-  /// Set the edge corner weights
-  void SetCornerWeights(VtFloatArray const &cornerWeights)
-  {
-    _cornerWeights = cornerWeights;
-  }
-  /// @}
+    /// Returns the edge corner indices
+    VtIntArray const &GetCornerIndices() const {
+        return _cornerIndices;
+    }
 
-  typedef size_t ID;
+    /// Set the edge corner indices
+    void SetCornerIndices(VtIntArray const &cornerIndices) {
+        _cornerIndices = cornerIndices;
+    }
 
-  /// Returns the hash value of this topology to be used for instancing.
-  PXOSD_API
-  ID ComputeHash() const;
+    /// Returns the edge corner weights
+    VtFloatArray const &GetCornerWeights() const {
+        return _cornerWeights;
+    }
 
- private:
-  // note: if you're going to add more members, make sure
-  // ComputeHash will be updated too.
+    /// Set the edge corner weights
+    void SetCornerWeights(VtFloatArray const &cornerWeights) {
+        _cornerWeights = cornerWeights;
+    }
+    /// @}
 
-  TfToken _vtxInterpolationRule, _fvarInterpolationRule, _creaseMethod, _trianglesSubdivision;
+    typedef size_t ID;
 
-  VtIntArray _creaseIndices, _creaseLengths;
-  VtFloatArray _creaseWeights;
+    /// Returns the hash value of this topology to be used for instancing.
+    PXOSD_API
+    ID ComputeHash() const;
 
-  VtIntArray _cornerIndices;
-  VtFloatArray _cornerWeights;
+private:
+
+    // note: if you're going to add more members, make sure
+    // ComputeHash will be updated too.
+
+    TfToken _vtxInterpolationRule,
+            _fvarInterpolationRule,
+            _creaseMethod,
+            _trianglesSubdivision;
+
+    VtIntArray   _creaseIndices,
+                 _creaseLengths;
+    VtFloatArray _creaseWeights;
+
+    VtIntArray   _cornerIndices;
+    VtFloatArray _cornerWeights;
 };
 
 PXOSD_API
-std::ostream &operator<<(std::ostream &out, PxOsdSubdivTags const &);
+std::ostream& operator<<(std::ostream &out, PxOsdSubdivTags const &);
 PXOSD_API
-bool operator==(const PxOsdSubdivTags &lhs, const PxOsdSubdivTags &rhs);
+bool operator==(const PxOsdSubdivTags& lhs, const PxOsdSubdivTags& rhs);
 PXOSD_API
-bool operator!=(const PxOsdSubdivTags &lhs, const PxOsdSubdivTags &rhs);
+bool operator!=(const PxOsdSubdivTags& lhs, const PxOsdSubdivTags& rhs);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_PX_OSD_SUBDIV_TAGS_H
+#endif // PXR_IMAGING_PX_OSD_SUBDIV_TAGS_H

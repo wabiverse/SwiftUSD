@@ -7,32 +7,35 @@
 #ifndef PXR_IMAGING_HD_GP_GENERATIVE_PROCEDURAL_PLUGIN_H
 #define PXR_IMAGING_HD_GP_GENERATIVE_PROCEDURAL_PLUGIN_H
 
-#include "HdGp/generativeProcedural.h"
-
-#include "HdGp/api.h"
-#include "Hf/pluginBase.h"
 #include "pxr/pxrns.h"
+#include "HdGp/api.h"
+#include "HdGp/generativeProcedural.h"
+#include "Hf/pluginBase.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class HdGpGenerativeProceduralPlugin
-///
+/// 
 /// HdGpGenerativeProceduralPlugin represents an HdGpGenerativeProcedural for
 /// plug-in discovery via HdGpGenerativeProceduralPluginRegistry.
 ///
-class HdGpGenerativeProceduralPlugin : public HfPluginBase {
- public:
-  /// Subclasses implement this to instantiate an HdGpGenerativeProcedural
-  /// at a given prim path.
-  HDGP_API
-  virtual HdGpGenerativeProcedural *Construct(const SdfPath &proceduralPrimPath);
+class HdGpGenerativeProceduralPlugin : public HfPluginBase
+{
+public:
 
- protected:
-  HDGP_API
-  HdGpGenerativeProceduralPlugin();
+    /// Subclasses implement this to instantiate an HdGpGenerativeProcedural
+    /// at a given prim path.
+    HDGP_API
+    virtual HdGpGenerativeProcedural *Construct(
+        const SdfPath &proceduralPrimPath);
 
-  HDGP_API
-  ~HdGpGenerativeProceduralPlugin() override;
+protected:
+
+    HDGP_API
+    HdGpGenerativeProceduralPlugin();
+
+    HDGP_API
+    ~HdGpGenerativeProceduralPlugin() override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -9,17 +9,17 @@
 
 /// \file usd/typed.h
 
-#include "Usd/api.h"
-#include "Usd/prim.h"
-#include "Usd/schemaBase.h"
-#include "Usd/stage.h"
 #include "pxr/pxrns.h"
+#include "Usd/api.h"
+#include "Usd/schemaBase.h"
+#include "Usd/prim.h"
+#include "Usd/stage.h"
 
 #include "Vt/value.h"
 
-#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
+#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -37,84 +37,94 @@ class SdfAssetPath;
 /// The base class for all \em typed schemas (those that can impart a
 /// typeName to a UsdPrim), and therefore the base class for all
 /// concrete, instantiable "IsA" schemas.
-///
+/// 
 /// UsdTyped implements a typeName-based query for its override of
 /// UsdSchemaBase::_IsCompatible().  It provides no other behavior.
 ///
-class UsdTyped : public UsdSchemaBase {
- public:
-  /// Compile time constant representing what kind of schema this class is.
-  ///
-  /// \sa UsdSchemaKind
-  static const UsdSchemaKind schemaKind = UsdSchemaKind::AbstractBase;
+class UsdTyped : public UsdSchemaBase
+{
+public:
+    /// Compile time constant representing what kind of schema this class is.
+    ///
+    /// \sa UsdSchemaKind
+    static const UsdSchemaKind schemaKind = UsdSchemaKind::AbstractBase;
 
-  /// Construct a UsdTyped on UsdPrim \p prim .
-  /// Equivalent to UsdTyped::Get(prim.GetStage(), prim.GetPath())
-  /// for a \em valid \p prim, but will not immediately throw an error for
-  /// an invalid \p prim
-  explicit UsdTyped(const UsdPrim &prim = UsdPrim()) : UsdSchemaBase(prim) {}
+    /// Construct a UsdTyped on UsdPrim \p prim .
+    /// Equivalent to UsdTyped::Get(prim.GetStage(), prim.GetPath())
+    /// for a \em valid \p prim, but will not immediately throw an error for
+    /// an invalid \p prim
+    explicit UsdTyped(const UsdPrim& prim=UsdPrim())
+        : UsdSchemaBase(prim)
+    {
+    }
 
-  /// Construct a UsdTyped on the prim held by \p schemaObj .
-  /// Should be preferred over UsdTyped(schemaObj.GetPrim()),
-  /// as it preserves SchemaBase state.
-  explicit UsdTyped(const UsdSchemaBase &schemaObj) : UsdSchemaBase(schemaObj) {}
+    /// Construct a UsdTyped on the prim held by \p schemaObj .
+    /// Should be preferred over UsdTyped(schemaObj.GetPrim()),
+    /// as it preserves SchemaBase state.
+    explicit UsdTyped(const UsdSchemaBase& schemaObj)
+        : UsdSchemaBase(schemaObj)
+    {
+    }
 
-  /// Destructor.
-  USD_API
-  virtual ~UsdTyped();
+    /// Destructor.
+    USD_API
+    virtual ~UsdTyped();
 
-  /// Return a vector of names of all pre-declared attributes for this schema
-  /// class and all its ancestor classes.  Does not include attributes that
-  /// may be authored by custom/extended methods of the schemas involved.
-  USD_API
-  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
+    /// Return a vector of names of all pre-declared attributes for this schema
+    /// class and all its ancestor classes.  Does not include attributes that
+    /// may be authored by custom/extended methods of the schemas involved.
+    USD_API
+    static const TfTokenVector &
+    GetSchemaAttributeNames(bool includeInherited=true);
 
-  /// Return a UsdTyped holding the prim adhering to this
-  /// schema at \p path on \p stage.  If no prim exists at \p path on
-  /// \p stage, or if the prim at that path does not adhere to this schema,
-  /// return an invalid schema object.  This is shorthand for the following:
-  ///
-  /// \code
-  /// UsdTyped(stage->GetPrimAtPath(path));
-  /// \endcode
-  ///
-  USD_API
-  static UsdTyped Get(const UsdStagePtr &stage, const SdfPath &path);
+    /// Return a UsdTyped holding the prim adhering to this
+    /// schema at \p path on \p stage.  If no prim exists at \p path on
+    /// \p stage, or if the prim at that path does not adhere to this schema,
+    /// return an invalid schema object.  This is shorthand for the following:
+    ///
+    /// \code
+    /// UsdTyped(stage->GetPrimAtPath(path));
+    /// \endcode
+    ///
+    USD_API
+    static UsdTyped
+    Get(const UsdStagePtr &stage, const SdfPath &path);
 
- protected:
-  /// Returns the kind of schema this class belongs to.
-  ///
-  /// \sa UsdSchemaKind
-  USD_API
-  UsdSchemaKind _GetSchemaKind() const override;
 
- private:
-  // needs to invoke _GetStaticTfType.
-  friend class UsdSchemaRegistry;
-  USD_API
-  static const TfType &_GetStaticTfType();
+protected:
+    /// Returns the kind of schema this class belongs to.
+    ///
+    /// \sa UsdSchemaKind
+    USD_API
+    UsdSchemaKind _GetSchemaKind() const override;
 
-  static bool _IsTypedSchema();
+private:
+    // needs to invoke _GetStaticTfType.
+    friend class UsdSchemaRegistry;
+    USD_API
+    static const TfType &_GetStaticTfType();
 
-  // override SchemaBase virtuals.
-  USD_API
-  const TfType &_GetTfType() const override;
+    static bool _IsTypedSchema();
 
- public:
-  // ===================================================================== //
-  // Feel free to add custom code below this line, it will be preserved by
-  // the code generator.
-  //
-  // Just remember to:
-  //  - Close the class declaration with };
-  //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
-  //  - Close the include guard with #endif
-  // ===================================================================== //
-  // --(BEGIN CUSTOM CODE)--
+    // override SchemaBase virtuals.
+    USD_API
+    const TfType &_GetTfType() const override;
 
- protected:
-  USD_API
-  bool _IsCompatible() const override;
+public:
+    // ===================================================================== //
+    // Feel free to add custom code below this line, it will be preserved by 
+    // the code generator. 
+    //
+    // Just remember to: 
+    //  - Close the class declaration with }; 
+    //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
+    //  - Close the include guard with #endif
+    // ===================================================================== //
+    // --(BEGIN CUSTOM CODE)--
+
+protected:
+    USD_API
+    bool _IsCompatible() const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

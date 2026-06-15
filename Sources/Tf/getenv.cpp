@@ -5,9 +5,9 @@
 // https://openusd.org/license.
 //
 
-#include "Tf/getenv.h"
-#include "Arch/env.h"
 #include "pxr/pxrns.h"
+#include "Arch/env.h"
+#include "Tf/getenv.h"
 #include <ctype.h>
 #include <string>
 
@@ -15,48 +15,55 @@ using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-string TfGetenv(const string &envName, const string &defaultValue)
+string
+TfGetenv(const string& envName, const string& defaultValue)
 {
-  string value = ArchGetEnv(envName);
+    string value = ArchGetEnv(envName);
 
-  if (value.empty())
-    return defaultValue;
-  else
-    return value;
+    if (value.empty())
+        return defaultValue;
+    else 
+        return value;
 }
 
-int TfGetenvInt(const string &envName, int defaultValue)
+int
+TfGetenvInt(const string& envName, int defaultValue)
 {
-  string value = ArchGetEnv(envName);
+    string value = ArchGetEnv(envName);
 
-  if (value.empty())
-    return defaultValue;
-  else
-    return std::stoi(value);
+    if (value.empty())
+        return defaultValue;
+    else 
+        return std::stoi(value);
 }
 
-bool TfGetenvBool(const string &envName, bool defaultValue)
+bool
+TfGetenvBool(const string& envName, bool defaultValue)
 {
-  string value = ArchGetEnv(envName);
+    string value = ArchGetEnv(envName);
 
-  if (value.empty())
-    return defaultValue;
-  else {
-    for (char &c : value)
-      c = tolower(c);
+    if (value.empty())
+        return defaultValue;
+    else {
+        for (char& c: value)
+            c = tolower(c);
 
-    return value == "true" || value == "yes" || value == "on" || value == "1";
-  }
+        return value == "true" ||
+               value == "yes"  ||
+               value == "on"   ||
+               value == "1";
+    }
 }
 
-double TfGetenvDouble(const string &envName, double defaultValue)
+double
+TfGetenvDouble(const string& envName, double defaultValue)
 {
-  string value = ArchGetEnv(envName);
+    string value = ArchGetEnv(envName);
 
-  if (value.empty())
-    return defaultValue;
-  else
-    return std::stod(value);
+    if (value.empty())
+        return defaultValue;
+    else
+        return std::stod(value);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

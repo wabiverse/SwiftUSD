@@ -16,26 +16,29 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 /// \class UsdImagingDataSourceBasisCurvesTopology
 ///
 /// A container data source representing basis curves topology information.
 ///
-class UsdImagingDataSourceBasisCurvesTopology : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceBasisCurvesTopology);
+class UsdImagingDataSourceBasisCurvesTopology : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceBasisCurvesTopology);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken & name) override;
 
- private:
-  UsdImagingDataSourceBasisCurvesTopology(const SdfPath &sceneIndexPath,
-                                          UsdGeomBasisCurves usdBasisCurves,
-                                          const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceBasisCurvesTopology(
+            const SdfPath &sceneIndexPath,
+            UsdGeomBasisCurves usdBasisCurves,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  const SdfPath _sceneIndexPath;
-  UsdGeomBasisCurves _usdBasisCurves;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    const SdfPath _sceneIndexPath;
+    UsdGeomBasisCurves _usdBasisCurves;
+    const UsdImagingDataSourceStageGlobals &_stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceBasisCurvesTopology);
@@ -46,22 +49,24 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceBasisCurvesTopology);
 ///
 /// A container data source representing data unique to basis curves
 ///
-class UsdImagingDataSourceBasisCurves : public HdContainerDataSource {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceBasisCurves);
+class UsdImagingDataSourceBasisCurves : public HdContainerDataSource
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceBasisCurves);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
- private:
-  UsdImagingDataSourceBasisCurves(const SdfPath &sceneIndexPath,
-                                  UsdGeomBasisCurves usdBasisCurves,
-                                  const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceBasisCurves(
+            const SdfPath &sceneIndexPath,
+            UsdGeomBasisCurves usdBasisCurves,
+            const UsdImagingDataSourceStageGlobals &stageGlobals);
 
- private:
-  const SdfPath _sceneIndexPath;
-  UsdGeomBasisCurves _usdBasisCurves;
-  const UsdImagingDataSourceStageGlobals &_stageGlobals;
+private:
+    const SdfPath _sceneIndexPath;
+    UsdGeomBasisCurves _usdBasisCurves;
+    const UsdImagingDataSourceStageGlobals & _stageGlobals;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceBasisCurves);
@@ -70,29 +75,32 @@ HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceBasisCurves);
 
 /// \class UsdImagingDataSourceBasisCurvesPrim
 ///
-/// A prim data source representing a UsdGeomBasisCurves prim.
+/// A prim data source representing a UsdGeomBasisCurves prim. 
 ///
-class UsdImagingDataSourceBasisCurvesPrim : public UsdImagingDataSourceGprim {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceBasisCurvesPrim);
+class UsdImagingDataSourceBasisCurvesPrim : public UsdImagingDataSourceGprim
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceBasisCurvesPrim);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
-  USDIMAGING_API
-  static HdDataSourceLocatorSet Invalidate(UsdPrim const &prim,
-                                           const TfToken &subprim,
-                                           const TfTokenVector &properties,
-                                           UsdImagingPropertyInvalidationType invalidationType);
+    USDIMAGING_API
+    static HdDataSourceLocatorSet Invalidate(
+            UsdPrim const& prim,
+            const TfToken &subprim,
+            const TfTokenVector &properties,
+            UsdImagingPropertyInvalidationType invalidationType);
 
- private:
-  UsdImagingDataSourceBasisCurvesPrim(const SdfPath &sceneIndexPath,
-                                      UsdPrim usdPrim,
-                                      const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    UsdImagingDataSourceBasisCurvesPrim(
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceBasisCurvesPrim);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_BASISCURVES_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_BASISCURVES_H

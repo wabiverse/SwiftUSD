@@ -19,64 +19,148 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialSchemaTokens, HD_MATERIAL_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialSchemaTokens,
+    HD_MATERIAL_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 
-HdMaterialNetworkSchema HdMaterialSchema::GetMaterialNetwork()
+TfTokenVector
+HdMaterialSchema::GetRenderContexts() const
 {
-  return HdMaterialNetworkSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMaterialSchemaTokens->universalRenderContext));
+    if (auto container = GetContainer()) {
+        return container->GetNames();
+    }
+    return {};
 }
 
-HdMaterialNetworkSchema HdMaterialSchema::GetMaterialNetwork(TfToken const &context)
+HdMaterialNetworkSchema
+HdMaterialSchema::GetMaterialNetwork() const
 {
-  if (auto b = _GetTypedDataSource<HdContainerDataSource>(context)) {
-    return HdMaterialNetworkSchema(b);
-  }
+    return 
+        HdMaterialNetworkSchema(
+            _GetTypedDataSource<HdContainerDataSource>(
+                HdMaterialSchemaTokens->universalRenderContext));
+}
 
-  // If we can't find the context-specific binding, return the fallback.
-  return HdMaterialNetworkSchema(
-      _GetTypedDataSource<HdContainerDataSource>(HdMaterialSchemaTokens->universalRenderContext));
+HdMaterialNetworkSchema
+HdMaterialSchema::GetMaterialNetwork(TfToken const &renderContext) const
+{
+    return 
+        HdMaterialNetworkSchema(
+            _GetTypedDataSource<HdContainerDataSource>(renderContext));
+}
+
+HdMaterialNetworkSchema
+HdMaterialSchema::GetMaterialNetwork(
+    TfTokenVector const &renderContexts) const
+{
+    for (TfToken const &context : renderContexts) {
+        if (auto b = _GetTypedDataSource<HdContainerDataSource>(context)) {
+            return HdMaterialNetworkSchema(b);
+        }
+    }
+
+    // If we can't find the context-specific binding, return the fallback.
+    return
+        HdMaterialNetworkSchema(
+            _GetTypedDataSource<HdContainerDataSource>(
+                HdMaterialSchemaTokens->universalRenderContext));
+}
+
+/*static*/
+TfToken
+HdMaterialSchema::GetLocatorTerminal(HdDataSourceLocator const& locator)
+{
+    return GetLocatorTerminal(locator, TfTokenVector());
+}
+
+/*static*/
+TfToken
+HdMaterialSchema::GetLocatorTerminal(
+    HdDataSourceLocator const& locator,
+    TfToken const &renderContext)
+{
+    return GetLocatorTerminal(locator, TfTokenVector({renderContext}));
+}
+
+/*static*/
+TfToken
+HdMaterialSchema::GetLocatorTerminal(
+    HdDataSourceLocator const& locator,
+    TfTokenVector const& renderContexts)
+{
+    if (locator.GetElementCount() >= 4) {
+
+        // Always check the universal render context
+        static const HdDataSourceLocator universalTerminalLocator(
+            HdMaterialSchema::GetSchemaToken(),
+            HdMaterialSchemaTokens->universalRenderContext,
+            HdMaterialSchemaTokens->terminals
+        );
+        if (locator.Intersects(universalTerminalLocator)) {
+            return locator.GetElement(3);
+        }
+
+        // Check the render specific contexts
+        for (const TfToken& context : renderContexts) {
+            const HdDataSourceLocator terminalLocator(
+                HdMaterialSchema::GetSchemaToken(),
+                context,
+                HdMaterialSchemaTokens->terminals
+            );
+            if (locator.Intersects(terminalLocator)) {
+                return locator.GetElement(3);
+            }
+        }
+    }
+
+    return TfToken();
 }
 
 // --(END CUSTOM CODE: Schema Methods)--
 
 /*static*/
-HdContainerDataSourceHandle HdMaterialSchema::BuildRetained(
-    const size_t count, const TfToken *const names, const HdDataSourceBaseHandle *const values)
+HdContainerDataSourceHandle
+HdMaterialSchema::BuildRetained(
+    const size_t count,
+    const TfToken * const names,
+    const HdDataSourceBaseHandle * const values)
 {
-  return HdRetainedContainerDataSource::New(count, names, values);
+    return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdMaterialSchema HdMaterialSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdMaterialSchema
+HdMaterialSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdMaterialSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(HdMaterialSchemaTokens->material)) :
-          nullptr);
+    return HdMaterialSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdMaterialSchemaTokens->material))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdMaterialSchema::GetSchemaToken()
+const TfToken &
+HdMaterialSchema::GetSchemaToken()
 {
-  return HdMaterialSchemaTokens->material;
+    return HdMaterialSchemaTokens->material;
 }
 
 /*static*/
-const HdDataSourceLocator &HdMaterialSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdMaterialSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
-}
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

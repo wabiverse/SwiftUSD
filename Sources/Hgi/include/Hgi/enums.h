@@ -7,13 +7,14 @@
 #ifndef PXR_IMAGING_HGI_ENUMS_H
 #define PXR_IMAGING_HGI_ENUMS_H
 
-#include "Hgi/api.h"
 #include "pxr/pxrns.h"
+#include "Hgi/api.h"
 #include <cstdint>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 using HgiBits = uint32_t;
+
 
 /// \enum HgiDeviceCapabilitiesBits
 ///
@@ -57,28 +58,32 @@ using HgiBits = uint32_t;
 ///   The device requires workaround for primitive id</li>
 /// <li>HgiDeviceCapabilitiesBitsIndirectCommandBuffers:
 ///   Indirect command buffers are supported</li>
+/// <li>HgiDeviceCapabilitiesBitsRoundPoints:
+///   Points can be natively rasterized as disks</li>
 /// </ul>
 ///
-enum HgiDeviceCapabilitiesBits : HgiBits {
-  HgiDeviceCapabilitiesBitsPresentation = 1 << 0,
-  HgiDeviceCapabilitiesBitsBindlessBuffers = 1 << 1,
-  HgiDeviceCapabilitiesBitsConcurrentDispatch = 1 << 2,
-  HgiDeviceCapabilitiesBitsUnifiedMemory = 1 << 3,
-  HgiDeviceCapabilitiesBitsBuiltinBarycentrics = 1 << 4,
-  HgiDeviceCapabilitiesBitsShaderDrawParameters = 1 << 5,
-  HgiDeviceCapabilitiesBitsMultiDrawIndirect = 1 << 6,
-  HgiDeviceCapabilitiesBitsBindlessTextures = 1 << 7,
-  HgiDeviceCapabilitiesBitsShaderDoublePrecision = 1 << 8,
-  HgiDeviceCapabilitiesBitsDepthRangeMinusOnetoOne = 1 << 9,
-  HgiDeviceCapabilitiesBitsCppShaderPadding = 1 << 10,
-  HgiDeviceCapabilitiesBitsConservativeRaster = 1 << 11,
-  HgiDeviceCapabilitiesBitsStencilReadback = 1 << 12,
-  HgiDeviceCapabilitiesBitsCustomDepthRange = 1 << 13,
-  HgiDeviceCapabilitiesBitsMetalTessellation = 1 << 14,
-  HgiDeviceCapabilitiesBitsBasePrimitiveOffset = 1 << 15,
-  HgiDeviceCapabilitiesBitsPrimitiveIdEmulation = 1 << 16,
-  HgiDeviceCapabilitiesBitsIndirectCommandBuffers = 1 << 17,
-  HgiDeviceCapabilitiesBitsMetalBackend = 1 << 18
+enum HgiDeviceCapabilitiesBits : HgiBits
+{
+    HgiDeviceCapabilitiesBitsPresentation             = 1 << 0,
+    HgiDeviceCapabilitiesBitsBindlessBuffers          = 1 << 1,
+    HgiDeviceCapabilitiesBitsConcurrentDispatch       = 1 << 2,
+    HgiDeviceCapabilitiesBitsUnifiedMemory            = 1 << 3,
+    HgiDeviceCapabilitiesBitsBuiltinBarycentrics      = 1 << 4,
+    HgiDeviceCapabilitiesBitsShaderDrawParameters     = 1 << 5,
+    HgiDeviceCapabilitiesBitsMultiDrawIndirect        = 1 << 6,
+    HgiDeviceCapabilitiesBitsBindlessTextures         = 1 << 7,
+    HgiDeviceCapabilitiesBitsShaderDoublePrecision    = 1 << 8,
+    HgiDeviceCapabilitiesBitsDepthRangeMinusOnetoOne  = 1 << 9,
+    HgiDeviceCapabilitiesBitsCppShaderPadding         = 1 << 10,
+    HgiDeviceCapabilitiesBitsConservativeRaster       = 1 << 11,
+    HgiDeviceCapabilitiesBitsStencilReadback          = 1 << 12,
+    HgiDeviceCapabilitiesBitsCustomDepthRange         = 1 << 13,
+    HgiDeviceCapabilitiesBitsMetalTessellation        = 1 << 14,
+    HgiDeviceCapabilitiesBitsBasePrimitiveOffset      = 1 << 15,
+    HgiDeviceCapabilitiesBitsPrimitiveIdEmulation     = 1 << 16,
+    HgiDeviceCapabilitiesBitsIndirectCommandBuffers   = 1 << 17,
+    HgiDeviceCapabilitiesBitsRoundPoints              = 1 << 18,
+    HgiDeviceCapabilitiesBitsSingleSlotResourceArrays = 1 << 19,
 };
 
 using HgiDeviceCapabilities = HgiBits;
@@ -94,20 +99,24 @@ using HgiDeviceCapabilities = HgiBits;
 ///   A two-dimensional texture.</li>
 /// <li>HgiTextureType3D:
 ///   A three-dimensional texture.</li>
+/// <li>HgiTextureTypeCubemap:
+///   A cubemap texture.</li>
 /// <li>HgiTextureType1DArray:
 ///   An array of one-dimensional textures.</li>
 /// <li>HgiTextureType2DArray:
 ///   An array of two-dimensional textures.</li>
 /// </ul>
 ///
-enum HgiTextureType {
-  HgiTextureType1D = 0,
-  HgiTextureType2D,
-  HgiTextureType3D,
-  HgiTextureType1DArray,
-  HgiTextureType2DArray,
+enum HgiTextureType
+{
+    HgiTextureType1D = 0,
+    HgiTextureType2D,
+    HgiTextureType3D,
+    HgiTextureTypeCubemap,
+    HgiTextureType1DArray,
+    HgiTextureType2DArray,
 
-  HgiTextureTypeCount
+    HgiTextureTypeCount
 };
 
 /// \enum HgiTextureUsageBits
@@ -134,14 +143,15 @@ enum HgiTextureType {
 ///   specific  bits to the usage bit. </li>
 /// </ul>
 ///
-enum HgiTextureUsageBits : HgiBits {
-  HgiTextureUsageBitsColorTarget = 1 << 0,
-  HgiTextureUsageBitsDepthTarget = 1 << 1,
-  HgiTextureUsageBitsStencilTarget = 1 << 2,
-  HgiTextureUsageBitsShaderRead = 1 << 3,
-  HgiTextureUsageBitsShaderWrite = 1 << 4,
+enum HgiTextureUsageBits : HgiBits
+{
+    HgiTextureUsageBitsColorTarget   = 1 << 0,
+    HgiTextureUsageBitsDepthTarget   = 1 << 1,
+    HgiTextureUsageBitsStencilTarget = 1 << 2,
+    HgiTextureUsageBitsShaderRead    = 1 << 3,
+    HgiTextureUsageBitsShaderWrite   = 1 << 4,
 
-  HgiTextureUsageCustomBitsBegin = 1 << 5,
+    HgiTextureUsageCustomBitsBegin = 1 << 5,
 };
 
 using HgiTextureUsage = HgiBits;
@@ -150,14 +160,15 @@ using HgiTextureUsage = HgiBits;
 ///
 /// Various modes used during sampling of a texture.
 ///
-enum HgiSamplerAddressMode {
-  HgiSamplerAddressModeClampToEdge = 0,
-  HgiSamplerAddressModeMirrorClampToEdge,
-  HgiSamplerAddressModeRepeat,
-  HgiSamplerAddressModeMirrorRepeat,
-  HgiSamplerAddressModeClampToBorderColor,
+enum HgiSamplerAddressMode
+{
+    HgiSamplerAddressModeClampToEdge = 0,
+    HgiSamplerAddressModeMirrorClampToEdge,
+    HgiSamplerAddressModeRepeat,
+    HgiSamplerAddressModeMirrorRepeat,
+    HgiSamplerAddressModeClampToBorderColor,
 
-  HgiSamplerAddressModeCount
+    HgiSamplerAddressModeCount
 };
 
 /// \enum HgiSamplerFilter
@@ -171,11 +182,12 @@ enum HgiSamplerAddressMode {
 ///   Combines the values of multiple mipmap levels.</li>
 /// </ul>
 ///
-enum HgiSamplerFilter {
-  HgiSamplerFilterNearest = 0,
-  HgiSamplerFilterLinear = 1,
+enum HgiSamplerFilter
+{
+    HgiSamplerFilterNearest = 0,
+    HgiSamplerFilterLinear  = 1,
 
-  HgiSamplerFilterCount
+    HgiSamplerFilterCount
 };
 
 /// \enum HgiMipFilter
@@ -191,12 +203,13 @@ enum HgiSamplerFilter {
 ///   Linear interpolates the values of up to two mipmap levels.</li>
 /// </ul>
 ///
-enum HgiMipFilter {
-  HgiMipFilterNotMipmapped = 0,
-  HgiMipFilterNearest = 1,
-  HgiMipFilterLinear = 2,
+enum HgiMipFilter
+{
+    HgiMipFilterNotMipmapped = 0,
+    HgiMipFilterNearest      = 1,
+    HgiMipFilterLinear       = 2,
 
-  HgiMipFilterCount
+    HgiMipFilterCount
 };
 
 /// \enum HgiBorderColor
@@ -209,26 +222,28 @@ enum HgiMipFilter {
 /// <li>HgiBorderColorOpaqueWhite</li>
 /// </ul>
 ///
-enum HgiBorderColor {
-  HgiBorderColorTransparentBlack = 0,
-  HgiBorderColorOpaqueBlack = 1,
-  HgiBorderColorOpaqueWhite = 2,
+enum HgiBorderColor
+{
+    HgiBorderColorTransparentBlack = 0,
+    HgiBorderColorOpaqueBlack      = 1,
+    HgiBorderColorOpaqueWhite      = 2,
 
-  HgiBorderColorCount
+    HgiBorderColorCount
 };
 
 /// \enum HgiSampleCount
 ///
 /// Sample count for multi-sampling
 ///
-enum HgiSampleCount {
-  HgiSampleCount1 = 1,
-  HgiSampleCount2 = 2,
-  HgiSampleCount4 = 4,
-  HgiSampleCount8 = 8,
-  HgiSampleCount16 = 16,
+enum HgiSampleCount
+{
+    HgiSampleCount1  = 1,
+    HgiSampleCount2  = 2,
+    HgiSampleCount4  = 4,
+    HgiSampleCount8  = 8,
+    HgiSampleCount16 = 16,
 
-  HgiSampleCountEnd
+    HgiSampleCountEnd
 };
 
 /// \enum HgiAttachmentLoadOp
@@ -244,12 +259,13 @@ enum HgiSampleCount {
 ///   Previous pixel data is loaded into attachment prior to rendering.</li>
 /// </ul>
 ///
-enum HgiAttachmentLoadOp {
-  HgiAttachmentLoadOpDontCare = 0,
-  HgiAttachmentLoadOpClear,
-  HgiAttachmentLoadOpLoad,
-
-  HgiAttachmentLoadOpCount
+enum HgiAttachmentLoadOp
+{
+    HgiAttachmentLoadOpDontCare = 0,
+    HgiAttachmentLoadOpClear,
+    HgiAttachmentLoadOpLoad,
+    
+    HgiAttachmentLoadOpCount
 };
 
 /// \enum HgiAttachmentStoreOp
@@ -263,11 +279,12 @@ enum HgiAttachmentLoadOp {
 ///   The attachment pixel data is stored in memory.</li>
 /// </ul>
 ///
-enum HgiAttachmentStoreOp {
-  HgiAttachmentStoreOpDontCare = 0,
-  HgiAttachmentStoreOpStore,
-
-  HgiAttachmentStoreOpCount
+enum HgiAttachmentStoreOp
+{
+    HgiAttachmentStoreOpDontCare = 0,
+    HgiAttachmentStoreOpStore,
+    
+    HgiAttachmentStoreOpCount
 };
 
 /// \enum HgiBufferUsageBits
@@ -283,20 +300,24 @@ enum HgiAttachmentStoreOp {
 ///   Vertex attributes.</li>
 /// <li>HgiBufferUsageStorage:
 ///   Shader storage buffer / Argument buffer.</li>
+/// <li>HgiBufferUsageUpload:
+///   Buffer will be used to upload data.</li>
 ///
 /// <li>HgiBufferUsageCustomBitsBegin:
 ///   This bit (and any bit after) can be used to attached custom, backend
 ///   specific  bits to the usage bit. </li>
 /// </ul>
 ///
-enum HgiBufferUsageBits : HgiBits {
-  HgiBufferUsageUniform = 1 << 0,
-  HgiBufferUsageIndex32 = 1 << 1,
-  HgiBufferUsageVertex = 1 << 2,
-  HgiBufferUsageStorage = 1 << 3,
-  HgiBufferUsageIndirect = 1 << 4,
+enum HgiBufferUsageBits : HgiBits
+{
+    HgiBufferUsageUniform  = 1 << 0,
+    HgiBufferUsageIndex32  = 1 << 1,
+    HgiBufferUsageVertex   = 1 << 2,
+    HgiBufferUsageStorage  = 1 << 3,
+    HgiBufferUsageIndirect = 1 << 4,
+    HgiBufferUsageUpload   = 1 << 5,
 
-  HgiBufferUsageCustomBitsBegin = 1 << 5,
+    HgiBufferUsageCustomBitsBegin = 1 << 6,
 };
 using HgiBufferUsage = HgiBits;
 
@@ -324,20 +345,21 @@ using HgiBufferUsage = HgiBits;
 ///   Metal specific stage which computes tess factors
 ///   and modifies user post tess vertex data.</li>
 /// <li>HgiShaderStagePostTessellationVertex:
-///   Metal specific stage which performs tessellation and
+///   Metal specific stage which performs tessellation and 
 ///   vertex processing.</li>
 /// </ul>
 ///
-enum HgiShaderStageBits : HgiBits {
-  HgiShaderStageVertex = 1 << 0,
-  HgiShaderStageFragment = 1 << 1,
-  HgiShaderStageCompute = 1 << 2,
-  HgiShaderStageTessellationControl = 1 << 3,
-  HgiShaderStageTessellationEval = 1 << 4,
-  HgiShaderStageGeometry = 1 << 5,
-  HgiShaderStagePostTessellationControl = 1 << 6,
-  HgiShaderStagePostTessellationVertex = 1 << 7,
-  HgiShaderStageCustomBitsBegin = 1 << 8,
+enum HgiShaderStageBits : HgiBits
+{
+    HgiShaderStageVertex                 = 1 << 0,
+    HgiShaderStageFragment               = 1 << 1,
+    HgiShaderStageCompute                = 1 << 2,
+    HgiShaderStageTessellationControl    = 1 << 3,
+    HgiShaderStageTessellationEval       = 1 << 4,
+    HgiShaderStageGeometry               = 1 << 5,
+    HgiShaderStagePostTessellationControl = 1 << 6,
+    HgiShaderStagePostTessellationVertex = 1 << 7,
+    HgiShaderStageCustomBitsBegin        = 1 << 8,
 };
 using HgiShaderStage = HgiBits;
 
@@ -367,16 +389,17 @@ using HgiShaderStage = HgiBits;
 ///   Tessellation factors for Metal tessellation.</li>
 /// </ul>
 ///
-enum HgiBindResourceType {
-  HgiBindResourceTypeSampler = 0,
-  HgiBindResourceTypeSampledImage,
-  HgiBindResourceTypeCombinedSamplerImage,
-  HgiBindResourceTypeStorageImage,
-  HgiBindResourceTypeUniformBuffer,
-  HgiBindResourceTypeStorageBuffer,
-  HgiBindResourceTypeTessFactors,
+enum HgiBindResourceType
+{
+    HgiBindResourceTypeSampler = 0,
+    HgiBindResourceTypeSampledImage,
+    HgiBindResourceTypeCombinedSamplerImage,
+    HgiBindResourceTypeStorageImage,
+    HgiBindResourceTypeUniformBuffer,
+    HgiBindResourceTypeStorageBuffer,
+    HgiBindResourceTypeTessFactors,
 
-  HgiBindResourceTypeCount
+    HgiBindResourceTypeCount
 };
 
 /// \enum HgiPolygonMode
@@ -392,12 +415,13 @@ enum HgiBindResourceType {
 ///   Polygon vertices are drawn as points.</li>
 /// </ul>
 ///
-enum HgiPolygonMode {
-  HgiPolygonModeFill = 0,
-  HgiPolygonModeLine,
-  HgiPolygonModePoint,
+enum HgiPolygonMode
+{
+    HgiPolygonModeFill = 0,
+    HgiPolygonModeLine,
+    HgiPolygonModePoint,
 
-  HgiPolygonModeCount
+    HgiPolygonModeCount
 };
 
 /// \enum HgiCullMode
@@ -415,13 +439,14 @@ enum HgiPolygonMode {
 ///   All primitive are discarded.</li>
 /// </ul>
 ///
-enum HgiCullMode {
-  HgiCullModeNone = 0,
-  HgiCullModeFront,
-  HgiCullModeBack,
-  HgiCullModeFrontAndBack,
+enum HgiCullMode
+{
+    HgiCullModeNone = 0,
+    HgiCullModeFront,
+    HgiCullModeBack,
+    HgiCullModeFrontAndBack,
 
-  HgiCullModeCount
+    HgiCullModeCount
 };
 
 /// \enum HgiWinding
@@ -435,53 +460,57 @@ enum HgiCullMode {
 ///   Primitives with counter-clockwise vertex-order are front facing.</li>
 /// </ul>
 ///
-enum HgiWinding {
-  HgiWindingClockwise = 0,
-  HgiWindingCounterClockwise,
+enum HgiWinding
+{
+    HgiWindingClockwise = 0,
+    HgiWindingCounterClockwise,
 
-  HgiWindingCount
+    HgiWindingCount
 };
+
 
 /// \enum HgiBlendOp
 ///
 /// Blend operations
 ///
-enum HgiBlendOp {
-  HgiBlendOpAdd = 0,
-  HgiBlendOpSubtract,
-  HgiBlendOpReverseSubtract,
-  HgiBlendOpMin,
-  HgiBlendOpMax,
+enum HgiBlendOp
+{
+    HgiBlendOpAdd = 0,
+    HgiBlendOpSubtract,
+    HgiBlendOpReverseSubtract,
+    HgiBlendOpMin,
+    HgiBlendOpMax,
 
-  HgiBlendOpCount
+    HgiBlendOpCount
 };
 
 /// \enum HgiBlendFactor
 ///
 /// Blend factors
 ///
-enum HgiBlendFactor {
-  HgiBlendFactorZero = 0,
-  HgiBlendFactorOne,
-  HgiBlendFactorSrcColor,
-  HgiBlendFactorOneMinusSrcColor,
-  HgiBlendFactorDstColor,
-  HgiBlendFactorOneMinusDstColor,
-  HgiBlendFactorSrcAlpha,
-  HgiBlendFactorOneMinusSrcAlpha,
-  HgiBlendFactorDstAlpha,
-  HgiBlendFactorOneMinusDstAlpha,
-  HgiBlendFactorConstantColor,
-  HgiBlendFactorOneMinusConstantColor,
-  HgiBlendFactorConstantAlpha,
-  HgiBlendFactorOneMinusConstantAlpha,
-  HgiBlendFactorSrcAlphaSaturate,
-  HgiBlendFactorSrc1Color,
-  HgiBlendFactorOneMinusSrc1Color,
-  HgiBlendFactorSrc1Alpha,
-  HgiBlendFactorOneMinusSrc1Alpha,
+enum HgiBlendFactor
+{
+    HgiBlendFactorZero = 0,
+    HgiBlendFactorOne,
+    HgiBlendFactorSrcColor,
+    HgiBlendFactorOneMinusSrcColor,
+    HgiBlendFactorDstColor,
+    HgiBlendFactorOneMinusDstColor,
+    HgiBlendFactorSrcAlpha,
+    HgiBlendFactorOneMinusSrcAlpha,
+    HgiBlendFactorDstAlpha,
+    HgiBlendFactorOneMinusDstAlpha,
+    HgiBlendFactorConstantColor,
+    HgiBlendFactorOneMinusConstantColor,
+    HgiBlendFactorConstantAlpha,
+    HgiBlendFactorOneMinusConstantAlpha,
+    HgiBlendFactorSrcAlphaSaturate,
+    HgiBlendFactorSrc1Color,
+    HgiBlendFactorOneMinusSrc1Color,
+    HgiBlendFactorSrc1Alpha,
+    HgiBlendFactorOneMinusSrc1Alpha,
 
-  HgiBlendFactorCount
+    HgiBlendFactorCount
 };
 
 /// \enum HgiColorMaskBits
@@ -489,11 +518,12 @@ enum HgiBlendFactor {
 /// Describes whether to permit or restrict writing to color components
 /// of a color attachment.
 ///
-enum HgiColorMaskBits : HgiBits {
-  HgiColorMaskRed = 1 << 0,
-  HgiColorMaskGreen = 1 << 1,
-  HgiColorMaskBlue = 1 << 2,
-  HgiColorMaskAlpha = 1 << 3,
+enum HgiColorMaskBits : HgiBits
+{
+    HgiColorMaskRed             = 1 << 0,
+    HgiColorMaskGreen           = 1 << 1,
+    HgiColorMaskBlue            = 1 << 2,
+    HgiColorMaskAlpha           = 1 << 3,
 };
 using HgiColorMask = HgiBits;
 
@@ -501,49 +531,52 @@ using HgiColorMask = HgiBits;
 ///
 /// Compare functions.
 ///
-enum HgiCompareFunction {
-  HgiCompareFunctionNever = 0,
-  HgiCompareFunctionLess,
-  HgiCompareFunctionEqual,
-  HgiCompareFunctionLEqual,
-  HgiCompareFunctionGreater,
-  HgiCompareFunctionNotEqual,
-  HgiCompareFunctionGEqual,
-  HgiCompareFunctionAlways,
+enum HgiCompareFunction
+{
+    HgiCompareFunctionNever = 0,
+    HgiCompareFunctionLess,
+    HgiCompareFunctionEqual,
+    HgiCompareFunctionLEqual,
+    HgiCompareFunctionGreater,
+    HgiCompareFunctionNotEqual,
+    HgiCompareFunctionGEqual,
+    HgiCompareFunctionAlways,
 
-  HgiCompareFunctionCount
+    HgiCompareFunctionCount
 };
 
 /// \enum HgiStencilOp
 ///
 /// Stencil operations.
 ///
-enum HgiStencilOp {
-  HgiStencilOpKeep = 0,
-  HgiStencilOpZero,
-  HgiStencilOpReplace,
-  HgiStencilOpIncrementClamp,
-  HgiStencilOpDecrementClamp,
-  HgiStencilOpInvert,
-  HgiStencilOpIncrementWrap,
-  HgiStencilOpDecrementWrap,
+enum HgiStencilOp
+{
+    HgiStencilOpKeep = 0,
+    HgiStencilOpZero,
+    HgiStencilOpReplace,
+    HgiStencilOpIncrementClamp,
+    HgiStencilOpDecrementClamp,
+    HgiStencilOpInvert,
+    HgiStencilOpIncrementWrap,
+    HgiStencilOpDecrementWrap,
 
-  HgiStencilOpCount
+    HgiStencilOpCount
 };
 
 /// \enum HgiComponentSwizzle
 ///
 /// Swizzle for a component.
 ///
-enum HgiComponentSwizzle {
-  HgiComponentSwizzleZero = 0,
-  HgiComponentSwizzleOne,
-  HgiComponentSwizzleR,
-  HgiComponentSwizzleG,
-  HgiComponentSwizzleB,
-  HgiComponentSwizzleA,
+enum HgiComponentSwizzle
+{
+    HgiComponentSwizzleZero = 0,
+    HgiComponentSwizzleOne,
+    HgiComponentSwizzleR,
+    HgiComponentSwizzleG,
+    HgiComponentSwizzleB,
+    HgiComponentSwizzleA,
 
-  HgiComponentSwizzleCount
+    HgiComponentSwizzleCount
 };
 
 /// \enum HgiPrimitiveType
@@ -567,15 +600,16 @@ enum HgiComponentSwizzle {
 ///   Rasterize two triangles for every separate set of four vertices.</li>
 /// </ul>
 ///
-enum HgiPrimitiveType {
-  HgiPrimitiveTypePointList = 0,
-  HgiPrimitiveTypeLineList,
-  HgiPrimitiveTypeLineStrip,
-  HgiPrimitiveTypeTriangleList,
-  HgiPrimitiveTypePatchList,
-  HgiPrimitiveTypeLineListWithAdjacency,
+enum HgiPrimitiveType
+{
+    HgiPrimitiveTypePointList = 0,
+    HgiPrimitiveTypeLineList,
+    HgiPrimitiveTypeLineStrip,
+    HgiPrimitiveTypeTriangleList,
+    HgiPrimitiveTypePatchList,
+    HgiPrimitiveTypeLineListWithAdjacency,
 
-  HgiPrimitiveTypeCount
+    HgiPrimitiveTypeCount
 };
 
 /// \enum HgiVertexBufferStepFunction
@@ -597,15 +631,16 @@ enum HgiPrimitiveType {
 ///   New attribute data is fetched for each draw in a multi-draw command.</li>
 /// </ul>
 ///
-enum HgiVertexBufferStepFunction {
-  HgiVertexBufferStepFunctionConstant = 0,
-  HgiVertexBufferStepFunctionPerVertex,
-  HgiVertexBufferStepFunctionPerInstance,
-  HgiVertexBufferStepFunctionPerPatch,
-  HgiVertexBufferStepFunctionPerPatchControlPoint,
-  HgiVertexBufferStepFunctionPerDrawCommand,
+enum HgiVertexBufferStepFunction
+{
+    HgiVertexBufferStepFunctionConstant = 0,
+    HgiVertexBufferStepFunctionPerVertex,
+    HgiVertexBufferStepFunctionPerInstance,
+    HgiVertexBufferStepFunctionPerPatch,
+    HgiVertexBufferStepFunctionPerPatchControlPoint,
+    HgiVertexBufferStepFunctionPerDrawCommand,
 
-  HgiVertexBufferStepFunctionCount
+    HgiVertexBufferStepFunctionCount
 };
 
 /// \enum HgiSubmitWaitType
@@ -619,9 +654,10 @@ enum HgiVertexBufferStepFunction {
 ///   The CPU waits ("blocked") until the GPU has consumed the cmds.</li>
 /// </ul>
 ///
-enum HgiSubmitWaitType {
-  HgiSubmitWaitTypeNoWait = 0,
-  HgiSubmitWaitTypeWaitUntilCompleted,
+enum HgiSubmitWaitType
+{
+    HgiSubmitWaitTypeNoWait = 0,
+    HgiSubmitWaitTypeWaitUntilCompleted,
 };
 
 /// \enum HgiMemoryBarrier
@@ -635,7 +671,11 @@ enum HgiSubmitWaitType {
 ///   The barrier affects all memory writes and reads.</li>
 /// </ul>
 ///
-enum HgiMemoryBarrierBits { HgiMemoryBarrierNone = 0, HgiMemoryBarrierAll = 1 << 0 };
+enum HgiMemoryBarrierBits
+{
+    HgiMemoryBarrierNone = 0,
+    HgiMemoryBarrierAll  = 1 << 0
+};
 using HgiMemoryBarrier = HgiBits;
 
 /// \enum HgiBindingType
@@ -665,12 +705,13 @@ using HgiMemoryBarrier = HgiBits;
 ///   Msl example: int *parameter;</li>
 /// </ul>
 ///
-enum HgiBindingType {
-  HgiBindingTypeValue = 0,
-  HgiBindingTypeUniformValue,
-  HgiBindingTypeArray,
-  HgiBindingTypeUniformArray,
-  HgiBindingTypePointer,
+enum HgiBindingType
+{
+    HgiBindingTypeValue = 0,
+    HgiBindingTypeUniformValue,
+    HgiBindingTypeArray,
+    HgiBindingTypeUniformArray,
+    HgiBindingTypePointer,
 };
 
 /// \enum HgiInterpolationType
@@ -692,10 +733,11 @@ enum HgiBindingType {
 ///   Msl example: vec2 parameter[[center_no_perspective]];</li>
 /// </ul>
 ///
-enum HgiInterpolationType {
-  HgiInterpolationDefault = 0,
-  HgiInterpolationFlat,
-  HgiInterpolationNoPerspective,
+enum HgiInterpolationType
+{
+    HgiInterpolationDefault = 0,
+    HgiInterpolationFlat,
+    HgiInterpolationNoPerspective,
 };
 
 /// \enum HgiSamplingType
@@ -717,10 +759,11 @@ enum HgiInterpolationType {
 ///   Msl example: vec2 parameter[[sample_perspective]];</li>
 /// </ul>
 ///
-enum HgiSamplingType {
-  HgiSamplingDefault = 0,
-  HgiSamplingCentroid,
-  HgiSamplingSample,
+enum HgiSamplingType
+{
+    HgiSamplingDefault = 0,
+    HgiSamplingCentroid,
+    HgiSamplingSample,
 };
 
 /// \enum HgiStorageType
@@ -736,9 +779,10 @@ enum HgiSamplingType {
 ///   Glsl example: patch vec2 parameter;</li>
 /// </ul>
 ///
-enum HgiStorageType {
-  HgiStorageDefault = 0,
-  HgiStoragePatch,
+enum HgiStorageType
+{
+    HgiStorageDefault = 0,
+    HgiStoragePatch,
 };
 
 /// \enum HgiShaderTextureType
@@ -752,12 +796,16 @@ enum HgiStorageType {
 ///   Indicates a shadow texture.</li>
 /// <li>HgiShaderTextureTypeArrayTexture:
 ///   Indicates an array texture.</li>
+/// <li>HgiShaderTextureTypeCubemapTexture:
+///   Indicates a cubemap texture.</li>
 /// </ul>
 ///
-enum HgiShaderTextureType {
-  HgiShaderTextureTypeTexture = 0,
-  HgiShaderTextureTypeShadowTexture,
-  HgiShaderTextureTypeArrayTexture
+enum HgiShaderTextureType
+{
+    HgiShaderTextureTypeTexture = 0,
+    HgiShaderTextureTypeShadowTexture,
+    HgiShaderTextureTypeArrayTexture,
+    HgiShaderTextureTypeCubemapTexture
 };
 
 /// \enum HgiComputeDispatch
@@ -771,7 +819,11 @@ enum HgiShaderTextureType {
 ///   Kernels are dispatched concurrently, if supported by the API</li>
 /// </ul>
 ///
-enum HgiComputeDispatch { HgiComputeDispatchSerial = 0, HgiComputeDispatchConcurrent };
+enum HgiComputeDispatch
+{
+    HgiComputeDispatchSerial = 0,
+    HgiComputeDispatchConcurrent
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

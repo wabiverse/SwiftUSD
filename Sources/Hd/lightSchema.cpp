@@ -19,37 +19,44 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdLightSchemaTokens, HD_LIGHT_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdLightSchemaTokens,
+    HD_LIGHT_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
 /*static*/
-HdLightSchema HdLightSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
+HdLightSchema
+HdLightSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdLightSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                                                 HdLightSchemaTokens->light)) :
-                                             nullptr);
+    return HdLightSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdLightSchemaTokens->light))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdLightSchema::GetSchemaToken()
+const TfToken &
+HdLightSchema::GetSchemaToken()
 {
-  return HdLightSchemaTokens->light;
+    return HdLightSchemaTokens->light;
 }
 
 /*static*/
-const HdDataSourceLocator &HdLightSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdLightSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
-}
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

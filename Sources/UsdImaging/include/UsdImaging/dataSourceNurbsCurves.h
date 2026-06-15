@@ -16,27 +16,32 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// A prim data source representing UsdNurbsCurves.
 ///
-class UsdImagingDataSourceNurbsCurvesPrim : public UsdImagingDataSourceGprim {
- public:
-  HD_DECLARE_DATASOURCE(UsdImagingDataSourceNurbsCurvesPrim);
+class UsdImagingDataSourceNurbsCurvesPrim : public UsdImagingDataSourceGprim
+{
+public:
+    HD_DECLARE_DATASOURCE(UsdImagingDataSourceNurbsCurvesPrim);
 
-  TfTokenVector GetNames() override;
-  HdDataSourceBaseHandle Get(const TfToken &name) override;
+    TfTokenVector GetNames() override;
+    HdDataSourceBaseHandle Get(const TfToken &name) override;
 
-  static HdDataSourceLocatorSet Invalidate(UsdPrim const &prim,
-                                           const TfToken &subprim,
-                                           const TfTokenVector &properties,
-                                           UsdImagingPropertyInvalidationType invalidationType);
+    static
+    HdDataSourceLocatorSet
+    Invalidate(
+        UsdPrim const& prim,
+        const TfToken &subprim,
+        const TfTokenVector &properties,
+        UsdImagingPropertyInvalidationType invalidationType);
 
- private:
-  // Private constructor, use static New() instead.
-  UsdImagingDataSourceNurbsCurvesPrim(const SdfPath &sceneIndexPath,
-                                      UsdPrim usdPrim,
-                                      const UsdImagingDataSourceStageGlobals &stageGlobals);
+private:
+    // Private constructor, use static New() instead.
+    UsdImagingDataSourceNurbsCurvesPrim(
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals);
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(UsdImagingDataSourceNurbsCurvesPrim);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_NURBS_CURVES_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_DATA_SOURCE_NURBS_CURVES_H

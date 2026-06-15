@@ -9,51 +9,47 @@
 
 /// \file work/detachedTask.h
 
+#include "pxr/pxrns.h"
 #include "Tf/errorMark.h"
 #include "Work/api.h"
 #include "Work/dispatcher.h"
-#include "pxr/pxrns.h"
+#include "Work/impl.h"
 
 #include <type_traits>
 #include <utility>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template<class Fn> struct Work_DetachedTask {
-  explicit Work_DetachedTask(Fn &&fn) : _fn(std::move(fn)) {}
-  explicit Work_DetachedTask(Fn const &fn) : _fn(fn) {}
-  void operator()() const
-  {
-    TfErrorMark m;
-    _fn();
-    m.Clear();
-  }
-
- private:
-  Fn _fn;
+template <class Fn>
+struct Work_DetachedTask
+{
+    explicit Work_DetachedTask(Fn &&fn) : _fn(std::move(fn)) {}
+    explicit Work_DetachedTask(Fn const &fn) : _fn(fn) {}
+    void operator()() const {
+        TfErrorMark m;
+        _fn();
+        m.Clear();
+    }
+private:
+    Fn _fn;
 };
-
-WORK_API
-WorkDispatcher &Work_GetDetachedDispatcher();
-
-WORK_API
-void Work_EnsureDetachedTaskProgress();
 
 /// Invoke \p fn asynchronously, discard any errors it produces, and provide
 /// no way to wait for it to complete.
-template<class Fn> void WorkRunDetachedTask(Fn &&fn)
+template <class Fn>
+void WorkRunDetachedTask(Fn &&fn)
 {
-  using FnType = typename std::remove_reference<Fn>::type;
-  Work_DetachedTask<FnType> task(std::forward<Fn>(fn));
-  if (WorkHasConcurrency()) {
-    Work_GetDetachedDispatcher().Run(std::move(task));
-    Work_EnsureDetachedTaskProgress();
-  }
-  else {
-    task();
-  }
+    using FnType = typename std::remove_reference<Fn>::type;
+    Work_DetachedTask<FnType> task(std::forward<Fn>(fn));
+    if (WorkHasConcurrency()) {
+        PXR_WORK_IMPL_NAMESPACE_USING_DIRECTIVE;
+        WorkImpl_RunDetachedTask<Work_DetachedTask<FnType>>(std::move(task));
+    }
+    else {
+        task();
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_WORK_DETACHED_TASK_H
+#endif // PXR_BASE_WORK_DETACHED_TASK_H

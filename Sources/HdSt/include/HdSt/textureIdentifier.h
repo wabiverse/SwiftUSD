@@ -7,10 +7,11 @@
 #ifndef PXR_IMAGING_HD_ST_TEXTURE_IDENTIFIER_H
 #define PXR_IMAGING_HD_ST_TEXTURE_IDENTIFIER_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
 #include "Tf/token.h"
+#include "Vt/value.h"
 
 #include <memory>
 
@@ -27,63 +28,82 @@ class HdStSubtextureIdentifier;
 /// The class has value semantics and uses HdStSubtextureIdentifier in a
 /// polymorphic way.
 ///
-class HdStTextureIdentifier final {
- public:
-  using ID = size_t;
+class HdStTextureIdentifier final
+{
+public:
+    using ID = size_t;
 
-  HDST_API
-  HdStTextureIdentifier();
+    HDST_API
+    HdStTextureIdentifier();
 
-  /// C'tor for files that can contain only one texture.
-  ///
-  HDST_API
-  explicit HdStTextureIdentifier(const TfToken &filePath);
+    /// C'tor for files that can contain only one texture.
+    ///
+    HDST_API
+    explicit HdStTextureIdentifier(
+        const TfToken &filePath,
+        const VtValue &fallback = VtValue(),
+        bool defaultToFallback = false);
 
-  /// C'tor for files that can contain more than one texture (e.g.,
-  /// frames in a movie, grids in a VDB file).
-  ///
-  HDST_API
-  HdStTextureIdentifier(const TfToken &filePath,
-                        std::unique_ptr<const HdStSubtextureIdentifier> &&subtextureId);
+    /// C'tor for files that can contain more than one texture (e.g.,
+    /// frames in a movie, grids in a VDB file).
+    ///
+    HDST_API
+    HdStTextureIdentifier(
+        const TfToken &filePath,
+        std::unique_ptr<const HdStSubtextureIdentifier> &&subtextureId,
+        const VtValue &fallback = VtValue(),
+        bool defaultToFallback = false);
 
-  HDST_API
-  HdStTextureIdentifier(const HdStTextureIdentifier &textureId);
+    HDST_API
+    HdStTextureIdentifier(const HdStTextureIdentifier &textureId);
 
-  HDST_API
-  HdStTextureIdentifier &operator=(HdStTextureIdentifier &&textureId);
+    HDST_API
+    HdStTextureIdentifier &operator=(HdStTextureIdentifier &&textureId);
 
-  HDST_API
-  HdStTextureIdentifier &operator=(const HdStTextureIdentifier &textureId);
+    HDST_API
+    HdStTextureIdentifier &operator=(const HdStTextureIdentifier &textureId);
 
-  HDST_API
-  ~HdStTextureIdentifier();
+    HDST_API
+    ~HdStTextureIdentifier();
 
-  /// Get file path of texture file.
-  ///
-  const TfToken &GetFilePath() const
-  {
-    return _filePath;
-  }
+    /// Get file path of texture file.
+    ///
+    const TfToken &GetFilePath() const {
+        return _filePath;
+    }
 
-  /// Get additional information identifying a texture in a file that
-  /// can contain more than one texture (e.g., a frame in a movie or
-  /// a grid in a VDB file).
-  ///
-  /// nullptr for files (e.g., png) that can contain only one texture.
-  ///
-  const HdStSubtextureIdentifier *GetSubtextureIdentifier() const
-  {
-    return _subtextureId.get();
-  }
+    /// Get fallback value that's used if loading from _filePath fails
+    ///
+    const VtValue &GetFallback() const {
+        return _fallback;
+    }
 
-  HDST_API
-  bool operator==(const HdStTextureIdentifier &other) const;
-  HDST_API
-  bool operator!=(const HdStTextureIdentifier &other) const;
+    /// Get if reading from _filePath should be skipped
+    ///
+    bool ShouldDefaultToFallback() const {
+        return _defaultToFallback;
+    }
+    
+    /// Get additional information identifying a texture in a file that
+    /// can contain more than one texture (e.g., a frame in a movie or
+    /// a grid in a VDB file).
+    ///
+    /// nullptr for files (e.g., png) that can contain only one texture.
+    ///
+    const HdStSubtextureIdentifier * GetSubtextureIdentifier() const {
+        return _subtextureId.get();
+    }
 
- private:
-  TfToken _filePath;
-  std::unique_ptr<const HdStSubtextureIdentifier> _subtextureId;
+    HDST_API
+    bool operator==(const HdStTextureIdentifier &other) const;
+    HDST_API
+    bool operator!=(const HdStTextureIdentifier &other) const;
+
+private:
+    TfToken _filePath;
+    VtValue _fallback;
+    bool _defaultToFallback = false;
+    std::unique_ptr<const HdStSubtextureIdentifier> _subtextureId;
 };
 
 HDST_API

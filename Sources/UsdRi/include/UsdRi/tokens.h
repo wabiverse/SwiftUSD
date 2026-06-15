@@ -10,19 +10,20 @@
 /// \file usdRi/tokens.h
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//
+// 
 // This is an automatically generated file (by usdGenSchema.py).
 // Do not hand-edit!
-//
+// 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+#include "pxr/pxrns.h"
+#include "UsdRi/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
-#include "UsdRi/api.h"
-#include "pxr/pxrns.h"
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 /// \class UsdRiTokensType
 ///
@@ -43,87 +44,77 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///     gprim.GetMyTokenValuedAttr().Set(UsdRiTokens->bspline);
 /// \endcode
 struct UsdRiTokensType {
-  USDRI_API UsdRiTokensType();
-  /// \brief "bspline"
-  ///
-  /// UsdSplineAPI - BSpline spline interpolation
-  const TfToken bspline;
-  /// \brief "cameraVisibility"
-  ///
-  ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI
-  ///  to set the camera visibility attribute on the prims in the collection for the RenderPass.
-  const TfToken cameraVisibility;
-  /// \brief "catmull-rom"
-  ///
-  /// UsdSplineAPI - Catmull-Rom spline interpolation
-  const TfToken catmullRom;
-  /// \brief "collection:cameraVisibility:includeRoot"
-  ///
-  /// UsdRiRenderPassAPI
-  const TfToken collectionCameraVisibilityIncludeRoot;
-  /// \brief "constant"
-  ///
-  /// UsdSplineAPI - Constant-value spline interpolation
-  const TfToken constant;
-  /// \brief "interpolation"
-  ///
-  /// UsdSplineAPI - Interpolation attribute name
-  const TfToken interpolation;
-  /// \brief "linear"
-  ///
-  /// UsdSplineAPI - Linear spline interpolation
-  const TfToken linear;
-  /// \brief "matte"
-  ///
-  ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI
-  ///  to set the matte attribute on the prims in the collection for the RenderPass.
-  const TfToken matte;
-  /// \brief "outputs:ri:displacement"
-  ///
-  /// UsdRiMaterialAPI
-  const TfToken outputsRiDisplacement;
-  /// \brief "outputs:ri:surface"
-  ///
-  /// UsdRiMaterialAPI
-  const TfToken outputsRiSurface;
-  /// \brief "outputs:ri:volume"
-  ///
-  /// UsdRiMaterialAPI
-  const TfToken outputsRiVolume;
-  /// \brief "positions"
-  ///
-  /// UsdSplineAPI - Positions attribute name
-  const TfToken positions;
-  /// \brief "ri"
-  ///
-  /// UsdShadeMaterial / Hydra render context token for UsdRi
-  const TfToken renderContext;
-  /// \brief "spline"
-  ///
-  /// UsdSplineAPI - Namespace for spline attributes
-  const TfToken spline;
-  /// \brief "values"
-  ///
-  /// UsdSplineAPI - values attribute name
-  const TfToken values;
-  /// \brief "RiMaterialAPI"
-  ///
-  /// Schema identifer and family for UsdRiMaterialAPI
-  const TfToken RiMaterialAPI;
-  /// \brief "RiRenderPassAPI"
-  ///
-  /// Schema identifer and family for UsdRiRenderPassAPI
-  const TfToken RiRenderPassAPI;
-  /// \brief "RiSplineAPI"
-  ///
-  /// Schema identifer and family for UsdRiSplineAPI
-  const TfToken RiSplineAPI;
-  /// \brief "StatementsAPI"
-  ///
-  /// Schema identifer and family for UsdRiStatementsAPI
-  const TfToken StatementsAPI;
-  /// A vector of all of the tokens listed above.
-  const std::vector<TfToken> allTokens;
+    USDRI_API UsdRiTokensType();
+    /// \brief "bspline"
+    /// 
+    /// UsdSplineAPI - BSpline spline interpolation
+    const TfToken bspline;
+    /// \brief "cameraVisibility"
+    /// 
+    ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI to set the camera visibility attribute on the prims in the collection for the RenderPass. 
+    const TfToken cameraVisibility;
+    /// \brief "catmull-rom"
+    /// 
+    /// UsdSplineAPI - Catmull-Rom spline interpolation
+    const TfToken catmullRom;
+    /// \brief "constant"
+    /// 
+    /// UsdSplineAPI - Constant-value spline interpolation
+    const TfToken constant;
+    /// \brief "interpolation"
+    /// 
+    /// UsdSplineAPI - Interpolation attribute name
+    const TfToken interpolation;
+    /// \brief "linear"
+    /// 
+    /// UsdSplineAPI - Linear spline interpolation
+    const TfToken linear;
+    /// \brief "matte"
+    /// 
+    ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI to set the matte attribute on the prims in the collection for the RenderPass. 
+    const TfToken matte;
+    /// \brief "outputs:ri:displacement"
+    /// 
+    /// UsdRiMaterialAPI
+    const TfToken outputsRiDisplacement;
+    /// \brief "outputs:ri:surface"
+    /// 
+    /// UsdRiMaterialAPI
+    const TfToken outputsRiSurface;
+    /// \brief "outputs:ri:volume"
+    /// 
+    /// UsdRiMaterialAPI
+    const TfToken outputsRiVolume;
+    /// \brief "positions"
+    /// 
+    /// UsdSplineAPI - Positions attribute name
+    const TfToken positions;
+    /// \brief "ri"
+    /// 
+    /// UsdShadeMaterial / Hydra render context token for UsdRi
+    const TfToken renderContext;
+    /// \brief "spline"
+    /// 
+    /// UsdSplineAPI - Namespace for spline attributes
+    const TfToken spline;
+    /// \brief "values"
+    /// 
+    /// UsdSplineAPI - values attribute name
+    const TfToken values;
+    /// \brief "RiMaterialAPI"
+    /// 
+    /// Schema identifer and family for UsdRiMaterialAPI
+    const TfToken RiMaterialAPI;
+    /// \brief "RiSplineAPI"
+    /// 
+    /// Schema identifer and family for UsdRiSplineAPI
+    const TfToken RiSplineAPI;
+    /// \brief "StatementsAPI"
+    /// 
+    /// Schema identifer and family for UsdRiStatementsAPI
+    const TfToken StatementsAPI;
+    /// A vector of all of the tokens listed above.
+    const std::vector<TfToken> allTokens;
 };
 
 /// \var UsdRiTokens

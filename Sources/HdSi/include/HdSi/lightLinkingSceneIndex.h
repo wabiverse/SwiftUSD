@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HDSI_LIGHT_LINKING_SCENE_INDEX_H
 #define PXR_IMAGING_HDSI_LIGHT_LINKING_SCENE_INDEX_H
 
-#include "HdSi/api.h"
 #include "pxr/pxrns.h"
+#include "HdSi/api.h"
 
 #include "Hd/filteringSceneIndex.h"
 #include "Sdf/path.h"
@@ -22,17 +22,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// See documentation below for the use of these tokens.
 ///
-#define HDSI_LIGHT_LINKING_SCENE_INDEX_TOKENS \
-  (lightPrimTypes)(lightFilterPrimTypes)(geometryPrimTypes)
+#define HDSI_LIGHT_LINKING_SCENE_INDEX_TOKENS   \
+    (lightPrimTypes)                            \
+    (lightFilterPrimTypes)                      \
+    (geometryPrimTypes)
 
-TF_DECLARE_PUBLIC_TOKENS(HdsiLightLinkingSceneIndexTokens,
-                         HDSI_API,
-                         HDSI_LIGHT_LINKING_SCENE_INDEX_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdsiLightLinkingSceneIndexTokens, HDSI_API,
+    HDSI_LIGHT_LINKING_SCENE_INDEX_TOKENS);
 
-namespace HdsiLightLinkingSceneIndex_Impl {
-struct _Cache;
-using _CacheSharedPtr = std::shared_ptr<_Cache>;
-}  // namespace HdsiLightLinkingSceneIndex_Impl
+namespace HdsiLightLinkingSceneIndex_Impl
+{
+    struct _Cache;
+    using _CacheSharedPtr = std::shared_ptr<_Cache>;
+}
 
 TF_DECLARE_REF_PTRS(HdsiLightLinkingSceneIndex);
 
@@ -62,63 +64,74 @@ TF_DECLARE_REF_PTRS(HdsiLightLinkingSceneIndex);
 ///   c'tor argument by providing a HdTokenArrayDataSourceHandle for
 ///   \p geometryPrimTypes.
 ///
-/// \note Current support does *not* handle instanced prims (be it natively
-///       instanced, or prototype prims under point instancers) due to
-///       limitations in the HdCollectionExpressionEvaluator.
-///       This will be addressed in a future change.
+/// \note Current support for instancing is limited to linking non-nested
+///       instance prims and non-nested point instancer prims.
+//        Linking to instance proxy prims, nested instances and
+///       nested point instancers is not yet supported.
 ///
 /// \note For legacy scene delegates that implement light linking (e.g.
 ///       UsdImagingDelegate) and don't transport the light linking collections,
 ///       this scene index should leave the category(ies) unaffected on the
 ///       light, geometry prims and instancers.
 ///
-class HdsiLightLinkingSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  HDSI_API
-  static HdSceneIndexBaseRefPtr New(const HdSceneIndexBaseRefPtr &inputSceneIndex,
-                                    const HdContainerDataSourceHandle &inputArgs);
+class HdsiLightLinkingSceneIndex : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    HDSI_API
+    static HdSceneIndexBaseRefPtr
+    New(const HdSceneIndexBaseRefPtr &inputSceneIndex,
+        const HdContainerDataSourceHandle &inputArgs);
 
-  HDSI_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HDSI_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  HDSI_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    HDSI_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
- protected:
-  HDSI_API
-  HdsiLightLinkingSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex,
-                             const HdContainerDataSourceHandle &inputArgs);
+protected:
 
-  HDSI_API
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    HDSI_API
+    HdsiLightLinkingSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputSceneIndex,
+        const HdContainerDataSourceHandle &inputArgs);
 
-  HDSI_API
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    HDSI_API
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  HDSI_API
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    HDSI_API
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
- private:
-  void _ProcessAddedLightOrFilter(const HdSceneIndexObserver::AddedPrimEntry &entry,
-                                  const TfTokenVector &collectionNames,
-                                  HdSceneIndexObserver::DirtiedPrimEntries *dirtiedEntries);
+    HDSI_API
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
-  bool _IsLight(const TfToken &primType) const;
-  bool _IsLightFilter(const TfToken &primType) const;
-  bool _IsGeometry(const TfToken &primType) const;
+private:
+    void _ProcessAddedLightOrFilter(
+        const HdSceneIndexObserver::AddedPrimEntry &entry,
+        const TfTokenVector &collectionNames,
+        HdSceneIndexObserver::DirtiedPrimEntries *dirtiedEntries);
 
- private:
-  HdsiLightLinkingSceneIndex_Impl::_CacheSharedPtr const _cache;
+    bool _IsLight(const TfToken &primType) const;
+    bool _IsLightFilter(const TfToken &primType) const;
+    bool _IsGeometry(const TfToken &primType) const;
 
-  // Track prims with light linking collections.
-  SdfPathSet _lightAndFilterPrimPaths;
+private:
+    HdsiLightLinkingSceneIndex_Impl::_CacheSharedPtr const _cache;
 
-  const VtArray<TfToken> _lightPrimTypes;
-  const VtArray<TfToken> _lightFilterPrimTypes;
-  const VtArray<TfToken> _geometryPrimTypes;
+    // Track prims with light linking collections.
+    SdfPathSet _lightAndFilterPrimPaths;
+
+    const VtArray<TfToken> _lightPrimTypes;
+    const VtArray<TfToken> _lightFilterPrimTypes;
+    const VtArray<TfToken> _geometryPrimTypes;
+
+    // Flag tracking first population.
+    bool _wasPopulated;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

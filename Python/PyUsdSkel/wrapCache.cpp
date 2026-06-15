@@ -6,11 +6,11 @@
 //
 #include "UsdSkel/cache.h"
 
+#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "Usd/pyConversions.h"
 
 #include "Usd/prim.h"
 
@@ -20,65 +20,77 @@
 #include "UsdSkel/skeletonQuery.h"
 #include "UsdSkel/skinningQuery.h"
 
-#include <boost/python.hpp>
-#include <boost/python/extract.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/extract.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
+
 namespace {
 
-std::vector<UsdSkelBinding> _ComputeSkelBindings(const UsdSkelCache &self,
-                                                 const UsdSkelRoot &skelRoot,
-                                                 const Usd_PrimFlagsPredicate predicate)
-{
-  std::vector<UsdSkelBinding> bindings;
-  self.ComputeSkelBindings(skelRoot, &bindings, predicate);
-  return bindings;
+
+std::vector<UsdSkelBinding>
+_ComputeSkelBindings(const UsdSkelCache& self,  
+                     const UsdSkelRoot& skelRoot,
+                     const Usd_PrimFlagsPredicate predicate)
+{   
+    std::vector<UsdSkelBinding> bindings;
+    self.ComputeSkelBindings(skelRoot, &bindings, predicate);
+    return bindings;
 }
 
-UsdSkelBinding _ComputeSkelBinding(const UsdSkelCache &self,
-                                   const UsdSkelRoot &skelRoot,
-                                   const UsdSkelSkeleton &skel,
-                                   const Usd_PrimFlagsPredicate predicate)
+
+UsdSkelBinding
+_ComputeSkelBinding(const UsdSkelCache& self,
+                    const UsdSkelRoot& skelRoot,
+                    const UsdSkelSkeleton& skel,
+                    const Usd_PrimFlagsPredicate predicate)
 {
-  UsdSkelBinding binding;
-  self.ComputeSkelBinding(skelRoot, skel, &binding, predicate);
-  return binding;
+    UsdSkelBinding binding;
+    self.ComputeSkelBinding(skelRoot, skel, &binding, predicate);
+    return binding;
 }
 
-}  // namespace
+} // namespace
+
 
 void wrapUsdSkelCache()
 {
-  using This = UsdSkelCache;
+    using This = UsdSkelCache;
 
-  class_<This>("Cache", init<>())
+    class_<This>("Cache", init<>())
 
-      .def("Clear", &This::Clear)
+        .def("Clear", &This::Clear)
 
-      .def("Populate", &This::Populate, (arg("skelRoot"), arg("predicate")))
+        .def("Populate", &This::Populate,
+             (arg("skelRoot"), arg("predicate")))
 
-      .def("GetSkelQuery", &This::GetSkelQuery)
+        .def("GetSkelQuery", &This::GetSkelQuery)
+        
+        .def("GetSkinningQuery", &This::GetSkinningQuery)
 
-      .def("GetSkinningQuery", &This::GetSkinningQuery)
+        .def("GetAnimQuery",
+             (UsdSkelAnimQuery (UsdSkelCache::*)(const UsdPrim&) const)
+             &This::GetAnimQuery,
+             (arg("prim")))
 
-      .def("GetAnimQuery",
-           (UsdSkelAnimQuery(UsdSkelCache::*)(const UsdPrim &) const) & This::GetAnimQuery,
-           (arg("prim")))
+        .def("GetAnimQuery",
+             (UsdSkelAnimQuery (UsdSkelCache::*)(const UsdSkelAnimation&) const)
+             &This::GetAnimQuery,
+             (arg("anim")))
 
-      .def("GetAnimQuery",
-           (UsdSkelAnimQuery(UsdSkelCache::*)(const UsdSkelAnimation &) const) &
-               This::GetAnimQuery,
-           (arg("anim")))
+        .def("ComputeSkelBindings", &_ComputeSkelBindings,
+             return_value_policy<TfPySequenceToList>(),
+             (arg("skelRoot"), arg("predicate")))
 
-      .def("ComputeSkelBindings",
-           &_ComputeSkelBindings,
-           return_value_policy<TfPySequenceToList>(),
-           (arg("skelRoot"), arg("predicate")))
-
-      .def("ComputeSkelBinding",
-           &_ComputeSkelBinding,
-           (arg("skelRoot"), arg("skel"), arg("predicate")));
-}
+        .def("ComputeSkelBinding", &_ComputeSkelBinding,
+             (arg("skelRoot"), arg("skel"), arg("predicate")))
+        ;
+}            

@@ -4,22 +4,22 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#ifndef PXR_BASE_TF_TFIMPL_H
-#define PXR_BASE_TF_TFIMPL_H
+#ifndef PXR_BASE_TF_TF_H
+#define PXR_BASE_TF_TF_H
 
 /// \file tf/tf.h
 /// A file containing basic constants and definitions.
 
 #if defined(__cplusplus) || defined(doxygen)
 
-#  include "pxr/pxrns.h"
+#include "pxr/pxrns.h"
 
-#  include "Arch/buildMode.h"
-#  include "Arch/inttypes.h"
-#  include "Arch/math.h"
+#include "Arch/buildMode.h"
+#include "Arch/math.h"
+#include "Arch/inttypes.h"
 
-#  include <math.h>
-#  include <utility>
+#include <math.h>
+#include <utility>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -27,40 +27,39 @@ PXR_NAMESPACE_OPEN_SCOPE
 // many files need a higher limit and define this constant themselves before
 // including anything else.
 
-#  ifndef TF_MAX_ARITY
-#    define TF_MAX_ARITY 7
-#  endif  // TF_MAX_ARITY
+#ifndef TF_MAX_ARITY
+#  define TF_MAX_ARITY 7
+#endif // TF_MAX_ARITY
+
 
 /// This value may be used by functions that return a \c size_t to indicate
 /// that a special or error condition has occurred.
 /// \ingroup group_tf_TfError
-#  define TF_BAD_SIZE_T SIZE_MAX
+#define TF_BAD_SIZE_T SIZE_MAX
 
 /// \addtogroup group_tf_BasicMath
 ///@{
 
 /// Returns the absolute value of the given \c int value.
-inline int TfAbs(int v)
-{
-  return (v < 0 ? -v : v);
+inline int TfAbs(int v) {
+    return (v < 0 ? -v : v);
 }
 
 /// Returns the absolute value of the given \c double value.
-inline double TfAbs(double v)
-{
-  return fabs(v);
+inline double TfAbs(double v) {
+    return fabs(v);
 }
 
 /// Returns the smaller of the two given \c  values.
-template<class T> inline T TfMin(const T &v1, const T &v2)
-{
-  return (v1 < v2 ? v1 : v2);
+template <class T>
+inline T TfMin(const T& v1, const T& v2) {
+    return (v1 < v2 ? v1 : v2);
 }
 
 /// Returns the larger of the two given \c  values.
-template<class T> inline T TfMax(const T &v1, const T &v2)
-{
-  return (v1 > v2 ? v1 : v2);
+template <class T>
+inline T TfMax(const T& v1, const T& v2) {
+    return (v1 > v2 ? v1 : v2);
 }
 
 ///@}
@@ -97,15 +96,15 @@ template<class T> inline T TfMax(const T &v1, const T &v2)
 ///
 /// \ingroup group_tf_Stl
 struct TfDeleter {
-  template<class T> void operator()(T *t) const
-  {
-    delete t;
-  }
+    template <class T>
+    void operator() (T* t) const {
+        delete t;
+    }
 
-  template<class T1, class T2> void operator()(std::pair<T1, T2 *> p) const
-  {
-    delete p.second;
-  }
+    template <class T1, class T2>
+    void operator() (std::pair<T1, T2*> p) const {
+        delete p.second;
+    }
 };
 
 /*
@@ -142,11 +141,11 @@ struct TfDeleter {
  * or creating functions which only show up in some builds.
  */
 
-#  define TF_DEV_BUILD ARCH_DEV_BUILD
+#define TF_DEV_BUILD ARCH_DEV_BUILD
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // defined(__cplusplus)
+#endif // defined(__cplusplus)
 
 /// Stops compiler from producing unused argument or variable warnings.
 /// This is useful mainly in C, because in C++ you can just leave
@@ -162,10 +161,10 @@ PXR_NAMESPACE_CLOSE_SCOPE
 /// #else
 ///     // do something that needs foo
 /// #endif
-/// }
+/// } 
 /// \endcode
 ///
 /// \ingroup group_tf_TfCompilerAids
-#define TF_UNUSED(x) (void)x
+#define TF_UNUSED(x)    (void) x
 
-#endif  // PXR_BASE_TF__TFIMPL_H
+#endif // TF_H

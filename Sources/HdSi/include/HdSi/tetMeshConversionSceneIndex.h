@@ -7,14 +7,15 @@
 #ifndef PXR_IMAGING_HDSI_TET_MESH_CONVERSION_SCENE_INDEX_H
 #define PXR_IMAGING_HDSI_TET_MESH_CONVERSION_SCENE_INDEX_H
 
-#include "Hd/filteringSceneIndex.h"
-#include "HdSi/api.h"
 #include "pxr/pxrns.h"
+#include "HdSi/api.h"
+#include "Hd/filteringSceneIndex.h"
 
 #include "Gf/vec3i.h"
 #include "Gf/vec4i.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 TF_DECLARE_REF_PTRS(HdsiTetMeshConversionSceneIndex);
 
@@ -23,34 +24,43 @@ TF_DECLARE_REF_PTRS(HdsiTetMeshConversionSceneIndex);
 ///
 /// A scene index converting TetMeshes into standard triangle based Meshes.
 ///
-class HdsiTetMeshConversionSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  HDSI_API
-  static HdsiTetMeshConversionSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+class HdsiTetMeshConversionSceneIndex : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    HDSI_API
+    static HdsiTetMeshConversionSceneIndexRefPtr
+    New(const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  HDSI_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    HDSI_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
 
-  HDSI_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+    HDSI_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
- protected:
-  HdsiTetMeshConversionSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex);
+protected:
+    HdsiTetMeshConversionSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputSceneIndex);
 
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
- public:
-  static void _ComputeSurfaceFaces(const VtVec4iArray &tetVertexIndices,
-                                   VtVec3iArray *surfaceFaceIndices);
+public:
+
+    static void _ComputeSurfaceFaces(
+        const VtVec4iArray& tetVertexIndices,
+        VtVec3iArray *surfaceFaceIndices);
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HDSI_TET_MESH_CONVERSION_SCENE_INDEX_H
+#endif //PXR_IMAGING_HDSI_TET_MESH_CONVERSION_SCENE_INDEX_H

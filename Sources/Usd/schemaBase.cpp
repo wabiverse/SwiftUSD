@@ -4,93 +4,104 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Usd/schemaBase.h"
 #include "pxr/pxrns.h"
+#include "Usd/schemaBase.h"
 
-#include "Tf/type.h"
 #include "Usd/stage.h"
+#include "Tf/type.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdSchemaBase>();
+    TfType::Define< UsdSchemaBase >();
 }
 
-UsdSchemaBase::UsdSchemaBase(const UsdPrim &prim)
-    : _primData(prim._Prim()), _proxyPrimPath(prim._ProxyPrimPath())
+UsdSchemaBase::UsdSchemaBase(const UsdPrim& prim) 
+    : _primData(prim._Prim())
+    , _proxyPrimPath(prim._ProxyPrimPath())
 {
-  /* NOTHING */
+    /* NOTHING */
 }
 
-UsdSchemaBase::UsdSchemaBase(const UsdSchemaBase &schema)
-    : _primData(schema._primData), _proxyPrimPath(schema._proxyPrimPath)
+UsdSchemaBase::UsdSchemaBase(const UsdSchemaBase& schema) 
+    : _primData(schema._primData)
+    , _proxyPrimPath(schema._proxyPrimPath)
 {
-  /* NOTHING YET */
+    /* NOTHING YET */
 }
 
 /*virtual*/
 UsdSchemaBase::~UsdSchemaBase()
 {
-  // This only exists to avoid memory leaks in derived classes which may
-  // define new members.
+    // This only exists to avoid memory leaks in derived classes which may
+    // define new members.
 }
 
-const UsdPrimDefinition *UsdSchemaBase::GetSchemaClassPrimDefinition() const
+const UsdPrimDefinition *
+UsdSchemaBase::GetSchemaClassPrimDefinition() const
 {
-  const UsdSchemaRegistry &reg = UsdSchemaRegistry::GetInstance();
-  const TfToken usdTypeName = reg.GetSchemaTypeName(_GetType());
-  return IsAppliedAPISchema() ? reg.FindAppliedAPIPrimDefinition(usdTypeName) :
-                                reg.FindConcretePrimDefinition(usdTypeName);
+    const UsdSchemaRegistry &reg = UsdSchemaRegistry::GetInstance();
+    const TfToken usdTypeName = reg.GetSchemaTypeName(_GetType());
+    return IsAppliedAPISchema() ?
+        reg.FindAppliedAPIPrimDefinition(usdTypeName) :
+        reg.FindConcretePrimDefinition(usdTypeName);
 }
 
-bool UsdSchemaBase::_IsCompatible() const
+bool
+UsdSchemaBase::_IsCompatible() const
 {
-  // By default, schema objects are compatible with any valid prim.
-  return true;
+    // By default, schema objects are compatible with any valid prim.
+    return true;
 }
 
 /* static */
-const TfType &UsdSchemaBase::_GetStaticTfType()
+const TfType &
+UsdSchemaBase::_GetStaticTfType()
 {
-  static TfType tfType = TfType::Find<UsdSchemaBase>();
-  return tfType;
+    static TfType tfType = TfType::Find<UsdSchemaBase>();
+    return tfType;
 }
 
-const TfType &UsdSchemaBase::_GetTfType() const
+const TfType &
+UsdSchemaBase::_GetTfType() const
 {
-  return _GetStaticTfType();
+    return _GetStaticTfType();
 }
 
-UsdAttribute UsdSchemaBase::_CreateAttr(TfToken const &attrName,
-                                        SdfValueTypeName const &typeName,
-                                        bool custom,
-                                        SdfVariability variability,
-                                        VtValue const &defaultValue,
-                                        bool writeSparsely) const
+UsdAttribute
+UsdSchemaBase::_CreateAttr(TfToken const &attrName,
+                           SdfValueTypeName const & typeName,
+                           bool custom, SdfVariability variability,
+                           VtValue const &defaultValue, 
+                           bool writeSparsely) const
 {
-  UsdPrim prim(GetPrim());
-
-  if (writeSparsely && !custom) {
-    // We are a builtin, and we're trying to be parsimonious.
-    // We only need to even CREATE a propertySpec if we are
-    // authoring a non-fallback default value
-    UsdAttribute attr = prim.GetAttribute(attrName);
-    VtValue fallback;
-    if (defaultValue.IsEmpty() ||
-        (!attr.HasAuthoredValue() && attr.Get(&fallback) && fallback == defaultValue))
-    {
-      return attr;
+    UsdPrim prim(GetPrim());
+    
+    if (writeSparsely && !custom){
+        // We are a builtin, and we're trying to be parsimonious.
+        // We only need to even CREATE a propertySpec if we are
+        // authoring a non-fallback default value
+        UsdAttribute attr = prim.GetAttribute(attrName);
+        VtValue  fallback;
+        if (defaultValue.IsEmpty() ||
+            (!attr.HasAuthoredValue()
+             && attr.Get(&fallback)
+             && fallback == defaultValue)){
+            return attr;
+        }
     }
-  }
+    
+    UsdAttribute attr(prim.CreateAttribute(attrName, typeName,
+                                           custom, variability));
+    if (attr && !defaultValue.IsEmpty()) {
+        attr.Set(defaultValue);
+    }
 
-  UsdAttribute attr(prim.CreateAttribute(attrName, typeName, custom, variability));
-  if (attr && !defaultValue.IsEmpty()) {
-    attr.Set(defaultValue);
-  }
-
-  return attr;
+    return attr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

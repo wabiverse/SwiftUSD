@@ -5,11 +5,13 @@
 // https://openusd.org/license.
 //
 
-#include "Usd/errors.h"
 #include "pxr/pxrns.h"
+#include "Usd/errors.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdExpiredPrimAccessError::~UsdExpiredPrimAccessError() {}
+UsdExpiredPrimAccessError::~UsdExpiredPrimAccessError()
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

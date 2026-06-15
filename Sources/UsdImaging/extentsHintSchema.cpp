@@ -12,41 +12,54 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(UsdImagingExtentsHintSchemaTokens, USDIMAGINGEXTENTSHINT_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(UsdImagingExtentsHintSchemaTokens,
+    USDIMAGINGEXTENTSHINT_SCHEMA_TOKENS);
 
-HdExtentSchema UsdImagingExtentsHintSchema::GetExtent(const TfToken &purpose)
+
+HdExtentSchema
+UsdImagingExtentsHintSchema::GetExtent(const TfToken &purpose)
 {
-  return HdExtentSchema(_GetTypedDataSource<HdContainerDataSource>(purpose));
+    return HdExtentSchema(_GetTypedDataSource<HdContainerDataSource>(purpose));
 }
 
 /*static*/
-HdContainerDataSourceHandle UsdImagingExtentsHintSchema::BuildRetained(
-    const size_t count, const TfToken *const names, const HdDataSourceBaseHandle *const values)
+HdContainerDataSourceHandle
+UsdImagingExtentsHintSchema::BuildRetained(
+    const size_t count,
+    const TfToken * const names,
+    const HdDataSourceBaseHandle * const values)
 {
-  return HdRetainedContainerDataSource::New(count, names, values);
+    return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-UsdImagingExtentsHintSchema UsdImagingExtentsHintSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+UsdImagingExtentsHintSchema
+UsdImagingExtentsHintSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return UsdImagingExtentsHintSchema(
-      fromParentContainer ?
-          HdContainerDataSource::Cast(fromParentContainer->Get(GetSchemaToken())) :
-          nullptr);
+    return UsdImagingExtentsHintSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(
+            fromParentContainer->Get(
+                GetSchemaToken()))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &UsdImagingExtentsHintSchema::GetSchemaToken()
+const TfToken &
+UsdImagingExtentsHintSchema::GetSchemaToken()
 {
-  return UsdImagingExtentsHintSchemaTokens->extentsHint;
+    return UsdImagingExtentsHintSchemaTokens->extentsHint;
 }
 
 /*static*/
-const HdDataSourceLocator &UsdImagingExtentsHintSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+UsdImagingExtentsHintSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(UsdImagingExtentsHintSchemaTokens->extentsHint);
-  return locator;
-}
+    static const HdDataSourceLocator locator(
+        UsdImagingExtentsHintSchemaTokens->extentsHint
+    );
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

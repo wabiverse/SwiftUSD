@@ -21,94 +21,105 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingHermiteCurvesAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingHermiteCurvesAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingHermiteCurvesAdapter::~UsdImagingHermiteCurvesAdapter() {}
-
-bool UsdImagingHermiteCurvesAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+UsdImagingHermiteCurvesAdapter::~UsdImagingHermiteCurvesAdapter() 
 {
-  return index->IsRprimTypeSupported(HdPrimTypeTokens->basisCurves);
 }
 
-SdfPath UsdImagingHermiteCurvesAdapter::Populate(
-    UsdPrim const &prim,
-    UsdImagingIndexProxy *index,
-    UsdImagingInstancerContext const *instancerContext)
+bool
+UsdImagingHermiteCurvesAdapter::IsSupported(
+        UsdImagingIndexProxy const* index) const
 {
-  return _AddRprim(
-      HdPrimTypeTokens->basisCurves, prim, index, GetMaterialUsdPath(prim), instancerContext);
+    return index->IsRprimTypeSupported(HdPrimTypeTokens->basisCurves);
 }
 
-void UsdImagingHermiteCurvesAdapter::TrackVariability(
-    UsdPrim const &prim,
-    SdfPath const &cachePath,
-    HdDirtyBits *timeVaryingBits,
-    UsdImagingInstancerContext const *instancerContext) const
+SdfPath
+UsdImagingHermiteCurvesAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
 {
-  BaseAdapter::TrackVariability(prim, cachePath, timeVaryingBits, instancerContext);
-
-  // Discover time-varying points.
-  _IsVarying(prim,
-             UsdGeomTokens->points,
-             HdChangeTracker::DirtyPoints,
-             UsdImagingTokens->usdVaryingPrimvar,
-             timeVaryingBits,
-             /*isInherited*/ false);
-
-  // Discover time-varying topology.
-  //
-  // Note that basis, wrap and type are all uniform attributes, so they can't
-  // vary over time.
-  _IsVarying(prim,
-             UsdGeomTokens->curveVertexCounts,
-             HdChangeTracker::DirtyTopology,
-             UsdImagingTokens->usdVaryingTopology,
-             timeVaryingBits,
-             /*isInherited*/ false);
+    return _AddRprim(HdPrimTypeTokens->basisCurves,
+                     prim, index, GetMaterialUsdPath(prim), instancerContext);
 }
 
-bool UsdImagingHermiteCurvesAdapter::_IsBuiltinPrimvar(TfToken const &primvarName) const
+void 
+UsdImagingHermiteCurvesAdapter::TrackVariability(UsdPrim const& prim,
+                                               SdfPath const& cachePath,
+                                               HdDirtyBits* timeVaryingBits,
+                                               UsdImagingInstancerContext const*
+                                                   instancerContext) const
 {
-  return (primvarName == HdTokens->normals || primvarName == HdTokens->widths) ||
-         UsdImagingGprimAdapter::_IsBuiltinPrimvar(primvarName);
+    BaseAdapter::TrackVariability(
+        prim, cachePath, timeVaryingBits, instancerContext);
+
+    // Discover time-varying points.
+    _IsVarying(prim,
+               UsdGeomTokens->points,
+               HdChangeTracker::DirtyPoints,
+               UsdImagingTokens->usdVaryingPrimvar,
+               timeVaryingBits,
+               /*isInherited*/false);
+
+    // Discover time-varying topology.
+    //
+    // Note that basis, wrap and type are all uniform attributes, so they can't
+    // vary over time.
+    _IsVarying(prim, UsdGeomTokens->curveVertexCounts,
+                       HdChangeTracker::DirtyTopology,
+                       UsdImagingTokens->usdVaryingTopology,
+                       timeVaryingBits,
+                       /*isInherited*/false);
 }
 
-HdDirtyBits UsdImagingHermiteCurvesAdapter::ProcessPropertyChange(UsdPrim const &prim,
-                                                                  SdfPath const &cachePath,
-                                                                  TfToken const &propertyName)
+bool
+UsdImagingHermiteCurvesAdapter::_IsBuiltinPrimvar(
+    TfToken const& primvarName) const
 {
-  if (propertyName == UsdGeomTokens->points) {
-    return HdChangeTracker::DirtyPoints;
-  }
+    return (primvarName == HdTokens->normals ||
+            primvarName == HdTokens->widths) ||
+        UsdImagingGprimAdapter::_IsBuiltinPrimvar(primvarName);
+}
 
-  else if (propertyName == UsdGeomTokens->curveVertexCounts) {
-    return HdChangeTracker::DirtyTopology;
-  }
+HdDirtyBits
+UsdImagingHermiteCurvesAdapter::ProcessPropertyChange(UsdPrim const& prim,
+                                             SdfPath const& cachePath,
+                                             TfToken const& propertyName)
+{
+    if (propertyName == UsdGeomTokens->points) {
+        return HdChangeTracker::DirtyPoints;
+    }
 
-  // Allow base class to handle change processing.
-  return BaseAdapter::ProcessPropertyChange(prim, cachePath, propertyName);
+    else if (propertyName == UsdGeomTokens->curveVertexCounts) {
+        return HdChangeTracker::DirtyTopology;
+    }
+
+    // Allow base class to handle change processing.
+    return BaseAdapter::ProcessPropertyChange(prim, cachePath, propertyName);
 }
 
 // -------------------------------------------------------------------------- //
 
-VtValue UsdImagingHermiteCurvesAdapter::GetTopology(UsdPrim const &prim,
-                                                    SdfPath const &cachePath,
-                                                    UsdTimeCode time) const
+VtValue
+UsdImagingHermiteCurvesAdapter::GetTopology(UsdPrim const& prim, 
+                                            SdfPath const& cachePath,
+                                            UsdTimeCode time) const
 {
-  TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
+    TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  HdBasisCurvesTopology topology(HdTokens->linear,
-                                 HdTokens->bezier,
-                                 HdTokens->nonperiodic,
-                                 _Get<VtIntArray>(prim, UsdGeomTokens->curveVertexCounts, time),
-                                 VtIntArray());
-  return VtValue(topology);
+    HdBasisCurvesTopology topology(
+        HdTokens->linear, HdTokens->bezier, HdTokens->nonperiodic,
+        _Get<VtIntArray>(prim, UsdGeomTokens->curveVertexCounts, time),
+        VtIntArray());
+    return VtValue(topology);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

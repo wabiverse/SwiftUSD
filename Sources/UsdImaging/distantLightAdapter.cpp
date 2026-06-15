@@ -13,47 +13,56 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingDistantLightAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingDistantLightAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingDistantLightAdapter::~UsdImagingDistantLightAdapter() {}
-
-TfTokenVector UsdImagingDistantLightAdapter::GetImagingSubprims(UsdPrim const &prim)
+UsdImagingDistantLightAdapter::~UsdImagingDistantLightAdapter() 
 {
-  return {TfToken()};
 }
 
-TfToken UsdImagingDistantLightAdapter::GetImagingSubprimType(UsdPrim const &prim,
-                                                             TfToken const &subprim)
+TfTokenVector
+UsdImagingDistantLightAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  if (subprim.IsEmpty()) {
-    return HdPrimTypeTokens->distantLight;
-  }
-
-  return TfToken();
+    return { TfToken() };
 }
 
-bool UsdImagingDistantLightAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+TfToken
+UsdImagingDistantLightAdapter::GetImagingSubprimType(
+        UsdPrim const& prim, TfToken const& subprim)
 {
-  return UsdImagingLightAdapter::IsEnabledSceneLights() &&
-         index->IsSprimTypeSupported(HdPrimTypeTokens->distantLight);
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->distantLight;
+    }
+
+    return TfToken();
 }
 
-SdfPath UsdImagingDistantLightAdapter::Populate(UsdPrim const &prim,
-                                                UsdImagingIndexProxy *index,
-                                                UsdImagingInstancerContext const *instancerContext)
+bool
+UsdImagingDistantLightAdapter::IsSupported(UsdImagingIndexProxy const* index) const
 {
-  return _AddSprim(HdPrimTypeTokens->distantLight, prim, index, instancerContext);
+    return UsdImagingLightAdapter::IsEnabledSceneLights() &&
+           index->IsSprimTypeSupported(HdPrimTypeTokens->distantLight);
 }
 
-void UsdImagingDistantLightAdapter::_RemovePrim(SdfPath const &cachePath,
-                                                UsdImagingIndexProxy *index)
+SdfPath
+UsdImagingDistantLightAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
 {
-  _RemoveSprim(HdPrimTypeTokens->distantLight, cachePath, index);
+    return _AddSprim(HdPrimTypeTokens->distantLight, prim, index, instancerContext);
 }
+
+void
+UsdImagingDistantLightAdapter::_RemovePrim(SdfPath const& cachePath,
+                                         UsdImagingIndexProxy* index)
+{
+    _RemoveSprim(HdPrimTypeTokens->distantLight, cachePath, index);
+}
+
 
 PXR_NAMESPACE_CLOSE_SCOPE

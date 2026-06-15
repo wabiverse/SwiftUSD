@@ -11,6 +11,7 @@
 
 #include "HgiMetal/api.h"
 
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiMetal;
@@ -20,29 +21,32 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiSampler
 ///
-class HgiMetalSampler final : public HgiSampler {
- public:
-  HGIMETAL_API
-  HgiMetalSampler(HgiMetal *hgi, HgiSamplerDesc const &desc);
+class HgiMetalSampler final : public HgiSampler
+{
+public:
+    HGIMETAL_API
+    HgiMetalSampler(HgiMetal *hgi,
+                    HgiSamplerDesc const & desc);
 
-  HGIMETAL_API
-  ~HgiMetalSampler() override;
+    HGIMETAL_API
+    ~HgiMetalSampler() override;
 
-  HGIMETAL_API
-  uint64_t GetRawResource() const override;
+    HGIMETAL_API
+    uint64_t GetRawResource() const override;
 
-  HGIMETAL_API
-  id<MTLSamplerState> GetSamplerId() const;
+    HGIMETAL_API
+    id<MTLSamplerState> GetSamplerId() const;
 
- private:
-  HgiMetalSampler() = delete;
-  HgiMetalSampler &operator=(const HgiMetalSampler &) = delete;
-  HgiMetalSampler(const HgiMetalSampler &) = delete;
+private:
+    HgiMetalSampler() = delete;
+    HgiMetalSampler & operator=(const HgiMetalSampler&) = delete;
+    HgiMetalSampler(const HgiMetalSampler&) = delete;
 
- private:
-  id<MTLSamplerState> _samplerId;
-  NSString *_label;
+private:
+    id<MTLSamplerState> _samplerId;
+    NSString* _label;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

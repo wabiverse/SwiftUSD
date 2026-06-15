@@ -5,115 +5,125 @@
 // https://openusd.org/license.
 //
 #include "pxr/pxrns.h"
-#include <boost/python/class.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/return_arg.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/return_arg.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Tf/pyResultConversions.h"
-#include "Tf/pyUtils.h"
-#include "Tf/stringUtils.h"
 #include "Usd/stagePopulationMask.h"
+#include "Tf/pyUtils.h"
+#include "Tf/pyResultConversions.h"
+#include "Tf/stringUtils.h"
 
 using std::string;
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
 static std::string __str__(UsdStagePopulationMask const &self)
 {
-  return TfStringify(self);
+    return TfStringify(self);
 }
 
 static string __repr__(UsdStagePopulationMask const &self)
 {
-  return TF_PY_REPR_PREFIX + "StagePopulationMask(" + TfPyRepr(self.GetPaths()) + ")";
+    return TF_PY_REPR_PREFIX + "StagePopulationMask(" +
+        TfPyRepr(self.GetPaths()) + ")";
 }
 
 static size_t __hash__(UsdStagePopulationMask const &self)
 {
-  return hash_value(self);
+    return hash_value(self);
 }
 
-static std::pair<bool, std::vector<TfToken>> _GetIncludedChildNames(
-    UsdStagePopulationMask const &self, SdfPath const &path)
+static std::pair<bool, std::vector<TfToken>> 
+_GetIncludedChildNames(UsdStagePopulationMask const &self, SdfPath const& path)
 {
-  TfTokenVector names;
-  const bool result = self.GetIncludedChildNames(path, &names);
-  return std::make_pair(result, std::move(names));
+    TfTokenVector names;
+    const bool result = self.GetIncludedChildNames(path, &names);
+    return std::make_pair(result, std::move(names));
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapUsdStagePopulationMask()
 {
-  class_<UsdStagePopulationMask>("StagePopulationMask")
-      .def(init<std::vector<SdfPath>>())
+    class_<UsdStagePopulationMask>("StagePopulationMask")
+        .def(init<std::vector<SdfPath>>())
+        
+        .def("All", &UsdStagePopulationMask::All)
+        .staticmethod("All")
+        
+        .def("Union", &UsdStagePopulationMask::Union)
+        .staticmethod("Union")
 
-      .def("All", &UsdStagePopulationMask::All)
-      .staticmethod("All")
+        .def("GetUnion",
+             (UsdStagePopulationMask (UsdStagePopulationMask::*)(
+                 UsdStagePopulationMask const &) const)
+             &UsdStagePopulationMask::GetUnion,
+             arg("other"))
+        .def("GetUnion",
+             (UsdStagePopulationMask (UsdStagePopulationMask::*)(
+                 SdfPath const &) const)
+             &UsdStagePopulationMask::GetUnion,
+             arg("path"))
 
-      .def("Union", &UsdStagePopulationMask::Union)
-      .staticmethod("Union")
+        .def("Intersection", &UsdStagePopulationMask::Intersection)
+        .staticmethod("Intersection")
 
-      .def("GetUnion",
-           (UsdStagePopulationMask(UsdStagePopulationMask::*)(UsdStagePopulationMask const &)
-                const) &
-               UsdStagePopulationMask::GetUnion,
-           arg("other"))
-      .def("GetUnion",
-           (UsdStagePopulationMask(UsdStagePopulationMask::*)(SdfPath const &) const) &
-               UsdStagePopulationMask::GetUnion,
-           arg("path"))
+        .def("GetIntersection",
+             (UsdStagePopulationMask (UsdStagePopulationMask::*)(
+                 UsdStagePopulationMask const &) const)
+             &UsdStagePopulationMask::GetIntersection,
+             arg("other"))
 
-      .def("Intersection", &UsdStagePopulationMask::Intersection)
-      .staticmethod("Intersection")
+        .def("Includes",
+             (bool (UsdStagePopulationMask::*)(
+                 UsdStagePopulationMask const &) const)
+             &UsdStagePopulationMask::Includes,
+             arg("other"))
+        .def("Includes",
+             (bool (UsdStagePopulationMask::*)(SdfPath const &) const)
+             &UsdStagePopulationMask::Includes,
+             arg("path"))
 
-      .def("GetIntersection",
-           (UsdStagePopulationMask(UsdStagePopulationMask::*)(UsdStagePopulationMask const &)
-                const) &
-               UsdStagePopulationMask::GetIntersection,
-           arg("other"))
+        .def("IncludesSubtree", &UsdStagePopulationMask::IncludesSubtree,
+             arg("path"))
 
-      .def("Includes",
-           (bool(UsdStagePopulationMask::*)(UsdStagePopulationMask const &) const) &
-               UsdStagePopulationMask::Includes,
-           arg("other"))
-      .def("Includes",
-           (bool(UsdStagePopulationMask::*)(SdfPath const &) const) &
-               UsdStagePopulationMask::Includes,
-           arg("path"))
+        .def("IsEmpty", &UsdStagePopulationMask::IsEmpty)
 
-      .def("IncludesSubtree", &UsdStagePopulationMask::IncludesSubtree, arg("path"))
+        .def("Add",
+             (UsdStagePopulationMask &(UsdStagePopulationMask::*)(
+                 UsdStagePopulationMask const &other))
+             &UsdStagePopulationMask::Add,
+             return_self<>())
+        
+        .def("Add",
+             (UsdStagePopulationMask &(UsdStagePopulationMask::*)(
+                 SdfPath const &path))
+             &UsdStagePopulationMask::Add,
+             return_self<>())
 
-      .def("IsEmpty", &UsdStagePopulationMask::IsEmpty)
+        .def("GetIncludedChildNames", &_GetIncludedChildNames,
+             arg("path"),
+             return_value_policy<TfPyPairToTuple>())
 
-      .def("Add",
-           (UsdStagePopulationMask &
-            (UsdStagePopulationMask::*)(UsdStagePopulationMask const &other)) &
-               UsdStagePopulationMask::Add,
-           return_self<>())
+        .def("GetPaths", &UsdStagePopulationMask::GetPaths)
 
-      .def("Add",
-           (UsdStagePopulationMask & (UsdStagePopulationMask::*)(SdfPath const &path)) &
-               UsdStagePopulationMask::Add,
-           return_self<>())
+        .def(self == self)
+        .def(self != self)
 
-      .def("GetIncludedChildNames",
-           &_GetIncludedChildNames,
-           arg("path"),
-           return_value_policy<TfPyPairToTuple>())
+        .def("__str__", __str__)
+        .def("__repr__", __repr__)
+        .def("__hash__", __hash__)
 
-      .def("GetPaths", &UsdStagePopulationMask::GetPaths)
-
-      .def(self == self)
-      .def(self != self)
-
-      .def("__str__", __str__)
-      .def("__repr__", __repr__)
-      .def("__hash__", __hash__)
-
-      ;
+        ;
 }

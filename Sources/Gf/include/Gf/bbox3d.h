@@ -10,10 +10,10 @@
 /// \file gf/bbox3d.h
 /// \ingroup group_gf_BasicGeometry
 
-#include "Gf/api.h"
+#include "pxr/pxrns.h"
 #include "Gf/matrix4d.h"
 #include "Gf/range3d.h"
-#include "pxr/pxrns.h"
+#include "Gf/api.h"
 
 #include <iosfwd>
 
@@ -66,179 +66,168 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class GfBBox3d {
 
- public:
-  /// The default constructor leaves the box empty, the transformation
-  /// matrix identity, and the \ref bbox3d_zeroAreaFlag "zero-area
-  /// primitives flag" \c false.
-  GfBBox3d()
-  {
-    _matrix.SetIdentity();
-    _inverse.SetIdentity();
-    _isDegenerate = false;
-    _hasZeroAreaPrimitives = false;
-  }
+  public:
 
-  /// This constructor takes a box and sets the matrix to identity.
-  GfBBox3d(const GfRange3d &box) : _box(box)
-  {
-    _matrix.SetIdentity();
-    _inverse.SetIdentity();
-    _isDegenerate = false;
-    _hasZeroAreaPrimitives = false;
-  }
+    /// The default constructor leaves the box empty, the transformation
+    /// matrix identity, and the \ref bbox3d_zeroAreaFlag "zero-area
+    /// primitives flag" \c false.
+    GfBBox3d() {
+        _matrix.SetIdentity();
+        _inverse.SetIdentity();
+        _isDegenerate = false;
+        _hasZeroAreaPrimitives = false;
+    }
 
-  /// This constructor takes a box and a transformation matrix.
-  GfBBox3d(const GfRange3d &box, const GfMatrix4d &matrix)
-  {
-    Set(box, matrix);
-    _hasZeroAreaPrimitives = false;
-  }
+    /// This constructor takes a box and sets the matrix to identity.
+    GfBBox3d(const GfRange3d &box) :
+        _box(box) {
+        _matrix.SetIdentity();
+        _inverse.SetIdentity();
+        _isDegenerate = false;
+        _hasZeroAreaPrimitives = false;
+    }
 
-  /// Sets the axis-aligned box and transformation matrix.
-  void Set(const GfRange3d &box, const GfMatrix4d &matrix)
-  {
-    _box = box;
-    _SetMatrices(matrix);
-  }
+    /// This constructor takes a box and a transformation matrix.
+    GfBBox3d(const GfRange3d &box, const GfMatrix4d &matrix) {
+        Set(box, matrix);
+        _hasZeroAreaPrimitives = false;
+    }
 
-  /// Sets the transformation matrix only.  The axis-aligned box is not
-  /// modified.
-  void SetMatrix(const GfMatrix4d &matrix)
-  {
-    _SetMatrices(matrix);
-  }
+    /// Sets the axis-aligned box and transformation matrix.
+    void                Set(const GfRange3d &box, const GfMatrix4d &matrix) {
+        _box = box;
+        _SetMatrices(matrix);
+    }
 
-  /// Sets the range of the axis-aligned box only.  The transformation
-  /// matrix is not modified.
-  void SetRange(const GfRange3d &box)
-  {
-    _box = box;
-  }
+    /// Sets the transformation matrix only.  The axis-aligned box is not
+    /// modified.
+    void                SetMatrix(const GfMatrix4d& matrix) {
+        _SetMatrices(matrix);
+    }
 
-  /// Returns the range of the axis-aligned untransformed box.
-  const GfRange3d &GetRange() const
-  {
-    return _box;
-  }
+    /// Sets the range of the axis-aligned box only.  The transformation
+    /// matrix is not modified.
+    void                SetRange(const GfRange3d& box) {
+        _box = box;
+    }
 
-  /// Returns the range of the axis-aligned untransformed box.
-  /// This synonym of \c GetRange exists for compatibility purposes.
-  const GfRange3d &GetBox() const
-  {
-    return GetRange();
-  }
+    /// Returns the range of the axis-aligned untransformed box.
+    const GfRange3d &   GetRange() const {
+        return _box;
+    }
 
-  /// Returns the transformation matrix.
-  const GfMatrix4d &GetMatrix() const
-  {
-    return _matrix;
-  }
+    /// Returns the range of the axis-aligned untransformed box.
+    /// This synonym of \c GetRange exists for compatibility purposes.
+    const GfRange3d &	GetBox() const {
+        return GetRange();
+    }
 
-  /// Returns the inverse of the transformation matrix. This will be the
-  /// identity matrix if the transformation matrix is not invertible.
-  const GfMatrix4d &GetInverseMatrix() const
-  {
-    return _inverse;
-  }
+    /// Returns the transformation matrix.
+    const GfMatrix4d &  GetMatrix() const {
+        return _matrix;
+    }
 
-  /// Sets the \ref bbox3d_zeroAreaFlag "zero-area primitives flag" to the
-  /// given value.
-  void SetHasZeroAreaPrimitives(bool hasThem)
-  {
-    _hasZeroAreaPrimitives = hasThem;
-  }
+    /// Returns the inverse of the transformation matrix. This will be the
+    /// identity matrix if the transformation matrix is not invertible.
+    const GfMatrix4d &  GetInverseMatrix() const {
+        return _inverse;
+    }
 
-  /// Returns the current state of the \ref bbox3d_zeroAreaFlag "zero-area
-  /// primitives flag".
-  bool HasZeroAreaPrimitives() const
-  {
-    return _hasZeroAreaPrimitives;
-  }
+    /// Sets the \ref bbox3d_zeroAreaFlag "zero-area primitives flag" to the
+    /// given value.
+    void                SetHasZeroAreaPrimitives(bool hasThem) {
+        _hasZeroAreaPrimitives = hasThem;
+    }
 
-  /// Returns the volume of the box (0 for an empty box).
-  GF_API
-  double GetVolume() const;
+    /// Returns the current state of the \ref bbox3d_zeroAreaFlag "zero-area
+    /// primitives flag".
+    bool                HasZeroAreaPrimitives() const {
+        return _hasZeroAreaPrimitives;
+    }
 
-  /// Transforms the bounding box by the given matrix, which is assumed to
-  /// be a global transformation to apply to the box. Therefore, this just
-  /// post-multiplies the box's matrix by \p matrix.
-  void Transform(const GfMatrix4d &matrix)
-  {
-    _SetMatrices(_matrix * matrix);
-  }
+    /// Returns the volume of the box (0 for an empty box).
+    GF_API
+    double              GetVolume() const;
 
-  /// Returns the axis-aligned range (as a \c GfRange3d) that results from
-  /// applying the transformation matrix to the wxis-aligned box and
-  /// aligning the result.
-  GF_API
-  GfRange3d ComputeAlignedRange() const;
+    /// Transforms the bounding box by the given matrix, which is assumed to
+    /// be a global transformation to apply to the box. Therefore, this just
+    /// post-multiplies the box's matrix by \p matrix.
+    void                Transform(const GfMatrix4d &matrix) {
+        _SetMatrices(_matrix * matrix);
+    }
 
-  /// Returns the axis-aligned range (as a \c GfRange3d) that results from
-  /// applying the transformation matrix to the axis-aligned box and
-  /// aligning the result. This synonym for \c ComputeAlignedRange exists
-  /// for compatibility purposes.
-  GfRange3d ComputeAlignedBox() const
-  {
-    return ComputeAlignedRange();
-  }
+    /// Returns the axis-aligned range (as a \c GfRange3d) that results from
+    /// applying the transformation matrix to the wxis-aligned box and
+    /// aligning the result.
+    GF_API
+    GfRange3d           ComputeAlignedRange() const;
 
-  /// Combines two bboxes, returning a new bbox that contains both.  This
-  /// uses the coordinate space of one of the two original boxes as the
-  /// space of the result; it uses the one that produces whe smaller of the
-  /// two resulting boxes.
-  GF_API
-  static GfBBox3d Combine(const GfBBox3d &b1, const GfBBox3d &b2);
+    /// Returns the axis-aligned range (as a \c GfRange3d) that results from
+    /// applying the transformation matrix to the axis-aligned box and
+    /// aligning the result. This synonym for \c ComputeAlignedRange exists
+    /// for compatibility purposes.
+    GfRange3d           ComputeAlignedBox() const {
+        return ComputeAlignedRange();
+    }
 
-  /// Returns the centroid of the bounding box.
-  /// The centroid is computed as the transformed centroid of the range.
-  GF_API
-  GfVec3d ComputeCentroid() const;
+    /// Combines two bboxes, returning a new bbox that contains both.  This
+    /// uses the coordinate space of one of the two original boxes as the
+    /// space of the result; it uses the one that produces whe smaller of the
+    /// two resulting boxes.
+    GF_API
+    static GfBBox3d     Combine(const GfBBox3d &b1, const GfBBox3d &b2);
 
-  /// Hash.
-  friend inline size_t hash_value(const GfBBox3d &b)
-  {
-    return TfHash::Combine(b._box, b._matrix);
-  }
+    /// Returns the centroid of the bounding box.
+    /// The centroid is computed as the transformed centroid of the range.
+    GF_API
+    GfVec3d             ComputeCentroid() const;
 
-  /// Component-wise equality test. The axis-aligned boxes and
-  /// transformation matrices match exactly for bboxes to be considered
-  /// equal. (To compare equality of the actual boxes, you can compute both
-  /// aligned boxes and test the results for equality.)
-  bool operator==(const GfBBox3d &b) const
-  {
-    return (_box == b._box && _matrix == b._matrix);
-  }
+    /// Hash.
+    friend inline size_t hash_value(const GfBBox3d &b) {
+        return TfHash::Combine(
+            b._box,
+            b._matrix
+        );
+    }
+    
+    /// Component-wise equality test. The axis-aligned boxes and
+    /// transformation matrices match exactly for bboxes to be considered
+    /// equal. (To compare equality of the actual boxes, you can compute both
+    /// aligned boxes and test the results for equality.)
+    bool                operator ==(const GfBBox3d &b) const {
+        return (_box    == b._box &&
+                _matrix == b._matrix);
+    }
 
-  /// Component-wise inequality test. The axis-aligned boxes and
-  /// transformation matrices match exactly for bboxes to be considered
-  /// equal. (To compare equality of the actual boxes, you can compute both
-  /// aligned boxes and test the results for equality.)
-  bool operator!=(const GfBBox3d &that) const
-  {
-    return !(*this == that);
-  }
+    /// Component-wise inequality test. The axis-aligned boxes and
+    /// transformation matrices match exactly for bboxes to be considered
+    /// equal. (To compare equality of the actual boxes, you can compute both
+    /// aligned boxes and test the results for equality.)
+    bool                operator !=(const GfBBox3d &that) const {
+        return !(*this == that);
+    }
 
- private:
-  /// The axis-aligned box.
-  GfRange3d _box;
-  /// Transformation matrix.
-  GfMatrix4d _matrix;
-  /// Inverse of the transformation matrix.
-  GfMatrix4d _inverse;
-  /// Flag indicating whether the matrix is degenerate.
-  bool _isDegenerate;
-  /// Flag indicating whether the bbox contains zero-area primitives.
-  bool _hasZeroAreaPrimitives;
+  private:
+    /// The axis-aligned box.
+    GfRange3d           _box;
+    /// Transformation matrix.
+    GfMatrix4d          _matrix;
+    /// Inverse of the transformation matrix.
+    GfMatrix4d          _inverse;
+    /// Flag indicating whether the matrix is degenerate.
+    bool                _isDegenerate;
+    /// Flag indicating whether the bbox contains zero-area primitives.
+    bool                _hasZeroAreaPrimitives;
 
-  /// Sets the transformation matrix and the inverse, checking for
-  /// degeneracies.
-  GF_API
-  void _SetMatrices(const GfMatrix4d &matrix);
+    /// Sets the transformation matrix and the inverse, checking for
+    /// degeneracies.
+    GF_API
+    void                _SetMatrices(const GfMatrix4d &matrix);
 
-  /// This is used by \c Combine() when it is determined which coordinate
-  /// space to use to combine two boxes: \p b2 is transformed into the space
-  /// of \p b1 and the results are merged in that space.
-  static GfBBox3d _CombineInOrder(const GfBBox3d &b1, const GfBBox3d &b2);
+    /// This is used by \c Combine() when it is determined which coordinate
+    /// space to use to combine two boxes: \p b2 is transformed into the space
+    /// of \p b1 and the results are merged in that space.
+    static GfBBox3d     _CombineInOrder(const GfBBox3d &b1, const GfBBox3d &b2);
 };
 
 /// Output a GfBBox3d using the format [(range) matrix zeroArea]
@@ -247,8 +236,8 @@ class GfBBox3d {
 /// bbox has zero area primitives in it.
 ///
 /// \ingroup group_gf_DebuggingOutput
-GF_API std::ostream &operator<<(std::ostream &, const GfBBox3d &);
+GF_API std::ostream& operator<<(std::ostream&, const GfBBox3d&);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_GF_BBOX3D_H
+#endif // PXR_BASE_GF_BBOX3D_H

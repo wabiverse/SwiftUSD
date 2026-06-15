@@ -9,55 +9,54 @@
 
 /// \file glf/glRawContext.h
 
-#include "Garch/glPlatformContext.h"
+#include "pxr/pxrns.h"
 #include "Glf/api.h"
 #include "Glf/glContext.h"
-#include "pxr/pxrns.h"
+#include "Garch/glPlatformContext.h"
 
 #include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 typedef std::shared_ptr<class GlfGLRawContext> GlfGLRawContextSharedPtr;
 
 class GlfGLRawContext : public GlfGLContext {
- public:
-  /// Returns a new object with the current context.
-  GLF_API
-  static GlfGLRawContextSharedPtr New();
+public:
+    /// Returns a new object with the current context.
+    GLF_API
+    static GlfGLRawContextSharedPtr New();
 
-  /// Returns a new object with the given state.
-  GLF_API
-  static GlfGLRawContextSharedPtr New(const GarchGLPlatformContextState &);
+    /// Returns a new object with the given state.
+    GLF_API
+    static GlfGLRawContextSharedPtr New(const GarchGLPlatformContextState&);
 
-  GLF_API
-  virtual ~GlfGLRawContext();
+    GLF_API
+    virtual ~GlfGLRawContext();
 
-  /// Returns the held state.
-  const GarchGLPlatformContextState &GetState() const
-  {
-    return _state;
-  }
+    /// Returns the held state.
+    const GarchGLPlatformContextState& GetState() const { return _state; }
 
-  // GlfGLContext overrides
-  GLF_API
-  virtual bool IsValid() const;
+    // GlfGLContext overrides
+    GLF_API
+    virtual bool IsValid() const;
 
- protected:
-  // GlfGLContext overrides
-  GLF_API
-  virtual void _MakeCurrent();
-  GLF_API
-  virtual bool _IsSharing(const GlfGLContextSharedPtr &rhs) const;
-  GLF_API
-  virtual bool _IsEqual(const GlfGLContextSharedPtr &rhs) const;
+protected:
+    // GlfGLContext overrides
+    GLF_API
+    virtual void _MakeCurrent();
+    GLF_API
+    virtual bool _IsSharing(const GlfGLContextSharedPtr& rhs) const;
+    GLF_API
+    virtual bool _IsEqual(const GlfGLContextSharedPtr& rhs) const;
 
- private:
-  GlfGLRawContext(const GarchGLPlatformContextState &);
+private:
+    GlfGLRawContext(const GarchGLPlatformContextState&);
 
- private:
-  GarchGLPlatformContextState _state;
+private:
+    GarchGLPlatformContextState _state;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -1,15 +1,30 @@
 #ifndef __PXR_BASE_WORK_H__
 #define __PXR_BASE_WORK_H__
 
-// work
-#include <Work/api.h>
+// Work
+#include <Work/utils.h>
 #include <Work/detachedTask.h>
+#include <Work/threadLimits.h>
+#include <Work/taskGraph_defaultImpl.h>
+#include <Work/isolatingDispatcher.h>
+#include <Work/zeroAllocator.h>
+#include <Work/impl.h>
+#include <Work/withScopedParallelism.h>
 #include <Work/dispatcher.h>
-#include <Work/loops.h>
+#include <Work/dispatcher_impl.h>
+#include <Work/withScopedParallelism_impl.h>
+#include <Work/threadLimits_impl.h>
+#include <Work/reduce_impl.h>
+#include <Work/taskGraph_impl.h>
+#include <Work/loops_impl.h>
+#include <Work/sort_impl.h>
+#include <Work/implTBB.h>
+#include <Work/detachedTask_impl.h>
+#include <Work/isolatingDispatcher_impl.h>
+#include <Work/api.h>
 #include <Work/reduce.h>
 #include <Work/singularTask.h>
-#include <Work/threadLimits.h>
-#include <Work/utils.h>
-#include <Work/withScopedParallelism.h>
-
+#include <Work/sort.h>
+#include <Work/taskGraph.h>
+#include <Work/loops.h>
 #endif  // __PXR_BASE_WORK_H__

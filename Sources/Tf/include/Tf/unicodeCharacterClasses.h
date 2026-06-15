@@ -7,8 +7,8 @@
 #ifndef PXR_BASE_TF_UNICODE_CHARACTER_CLASSES_H
 #define PXR_BASE_TF_UNICODE_CHARACTER_CLASSES_H
 
-#include "Tf/staticData.h"
 #include "pxr/pxrns.h"
+#include "Tf/staticData.h"
 
 #include <bitset>
 
@@ -19,62 +19,66 @@ PXR_NAMESPACE_OPEN_SCOPE
 // but we need the flags to be contiguous
 constexpr uint32_t TF_MAX_CODE_POINT = 1114112;
 
-/// \brief
+/// \brief 
 /// Provides static initialization of the whether a Unicode code
 /// point is contained with the XID_Start set of Unicode character
 /// classes.
 ///
-class TfUnicodeXidStartFlagData {
- public:
-  TfUnicodeXidStartFlagData();
+class TfUnicodeXidStartFlagData
+{
+public:
 
-  /// \brief Determines whether the given code point is contained within
-  /// the XID_Start character class.
-  /// \param codePoint The Unicode code point to determine inclusion for.
-  /// \return true if the given codePoint is in the XID_Start character
-  /// class, false otherwise.
-  inline bool IsXidStartCodePoint(uint32_t codePoint) const
-  {
-    return (codePoint < TF_MAX_CODE_POINT) ? _flags[codePoint] : false;
-  }
+    TfUnicodeXidStartFlagData();
 
- private:
-  std::bitset<TF_MAX_CODE_POINT> _flags;
+    /// \brief Determines whether the given code point is contained within
+    /// the XID_Start character class.
+    /// \param codePoint The Unicode code point to determine inclusion for.
+    /// \return true if the given codePoint is in the XID_Start character
+    /// class, false otherwise.
+    inline bool IsXidStartCodePoint(uint32_t codePoint) const {
+        return (codePoint < TF_MAX_CODE_POINT) ? _flags[codePoint] : false;
+    }
+
+private:
+
+    std::bitset<TF_MAX_CODE_POINT> _flags;
 };
 
-/// \brief
+/// \brief 
 /// Provides static initialization of the whether a Unicode code
 /// point is contained with the XID_Continue set of Unicode character
 /// classes.
 ///
-class TfUnicodeXidContinueFlagData {
- public:
-  TfUnicodeXidContinueFlagData();
+class TfUnicodeXidContinueFlagData
+{
+public:
 
-  /// \brief Determines whether the given code point is contained within
-  /// the XID_Continue character class.
-  /// \param codePoint The Unicode code point to determine inclusion for.
-  /// \return true if the given codePoint is in the XID_Continue
-  /// character class false otherwise.
-  inline bool IsXidContinueCodePoint(uint32_t codePoint) const
-  {
-    return (codePoint < TF_MAX_CODE_POINT) ? _flags[codePoint] : false;
-  }
+    TfUnicodeXidContinueFlagData();
 
- private:
-  std::bitset<TF_MAX_CODE_POINT> _flags;
+    /// \brief Determines whether the given code point is contained within
+    /// the XID_Continue character class.
+    /// \param codePoint The Unicode code point to determine inclusion for.
+    /// \return true if the given codePoint is in the XID_Continue 
+    /// character class false otherwise.
+    inline bool IsXidContinueCodePoint(uint32_t codePoint) const {
+        return (codePoint < TF_MAX_CODE_POINT) ? _flags[codePoint] : false;
+    }
+
+private:
+    
+    std::bitset<TF_MAX_CODE_POINT> _flags;
 };
 
 /// \brief Retrieves character class data for XID_Start.
 /// \return An object which can be used to interrogate whether a code point
 /// is contained within the XID_Start character class.
-const TfUnicodeXidStartFlagData &TfUnicodeGetXidStartFlagData();
+const TfUnicodeXidStartFlagData& TfUnicodeGetXidStartFlagData();
 
 /// \brief Retrieves character class data for XID_Continue.
 /// \return An object which can be used to interrogate whether a code point
 /// is contained within the XID_Continue character class.
-const TfUnicodeXidContinueFlagData &TfUnicodeGetXidContinueFlagData();
+const TfUnicodeXidContinueFlagData& TfUnicodeGetXidContinueFlagData();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TF_UNICODE_CHARACTER_CLASSES_H_
+#endif // PXR_BASE_TF_UNICODE_CHARACTER_CLASSES_H_

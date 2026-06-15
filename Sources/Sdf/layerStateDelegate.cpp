@@ -5,262 +5,339 @@
 // https://openusd.org/license.
 //
 
+#include "pxr/pxrns.h"
 #include "Sdf/layerStateDelegate.h"
 #include "Sdf/layer.h"
 #include "Tf/staticData.h"
-#include "pxr/pxrns.h"
 
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SdfLayerStateDelegateBase::SdfLayerStateDelegateBase() {}
-
-SdfLayerStateDelegateBase::~SdfLayerStateDelegateBase() {}
-
-bool SdfLayerStateDelegateBase::IsDirty()
+SdfLayerStateDelegateBase::SdfLayerStateDelegateBase()
 {
-  return _IsDirty();
 }
 
-void SdfLayerStateDelegateBase::SetField(const SdfPath &path,
-                                         const TfToken &field,
-                                         const VtValue &value,
-                                         VtValue *oldValue)
+SdfLayerStateDelegateBase::~SdfLayerStateDelegateBase()
 {
-  _OnSetField(path, field, value);
-  _layer->_PrimSetField(path, field, value, oldValue, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::SetField(const SdfPath &path,
-                                         const TfToken &field,
-                                         const SdfAbstractDataConstValue &value,
-                                         VtValue *oldValue)
+bool 
+SdfLayerStateDelegateBase::IsDirty()
 {
-  _OnSetField(path, field, value);
-  _layer->_PrimSetField(path, field, value, oldValue, /* useDelegate = */ false);
-}
-void SdfLayerStateDelegateBase::SetFieldDictValueByKey(const SdfPath &path,
-                                                       const TfToken &field,
-                                                       const TfToken &keyPath,
-                                                       const VtValue &value,
-                                                       VtValue *oldValue)
-{
-  _OnSetFieldDictValueByKey(path, field, keyPath, value);
-  _layer->_PrimSetFieldDictValueByKey(
-      path, field, keyPath, value, oldValue, /* useDelegate = */ false);
+    return _IsDirty();
 }
 
-void SdfLayerStateDelegateBase::SetFieldDictValueByKey(const SdfPath &path,
-                                                       const TfToken &field,
-                                                       const TfToken &keyPath,
-                                                       const SdfAbstractDataConstValue &value,
-                                                       VtValue *oldValue)
+void 
+SdfLayerStateDelegateBase::SetField(
+    const SdfPath& path,
+    const TfToken& field,
+    const VtValue& value,
+    VtValue *oldValue)
 {
-  _OnSetFieldDictValueByKey(path, field, keyPath, value);
-  _layer->_PrimSetFieldDictValueByKey(
-      path, field, keyPath, value, oldValue, /* useDelegate = */ false);
+    _OnSetField(path, field, value);
+    _layer->_PrimSetField(
+        path, field, value, oldValue, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::SetTimeSample(const SdfPath &path,
-                                              double time,
-                                              const VtValue &value)
+void 
+SdfLayerStateDelegateBase::SetField(
+    const SdfPath &path,
+    const TfToken& field,
+    const SdfAbstractDataConstValue& value,
+    VtValue *oldValue)
 {
-  _OnSetTimeSample(path, time, value);
-  _layer->_PrimSetTimeSample(path, time, value, /* useDelegate = */ false);
+    _OnSetField(path, field, value);
+    _layer->_PrimSetField(
+        path, field, value, oldValue, /* useDelegate = */ false);
+}
+void 
+SdfLayerStateDelegateBase::SetFieldDictValueByKey(
+    const SdfPath& path,
+    const TfToken& field,
+    const TfToken& keyPath,
+    const VtValue& value,
+    VtValue *oldValue)
+{
+    _OnSetFieldDictValueByKey(path, field, keyPath, value);
+    _layer->_PrimSetFieldDictValueByKey(
+        path, field, keyPath, value, oldValue, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::SetTimeSample(const SdfPath &path,
-                                              double time,
-                                              const SdfAbstractDataConstValue &value)
+void 
+SdfLayerStateDelegateBase::SetFieldDictValueByKey(
+    const SdfPath& path,
+    const TfToken& field,
+    const TfToken& keyPath,
+    const SdfAbstractDataConstValue& value,
+    VtValue *oldValue)
 {
-  _OnSetTimeSample(path, time, value);
-  _layer->_PrimSetTimeSample(path, time, value, /* useDelegate = */ false);
+    _OnSetFieldDictValueByKey(path, field, keyPath, value);
+    _layer->_PrimSetFieldDictValueByKey(
+        path, field, keyPath, value, oldValue, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::CreateSpec(const SdfPath &path, SdfSpecType specType, bool inert)
+void 
+SdfLayerStateDelegateBase::SetTimeSample(
+    const SdfPath& path,
+    double time,
+    const VtValue& value)
 {
-  _OnCreateSpec(path, specType, inert);
-  _layer->_PrimCreateSpec(path, specType, inert, /* useDelegate = */ false);
+    _OnSetTimeSample(path, time, value);
+    _layer->_PrimSetTimeSample(path, time, value, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::DeleteSpec(const SdfPath &path, bool inert)
+void 
+SdfLayerStateDelegateBase::SetTimeSample(
+    const SdfPath& path,
+    double time,
+    const SdfAbstractDataConstValue& value)
 {
-  _OnDeleteSpec(path, inert);
-  _layer->_PrimDeleteSpec(path, inert, /* useDelegate = */ false);
+    _OnSetTimeSample(path, time, value);
+    _layer->_PrimSetTimeSample(path, time, value, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::MoveSpec(const SdfPath &oldPath, const SdfPath &newPath)
+void 
+SdfLayerStateDelegateBase::CreateSpec(
+    const SdfPath& path,
+    SdfSpecType specType,
+    bool inert)
 {
-  _OnMoveSpec(oldPath, newPath);
-  _layer->_PrimMoveSpec(oldPath, newPath, /* useDelegate = */ false);
+    _OnCreateSpec(path, specType, inert);
+    _layer->_PrimCreateSpec(path, specType, inert, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::PushChild(const SdfPath &parentPath,
-                                          const TfToken &field,
-                                          const TfToken &value)
+void 
+SdfLayerStateDelegateBase::DeleteSpec(
+    const SdfPath& path,
+    bool inert)
 {
-  _OnPushChild(parentPath, field, value);
-  _layer->_PrimPushChild(parentPath, field, value, /* useDelegate = */ false);
+    _OnDeleteSpec(path, inert);
+    _layer->_PrimDeleteSpec(path, inert, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::PushChild(const SdfPath &parentPath,
-                                          const TfToken &field,
-                                          const SdfPath &value)
+void 
+SdfLayerStateDelegateBase::MoveSpec(
+    const SdfPath& oldPath,
+    const SdfPath& newPath)
 {
-  _OnPushChild(parentPath, field, value);
-  _layer->_PrimPushChild(parentPath, field, value, /* useDelegate = */ false);
+    _OnMoveSpec(oldPath, newPath);
+    _layer->_PrimMoveSpec(oldPath, newPath, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::PopChild(const SdfPath &parentPath,
-                                         const TfToken &field,
-                                         const TfToken &oldValue)
+void 
+SdfLayerStateDelegateBase::PushChild(
+    const SdfPath& parentPath,
+    const TfToken& field,
+    const TfToken& value)
 {
-  _OnPopChild(parentPath, field, oldValue);
-  _layer->_PrimPopChild<TfToken>(parentPath,
-                                 field,
-                                 /* useDelegate = */ false);
+    _OnPushChild(parentPath, field, value);
+    _layer->_PrimPushChild(parentPath, field, value, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::PopChild(const SdfPath &parentPath,
-                                         const TfToken &field,
-                                         const SdfPath &oldValue)
+void 
+SdfLayerStateDelegateBase::PushChild(
+    const SdfPath& parentPath,
+    const TfToken& field,
+    const SdfPath& value)
 {
-  _OnPopChild(parentPath, field, oldValue);
-  _layer->_PrimPopChild<SdfPath>(parentPath,
-                                 field,
-                                 /* useDelegate = */ false);
+    _OnPushChild(parentPath, field, value);
+    _layer->_PrimPushChild(parentPath, field, value, /* useDelegate = */ false);
 }
 
-void SdfLayerStateDelegateBase::_SetLayer(const SdfLayerHandle &layer)
+void 
+SdfLayerStateDelegateBase::PopChild(
+    const SdfPath& parentPath,
+    const TfToken& field,
+    const TfToken& oldValue)
 {
-  _layer = layer;
-  _OnSetLayer(_layer);
+    _OnPopChild(parentPath, field, oldValue);
+    _layer->_PrimPopChild<TfToken>(parentPath, field,
+                                   /* useDelegate = */ false);
 }
 
-SdfLayerHandle SdfLayerStateDelegateBase::_GetLayer() const
+void 
+SdfLayerStateDelegateBase::PopChild(
+    const SdfPath& parentPath,
+    const TfToken& field,
+    const SdfPath& oldValue)
 {
-  return _layer;
+    _OnPopChild(parentPath, field, oldValue);
+    _layer->_PrimPopChild<SdfPath>(parentPath, field,
+                                   /* useDelegate = */ false);
 }
 
-SdfAbstractDataPtr SdfLayerStateDelegateBase::_GetLayerData() const
+void 
+SdfLayerStateDelegateBase::_SetLayer(const SdfLayerHandle& layer)
 {
-  return _layer ? SdfAbstractDataPtr(_layer->_data) : SdfAbstractDataPtr();
+    _layer = layer;
+    _OnSetLayer(_layer);
+}
+
+SdfLayerHandle 
+SdfLayerStateDelegateBase::_GetLayer() const
+{
+    return _layer;
+}
+
+SdfAbstractDataPtr 
+SdfLayerStateDelegateBase::_GetLayerData() const
+{
+    return _layer ? SdfAbstractDataPtr(_layer->_data) : SdfAbstractDataPtr();
 }
 
 // ------------------------------------------------------------
 
-SdfSimpleLayerStateDelegateRefPtr SdfSimpleLayerStateDelegate::New()
+SdfSimpleLayerStateDelegateRefPtr 
+SdfSimpleLayerStateDelegate::New()
 {
-  return TfCreateRefPtr(new SdfSimpleLayerStateDelegate);
+    return TfCreateRefPtr(new SdfSimpleLayerStateDelegate);
 }
 
-SdfSimpleLayerStateDelegate::SdfSimpleLayerStateDelegate() : _dirty(false) {}
-
-bool SdfSimpleLayerStateDelegate::_IsDirty()
+SdfSimpleLayerStateDelegate::SdfSimpleLayerStateDelegate()
+    : _dirty(false)
 {
-  return _dirty;
 }
 
-void SdfSimpleLayerStateDelegate::_MarkCurrentStateAsClean()
+bool
+SdfSimpleLayerStateDelegate::_IsDirty()
 {
-  _dirty = false;
+    return _dirty;
 }
 
-void SdfSimpleLayerStateDelegate::_MarkCurrentStateAsDirty()
+void
+SdfSimpleLayerStateDelegate::_MarkCurrentStateAsClean()
 {
-  _dirty = true;
+    _dirty = false;
 }
 
-void SdfSimpleLayerStateDelegate::_OnSetLayer(const SdfLayerHandle &layer) {}
-
-void SdfSimpleLayerStateDelegate::_OnSetField(const SdfPath &path,
-                                              const TfToken &fieldName,
-                                              const VtValue &value)
+void
+SdfSimpleLayerStateDelegate::_MarkCurrentStateAsDirty()
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnSetField(const SdfPath &path,
-                                              const TfToken &fieldName,
-                                              const SdfAbstractDataConstValue &value)
+void 
+SdfSimpleLayerStateDelegate::_OnSetLayer(
+    const SdfLayerHandle& layer)
 {
-  _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnSetFieldDictValueByKey(const SdfPath &path,
-                                                            const TfToken &fieldName,
-                                                            const TfToken &keyPath,
-                                                            const VtValue &value)
+void 
+SdfSimpleLayerStateDelegate::_OnSetField(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    const VtValue& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnSetFieldDictValueByKey(const SdfPath &path,
-                                                            const TfToken &fieldName,
-                                                            const TfToken &keyPath,
-                                                            const SdfAbstractDataConstValue &value)
+void 
+SdfSimpleLayerStateDelegate::_OnSetField(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    const SdfAbstractDataConstValue& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnSetTimeSample(const SdfPath &path,
-                                                   double time,
-                                                   const VtValue &value)
+void 
+SdfSimpleLayerStateDelegate::_OnSetFieldDictValueByKey(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    const TfToken& keyPath,
+    const VtValue& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnSetTimeSample(const SdfPath &path,
-                                                   double time,
-                                                   const SdfAbstractDataConstValue &value)
+void 
+SdfSimpleLayerStateDelegate::_OnSetFieldDictValueByKey(
+    const SdfPath& path,
+    const TfToken& fieldName,
+    const TfToken& keyPath,
+    const SdfAbstractDataConstValue& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnCreateSpec(const SdfPath &path,
-                                                SdfSpecType specType,
-                                                bool inert)
+void 
+SdfSimpleLayerStateDelegate::_OnSetTimeSample(
+    const SdfPath& path,
+    double time,
+    const VtValue& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnDeleteSpec(const SdfPath &path, bool inert)
+void 
+SdfSimpleLayerStateDelegate::_OnSetTimeSample(
+    const SdfPath& path,
+    double time,
+    const SdfAbstractDataConstValue& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnMoveSpec(const SdfPath &oldPath, const SdfPath &newPath)
+void 
+SdfSimpleLayerStateDelegate::_OnCreateSpec(
+    const SdfPath& path,
+    SdfSpecType specType,
+    bool inert)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnPushChild(const SdfPath &parentPath,
-                                               const TfToken &fieldName,
-                                               const TfToken &value)
+void 
+SdfSimpleLayerStateDelegate::_OnDeleteSpec(
+    const SdfPath& path,
+    bool inert)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnPushChild(const SdfPath &parentPath,
-                                               const TfToken &fieldName,
-                                               const SdfPath &value)
+void 
+SdfSimpleLayerStateDelegate::_OnMoveSpec(
+    const SdfPath& oldPath,
+    const SdfPath& newPath)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnPopChild(const SdfPath &parentPath,
-                                              const TfToken &fieldName,
-                                              const TfToken &oldValue)
+void
+SdfSimpleLayerStateDelegate::_OnPushChild(
+    const SdfPath& parentPath,
+    const TfToken& fieldName,
+    const TfToken& value)
 {
-  _dirty = true;
+    _dirty = true;
 }
 
-void SdfSimpleLayerStateDelegate::_OnPopChild(const SdfPath &parentPath,
-                                              const TfToken &fieldName,
-                                              const SdfPath &oldValue)
+void 
+SdfSimpleLayerStateDelegate::_OnPushChild(
+    const SdfPath& parentPath,
+    const TfToken& fieldName,
+    const SdfPath& value)
 {
-  _dirty = true;
+    _dirty = true;
+}
+
+void
+SdfSimpleLayerStateDelegate::_OnPopChild(
+    const SdfPath& parentPath,
+    const TfToken& fieldName,
+    const TfToken& oldValue)
+{
+    _dirty = true;
+}
+
+void 
+SdfSimpleLayerStateDelegate::_OnPopChild(
+    const SdfPath& parentPath,
+    const TfToken& fieldName,
+    const SdfPath& oldValue)
+{
+    _dirty = true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -4,17 +4,27 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "UsdAppUtils/camera.h"
 #include "pxr/pxrns.h"
+#include "UsdAppUtils/camera.h"
 
-#include <boost/python.hpp>
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/def.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapCamera()
+using namespace pxr_boost::python;
+
+
+void
+wrapCamera()
 {
-  def("GetCameraAtPath", UsdAppUtilsGetCameraAtPath, (arg("stage"), arg("cameraPath")));
+    def(
+        "GetCameraAtPath",
+        UsdAppUtilsGetCameraAtPath,
+        (arg("stage"), arg("cameraPath")));
 }

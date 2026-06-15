@@ -1,6 +1,6 @@
-#ifndef __PXR_IMAGING_PLUGIN_HD_STORM_H__
-#define __PXR_IMAGING_PLUGIN_HD_STORM_H__
+#ifndef __PXR_IMAGING_HDSTORM_H__
+#define __PXR_IMAGING_HDSTORM_H__
 
+// HdStorm
 #include <HdStorm/rendererPlugin.h>
-
-#endif // __PXR_IMAGING_PLUGIN_HD_STORM_H__
+#endif  // __PXR_IMAGING_HDSTORM_H__

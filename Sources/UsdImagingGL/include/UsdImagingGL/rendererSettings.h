@@ -10,22 +10,28 @@
 #ifndef PXR_USD_IMAGING_USD_IMAGING_GL_RENDERER_SETTINGS_H
 #define PXR_USD_IMAGING_USD_IMAGING_GL_RENDERER_SETTINGS_H
 
+#include "pxr/pxrns.h"
 #include "Tf/token.h"
 #include "Vt/value.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct UsdImagingGLRendererSetting {
-  enum Type { TYPE_FLAG, TYPE_INT, TYPE_FLOAT, TYPE_STRING };
-  std::string name;
-  TfToken key;
-  Type type;
-  VtValue defValue;
+    enum Type {
+        TYPE_FLAG,
+        TYPE_INT,
+        TYPE_FLOAT,
+        TYPE_STRING
+    };
+    std::string name;
+    TfToken key;
+    Type type;
+    VtValue defValue;
 };
 
-typedef std::vector<UsdImagingGLRendererSetting> UsdImagingGLRendererSettingsList;
+typedef std::vector<UsdImagingGLRendererSetting>
+    UsdImagingGLRendererSettingsList;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_GL_RENDERER_SETTINGS_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_GL_RENDERER_SETTINGS_H

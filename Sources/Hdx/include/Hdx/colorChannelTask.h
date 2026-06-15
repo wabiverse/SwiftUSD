@@ -7,91 +7,102 @@
 #ifndef HDX_COLORCHANNEL_TASK_H
 #define HDX_COLORCHANNEL_TASK_H
 
+#include "pxr/pxrns.h"
+#include "Sdf/path.h"
 #include "Hdx/api.h"
 #include "Hdx/task.h"
 #include "Hdx/tokens.h"
 #include "Hgi/graphicsCmds.h"
-#include "Sdf/path.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+struct HdxColorChannelTaskParams;
 
 /// \class HdxColorChannelTask
 ///
 /// A task for choosing a color channel for display.
 ///
-class HdxColorChannelTask : public HdxTask {
- public:
-  HDX_API
-  HdxColorChannelTask(HdSceneDelegate *delegate, SdfPath const &id);
+class HdxColorChannelTask : public HdxTask
+{
+public:
+    using TaskParams = HdxColorChannelTaskParams;
 
-  HDX_API
-  ~HdxColorChannelTask() override;
+    HDX_API
+    HdxColorChannelTask(HdSceneDelegate* delegate, SdfPath const& id);
 
-  /// Prepare the tasks resources
-  HDX_API
-  void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override;
+    HDX_API
+    ~HdxColorChannelTask() override;
 
-  /// Execute the color channel task
-  HDX_API
-  void Execute(HdTaskContext *ctx) override;
+    /// Prepare the tasks resources
+    HDX_API
+    void Prepare(HdTaskContext* ctx,
+                 HdRenderIndex* renderIndex) override;
 
- protected:
-  /// Sync the render pass resources
-  HDX_API
-  void _Sync(HdSceneDelegate *delegate, HdTaskContext *ctx, HdDirtyBits *dirtyBits) override;
+    /// Execute the color channel task
+    HDX_API
+    void Execute(HdTaskContext* ctx) override;
 
- private:
-  HdxColorChannelTask() = delete;
-  HdxColorChannelTask(const HdxColorChannelTask &) = delete;
-  HdxColorChannelTask &operator=(const HdxColorChannelTask &) = delete;
+protected:
+    /// Sync the render pass resources
+    HDX_API
+    void _Sync(HdSceneDelegate* delegate,
+               HdTaskContext* ctx,
+               HdDirtyBits* dirtyBits) override;
 
-  // Utility function to update the shader uniform parameters.
-  // Returns true if the values were updated. False if unchanged.
-  bool _UpdateParameterBuffer(float screenSizeX, float screenSizeY);
+private:
+    HdxColorChannelTask() = delete;
+    HdxColorChannelTask(const HdxColorChannelTask &) = delete;
+    HdxColorChannelTask &operator =(const HdxColorChannelTask &) = delete;
 
-  /// Apply the color channel filtering.
-  void _ApplyColorChannel();
+    // Utility function to update the shader uniform parameters.
+    // Returns true if the values were updated. False if unchanged.
+    bool _UpdateParameterBuffer(float screenSizeX, float screenSizeY);
 
-  // This struct must match ParameterBuffer in colorChannel.glslfx.
-  // Be careful to remember the std430 rules.
-  struct _ParameterBuffer {
-    float screenSize[2];
-    int channel;
-    bool operator==(const _ParameterBuffer &other) const
+    // This struct must match ParameterBuffer in colorChannel.glslfx.
+    // Be careful to remember the std430 rules.
+    struct _ParameterBuffer
     {
-      return channel == other.channel && screenSize[0] == other.screenSize[0] &&
-             screenSize[1] == other.screenSize[1];
-    }
-  };
+        float screenSize[2];
+        int channel;
+        bool operator==(const _ParameterBuffer& other) const {
+            return channel == other.channel &&
+                   screenSize[0] == other.screenSize[0] &&
+                   screenSize[1] == other.screenSize[1];
+        }
+    };
 
-  std::unique_ptr<class HdxFullscreenShader> _compositor;
-  _ParameterBuffer _parameterData;
+    std::unique_ptr<class HdxFullscreenShader> _compositor;
+    _ParameterBuffer _parameterData;
 
-  // The color channel to be rendered (see HdxColorChannelTokens for the
-  // possible values).
-  TfToken _channel;
+    // The color channel to be rendered (see HdxColorChannelTokens for the
+    // possible values).
+    TfToken _channel;
 };
+
 
 /// \class HdxColorChannelTaskParams
 ///
 /// ColorChannelTask parameters.
 ///
-struct HdxColorChannelTaskParams {
-  HdxColorChannelTaskParams() {}
-
-  // Specifies which output color channel should be drawn. Defaults to 'color'
-  // (untouched RGBA).
-  TfToken channel = HdxColorChannelTokens->color;
+struct HdxColorChannelTaskParams
+{
+    HdxColorChannelTaskParams() {}
+    
+    // Specifies which output color channel should be drawn. Defaults to 'color'
+    // (untouched RGBA).
+    TfToken channel = HdxColorChannelTokens->color;
 };
 
 // VtValue requirements
 HDX_API
-std::ostream &operator<<(std::ostream &out, const HdxColorChannelTaskParams &pv);
+std::ostream& operator<<(std::ostream& out, const HdxColorChannelTaskParams& pv);
 HDX_API
-bool operator==(const HdxColorChannelTaskParams &lhs, const HdxColorChannelTaskParams &rhs);
+bool operator==(const HdxColorChannelTaskParams& lhs,
+                const HdxColorChannelTaskParams& rhs);
 HDX_API
-bool operator!=(const HdxColorChannelTaskParams &lhs, const HdxColorChannelTaskParams &rhs);
+bool operator!=(const HdxColorChannelTaskParams& lhs,
+                const HdxColorChannelTaskParams& rhs);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

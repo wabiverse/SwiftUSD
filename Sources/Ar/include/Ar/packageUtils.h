@@ -10,8 +10,8 @@
 /// \file ar/packageUtils.h
 /// Utility functions for working with package assets
 
-#include "Ar/api.h"
 #include "pxr/pxrns.h"
+#include "Ar/api.h"
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \name Package Relative Paths
 ///
 /// Assets within package assets can be addressed via "package-relative"
-/// paths. For example, given a hypothetical package <tt>"Model.package"</tt>,
+/// paths. For example, given a hypothetical package <tt>"Model.package"</tt>, 
 /// the asset <tt>"Geom.file"</tt>, can be referred to using the path
 /// <tt>"Model.package[Geom.file]"</tt>.
 ///
@@ -47,9 +47,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// Return true if \p path is a package-relative path, false otherwise.
 AR_API
-bool ArIsPackageRelativePath(const std::string &path);
+bool
+ArIsPackageRelativePath(const std::string& path);
 
-/// Combines the given \p paths into a single package-relative path, nesting
+/// Combines the given \p paths into a single package-relative path, nesting 
 /// paths as necessary.
 ///
 /// \code
@@ -63,20 +64,23 @@ bool ArIsPackageRelativePath(const std::string &path);
 ///    => "a.pack[b.pack[c.pack]]"
 /// \endcode
 AR_API
-std::string ArJoinPackageRelativePath(const std::vector<std::string> &paths);
+std::string
+ArJoinPackageRelativePath(const std::vector<std::string>& paths);
 
 /// \overload
 AR_API
-std::string ArJoinPackageRelativePath(const std::pair<std::string, std::string> &paths);
+std::string
+ArJoinPackageRelativePath(const std::pair<std::string, std::string>& paths);
 
 /// \overload
 AR_API
-std::string ArJoinPackageRelativePath(const std::string &packagePath,
-                                      const std::string &packagedPath);
+std::string
+ArJoinPackageRelativePath(
+    const std::string& packagePath, const std::string& packagedPath);
 
 /// Split package-relative path \p path into a (package path, packaged path)
 /// pair. If \p packageRelativePath contains nested package-relative paths
-/// the package path will be the outermost package path, and the packaged path
+/// the package path will be the outermost package path, and the packaged path 
 /// will be the inner package-relative path.
 ///
 /// \code
@@ -87,11 +91,12 @@ std::string ArJoinPackageRelativePath(const std::string &packagePath,
 ///    => ("a.pack", "b.pack[c.pack]")
 /// \endcode
 AR_API
-std::pair<std::string, std::string> ArSplitPackageRelativePathOuter(const std::string &path);
+std::pair<std::string, std::string>
+ArSplitPackageRelativePathOuter(const std::string& path);
 
 /// Split package-relative path \p path into a (package path, packaged path)
 /// pair. If \p packageRelativePath contains nested package-relative paths
-/// the package path will be the outermost package-relative path, and the
+/// the package path will be the outermost package-relative path, and the 
 /// packaged path will be the innermost packaged path.
 ///
 /// \code
@@ -102,10 +107,11 @@ std::pair<std::string, std::string> ArSplitPackageRelativePathOuter(const std::s
 ///    => ("a.pack[b.pack]", "c.pack")
 /// \endcode
 AR_API
-std::pair<std::string, std::string> ArSplitPackageRelativePathInner(const std::string &path);
+std::pair<std::string, std::string>
+ArSplitPackageRelativePathInner(const std::string& path);
 
 /// @}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_AR_PACKAGE_UTILS_H
+#endif // PXR_USD_AR_PACKAGE_UTILS_H

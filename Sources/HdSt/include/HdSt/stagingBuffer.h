@@ -7,8 +7,8 @@
 #ifndef PXR_IMAGING_HD_ST_STAGING_BUFFER_H
 #define PXR_IMAGING_HD_ST_STAGING_BUFFER_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/buffer.h"
@@ -20,7 +20,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdStResourceRegistry;
 
-using HdStStagingBufferSharedPtr = std::shared_ptr<class HdStStagingBuffer>;
+using HdStStagingBufferSharedPtr =
+    std::shared_ptr<class HdStStagingBuffer>;
 
 /// \class HdStStagingBuffer
 ///
@@ -28,48 +29,49 @@ using HdStStagingBufferSharedPtr = std::shared_ptr<class HdStStagingBuffer>;
 /// None of the function calls are thread safe, they should be only accessed
 /// from the commit call to ResourceRegistry.
 ///
-class HdStStagingBuffer {
- public:
-  HDST_API
-  HdStStagingBuffer(HdStResourceRegistry *resourceRegistry);
+class HdStStagingBuffer
+{
+public:
+    HDST_API
+    HdStStagingBuffer(HdStResourceRegistry *resourceRegistry);
 
-  HDST_API
-  ~HdStStagingBuffer();
+    HDST_API
+    ~HdStStagingBuffer();
 
-  /// Destroys contained HgiBuffers and resets state to empty.
-  HDST_API
-  void Deallocate();
+    /// Destroys contained HgiBuffers and resets state to empty.
+    HDST_API
+    void Deallocate();
 
-  /// Set the capacity for the staging buffer.  Only applied once first call
-  /// to StageCopy is called.
-  /// Cannot be called if there have already been calls to StageCopy for this
-  /// commit.
-  HDST_API
-  void Resize(size_t totalSize);
+    /// Set the capacity for the staging buffer.  Only applied once first call
+    /// to StageCopy is called.
+    /// Cannot be called if there have already been calls to StageCopy for this
+    /// commit.
+    HDST_API
+    void Resize(size_t totalSize);
 
-  /// Submit a CPU to GPU copy operation to be added to the staging buffer.
-  /// The contents are memcpy'd over into the staging buffer during this call
-  /// and a GPU to GPU blit is queued up to do the final copy to destination.
-  HDST_API
-  void StageCopy(HgiBufferCpuToGpuOp const &copyOp);
+    /// Submit a CPU to GPU copy operation to be added to the staging buffer.
+    /// The contents are memcpy'd over into the staging buffer during this call
+    /// and a GPU to GPU blit is queued up to do the final copy to destination.
+    HDST_API
+    void StageCopy(HgiBufferCpuToGpuOp const &copyOp);
 
-  /// Flush the queued GPU to GPU blits from the calls to StageCopy.  Resets
-  /// the state for the next ResoureRegistry commit.
-  HDST_API
-  void Flush();
+    /// Flush the queued GPU to GPU blits from the calls to StageCopy.  Resets
+    /// the state for the next ResoureRegistry commit.
+    HDST_API
+    void Flush();
 
- private:
-  static constexpr int32_t MULTIBUFFERING = 3;
+private:
+    static constexpr int32_t MULTIBUFFERING = 3;
 
-  HdStResourceRegistry *_resourceRegistry;
-  HgiBufferHandle _handles[MULTIBUFFERING];
-  size_t _head;
-  size_t _capacity;
-  size_t _activeSlot;
-  bool _tripleBuffered;
-  std::vector<HgiBufferGpuToGpuOp> _gpuCopyOps;
+    HdStResourceRegistry *_resourceRegistry;
+    HgiBufferHandle _handles[MULTIBUFFERING];
+    std::vector<HgiBufferGpuToGpuOp> _gpuCopyOps;
+    size_t _head;
+    size_t _capacity;
+    size_t _activeSlot;
+    bool _isUma;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_STAGING_BUFFER_H
+#endif // PXR_IMAGING_HD_ST_STAGING_BUFFER_H

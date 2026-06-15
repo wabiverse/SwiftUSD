@@ -7,24 +7,30 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/diagnostic.h"
 #include "Tf/refBase.h"
+#include "Tf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TfRefBase::UniqueChangedListener TfRefBase::_uniqueChangedListener;
 
-TfRefBase::~TfRefBase() {}
-
-void TfRefBase::SetUniqueChangedListener(UniqueChangedListener listener)
+TfRefBase::~TfRefBase()
 {
-  if (_uniqueChangedListener.lock || _uniqueChangedListener.func || _uniqueChangedListener.unlock)
-  {
-    TF_FATAL_ERROR("Setting an already set UniqueChangedListener");
-  }
-  _uniqueChangedListener = listener;
 }
 
-TfSimpleRefBase::~TfSimpleRefBase() {}
+void
+TfRefBase::SetUniqueChangedListener(UniqueChangedListener listener)
+{
+    if (_uniqueChangedListener.lock ||
+        _uniqueChangedListener.func ||
+        _uniqueChangedListener.unlock) {
+        TF_FATAL_ERROR("Setting an already set UniqueChangedListener");
+    }
+    _uniqueChangedListener = listener;
+}
+
+TfSimpleRefBase::~TfSimpleRefBase()
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

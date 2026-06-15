@@ -5,109 +5,108 @@
 // https://openusd.org/license.
 //
 
-#include "Arch/daemon.h"
 #include "pxr/pxrns.h"
+#include "Arch/daemon.h"
 
 #include <errno.h>
 #if !defined(ARCH_OS_WINDOWS)
-#  include <signal.h>
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include <sys/param.h>
-#  include <sys/resource.h>
-#  include <sys/stat.h>
-#  include <sys/time.h>
-#  include <sys/types.h>
-#  include <unistd.h>
+#include <stdio.h>
+#include <signal.h>
+#include <sys/param.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/resource.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Fork the current process and close all undesired file descriptors.
 //
-int ArchCloseAllFiles(int nExcept, const int *exceptFds)
+int
+ArchCloseAllFiles(int nExcept, const int* exceptFds)
 {
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 
-  int status, retStatus, retErrno;
-  int i, j, maxfd, maxExcept = -1;
-  struct rlimit limits;
+    int status, retStatus, retErrno;
+    int i, j, maxfd, maxExcept = -1;
+    struct rlimit limits;
 
-  // Figure out how many file descriptors there are.
-  //
-  status = getrlimit(RLIMIT_NOFILE, &limits);
+    // Figure out how many file descriptors there are.
+    //
+    status = getrlimit(RLIMIT_NOFILE, &limits);
 
-  if (limits.rlim_cur == RLIM_INFINITY) {
-#  if defined(NOFILE)
-    maxfd = NOFILE;
-#  else
-    // Android bionic (and some Linux configs) don't define NOFILE.
-    // sysconf(_SC_OPEN_MAX) is the POSIX-portable equivalent.
-    maxfd = (int)sysconf(_SC_OPEN_MAX);
-    if (maxfd < 0) maxfd = 256;
-#  endif
-  }
-  else {
-    maxfd = (int)limits.rlim_cur;
-  }
-
-  // Figure out the largest file descriptor in exceptFds.
-  for (i = 0; i < nExcept; ++i) {
-    if (maxExcept < exceptFds[i]) {
-      maxExcept = exceptFds[i];
+    if (limits.rlim_cur == RLIM_INFINITY)
+    {
+        maxfd = NOFILE;
     }
-  }
+    else
+    {
+        maxfd = (int)limits.rlim_cur;
+    }
 
-  retStatus = 0;
-  retErrno = 0;
-
-  for (i = 0; i < maxfd; ++i) {
-    // Check if we should skip this file descriptor.
-    // XXX -- This is slow for large maxfd and nExcept but nExcept is
-    //        never large in our use cases.  We could copy and sort
-    //        exceptFds if we think it might get big but we should
-    //        avoid using the heap because we might get called from
-    //        precarious situations, e.g. signal handlers.
-    if (i <= maxExcept) {
-      for (j = 0; j != nExcept; ++j) {
-        if (exceptFds[j] == i) {
-          break;
+    // Figure out the largest file descriptor in exceptFds.
+    for (i = 0; i < nExcept; ++i) {
+        if (maxExcept < exceptFds[i]) {
+            maxExcept = exceptFds[i];
         }
-      }
-      if (j != nExcept) {
-        // File descriptor is in exceptFds
-        continue;
-      }
     }
 
-    do {
-      // Close the file, repeat if interrupted.
-      //
-      errno = 0;
-      status = close(i);
-    } while (status != 0 && errno == EINTR);
+    retStatus = 0;
+    retErrno  = 0;
 
-    if (status != 0 && errno != EBADF) {
-      // We got some real error.  Remember it but keep going.
-      //
-      retStatus = status;
-      retErrno = errno;
+    for (i = 0; i < maxfd; ++i)
+    {
+        // Check if we should skip this file descriptor.
+        // XXX -- This is slow for large maxfd and nExcept but nExcept is
+        //        never large in our use cases.  We could copy and sort
+        //        exceptFds if we think it might get big but we should
+        //        avoid using the heap because we might get called from
+        //        precarious situations, e.g. signal handlers.
+        if (i <= maxExcept) {
+            for (j = 0; j != nExcept; ++j) {
+                if (exceptFds[j] == i) {
+                    break;
+                }
+            }
+            if (j != nExcept) {
+                // File descriptor is in exceptFds
+                continue;
+            }
+        }
+
+        do {
+            // Close the file, repeat if interrupted.
+            //
+            errno = 0;
+            status = close(i);
+        } while (status != 0 && errno == EINTR);
+
+        if (status != 0 &&
+            errno  != EBADF)
+        {
+            // We got some real error.  Remember it but keep going.
+            //
+            retStatus = status;
+            retErrno  = errno;
+        }
     }
-  }
 
-  // Restore errno to the last encountered real error.  In
-  // particular this will clear out any EBADF value left over from
-  // the loop above.
-  //
-  errno = retErrno;
+    // Restore errno to the last encountered real error.  In
+    // particular this will clear out any EBADF value left over from
+    // the loop above.
+    //
+    errno = retErrno;
 
-  return retStatus;
+    return retStatus;
 
 #else
 
-  // Not supported
-  errno = EINVAL;
-  return -1;
+    // Not supported
+    errno = EINVAL;
+    return -1;
 
 #endif
 }

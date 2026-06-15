@@ -7,13 +7,14 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_PIPELINE_H
 #define PXR_IMAGING_HGI_VULKAN_PIPELINE_H
 
+#include "pxr/pxrns.h"
 #include "Gf/vec2i.h"
 #include "Hgi/graphicsCmdsDesc.h"
 #include "Hgi/graphicsPipeline.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
-#include "pxr/pxrns.h"
 #include <vector>
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -25,77 +26,84 @@ using VkDescriptorSetLayoutVector = std::vector<VkDescriptorSetLayout>;
 ///
 /// Vulkan implementation of HgiGraphicsPipeline.
 ///
-class HgiVulkanGraphicsPipeline final : public HgiGraphicsPipeline {
- public:
-  HGIVULKAN_API
-  ~HgiVulkanGraphicsPipeline() override;
+class HgiVulkanGraphicsPipeline final : public HgiGraphicsPipeline
+{
+public:
+    HGIVULKAN_API
+    ~HgiVulkanGraphicsPipeline() override;
 
-  /// Apply pipeline state
-  HGIVULKAN_API
-  void BindPipeline(VkCommandBuffer cb);
+    /// Apply pipeline state
+    HGIVULKAN_API
+    void BindPipeline(VkCommandBuffer cb);
 
-  /// Returns the device used to create this object.
-  HGIVULKAN_API
-  HgiVulkanDevice *GetDevice() const;
+    /// Returns the device used to create this object.
+    HGIVULKAN_API
+    HgiVulkanDevice* GetDevice() const;
 
-  /// Returns the vulkan pipeline layout
-  HGIVULKAN_API
-  VkPipelineLayout GetVulkanPipelineLayout() const;
+    /// Returns the vulkan pipeline layout
+    HGIVULKAN_API
+    VkPipelineLayout GetVulkanPipelineLayout() const;
 
-  /// Returns the vulkan render pass
-  HGIVULKAN_API
-  VkRenderPass GetVulkanRenderPass() const;
+    /// Returns the vulkan render pass
+    HGIVULKAN_API
+    VkRenderPass GetVulkanRenderPass() const;
 
-  /// Returns the vulkan frame buffer, creating it if needed.
-  HGIVULKAN_API
-  VkFramebuffer AcquireVulkanFramebuffer(HgiGraphicsCmdsDesc const &gfxDesc, GfVec2i *dimensions);
+    /// Returns the vulkan frame buffer, creating it if needed.
+    HGIVULKAN_API
+    VkFramebuffer AcquireVulkanFramebuffer(
+        HgiGraphicsCmdsDesc const& gfxDesc,
+        GfVec2i* dimensions);
 
-  /// Returns the (writable) inflight bits of when this object was trashed.
-  HGIVULKAN_API
-  uint64_t &GetInflightBits();
+    /// Returns the (writable) inflight bits of when this object was trashed.
+    HGIVULKAN_API
+    uint64_t & GetInflightBits();
 
-  /// Returns true if any of the attachments in HgiGraphicsPipelineDesc
-  /// specify a clear operation.
-  HGIVULKAN_API
-  bool GetClearNeeded() const
-  {
-    return _clearNeeded;
-  }
+    /// Returns true if any of the attachments in HgiGraphicsPipelineDesc 
+    /// specify a clear operation.
+    HGIVULKAN_API
+    bool GetClearNeeded() const
+    {
+        return _clearNeeded;
+    }
 
- protected:
-  friend class HgiVulkan;
+protected:
+    friend class HgiVulkan;
 
-  HGIVULKAN_API
-  HgiVulkanGraphicsPipeline(HgiVulkanDevice *device, HgiGraphicsPipelineDesc const &desc);
+    HGIVULKAN_API
+    HgiVulkanGraphicsPipeline(
+        HgiVulkanDevice* device,
+        HgiGraphicsPipelineDesc const& desc);
 
- private:
-  HgiVulkanGraphicsPipeline() = delete;
-  HgiVulkanGraphicsPipeline &operator=(const HgiVulkanGraphicsPipeline &) = delete;
-  HgiVulkanGraphicsPipeline(const HgiVulkanGraphicsPipeline &) = delete;
+private:
+    HgiVulkanGraphicsPipeline() = delete;
+    HgiVulkanGraphicsPipeline & operator=(const HgiVulkanGraphicsPipeline&) = delete;
+    HgiVulkanGraphicsPipeline(const HgiVulkanGraphicsPipeline&) = delete;
 
-  void _ProcessAttachment(HgiAttachmentDesc const &attachment,
-                          uint32_t attachmentIndex,
-                          HgiSampleCount sampleCount,
-                          VkAttachmentDescription2 *vkAttachDesc,
-                          VkAttachmentReference2 *vkRef);
-  void _CreateRenderPass();
+    void _ProcessAttachment(
+        HgiAttachmentDesc const& attachment,
+        uint32_t attachmentIndex,
+        HgiSampleCount sampleCount,
+        VkAttachmentDescription2* vkAttachDesc,
+        VkAttachmentReference2* vkRef);
+    void _CreateRenderPass();
 
-  struct HgiVulkan_Framebuffer {
-    GfVec2i dimensions;
-    HgiGraphicsCmdsDesc desc;
-    VkFramebuffer vkFramebuffer;
-  };
+    struct HgiVulkan_Framebuffer {
+        GfVec2i dimensions;
+        HgiGraphicsCmdsDesc desc;
+        VkFramebuffer vkFramebuffer;
+    };
 
-  HgiVulkanDevice *_device;
-  uint64_t _inflightBits;
-  VkPipeline _vkPipeline;
-  VkRenderPass _vkRenderPass;
-  VkPipelineLayout _vkPipelineLayout;
-  VkDescriptorSetLayoutVector _vkDescriptorSetLayouts;
-  bool _clearNeeded;
+    HgiVulkanDevice* _device;
+    uint64_t _inflightBits;
+    VkPipeline _vkPipeline;
+    VkRenderPass _vkRenderPass;
+    VkPipelineLayout _vkPipelineLayout;
+    VkDescriptorSetLayoutVector _vkDescriptorSetLayouts;
+    bool _clearNeeded;
 
-  std::vector<HgiVulkan_Framebuffer> _framebuffers;
+    std::vector<HgiVulkan_Framebuffer> _framebuffers;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

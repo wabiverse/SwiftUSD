@@ -7,12 +7,12 @@
 #ifndef PXR_IMAGING_HD_ST_TEXTURE_OBJECT_H
 #define PXR_IMAGING_HD_ST_TEXTURE_OBJECT_H
 
-#include "HdSt/api.h"
 #include "pxr/pxrns.h"
+#include "HdSt/api.h"
 
-#include "Hd/types.h"
-#include "HdSt/enums.h"
 #include "HdSt/textureIdentifier.h"
+#include "HdSt/enums.h"
+#include "Hd/types.h"
 
 #include "Hgi/handle.h"
 #include "Hio/image.h"
@@ -34,240 +34,259 @@ class HdStResourceRegistry;
 using HdStTextureObjectSharedPtr = std::shared_ptr<class HdStTextureObject>;
 
 /// \class HdStTextureObject
-///
+/// 
 /// Base class for a texture object. The actual GPU resources will be
 /// allocated during the commit phase.
 ///
-class HdStTextureObject : public std::enable_shared_from_this<HdStTextureObject> {
- public:
-  /// Get texture identifier
-  ///
-  const HdStTextureIdentifier &GetTextureIdentifier() const
-  {
-    return _textureId;
-  }
+class HdStTextureObject :
+            public std::enable_shared_from_this<HdStTextureObject>
+{
+public:
+    /// Get texture identifier
+    ///
+    const HdStTextureIdentifier &
+    GetTextureIdentifier() const { return _textureId; }
 
-  /// Get the target memory for the texture.
-  ///
-  size_t GetTargetMemory() const
-  {
-    return _targetMemory;
-  }
+    /// Get the target memory for the texture.
+    ///
+    size_t GetTargetMemory() const { return _targetMemory; }
 
-  /// Set the target memory (in bytes).
-  ///
-  /// When uploading the texture to the GPU, it will be downsampled
-  /// to meet this target memory.
-  ///
-  HDST_API
-  void SetTargetMemory(size_t);
+    /// Set the target memory (in bytes).
+    ///
+    /// When uploading the texture to the GPU, it will be downsampled
+    /// to meet this target memory.
+    ///
+    HDST_API
+    void SetTargetMemory(size_t);
 
-  /// Is texture valid? Only correct after commit phase.
-  ///
-  /// E.g., no file at given file path. Consulted by clients to
-  /// determine whether to use the fallback value.
-  ///
-  HDST_API
-  virtual bool IsValid() const = 0;
+    /// Returns the actual amount of memory committed to the GPU.
+    HDST_API
+    virtual size_t GetCommittedSize() const = 0;
 
-  /// Get texture type
-  ///
-  HDST_API
-  virtual HdStTextureType GetTextureType() const = 0;
+    /// Is texture valid? Only correct after commit phase.
+    ///
+    /// E.g., no file at given file path. Consulted by clients to
+    /// determine whether to use the fallback value.
+    ///
+    HDST_API
+    virtual bool IsValid() const = 0;
 
-  HDST_API
-  virtual ~HdStTextureObject();
+    /// Get texture type
+    ///
+    HDST_API
+    virtual HdStTextureType GetTextureType() const = 0;
 
- protected:
-  HdStTextureObject(const HdStTextureIdentifier &textureId,
-                    HdSt_TextureObjectRegistry *textureObjectRegistry);
+    HDST_API
+    virtual ~HdStTextureObject();
 
-  HDST_API
-  HdStResourceRegistry *_GetResourceRegistry() const;
+protected:
+    HdStTextureObject(
+        const HdStTextureIdentifier &textureId,
+        HdSt_TextureObjectRegistry * textureObjectRegistry);
 
-  HDST_API
-  Hgi *_GetHgi() const;
+    HDST_API
+    HdStResourceRegistry* _GetResourceRegistry() const;
 
-  HDST_API
-  std::string _GetDebugName(const HdStTextureIdentifier &textureId) const;
+    HDST_API
+    Hgi* _GetHgi() const;
+    
+    HDST_API
+    std::string _GetDebugName(const HdStTextureIdentifier &textureId) const;
 
-  HDST_API
-  bool _GetPremultiplyAlpha(const HdStSubtextureIdentifier *const subId) const;
+    HDST_API
+    bool
+    _GetPremultiplyAlpha(const HdStSubtextureIdentifier * const subId) const;
 
-  HDST_API
-  HioImage::SourceColorSpace _GetSourceColorSpace(
-      const HdStSubtextureIdentifier *const subId) const;
+    HDST_API
+    HioImage::SourceColorSpace
+    _GetSourceColorSpace(const HdStSubtextureIdentifier * const subId) const;
 
-  /// Load texture to CPU (thread-safe)
-  ///
-  HDST_API
-  virtual void _Load() = 0;
+    /// Load texture to CPU (thread-safe)
+    ///
+    HDST_API
+    virtual void _Load() = 0;
 
-  /// Commit texture to GPU (not thread-safe)
-  ///
-  HDST_API
-  virtual void _Commit() = 0;
+    /// Commit texture to GPU (not thread-safe)
+    ///
+    HDST_API
+    virtual void _Commit() = 0;
 
-  /// Add signed number to total texture memory amount maintained by
-  /// registry.
-  ///
-  HDST_API
-  void _AdjustTotalTextureMemory(int64_t memDiff);
+    /// Add signed number to total texture memory amount maintained by
+    /// registry.
+    ///
+    HDST_API
+    void _AdjustTotalTextureMemory(int64_t memDiff);
 
-  /// Compute memory of texture and add to total texture memory
-  /// amount maintained by registry.
-  HDST_API
-  void _AddToTotalTextureMemory(const HgiTextureHandle &texture);
+    /// Compute memory of texture and add to total texture memory
+    /// amount maintained by registry.
+    HDST_API
+    void _AddToTotalTextureMemory(const HgiTextureHandle &texture);
 
-  /// Compute memory of texture and subtract to total texture memory
-  /// amount maintained by registry.
-  HDST_API
-  void _SubtractFromTotalTextureMemory(const HgiTextureHandle &texture);
+    /// Compute memory of texture and subtract to total texture memory
+    /// amount maintained by registry.
+    HDST_API
+    void _SubtractFromTotalTextureMemory(const HgiTextureHandle &texture);
 
- private:
-  friend class HdSt_TextureObjectRegistry;
+private:
+    friend class HdSt_TextureObjectRegistry;
 
-  HdSt_TextureObjectRegistry *const _textureObjectRegistry;
-  const HdStTextureIdentifier _textureId;
-  size_t _targetMemory;
+    HdSt_TextureObjectRegistry * const _textureObjectRegistry;
+    const HdStTextureIdentifier _textureId;
+    size_t _targetMemory;
 };
 
 /// \class HdStUvTextureObject
 ///
-/// A base class for uv textures.
+/// A base class for uv textures (including cubemaps).
 ///
-class HdStUvTextureObject : public HdStTextureObject {
- public:
-  ~HdStUvTextureObject() override;
+class HdStUvTextureObject : public HdStTextureObject
+{
+public:
+    HDST_API
+    ~HdStUvTextureObject() override;
 
-  /// Get the handle to the actual GPU resource.
-  ///
-  /// Only valid after commit phase.
-  ///
-  HgiTextureHandle const &GetTexture() const
-  {
-    return _gpuTexture;
-  }
+    /// Get the handle to the actual GPU resource.
+    ///
+    /// Only valid after commit phase.
+    ///
+    HgiTextureHandle const &GetTexture() const {
+        return _gpuTexture;
+    }
 
-  /// Opinion about wrapS and wrapT parameters from the texture file.
-  ///
-  /// Only valid after commit phase. Can be HdWrapNoOpinion.
-  const std::pair<HdWrap, HdWrap> &GetWrapParameters() const
-  {
-    return _wrapParameters;
-  }
+    /// Opinion about wrapS and wrapT parameters from the texture file.
+    ///
+    /// Only valid after commit phase. Can be HdWrapNoOpinion.
+    const std::pair<HdWrap, HdWrap> &GetWrapParameters() const {
+        return _wrapParameters;
+    }
 
-  HDST_API
-  HdStTextureType GetTextureType() const override final;
+    HDST_API
+    HdStTextureType GetTextureType() const override final;
 
- protected:
-  HdStUvTextureObject(const HdStTextureIdentifier &textureId,
-                      HdSt_TextureObjectRegistry *textureObjectRegistry);
+    HDST_API
+    size_t GetCommittedSize() const override;
 
-  void _SetWrapParameters(const std::pair<HdWrap, HdWrap> &wrapParameters);
+protected:
+    HDST_API
+    HdStUvTextureObject(
+        const HdStTextureIdentifier &textureId,
+        HdSt_TextureObjectRegistry * textureObjectRegistry);
 
-  void _SetCpuData(std::unique_ptr<HdStTextureCpuData> &&);
-  HdStTextureCpuData *_GetCpuData() const;
+    HDST_API
+    void _SetWrapParameters(
+        const std::pair<HdWrap, HdWrap> &wrapParameters);
 
-  void _CreateTexture(const HgiTextureDesc &desc);
-  void _GenerateMipmaps();
-  void _DestroyTexture();
+    HDST_API
+    void _SetCpuData(std::unique_ptr<HdStTextureCpuData> &&);
+    HDST_API
+    HdStTextureCpuData * _GetCpuData() const;
 
- private:
-  std::pair<HdWrap, HdWrap> _wrapParameters;
-  std::unique_ptr<HdStTextureCpuData> _cpuData;
-  HgiTextureHandle _gpuTexture;
+    HDST_API
+    void _CreateTexture(const HgiTextureDesc &desc);
+    HDST_API
+    void _GenerateMipmaps();
+    HDST_API
+    void _DestroyTexture();
+
+private:
+    std::pair<HdWrap, HdWrap> _wrapParameters;
+    std::unique_ptr<HdStTextureCpuData> _cpuData;
+    HgiTextureHandle _gpuTexture;
+    HdStTextureType _textureType;
 };
 
 /// \class HdAssetStUvTextureObject
 ///
 /// A uv texture loading the asset identified by the texture identifier.
 ///
-class HdStAssetUvTextureObject final : public HdStUvTextureObject {
- public:
-  HDST_API
-  HdStAssetUvTextureObject(const HdStTextureIdentifier &textureId,
-                           HdSt_TextureObjectRegistry *textureObjectRegistry);
+class HdStAssetUvTextureObject final : public HdStUvTextureObject
+{
+public:
+    HDST_API
+    HdStAssetUvTextureObject(
+        const HdStTextureIdentifier &textureId,
+        HdSt_TextureObjectRegistry *textureObjectRegistry);
 
-  HDST_API
-  ~HdStAssetUvTextureObject() override;
+    HDST_API
+    ~HdStAssetUvTextureObject() override;
 
-  HDST_API
-  bool IsValid() const override;
+    HDST_API
+    bool IsValid() const override;
 
- protected:
-  HDST_API
-  void _Load() override;
+protected:
+    HDST_API
+    void _Load() override;
 
-  HDST_API
-  void _Commit() override;
+    HDST_API
+    void _Commit() override;
 
- private:
-  bool _valid;
+private:
+    bool _valid;
 };
 
 /// \class HdStFieldTextureObject
 ///
 /// A uvw texture with a bounding box describing how to transform it.
 ///
-class HdStFieldTextureObject final : public HdStTextureObject {
- public:
-  HDST_API
-  HdStFieldTextureObject(const HdStTextureIdentifier &textureId,
-                         HdSt_TextureObjectRegistry *textureObjectRegistry);
+class HdStFieldTextureObject final : public HdStTextureObject
+{
+public:
+    HDST_API
+    HdStFieldTextureObject(
+        const HdStTextureIdentifier &textureId,
+        HdSt_TextureObjectRegistry *textureObjectRegistry);
 
-  HDST_API
-  ~HdStFieldTextureObject() override;
+    HDST_API
+    ~HdStFieldTextureObject() override;
 
-  /// Get the handle to the actual GPU resource.
-  ///
-  /// Only valid after commit phase.
-  ///
-  HgiTextureHandle const &GetTexture() const
-  {
-    return _gpuTexture;
-  }
+    /// Get the handle to the actual GPU resource.
+    ///
+    /// Only valid after commit phase.
+    ///
+    HgiTextureHandle const &GetTexture() const {
+        return _gpuTexture;
+    }
 
-  /// The box the texture fills out.
-  ///
-  /// Only valid after the commit phase.
-  ///
-  const GfBBox3d &GetBoundingBox() const
-  {
-    return _bbox;
-  }
+    /// The box the texture fills out.
+    ///
+    /// Only valid after the commit phase.
+    ///
+    const GfBBox3d &GetBoundingBox() const { return _bbox; }
 
-  /// The sampling transform.
-  ///
-  /// Only valid after the commit phase.
-  ///
-  const GfMatrix4d &GetSamplingTransform() const
-  {
-    return _samplingTransform;
-  }
+    /// The sampling transform.
+    ///
+    /// Only valid after the commit phase.
+    ///
+    const GfMatrix4d &GetSamplingTransform() const {
+        return _samplingTransform;
+    }
 
-  HDST_API
-  bool IsValid() const override;
+    HDST_API
+    bool IsValid() const override;
 
-  HDST_API
-  HdStTextureType GetTextureType() const override;
+    HDST_API
+    HdStTextureType GetTextureType() const override;
 
- protected:
-  HDST_API
-  void _Load() override;
+    HDST_API
+    size_t GetCommittedSize() const override;
 
-  HDST_API
-  void _Commit() override;
+protected:
+    HDST_API
+    void _Load() override;
 
- private:
-  std::unique_ptr<HdStTextureCpuData> _cpuData;
-  GfBBox3d _bbox;
-  GfMatrix4d _samplingTransform;
-  HgiTextureHandle _gpuTexture;
-  bool _valid;
+    HDST_API
+    void _Commit() override;
+
+private:
+    std::unique_ptr<HdStTextureCpuData> _cpuData;
+    GfBBox3d _bbox;
+    GfMatrix4d _samplingTransform;
+    HgiTextureHandle _gpuTexture;
+    bool _valid;
 };
 
-template<HdStTextureType textureType> struct HdSt_TypedTextureObjectHelper;
+template<HdStTextureType textureType>
+struct HdSt_TypedTextureObjectHelper;
 
 /// \class HdStTypedTextureObject
 ///
@@ -275,14 +294,22 @@ template<HdStTextureType textureType> struct HdSt_TypedTextureObjectHelper;
 /// accessed as HdStTypedTextureObject<HdStTextureType::Uv>.
 ///
 template<HdStTextureType textureType>
-using HdStTypedTextureObject = typename HdSt_TypedTextureObjectHelper<textureType>::type;
+using HdStTypedTextureObject =
+    typename HdSt_TypedTextureObjectHelper<textureType>::type;
 
-template<> struct HdSt_TypedTextureObjectHelper<HdStTextureType::Uv> {
-  using type = HdStUvTextureObject;
+template<>
+struct HdSt_TypedTextureObjectHelper<HdStTextureType::Uv> {
+    using type = HdStUvTextureObject;
 };
 
-template<> struct HdSt_TypedTextureObjectHelper<HdStTextureType::Field> {
-  using type = HdStFieldTextureObject;
+template<>
+struct HdSt_TypedTextureObjectHelper<HdStTextureType::Field> {
+    using type = HdStFieldTextureObject;
+};
+
+template<>
+struct HdSt_TypedTextureObjectHelper<HdStTextureType::Cubemap> {
+    using type = HdStUvTextureObject;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

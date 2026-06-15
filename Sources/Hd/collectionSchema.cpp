@@ -19,73 +19,85 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCollectionSchemaTokens, HD_COLLECTION_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCollectionSchemaTokens,
+    HD_COLLECTION_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdPathExpressionDataSourceHandle HdCollectionSchema::GetMembershipExpression() const
+HdPathExpressionDataSourceHandle
+HdCollectionSchema::GetMembershipExpression() const
 {
-  return _GetTypedDataSource<HdPathExpressionDataSource>(
-      HdCollectionSchemaTokens->membershipExpression);
+    return _GetTypedDataSource<HdPathExpressionDataSource>(
+        HdCollectionSchemaTokens->membershipExpression);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdCollectionSchema::BuildRetained(
+HdContainerDataSourceHandle
+HdCollectionSchema::BuildRetained(
+        const HdPathExpressionDataSourceHandle &membershipExpression
+)
+{
+    TfToken _names[1];
+    HdDataSourceBaseHandle _values[1];
+
+    size_t _count = 0;
+
+    if (membershipExpression) {
+        _names[_count] = HdCollectionSchemaTokens->membershipExpression;
+        _values[_count++] = membershipExpression;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
+}
+
+HdCollectionSchema::Builder &
+HdCollectionSchema::Builder::SetMembershipExpression(
     const HdPathExpressionDataSourceHandle &membershipExpression)
 {
-  TfToken _names[1];
-  HdDataSourceBaseHandle _values[1];
-
-  size_t _count = 0;
-
-  if (membershipExpression) {
-    _names[_count] = HdCollectionSchemaTokens->membershipExpression;
-    _values[_count++] = membershipExpression;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    _membershipExpression = membershipExpression;
+    return *this;
 }
 
-HdCollectionSchema::Builder &HdCollectionSchema::Builder::SetMembershipExpression(
-    const HdPathExpressionDataSourceHandle &membershipExpression)
+HdContainerDataSourceHandle
+HdCollectionSchema::Builder::Build()
 {
-  _membershipExpression = membershipExpression;
-  return *this;
-}
-
-HdContainerDataSourceHandle HdCollectionSchema::Builder::Build()
-{
-  return HdCollectionSchema::BuildRetained(_membershipExpression);
+    return HdCollectionSchema::BuildRetained(
+        _membershipExpression
+    );
 }
 
 /*static*/
-HdCollectionSchema HdCollectionSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdCollectionSchema
+HdCollectionSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdCollectionSchema(fromParentContainer ?
-                                HdContainerDataSource::Cast(fromParentContainer->Get(
-                                    HdCollectionSchemaTokens->collection)) :
-                                nullptr);
+    return HdCollectionSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdCollectionSchemaTokens->collection))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdCollectionSchema::GetSchemaToken()
+const TfToken &
+HdCollectionSchema::GetSchemaToken()
 {
-  return HdCollectionSchemaTokens->collection;
+    return HdCollectionSchemaTokens->collection;
 }
 
 /*static*/
-const HdDataSourceLocator &HdCollectionSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdCollectionSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
-}
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

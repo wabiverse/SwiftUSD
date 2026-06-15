@@ -4,49 +4,72 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include <boost/python/class.hpp>
-#include <boost/python/object.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/object.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Ar/resolverScopedCache.h"
 #include "pxr/pxrns.h"
+#include "Ar/resolverScopedCache.h"
+
+#include "Tf/pyLock.h"
 
 #include <memory>
 
-using namespace boost::python;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 namespace {
 
-class _PyResolverScopedCache : public boost::noncopyable {
- public:
-  _PyResolverScopedCache() {}
+class _PyResolverScopedCache
+{
+public:
+    _PyResolverScopedCache()
+    {
+    }
 
-  void Enter()
-  {
-    _scopedCache.reset(new ArResolverScopedCache);
-  }
+    _PyResolverScopedCache(const _PyResolverScopedCache&) = delete;
+    _PyResolverScopedCache& operator=(const _PyResolverScopedCache&) = delete;
 
-  bool Exit(boost::python::object & /* exc_type */,
-            boost::python::object & /* exc_val  */,
-            boost::python::object & /* exc_tb   */)
-  {
-    _scopedCache.reset(0);
-    // Re-raise exceptions.
-    return false;
-  }
+    void Enter()
+    {
+        // Do not hold the GIL while constructing the ArResolverScopedCache.
+        // The cache may try to construct the resolver and it's possible another
+        // thread is already constructing it. We would then block waiting for
+        // that construction to complete. Meanwhile, the other thread may need
+        // the GIL to load plugins. See GitHub issue #3986.
+        TF_PY_ALLOW_THREADS_IN_SCOPE();
 
- private:
-  std::unique_ptr<ArResolverScopedCache> _scopedCache;
+        _scopedCache.reset(new ArResolverScopedCache);
+    }
+
+    bool Exit(
+        pxr_boost::python::object& /* exc_type */,
+        pxr_boost::python::object& /* exc_val  */,
+        pxr_boost::python::object& /* exc_tb   */)
+    {
+        _scopedCache.reset(0);
+        // Re-raise exceptions.
+        return false;
+    }
+
+private:
+    std::unique_ptr<ArResolverScopedCache> _scopedCache;
 };
 
-}  // anonymous namespace
+} // anonymous namespace 
 
-void wrapResolverScopedCache()
+void
+wrapResolverScopedCache()
 {
-  typedef _PyResolverScopedCache This;
+    typedef _PyResolverScopedCache This;
 
-  class_<This, boost::noncopyable>("ResolverScopedCache")
-      .def("__enter__", &This::Enter)
-      .def("__exit__", &This::Exit);
+    class_<This, noncopyable>
+        ("ResolverScopedCache")
+        .def("__enter__", &This::Enter)
+        .def("__exit__", &This::Exit)
+        ;
 }

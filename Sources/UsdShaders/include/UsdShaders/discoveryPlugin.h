@@ -1,49 +1,33 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
-//
-#ifndef PXR_USD_IMAGING_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
-#define PXR_USD_IMAGING_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
+#ifndef PXR_USD_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
+#define PXR_USD_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
 
+#include "pxr/pxrns.h"
 #include "Tf/token.h"
-#include <pxr/pxrns.h>
 
-#include "Ndr/declare.h"
-#include "Ndr/discoveryPlugin.h"
-#include "Ndr/parserPlugin.h"
+#include "Sdr/declare.h"
+#include "Sdr/discoveryPlugin.h"
+#include "Sdr/parserPlugin.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdShadersDiscoveryPlugin : public NdrDiscoveryPlugin {
- public:
-  UsdShadersDiscoveryPlugin() = default;
+class UsdShadersDiscoveryPlugin : public SdrDiscoveryPlugin {
+public:
+    UsdShadersDiscoveryPlugin() = default;
 
-  ~UsdShadersDiscoveryPlugin() override = default;
+    ~UsdShadersDiscoveryPlugin() override = default;
+    
+    virtual SdrShaderNodeDiscoveryResultVec DiscoverShaderNodes(const Context &context) 
+        override;
 
-  virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context) override;
-
-  virtual const NdrStringVec &GetSearchURIs() const override;
+    virtual const SdrStringVec& GetSearchURIs() const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
+#endif // PXR_USD_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H

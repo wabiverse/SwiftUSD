@@ -12,8 +12,8 @@
 
 #include "pxr/pxrns.h"
 
-#include "Tf/singleton.h"
 #include "Trace/api.h"
+#include "Tf/singleton.h"
 #include "Trace/stringHash.h"
 
 #include <cstdint>
@@ -30,43 +30,42 @@ using TraceCategoryId = uint32_t;
 ///
 /// \class TraceCategory
 ///
-/// This singleton class provides a way to mark TraceEvent instances with
-/// category Ids which can be used to filter them. This class also provides a
+/// This singleton class provides a way to mark TraceEvent instances with 
+/// category Ids which can be used to filter them. This class also provides a 
 /// way to associate TraceCategoryId values with human readable names.
 ///
 class TraceCategory {
- public:
-  /// Computes an id for the given a string literal \p str.
-  template<int N> static constexpr TraceCategoryId CreateTraceCategoryId(const char (&str)[N])
-  {
-    return TraceStringHash::Hash(str);
-  }
+public:
+    /// Computes an id for the given a string literal \p str.
+    template <int N>
+    static constexpr TraceCategoryId CreateTraceCategoryId(
+        const char (&str)[N]) {
+        return TraceStringHash::Hash(str);
+    }
 
-  /// Default category if none are explicitly specified when creating a
-  /// TraceEvent.
-  enum : TraceCategoryId { Default = 0 };
+    /// Default category if none are explicitly specified when creating a 
+    /// TraceEvent.
+    enum : TraceCategoryId { Default = 0 };
 
-  /// Associates the \p id with \p name. These associates are not necessarily
-  /// unique.
-  TRACE_API void RegisterCategory(TraceCategoryId id, const std::string &name);
+    /// Associates the \p id with \p name. These associates are not necessarily 
+    /// unique.
+    TRACE_API void RegisterCategory(TraceCategoryId id, const std::string& name);
 
-  /// Returns all names associated with the \p id.
-  TRACE_API std::vector<std::string> GetCategories(TraceCategoryId id) const;
+    /// Returns all names associated with the \p id.
+    TRACE_API std::vector<std::string> GetCategories(TraceCategoryId id) const;
 
-  /// Singleton accessor.
-  TRACE_API static TraceCategory &GetInstance();
+    /// Singleton accessor.
+    TRACE_API static TraceCategory& GetInstance();
 
- private:
-  friend class TfSingleton<TraceCategory>;
+private:
+    friend class TfSingleton<TraceCategory>;
 
-  TraceCategory();
+    TraceCategory();
 
-  // Mapping of ids to names.
-  std::multimap<TraceCategoryId, std::string> _idToNames;
+    // Mapping of ids to names.
+    std::multimap<TraceCategoryId, std::string> _idToNames;
 };
-
-TRACE_API_TEMPLATE_CLASS(TfSingleton<TraceCategory>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_BASE_TRACE_CATEGORY_H
+#endif // PXR_BASE_TRACE_CATEGORY_H

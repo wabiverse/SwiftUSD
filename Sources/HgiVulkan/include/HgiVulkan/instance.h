@@ -14,30 +14,40 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+
 /// \class HgiVkInstance
 ///
 /// Initializes the Vulkan library and contains the apps Vulkan state.
 ///
-class HgiVulkanInstance final {
- public:
-  HGIVULKAN_API
-  HgiVulkanInstance();
+class HgiVulkanInstance final
+{
+public:
+    HGIVULKAN_API
+    HgiVulkanInstance();
 
-  HGIVULKAN_API
-  ~HgiVulkanInstance();
+    HGIVULKAN_API
+    ~HgiVulkanInstance();
 
-  /// Returns the vulkan instance.
-  HGIVULKAN_API
-  VkInstance const &GetVulkanInstance() const;
+    /// Returns the vulkan instance.
+    HGIVULKAN_API
+    VkInstance const& GetVulkanInstance() const;
 
-  /// Instance Extension function pointers
-  VkDebugUtilsMessengerEXT vkDebugMessenger = 0;
-  PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT = 0;
-  PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = 0;
+    /// Instance Extension function pointers
+    VkDebugUtilsMessengerEXT vkDebugMessenger = 0;
+    PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT = 0;
+    PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = 0;
 
- private:
-  VkInstance _vkInstance;
+    /// Does the instance support presentation?
+    bool HasPresentation() const
+    {
+        return _hasPresentation;
+    }
+
+private:
+    VkInstance _vkInstance;
+    bool _hasPresentation;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

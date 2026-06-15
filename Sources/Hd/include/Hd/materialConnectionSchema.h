@@ -32,75 +32,93 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_MATERIAL_CONNECTION_SCHEMA_TOKENS (upstreamNodePath)(upstreamNodeOutputName)
+#define HD_MATERIAL_CONNECTION_SCHEMA_TOKENS \
+    (upstreamNodePath) \
+    (upstreamNodeOutputName) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialConnectionSchemaTokens,
-                         HD_API,
-                         HD_MATERIAL_CONNECTION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialConnectionSchemaTokens, HD_API,
+    HD_MATERIAL_CONNECTION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialConnectionSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
 
-  HdMaterialConnectionSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+/// \class HdMaterialConnectionSchema
+///
+/// The MaterialConnection schema defines an upstream connected node and
+/// output.
+///
+/// See MaterialNode schema's documentation on its 'inputConnections' member
+/// for an example.
+///
+class HdMaterialConnectionSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  /// @}
+    HdMaterialConnectionSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+    /// @}
 
-  /// \name Member accessor
-  /// @{
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  HD_API
-  HdTokenDataSourceHandle GetUpstreamNodePath() const;
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  HdTokenDataSourceHandle GetUpstreamNodeOutputName() const;
-
-  /// @}
-
-  /// \name Schema construction
-  /// @{
-
-  /// \deprecated Use Builder instead.
-  ///
-  /// Builds a container data source which includes the provided child data
-  /// sources. Parameters with nullptr values are excluded. This is a
-  /// low-level interface. For cases in which it's desired to define
-  /// the container with a sparse set of child fields, the Builder class
-  /// is often more convenient and readable.
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(
-      const HdTokenDataSourceHandle &upstreamNodePath,
-      const HdTokenDataSourceHandle &upstreamNodeOutputName);
-
-  /// \class HdMaterialConnectionSchema::Builder
-  ///
-  /// Utility class for setting sparse sets of child data source fields to be
-  /// filled as arguments into BuildRetained. Because all setter methods
-  /// return a reference to the instance, this can be used in the "builder
-  /// pattern" form.
-  class Builder {
-   public:
     HD_API
-    Builder &SetUpstreamNodePath(const HdTokenDataSourceHandle &upstreamNodePath);
+    HdTokenDataSourceHandle GetUpstreamNodePath() const;
+
     HD_API
-    Builder &SetUpstreamNodeOutputName(const HdTokenDataSourceHandle &upstreamNodeOutputName);
+    HdTokenDataSourceHandle GetUpstreamNodeOutputName() const; 
 
-    /// Returns a container data source containing the members set thus far.
+    /// @} 
+
+    /// \name Schema construction
+    /// @{
+
+    /// \deprecated Use Builder instead.
+    ///
+    /// Builds a container data source which includes the provided child data
+    /// sources. Parameters with nullptr values are excluded. This is a
+    /// low-level interface. For cases in which it's desired to define
+    /// the container with a sparse set of child fields, the Builder class
+    /// is often more convenient and readable.
     HD_API
-    HdContainerDataSourceHandle Build();
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        const HdTokenDataSourceHandle &upstreamNodePath,
+        const HdTokenDataSourceHandle &upstreamNodeOutputName
+    );
 
-   private:
-    HdTokenDataSourceHandle _upstreamNodePath;
-    HdTokenDataSourceHandle _upstreamNodeOutputName;
-  };
+    /// \class HdMaterialConnectionSchema::Builder
+    /// 
+    /// Utility class for setting sparse sets of child data source fields to be
+    /// filled as arguments into BuildRetained. Because all setter methods
+    /// return a reference to the instance, this can be used in the "builder
+    /// pattern" form.
+    class Builder
+    {
+    public:
+        HD_API
+        Builder &SetUpstreamNodePath(
+            const HdTokenDataSourceHandle &upstreamNodePath);
+        HD_API
+        Builder &SetUpstreamNodeOutputName(
+            const HdTokenDataSourceHandle &upstreamNodeOutputName);
 
-  /// @}
+        /// Returns a container data source containing the members set thus far.
+        HD_API
+        HdContainerDataSourceHandle Build();
+
+    private:
+        HdTokenDataSourceHandle _upstreamNodePath;
+        HdTokenDataSourceHandle _upstreamNodeOutputName;
+
+    };
+
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

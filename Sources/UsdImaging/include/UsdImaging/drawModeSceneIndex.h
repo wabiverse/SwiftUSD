@@ -6,13 +6,14 @@
 #ifndef PXR_USD_IMAGING_USD_IMAGING_DRAW_MODE_SCENE_INDEX_H
 #define PXR_USD_IMAGING_USD_IMAGING_DRAW_MODE_SCENE_INDEX_H
 
-#include "Hd/filteringSceneIndex.h"
-#include "UsdImaging/api.h"
 #include "pxr/pxrns.h"
+#include "UsdImaging/api.h"
+#include "Hd/filteringSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-using UsdImaging_DrawModeStandinSharedPtr = std::shared_ptr<class UsdImaging_DrawModeStandin>;
+using UsdImaging_DrawModeStandinSharedPtr =
+    std::shared_ptr<class UsdImaging_DrawModeStandin>;
 
 TF_DECLARE_REF_PTRS(UsdImagingDrawModeSceneIndex);
 
@@ -30,61 +31,69 @@ TF_DECLARE_REF_PTRS(UsdImagingDrawModeSceneIndex);
 /// Using a UsdPreviewSurface instead (so that it works accross different
 /// renderers) probably requires breaking up the geometry into several pieces.
 ///
-class UsdImagingDrawModeSceneIndex : public HdSingleInputFilteringSceneIndexBase {
- public:
-  /// inputArgs unused for now. In the future, we might use it to say that
-  /// we want to break up the geometry and use UsdPreviewSurface to work
-  /// across different renderers.
-  ///
-  USDIMAGING_API
-  static UsdImagingDrawModeSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputSceneIndex,
-                                                const HdContainerDataSourceHandle &inputArgs);
+class UsdImagingDrawModeSceneIndex : public HdSingleInputFilteringSceneIndexBase
+{
+public:
+    /// inputArgs unused for now. In the future, we might use it to say that
+    /// we want to break up the geometry and use UsdPreviewSurface to work
+    /// across different renderers.
+    /// 
+    USDIMAGING_API
+    static UsdImagingDrawModeSceneIndexRefPtr
+    New(const HdSceneIndexBaseRefPtr &inputSceneIndex,
+        const HdContainerDataSourceHandle &inputArgs);
 
-  USDIMAGING_API
-  ~UsdImagingDrawModeSceneIndex() override;
+    USDIMAGING_API
+    ~UsdImagingDrawModeSceneIndex() override;
+    
+    USDIMAGING_API
+    HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
+    USDIMAGING_API
+    SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
 
-  USDIMAGING_API
-  HdSceneIndexPrim GetPrim(const SdfPath &primPath) const override;
-  USDIMAGING_API
-  SdfPathVector GetChildPrimPaths(const SdfPath &primPath) const override;
+protected:
+    UsdImagingDrawModeSceneIndex(
+        const HdSceneIndexBaseRefPtr &inputSceneIndex,
+        const HdContainerDataSourceHandle &inputArgs);
 
- protected:
-  UsdImagingDrawModeSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex,
-                               const HdContainerDataSourceHandle &inputArgs);
+    void _PrimsAdded(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::AddedPrimEntries &entries) override;
 
-  void _PrimsAdded(const HdSceneIndexBase &sender,
-                   const HdSceneIndexObserver::AddedPrimEntries &entries) override;
+    void _PrimsRemoved(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
 
-  void _PrimsRemoved(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::RemovedPrimEntries &entries) override;
+    void _PrimsDirtied(
+        const HdSceneIndexBase &sender,
+        const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
 
-  void _PrimsDirtied(const HdSceneIndexBase &sender,
-                     const HdSceneIndexObserver::DirtiedPrimEntries &entries) override;
+private:
+    // Delete path and all descendents from _prims.
+    void _DeleteSubtree(const SdfPath &path);
+    // Pull prim at path and recursively its descendants from input
+    // scene index - stopping the recursion when a prim with
+    // non-default drawmode is hit. When a prim has non-trivial drawmode,
+    // the DrawModeStandin object is instantiated instead.
+    void _RecursePrims(
+        const TfToken &drawMode,
+        const SdfPath &path,
+        const HdSceneIndexPrim &prim,
+        HdSceneIndexObserver::AddedPrimEntries *entries);
 
- private:
-  // Delete path and all descendents from _prims.
-  void _DeleteSubtree(const SdfPath &path);
-  // Pull prim at path and recursively its descendants from input
-  // scene index - stopping the recursion when a prim with
-  // non-default drawmode is hit. When a prim has non-trivial drawmode,
-  // the DrawModeStandin object is instantiated instead.
-  void _RecursePrims(const TfToken &drawMode,
-                     const SdfPath &path,
-                     const HdSceneIndexPrim &prim,
-                     HdSceneIndexObserver::AddedPrimEntries *entries);
+    // Finds prim or ancestor of prim with non-trivial drawmode in _prims map.
+    // isPathDescendant is set to true if the given path is a descendant of such
+    // a prim (but not the prim itself).
+    UsdImaging_DrawModeStandinSharedPtr
+    _FindStandinForPrimOrAncestor(
+        const SdfPath &path, bool * isPathDescendant = nullptr) const;
 
-  // Finds prim or ancestor of prim with non-default drawmode in _prims map.
-  // relPathLen indicates whether the found entry is for the prim itself (0),
-  // an immediate parent (1) or further ancestor (2 or larger).
-  UsdImaging_DrawModeStandinSharedPtr _FindStandinForPrimOrAncestor(
-      const SdfPath &path, size_t *const relPathLen) const;
-
-  // For prims with non-default drawmode, store a DrawModeStandin object
-  // that can be queried for the stand-in geometry.
-  // No path in the map is a prefix of any other path in the map.
-  std::map<SdfPath, UsdImaging_DrawModeStandinSharedPtr> _prims;
+    // For prims with applyDrawMode, store a DrawModeStandin object
+    // that can be queried for the stand-in geometry.
+    // No path in the map is a prefix of any other path in the map.
+    std::map<SdfPath, UsdImaging_DrawModeStandinSharedPtr> _prims;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_IMAGING_USD_IMAGING_GL_DRAW_MODE_SCENE_INDEX_H
+#endif // PXR_USD_IMAGING_USD_IMAGING_GL_DRAW_MODE_SCENE_INDEX_H

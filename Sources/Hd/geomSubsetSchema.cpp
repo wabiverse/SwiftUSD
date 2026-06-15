@@ -19,112 +19,132 @@
 
 #include "Hd/retainedDataSource.h"
 
-#include "Trace/traceImpl.h"
+#include "Trace/trace.h"
 
 // --(BEGIN CUSTOM CODE: Includes)--
 // --(END CUSTOM CODE: Includes)--
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdGeomSubsetSchemaTokens, HD_GEOM_SUBSET_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdGeomSubsetSchemaTokens,
+    HD_GEOM_SUBSET_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
-HdTokenDataSourceHandle HdGeomSubsetSchema::GetType() const
+HdTokenDataSourceHandle
+HdGeomSubsetSchema::GetType() const
 {
-  return _GetTypedDataSource<HdTokenDataSource>(HdGeomSubsetSchemaTokens->type);
+    return _GetTypedDataSource<HdTokenDataSource>(
+        HdGeomSubsetSchemaTokens->type);
 }
 
-HdIntArrayDataSourceHandle HdGeomSubsetSchema::GetIndices() const
+HdIntArrayDataSourceHandle
+HdGeomSubsetSchema::GetIndices() const
 {
-  return _GetTypedDataSource<HdIntArrayDataSource>(HdGeomSubsetSchemaTokens->indices);
+    return _GetTypedDataSource<HdIntArrayDataSource>(
+        HdGeomSubsetSchemaTokens->indices);
 }
 
 /*static*/
-HdContainerDataSourceHandle HdGeomSubsetSchema::BuildRetained(
-    const HdTokenDataSourceHandle &type, const HdIntArrayDataSourceHandle &indices)
+HdContainerDataSourceHandle
+HdGeomSubsetSchema::BuildRetained(
+        const HdTokenDataSourceHandle &type,
+        const HdIntArrayDataSourceHandle &indices
+)
 {
-  TfToken _names[2];
-  HdDataSourceBaseHandle _values[2];
+    TfToken _names[2];
+    HdDataSourceBaseHandle _values[2];
 
-  size_t _count = 0;
+    size_t _count = 0;
 
-  if (type) {
-    _names[_count] = HdGeomSubsetSchemaTokens->type;
-    _values[_count++] = type;
-  }
+    if (type) {
+        _names[_count] = HdGeomSubsetSchemaTokens->type;
+        _values[_count++] = type;
+    }
 
-  if (indices) {
-    _names[_count] = HdGeomSubsetSchemaTokens->indices;
-    _values[_count++] = indices;
-  }
-  return HdRetainedContainerDataSource::New(_count, _names, _values);
+    if (indices) {
+        _names[_count] = HdGeomSubsetSchemaTokens->indices;
+        _values[_count++] = indices;
+    }
+    return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdGeomSubsetSchema::Builder &HdGeomSubsetSchema::Builder::SetType(
+HdGeomSubsetSchema::Builder &
+HdGeomSubsetSchema::Builder::SetType(
     const HdTokenDataSourceHandle &type)
 {
-  _type = type;
-  return *this;
+    _type = type;
+    return *this;
 }
 
-HdGeomSubsetSchema::Builder &HdGeomSubsetSchema::Builder::SetIndices(
+HdGeomSubsetSchema::Builder &
+HdGeomSubsetSchema::Builder::SetIndices(
     const HdIntArrayDataSourceHandle &indices)
 {
-  _indices = indices;
-  return *this;
+    _indices = indices;
+    return *this;
 }
 
-HdContainerDataSourceHandle HdGeomSubsetSchema::Builder::Build()
+HdContainerDataSourceHandle
+HdGeomSubsetSchema::Builder::Build()
 {
-  return HdGeomSubsetSchema::BuildRetained(_type, _indices);
+    return HdGeomSubsetSchema::BuildRetained(
+        _type,
+        _indices
+    );
 }
 
 /*static*/
-HdGeomSubsetSchema HdGeomSubsetSchema::GetFromParent(
-    const HdContainerDataSourceHandle &fromParentContainer)
+HdGeomSubsetSchema
+HdGeomSubsetSchema::GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer)
 {
-  return HdGeomSubsetSchema(fromParentContainer ?
-                                HdContainerDataSource::Cast(fromParentContainer->Get(
-                                    HdGeomSubsetSchemaTokens->geomSubset)) :
-                                nullptr);
+    return HdGeomSubsetSchema(
+        fromParentContainer
+        ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                HdGeomSubsetSchemaTokens->geomSubset))
+        : nullptr);
 }
 
 /*static*/
-const TfToken &HdGeomSubsetSchema::GetSchemaToken()
+const TfToken &
+HdGeomSubsetSchema::GetSchemaToken()
 {
-  return HdGeomSubsetSchemaTokens->geomSubset;
+    return HdGeomSubsetSchemaTokens->geomSubset;
 }
 
 /*static*/
-const HdDataSourceLocator &HdGeomSubsetSchema::GetDefaultLocator()
+const HdDataSourceLocator &
+HdGeomSubsetSchema::GetDefaultLocator()
 {
-  static const HdDataSourceLocator locator(GetSchemaToken());
-  return locator;
+    static const HdDataSourceLocator locator(GetSchemaToken());
+    return locator;
 }
 
 /*static*/
-HdTokenDataSourceHandle HdGeomSubsetSchema::BuildTypeDataSource(const TfToken &type)
+HdTokenDataSourceHandle
+HdGeomSubsetSchema::BuildTypeDataSource(
+    const TfToken &type)
 {
 
-  if (type == HdGeomSubsetSchemaTokens->typeFaceSet) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(type);
-    return ds;
-  }
-  if (type == HdGeomSubsetSchemaTokens->typePointSet) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(type);
-    return ds;
-  }
-  if (type == HdGeomSubsetSchemaTokens->typeCurveSet) {
-    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-        HdRetainedTypedSampledDataSource<TfToken>::New(type);
-    return ds;
-  }
-  // fallback for unknown token
-  return HdRetainedTypedSampledDataSource<TfToken>::New(type);
-}
+    if (type == HdGeomSubsetSchemaTokens->typeFaceSet) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(type);
+        return ds;
+    }
+    if (type == HdGeomSubsetSchemaTokens->typePointSet) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(type);
+        return ds;
+    }
+    if (type == HdGeomSubsetSchemaTokens->typeCurveSet) {
+        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+            HdRetainedTypedSampledDataSource<TfToken>::New(type);
+        return ds;
+    }
+    // fallback for unknown token
+    return HdRetainedTypedSampledDataSource<TfToken>::New(type);
+} 
 
 PXR_NAMESPACE_CLOSE_SCOPE

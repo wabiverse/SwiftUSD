@@ -33,70 +33,79 @@ PXR_NAMESPACE_OPEN_SCOPE
 // --(BEGIN CUSTOM CODE: Declares)--
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_COLLECTIONS_SCHEMA_TOKENS (collections)
+#define HD_COLLECTIONS_SCHEMA_TOKENS \
+    (collections) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdCollectionsSchemaTokens, HD_API, HD_COLLECTIONS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCollectionsSchemaTokens, HD_API,
+    HD_COLLECTIONS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-// The HdCollectionsSchema specifies a wrapper container for collection
-// entries with the key being the collection name.
-//
 
-class HdCollectionsSchema : public HdSchema {
- public:
-  /// \name Schema retrieval
-  /// @{
+/// \class HdCollectionsSchema
+///
+/// The HdCollectionsSchema specifies a wrapper container for collection
+/// entries with the key being the collection name.
+///
+class HdCollectionsSchema : public HdSchema
+{
+public:
+    /// \name Schema retrieval
+    /// @{
 
-  HdCollectionsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
+    HdCollectionsSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container) {}
 
-  /// Retrieves a container data source with the schema's default name token
-  /// "collections" from the parent container and constructs a
-  /// HdCollectionsSchema instance.
-  /// Because the requested container data source may not exist, the result
-  /// should be checked with IsDefined() or a bool comparison before use.
-  HD_API
-  static HdCollectionsSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
+    /// Retrieves a container data source with the schema's default name token
+    /// "collections" from the parent container and constructs a
+    /// HdCollectionsSchema instance.
+    /// Because the requested container data source may not exist, the result
+    /// should be checked with IsDefined() or a bool comparison before use.
+    HD_API
+    static HdCollectionsSchema GetFromParent(
+        const HdContainerDataSourceHandle &fromParentContainer);
 
-  /// @}
+    /// @}
 
-  // --(BEGIN CUSTOM CODE: Schema Methods)--
-  // --(END CUSTOM CODE: Schema Methods)--
+// --(BEGIN CUSTOM CODE: Schema Methods)--
+// --(END CUSTOM CODE: Schema Methods)--
 
-  /// \name Member accessor
-  /// @{
+    /// \name Member accessor
+    /// @{
 
-  HD_API
-  TfTokenVector GetCollectionNames() const;
+    HD_API
+    TfTokenVector GetCollectionNames() const;
 
-  HD_API
-  HdCollectionSchema GetCollection(const TfToken &name) const;
+    HD_API
+    HdCollectionSchema GetCollection(const TfToken &name) const; 
 
-  /// @}
+    /// @}
 
-  /// \name Schema location
-  /// @{
+    /// \name Schema location
+    /// @{
 
-  /// Returns a token where the container representing this schema is found in
-  /// a container by default.
-  HD_API
-  static const TfToken &GetSchemaToken();
+    /// Returns a token where the container representing this schema is found in
+    /// a container by default.
+    HD_API
+    static const TfToken &GetSchemaToken();
 
-  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-  /// where the container representing this schema is found by default.
-  HD_API
-  static const HdDataSourceLocator &GetDefaultLocator();
+    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+    /// where the container representing this schema is found by default.
+    HD_API
+    static const HdDataSourceLocator &GetDefaultLocator();
 
-  /// @}
+    /// @} 
 
-  /// \name Schema construction
-  /// @{
-  HD_API
-  static HdContainerDataSourceHandle BuildRetained(size_t count,
-                                                   const TfToken *names,
-                                                   const HdDataSourceBaseHandle *values);
+    /// \name Schema construction
+    /// @{
+    HD_API
+    static HdContainerDataSourceHandle
+    BuildRetained(
+        size_t count,
+        const TfToken *names,
+        const HdDataSourceBaseHandle *values);
 
-  /// @}
+    /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

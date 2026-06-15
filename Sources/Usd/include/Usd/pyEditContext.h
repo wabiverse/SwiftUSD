@@ -7,35 +7,39 @@
 #ifndef PXR_USD_USD_PY_EDIT_CONTEXT_H
 #define PXR_USD_USD_PY_EDIT_CONTEXT_H
 
+#include "pxr/pxrns.h"
 #include "Usd/api.h"
 #include "Usd/editContext.h"
 #include "Usd/editTarget.h"
-#include "pxr/pxrns.h"
 
 #include <memory>
 #include <utility>
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DECLARE_WEAK_PTRS(UsdStage);
 
 // Utility class for returning UsdEditContexts to python.  For use in wrapping
 // code.
-struct UsdPyEditContext {
-  USD_API
-  explicit UsdPyEditContext(const std::pair<UsdStagePtr, UsdEditTarget> &stageTarget);
-  USD_API
-  explicit UsdPyEditContext(const UsdStagePtr &stage,
-                            const UsdEditTarget &editTarget = UsdEditTarget());
+struct UsdPyEditContext
+{
+    USD_API
+    explicit UsdPyEditContext(
+        const std::pair<UsdStagePtr, UsdEditTarget> &stageTarget);
+    USD_API
+    explicit UsdPyEditContext(const UsdStagePtr &stage,
+                              const UsdEditTarget &editTarget=UsdEditTarget());
+private:
+    friend struct Usd_PyEditContextAccess;
 
- private:
-  friend struct Usd_PyEditContextAccess;
-
-  UsdStagePtr _stage;
-  UsdEditTarget _editTarget;
-  std::shared_ptr<UsdEditContext> _editContext;
+    UsdStagePtr _stage;
+    UsdEditTarget _editTarget;
+    std::shared_ptr<UsdEditContext> _editContext;
 };
 
-PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_USD_USD_PY_EDIT_CONTEXT_H
+PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+
+#endif // PXR_USD_USD_PY_EDIT_CONTEXT_H

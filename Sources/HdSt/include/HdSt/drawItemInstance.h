@@ -7,9 +7,9 @@
 #ifndef PXR_IMAGING_HD_ST_DRAW_ITEM_INSTANCE_H
 #define PXR_IMAGING_HD_ST_DRAW_ITEM_INSTANCE_H
 
+#include "pxr/pxrns.h"
 #include "HdSt/api.h"
 #include "HdSt/drawItem.h"
-#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -27,55 +27,49 @@ using HdSt_DrawBatchSharedPtr = std::shared_ptr<class HdSt_DrawBatch>;
 /// when adding / appending the instance. If the batch does not require
 /// the DrawItemInstanceChanged callback, then this step can be skipped
 ///
-class HdStDrawItemInstance {
- public:
-  HDST_API
-  HdStDrawItemInstance(HdStDrawItem const *drawItem);
-  HDST_API
-  ~HdStDrawItemInstance();
+class HdStDrawItemInstance
+{
+public:
+    HDST_API
+    HdStDrawItemInstance(HdStDrawItem const *drawItem);
+    HDST_API
+    ~HdStDrawItemInstance();
 
-  /// Set visibility state
-  HDST_API
-  void SetVisible(bool visible);
+    /// Set visibility state
+    HDST_API
+    void SetVisible(bool visible);
 
-  /// Query visibility state
-  bool IsVisible() const
-  {
-    return _visible;
-  }
+    /// Query visibility state
+    bool IsVisible() const { return _visible; }
 
-  /// Set index into batch list. Can be used by
-  /// batch during DrawItemInstanceChanged callback
-  HDST_API
-  void SetBatchIndex(size_t batchIndex);
+    /// Set index into batch list. Can be used by
+    /// batch during DrawItemInstanceChanged callback
+    HDST_API
+    void SetBatchIndex(size_t batchIndex);
 
-  /// Query batch index
-  size_t GetBatchIndex() const
-  {
-    return _batchIndex;
-  }
+    /// Query batch index
+    size_t GetBatchIndex() const { return _batchIndex; }
 
-  /// Set the batch that will receive the DrawItemInstanceChanged
-  /// callback when visibility is updated. Setting batch to NULL
-  /// will disable this callback.
-  // HDST_API
-  void SetBatch(HdSt_DrawBatch *batch);
+    /// Set the batch that will receive the DrawItemInstanceChanged
+    /// callback when visibility is updated. Setting batch to NULL
+    /// will disable this callback.
+    // HDST_API
+    void SetBatch(HdSt_DrawBatch *batch);
 
-  /// Return a const pointer to draw item
-  HdStDrawItem const *GetDrawItem() const
-  {
-    return _drawItem;
-  }
+    /// Return a const pointer to draw item
+    HdStDrawItem const *GetDrawItem() const { return _drawItem; }
 
- private:
-  HdStDrawItemInstance();
+private:
+    HdStDrawItemInstance();
 
-  HdSt_DrawBatch *_batch;
-  HdStDrawItem const *_drawItem;
-  size_t _batchIndex;
-  bool _visible;
+    HdSt_DrawBatch * _batch;
+    HdStDrawItem const * _drawItem;
+    size_t _batchIndex;
+    bool _visible;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_IMAGING_HD_ST_DRAW_ITEM_INSTANCE_H
+#endif // PXR_IMAGING_HD_ST_DRAW_ITEM_INSTANCE_H
+

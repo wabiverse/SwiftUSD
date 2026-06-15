@@ -17,134 +17,146 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdImagingDataSourceBasisCurvesTopology ::UsdImagingDataSourceBasisCurvesTopology(
-    const SdfPath &sceneIndexPath,
-    UsdGeomBasisCurves usdBasisCurves,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : _sceneIndexPath(sceneIndexPath), _usdBasisCurves(usdBasisCurves), _stageGlobals(stageGlobals)
+UsdImagingDataSourceBasisCurvesTopology
+::UsdImagingDataSourceBasisCurvesTopology(
+        const SdfPath &sceneIndexPath,
+        UsdGeomBasisCurves usdBasisCurves,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
+    : _sceneIndexPath(sceneIndexPath)
+    , _usdBasisCurves(usdBasisCurves)
+    , _stageGlobals(stageGlobals)
 {
 }
 
-TfTokenVector UsdImagingDataSourceBasisCurvesTopology::GetNames()
+TfTokenVector
+UsdImagingDataSourceBasisCurvesTopology::GetNames()
 {
-  return {
-      HdBasisCurvesTopologySchemaTokens->curveVertexCounts,
-      HdBasisCurvesTopologySchemaTokens->basis,
-      HdBasisCurvesTopologySchemaTokens->type,
-      HdBasisCurvesTopologySchemaTokens->wrap,
-  };
+    return {
+        HdBasisCurvesTopologySchemaTokens->curveVertexCounts,
+        HdBasisCurvesTopologySchemaTokens->basis,
+        HdBasisCurvesTopologySchemaTokens->type,
+        HdBasisCurvesTopologySchemaTokens->wrap,
+    };
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourceBasisCurvesTopology::Get(const TfToken &name)
+HdDataSourceBaseHandle
+UsdImagingDataSourceBasisCurvesTopology::Get(const TfToken &name)
 {
-  if (name == HdBasisCurvesTopologySchemaTokens->curveVertexCounts) {
-    static const HdDataSourceLocator locator =
-        HdBasisCurvesTopologySchema::GetDefaultLocator().Append(name);
-    return UsdImagingDataSourceAttribute<VtIntArray>::New(
-        _usdBasisCurves.GetCurveVertexCountsAttr(), _stageGlobals, _sceneIndexPath, locator);
-  }
-  else if (name == HdBasisCurvesTopologySchemaTokens->basis) {
-    return UsdImagingDataSourceAttribute<TfToken>::New(_usdBasisCurves.GetBasisAttr(),
-                                                       _stageGlobals);
-  }
-  else if (name == HdBasisCurvesTopologySchemaTokens->type) {
-    return UsdImagingDataSourceAttribute<TfToken>::New(_usdBasisCurves.GetTypeAttr(),
-                                                       _stageGlobals);
-  }
-  else if (name == HdBasisCurvesTopologySchemaTokens->wrap) {
-    return UsdImagingDataSourceAttribute<TfToken>::New(_usdBasisCurves.GetWrapAttr(),
-                                                       _stageGlobals);
-  }
-  return nullptr;
+    if (name == HdBasisCurvesTopologySchemaTokens->curveVertexCounts) {
+        static const HdDataSourceLocator locator =
+            HdBasisCurvesTopologySchema::GetDefaultLocator().Append(name);
+        return UsdImagingDataSourceAttribute<VtIntArray>::New(
+                _usdBasisCurves.GetCurveVertexCountsAttr(), _stageGlobals,
+                _sceneIndexPath, locator);
+    } else if (name == HdBasisCurvesTopologySchemaTokens->basis) {
+        return UsdImagingDataSourceAttribute<TfToken>::New(
+                _usdBasisCurves.GetBasisAttr(), _stageGlobals);
+    } else if (name == HdBasisCurvesTopologySchemaTokens->type) {
+        return UsdImagingDataSourceAttribute<TfToken>::New(
+                _usdBasisCurves.GetTypeAttr(), _stageGlobals);
+    } else if (name == HdBasisCurvesTopologySchemaTokens->wrap) {
+        return UsdImagingDataSourceAttribute<TfToken>::New(
+                _usdBasisCurves.GetWrapAttr(), _stageGlobals);
+    }
+    return nullptr;
 }
 
 // ----------------------------------------------------------------------------
 
 UsdImagingDataSourceBasisCurves::UsdImagingDataSourceBasisCurves(
-    const SdfPath &sceneIndexPath,
-    UsdGeomBasisCurves usdBasisCurves,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
-    : _sceneIndexPath(sceneIndexPath), _usdBasisCurves(usdBasisCurves), _stageGlobals(stageGlobals)
+        const SdfPath &sceneIndexPath,
+        UsdGeomBasisCurves usdBasisCurves,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
+    : _sceneIndexPath(sceneIndexPath)
+    , _usdBasisCurves(usdBasisCurves)
+    , _stageGlobals(stageGlobals)
 {
 }
 
-TfTokenVector UsdImagingDataSourceBasisCurves::GetNames()
+TfTokenVector
+UsdImagingDataSourceBasisCurves::GetNames()
 {
-  return {
-      HdBasisCurvesSchemaTokens->topology,
-  };
+    return {
+        HdBasisCurvesSchemaTokens->topology,
+    };
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourceBasisCurves::Get(const TfToken &name)
+HdDataSourceBaseHandle
+UsdImagingDataSourceBasisCurves::Get(const TfToken &name)
 {
-  if (name == HdBasisCurvesSchemaTokens->topology) {
-    return UsdImagingDataSourceBasisCurvesTopology::New(
-        _sceneIndexPath, _usdBasisCurves, _stageGlobals);
-  }
+    if (name == HdBasisCurvesSchemaTokens->topology) {
+        return UsdImagingDataSourceBasisCurvesTopology::New(
+            _sceneIndexPath, _usdBasisCurves, _stageGlobals);
+    }
 
-  return nullptr;
+    return nullptr;
 }
 // ----------------------------------------------------------------------------
 
 UsdImagingDataSourceBasisCurvesPrim::UsdImagingDataSourceBasisCurvesPrim(
-    const SdfPath &sceneIndexPath,
-    UsdPrim usdPrim,
-    const UsdImagingDataSourceStageGlobals &stageGlobals)
+        const SdfPath &sceneIndexPath,
+        UsdPrim usdPrim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
     : UsdImagingDataSourceGprim(sceneIndexPath, usdPrim, stageGlobals)
 {
 }
 
-TfTokenVector UsdImagingDataSourceBasisCurvesPrim::GetNames()
+TfTokenVector 
+UsdImagingDataSourceBasisCurvesPrim::GetNames()
 {
-  TfTokenVector result = UsdImagingDataSourceGprim::GetNames();
-  result.push_back(HdBasisCurvesSchema::GetSchemaToken());
+    TfTokenVector result = UsdImagingDataSourceGprim::GetNames();
+    result.push_back(HdBasisCurvesSchema::GetSchemaToken());
 
-  return result;
+    return result;
 }
 
-HdDataSourceBaseHandle UsdImagingDataSourceBasisCurvesPrim::Get(const TfToken &name)
-{
-  if (name == HdBasisCurvesSchema::GetSchemaToken()) {
-    return UsdImagingDataSourceBasisCurves::New(
-        _GetSceneIndexPath(), UsdGeomBasisCurves(_GetUsdPrim()), _GetStageGlobals());
-  }
 
-  return UsdImagingDataSourceGprim::Get(name);
+HdDataSourceBaseHandle 
+UsdImagingDataSourceBasisCurvesPrim::Get(const TfToken &name)
+{
+    if (name == HdBasisCurvesSchema::GetSchemaToken()) {
+        return UsdImagingDataSourceBasisCurves::New(
+                _GetSceneIndexPath(),
+                UsdGeomBasisCurves(_GetUsdPrim()),
+                _GetStageGlobals());
+    }
+
+    return UsdImagingDataSourceGprim::Get(name);
 }
 
 /*static*/
-HdDataSourceLocatorSet UsdImagingDataSourceBasisCurvesPrim::Invalidate(
-    UsdPrim const &prim,
+HdDataSourceLocatorSet
+UsdImagingDataSourceBasisCurvesPrim::Invalidate(
+    UsdPrim const& prim,
     const TfToken &subprim,
     const TfTokenVector &properties,
     UsdImagingPropertyInvalidationType invalidationType)
 {
-  HdDataSourceLocatorSet result;
+    HdDataSourceLocatorSet result;
 
-  if (subprim.IsEmpty()) {
-    result = UsdImagingDataSourceGprim::Invalidate(prim, subprim, properties, invalidationType);
+    if (subprim.IsEmpty()) {
+        result = UsdImagingDataSourceGprim::Invalidate(
+            prim, subprim, properties, invalidationType);
 
-    for (const TfToken &propertyName : properties) {
-      if (propertyName == UsdGeomTokens->curveVertexCounts) {
-        result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator().Append(
-            HdBasisCurvesTopologySchemaTokens->curveVertexCounts));
-      }
-      else if (propertyName == UsdGeomTokens->type) {
-        result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator().Append(
-            HdBasisCurvesTopologySchemaTokens->type));
-      }
-      else if (propertyName == UsdGeomTokens->basis) {
-        result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator().Append(
-            HdBasisCurvesTopologySchemaTokens->basis));
-      }
-      else if (propertyName == UsdGeomTokens->wrap) {
-        result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator().Append(
-            HdBasisCurvesTopologySchemaTokens->wrap));
-      }
+        for (const TfToken &propertyName : properties) {
+            if (propertyName == UsdGeomTokens->curveVertexCounts) {
+                result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator()
+                    .Append(
+                        HdBasisCurvesTopologySchemaTokens->curveVertexCounts));
+            } else if (propertyName == UsdGeomTokens->type) {
+                result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator()
+                    .Append(HdBasisCurvesTopologySchemaTokens->type));
+            } else if (propertyName == UsdGeomTokens->basis) {
+                result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator()
+                    .Append(HdBasisCurvesTopologySchemaTokens->basis));
+            } else if (propertyName == UsdGeomTokens->wrap) {
+                result.insert(HdBasisCurvesTopologySchema::GetDefaultLocator()
+                    .Append(HdBasisCurvesTopologySchemaTokens->wrap));
+            }
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -15,98 +15,116 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdImageShaderTokens, HD_IMAGE_SHADER_TOKENS);
 
-HdImageShader::HdImageShader(SdfPath const &id) : HdSprim(id), _enabled(false), _priority(0) {}
+HdImageShader::HdImageShader(SdfPath const &id)
+  : HdSprim(id)
+  , _enabled(false)
+  , _priority(0)
+{
+}
 
 HdImageShader::~HdImageShader() = default;
 
-void HdImageShader::Sync(HdSceneDelegate *sceneDelegate,
-                         HdRenderParam *renderParam,
-                         HdDirtyBits *dirtyBits)
+void
+HdImageShader::Sync(
+    HdSceneDelegate* sceneDelegate,
+    HdRenderParam* renderParam,
+    HdDirtyBits* dirtyBits)
 {
-  HD_TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
+    HD_TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
 
-  TF_UNUSED(renderParam);
+    TF_UNUSED(renderParam);
 
-  if (!TF_VERIFY(sceneDelegate != nullptr)) {
-    return;
-  }
-
-  HdDirtyBits bits = *dirtyBits;
-  SdfPath const &id = GetId();
-
-  if (bits & DirtyEnabled) {
-    const VtValue enabledValue = sceneDelegate->Get(id, HdImageShaderTokens->enabled);
-    if (!enabledValue.IsEmpty()) {
-      _enabled = enabledValue.Get<bool>();
+    if (!TF_VERIFY(sceneDelegate != nullptr)) {
+        return;
     }
-  }
 
-  if (bits & DirtyPriority) {
-    const VtValue priorityValue = sceneDelegate->Get(id, HdImageShaderTokens->priority);
-    if (!priorityValue.IsEmpty()) {
-      _priority = priorityValue.Get<int>();
+    HdDirtyBits bits = *dirtyBits;
+    SdfPath const &id = GetId();
+
+    if (bits & DirtyEnabled) {
+        const VtValue enabledValue =
+            sceneDelegate->Get(id, HdImageShaderTokens->enabled);
+        if (!enabledValue.IsEmpty()) {
+            _enabled = enabledValue.Get<bool>();
+        }
     }
-  }
 
-  if (bits & DirtyFilePath) {
-    const VtValue filePathValue = sceneDelegate->Get(id, HdImageShaderTokens->filePath);
-    if (!filePathValue.IsEmpty()) {
-      _filePath = filePathValue.Get<std::string>();
+    if (bits & DirtyPriority) {
+        const VtValue priorityValue =
+            sceneDelegate->Get(id, HdImageShaderTokens->priority);
+        if (!priorityValue.IsEmpty()) {
+            _priority = priorityValue.Get<int>();
+        }
     }
-  }
 
-  if (bits & DirtyConstants) {
-    const VtValue constantsValue = sceneDelegate->Get(id, HdImageShaderTokens->constants);
-    if (!constantsValue.IsEmpty()) {
-      _constants = constantsValue.Get<VtDictionary>();
+    if (bits & DirtyFilePath) {
+        const VtValue filePathValue =
+            sceneDelegate->Get(id, HdImageShaderTokens->filePath);
+        if (!filePathValue.IsEmpty()) {
+            _filePath = filePathValue.Get<std::string>();
+        }
     }
-  }
 
-  if (bits & DirtyMaterialNetwork) {
-    const VtValue materialNetworkValue = sceneDelegate->Get(id,
-                                                            HdImageShaderTokens->materialNetwork);
-    if (!materialNetworkValue.IsEmpty()) {
-      _materialNetwork = HdConvertToHdMaterialNetwork2(
-          materialNetworkValue.Get<HdMaterialNetworkMap>());
-      _materialNetworkInterface = std::make_unique<HdMaterialNetwork2Interface>(GetId(),
-                                                                                &_materialNetwork);
+    if (bits & DirtyConstants) {
+        const VtValue constantsValue =
+            sceneDelegate->Get(id, HdImageShaderTokens->constants);
+        if (!constantsValue.IsEmpty()) {
+            _constants = constantsValue.Get<VtDictionary>();
+        }
     }
-  }
 
-  // Clear all the dirty bits. This ensures that the sprim doesn't
-  // remain in the dirty list always.
-  *dirtyBits = Clean;
+    if (bits & DirtyMaterialNetwork) {
+        const VtValue materialNetworkValue =
+            sceneDelegate->Get(id, HdImageShaderTokens->materialNetwork);
+        if (!materialNetworkValue.IsEmpty()) {
+            _materialNetwork = HdConvertToHdMaterialNetwork2(
+                materialNetworkValue.Get<HdMaterialNetworkMap>());
+            _materialNetworkInterface =
+                std::make_unique<HdMaterialNetwork2Interface>(
+                    GetId(), &_materialNetwork);
+        }
+    }
+
+    // Clear all the dirty bits. This ensures that the sprim doesn't
+    // remain in the dirty list always.
+    *dirtyBits = Clean;
 }
 
-HdDirtyBits HdImageShader::GetInitialDirtyBitsMask() const
+HdDirtyBits
+HdImageShader::GetInitialDirtyBitsMask() const
 {
-  return AllDirty;
+    return AllDirty;
 }
 
-bool HdImageShader::GetEnabled() const
+bool
+HdImageShader::GetEnabled() const
 {
-  return _enabled;
+    return _enabled;
 }
 
-int HdImageShader::GetPriority() const
+int
+HdImageShader::GetPriority() const
 {
-  return _priority;
+    return _priority;
 }
 
-const std::string &HdImageShader::GetFilePath() const
+const std::string&
+HdImageShader::GetFilePath() const
 {
-  return _filePath;
+    return _filePath;
 }
 
-const VtDictionary &HdImageShader::GetConstants() const
+const VtDictionary&
+HdImageShader::GetConstants() const
 {
-  return _constants;
+    return _constants;
 }
 
-const HdMaterialNetworkInterface *HdImageShader::GetMaterialNetwork() const
+const HdMaterialNetworkInterface*
+HdImageShader::GetMaterialNetwork() const
 {
-  return _materialNetworkInterface.get();
+    return _materialNetworkInterface.get();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

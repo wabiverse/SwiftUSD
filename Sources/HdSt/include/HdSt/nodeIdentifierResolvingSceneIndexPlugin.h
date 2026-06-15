@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Pixar
+// Copyright 2025 Pixar
 //
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
@@ -11,14 +11,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdSt_NodeIdentifierResolvingSceneIndexPlugin : public HdSceneIndexPlugin {
- public:
-  HdSt_NodeIdentifierResolvingSceneIndexPlugin();
-  ~HdSt_NodeIdentifierResolvingSceneIndexPlugin() override;
+class HdSt_NodeIdentifierResolvingSceneIndexPlugin : public HdSceneIndexPlugin
+{
+public:
+    HdSt_NodeIdentifierResolvingSceneIndexPlugin();
+    ~HdSt_NodeIdentifierResolvingSceneIndexPlugin() override;
 
- protected:  // HdSceneIndexPlugin overrides
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
-                                           const HdContainerDataSourceHandle &inputArgs) override;
+protected: // HdSceneIndexPlugin overrides
+    HdSceneIndexBaseRefPtr _AppendSceneIndex(
+        const HdSceneIndexBaseRefPtr& inputScene,
+        const HdContainerDataSourceHandle& inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

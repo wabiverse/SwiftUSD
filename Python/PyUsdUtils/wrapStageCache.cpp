@@ -5,27 +5,39 @@
 // https://openusd.org/license.
 //
 #include "pxr/pxrns.h"
-#include <boost/python.hpp>
-#include <boost/python/def.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "UsdUtils/stageCache.h"
 
 #include "Tf/pyResultConversions.h"
 
-using namespace std;
-using namespace boost::python;
-using namespace boost;
-
 PXR_NAMESPACE_USING_DIRECTIVE
+
+using namespace pxr_boost::python;
 
 void wrapStageCache()
 {
-  class_<UsdUtilsStageCache>("StageCache")
+    class_<UsdUtilsStageCache>("StageCache")
 
-      .def("Get", &UsdUtilsStageCache::Get, return_value_policy<reference_existing_object>())
-      .staticmethod("Get")
+        .def("Get", &UsdUtilsStageCache::Get,
+             return_value_policy<reference_existing_object>())
+        .staticmethod("Get")
 
-      .def("GetSessionLayerForVariantSelections",
-           &UsdUtilsStageCache::GetSessionLayerForVariantSelections)
-      .staticmethod("GetSessionLayerForVariantSelections");
+        .def<SdfLayerRefPtr (*)(
+            const TfToken& name,
+            const std::vector<std::pair<std::string, std::string>>&)>(
+            "GetSessionLayerForVariantSelections",
+            &UsdUtilsStageCache::GetSessionLayerForVariantSelections,
+            (arg("modelName"), arg("variantSelections"))
+            )
+        .def<SdfLayerRefPtr (*)(
+            const SdfPath& primPath,
+            const std::vector<std::pair<std::string, std::string>>&)>(
+            "GetSessionLayerForVariantSelections",
+            &UsdUtilsStageCache::GetSessionLayerForVariantSelections,
+            (arg("primPath"), arg("variantSelections")))
+        .staticmethod("GetSessionLayerForVariantSelections")
+        ;
 }

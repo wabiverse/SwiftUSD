@@ -35,7 +35,9 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+#if PXR_PYTHON_SUPPORT_ENABLED
 using namespace boost::python;
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 
 static size_t _Hash(const UsdResolverExampleResolverContext &ctx)
 {

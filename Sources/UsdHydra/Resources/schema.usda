@@ -2,14 +2,14 @@
 (
     "This file describes the Pixar-specific USD Geometric schemata for code generation."
     subLayers = [
-        @Usd/schema.usda@
+        @usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName           = "UsdHydra"
-        string libraryPath           = "UsdHydra"
+        string libraryName           = "usdHydra"
+        string libraryPath           = "pxr/usd/usdHydra"
         dictionary libraryTokens = {
 
             dictionary HwPrimvar_1 = {
@@ -171,7 +171,7 @@ class "HydraGenerativeProceduralAPI" (
     inherits = </APISchemaBase>
     doc = """
     This API extends and configures the core UsdProcGenerativeProcedural schema
-    defined within UsdProc for use with hydra generative procedurals as defined
+    defined within usdProc for use with hydra generative procedurals as defined
     within hdGp.
     """
     customData = {

@@ -5,124 +5,149 @@
 // https://openusd.org/license.
 //
 
-#include "Gf/multiInterval.h"
 #include "pxr/pxrns.h"
+#include "Gf/multiInterval.h"
 
 #include "Tf/iterator.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
 
-#include <boost/python/class.hpp>
-#include <boost/python/iterator.hpp>
-#include <boost/python/operators.hpp>
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/iterator.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/class.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
+#if PXR_PYTHON_SUPPORT_ENABLED
+#include "boost/python/operators.hpp"
+#endif // PXR_PYTHON_SUPPORT_ENABLED
 #include <string>
-
-using namespace boost::python;
 
 using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+using namespace pxr_boost::python;
+
 namespace {
 
-static string _Repr(GfMultiInterval const &self)
+static string
+_Repr(GfMultiInterval const &self)
 {
-  string r = TF_PY_REPR_PREFIX + "MultiInterval(";
-  if (!self.IsEmpty()) {
-    r += "[";
-    int count = 0;
-    TF_FOR_ALL(i, self)
-    {
-      if (count)
-        r += ", ";
-      r += TfPyRepr(*i);
-      count++;
+    string r = TF_PY_REPR_PREFIX + "MultiInterval(";
+    if (!self.IsEmpty()) {
+        r += "[";
+        int count = 0;
+        TF_FOR_ALL(i, self) {
+            if (count)
+                r += ", ";
+            r += TfPyRepr(*i);
+            count++;
+        }
+        r += "]";
     }
-    r += "]";
-  }
-  r += ")";
-  return r;
+    r += ")";
+    return r;
 }
 
-static object _GetNextNonContainingInterval(GfMultiInterval const &self, double x)
+static object
+_GetNextNonContainingInterval(
+    GfMultiInterval const &self,
+    double x) 
 {
-  const GfMultiInterval::const_iterator it = self.GetNextNonContainingInterval(x);
-  return it == self.end() ? /* None */ object() : object(*it);
+    const GfMultiInterval::const_iterator it = 
+        self.GetNextNonContainingInterval(x);
+    return it == self.end() ? /* None */ object() : object(*it);
 }
 
-static object _GetPriorNonContainingInterval(GfMultiInterval const &self, double x)
+static object
+_GetPriorNonContainingInterval(
+    GfMultiInterval const &self,
+    double x) 
 {
-  const GfMultiInterval::const_iterator it = self.GetPriorNonContainingInterval(x);
-  return it == self.end() ? /* None */ object() : object(*it);
+    const GfMultiInterval::const_iterator it = 
+        self.GetPriorNonContainingInterval(x);
+    return it == self.end() ? /* None */ object() : object(*it);
 }
 
-static object _GetContainingInterval(GfMultiInterval const &self, double x)
+static object
+_GetContainingInterval(
+    GfMultiInterval const &self,
+    double x) 
 {
-  const GfMultiInterval::const_iterator it = self.GetContainingInterval(x);
-  return it == self.end() ? /* None */ object() : object(*it);
+    const GfMultiInterval::const_iterator it = self.GetContainingInterval(x);
+    return it == self.end() ? /* None */ object() : object(*it);
 }
 
-}  // anonymous namespace
+} // anonymous namespace 
 
 void wrapMultiInterval()
-{
-  typedef GfMultiInterval This;
+{    
+    typedef GfMultiInterval This;
 
-  class_<This>("MultiInterval", init<>())
-      .def(init<const GfInterval &>())
-      .def(init<const GfMultiInterval &>())
-      .def(init<const std::vector<GfInterval> &>())
-      .def(TfTypePythonClass())
+    class_<This>( "MultiInterval", init<>() )
+        .def(init<const GfInterval &>())
+        .def(init<const GfMultiInterval &>())
+        .def(init<const std::vector<GfInterval> &>())
+        .def(TfTypePythonClass())
 
-      .add_property("size", &This::GetSize)
-      .add_property("isEmpty", &This::IsEmpty)
-      .add_property("bounds", &This::GetBounds)
+        .add_property("size", &This::GetSize)
+        .add_property("isEmpty", &This::IsEmpty)
+        .add_property("bounds", &This::GetBounds)
 
-      .def("Contains",
-           (bool(This::*)(const GfInterval &) const) & This::Contains,
-           "Returns true if x is inside the multi-interval.")
-      .def("Contains",
-           (bool(This::*)(const GfMultiInterval &) const) & This::Contains,
-           "Returns true if x is inside the multi-interval.")
-      .def("Contains",
-           (bool(This::*)(double) const) & This::Contains,
-           "Returns true if x is inside the multi-interval.")
+        .def("Contains",
+            (bool (This::*)(const GfInterval &) const) &This::Contains,
+            "Returns true if x is inside the multi-interval.")
+        .def("Contains",
+            (bool (This::*)(const GfMultiInterval &) const) &This::Contains,
+            "Returns true if x is inside the multi-interval.")
+        .def("Contains",
+            (bool (This::*)(double) const) &This::Contains,
+            "Returns true if x is inside the multi-interval.")
 
-      .def("Clear", &This::Clear)
-      .def("GetComplement", &This::GetComplement)
+        .def("Clear", &This::Clear)
+        .def("GetComplement", &This::GetComplement)
 
-      .def("Add", (void(This::*)(const GfInterval &)) & This::Add)
-      .def("Add", (void(This::*)(const GfMultiInterval &)) & This::Add)
+        .def("Add",
+            (void (This::*)(const GfInterval &)) &This::Add)
+        .def("Add",
+            (void (This::*)(const GfMultiInterval &)) &This::Add)
 
-      .def("ArithmeticAdd", (void(This::*)(const GfInterval &)) & This::ArithmeticAdd)
+        .def("ArithmeticAdd",
+            (void (This::*)(const GfInterval &)) &This::ArithmeticAdd)
 
-      .def("Remove", (void(This::*)(const GfInterval &)) & This::Remove)
-      .def("Remove", (void(This::*)(const GfMultiInterval &)) & This::Remove)
+        .def("Remove",
+            (void (This::*)(const GfInterval &)) &This::Remove)
+        .def("Remove",
+            (void (This::*)(const GfMultiInterval &)) &This::Remove)
 
-      .def("Intersect", (void(This::*)(const GfInterval &)) & This::Intersect)
-      .def("Intersect", (void(This::*)(const GfMultiInterval &)) & This::Intersect)
+        .def("Intersect",
+            (void (This::*)(const GfInterval &)) &This::Intersect)
+        .def("Intersect",
+            (void (This::*)(const GfMultiInterval &)) &This::Intersect)
 
-      .def("IsEmpty", &This::IsEmpty)
-      .def("GetSize", &This::GetSize)
-      .def("GetBounds", &This::GetBounds)
+        .def("IsEmpty", &This::IsEmpty)
+        .def("GetSize", &This::GetSize)
+        .def("GetBounds", &This::GetBounds)
 
-      .def("GetNextNonContainingInterval", _GetNextNonContainingInterval)
-      .def("GetPriorNonContainingInterval", _GetPriorNonContainingInterval)
-      .def("GetContainingInterval", _GetContainingInterval)
+        .def("GetNextNonContainingInterval", _GetNextNonContainingInterval)
+        .def("GetPriorNonContainingInterval", _GetPriorNonContainingInterval)
+        .def("GetContainingInterval", _GetContainingInterval)
 
-      .def("GetFullInterval", &This::GetFullInterval)
-      .staticmethod("GetFullInterval")
+        .def("GetFullInterval", &This::GetFullInterval)
+        .staticmethod("GetFullInterval")
 
-      // totally_ordered
-      .def(self == self)
-      .def(self != self)
-      .def(self < self)
-      .def(self <= self)
-      .def(self > self)
-      .def(self >= self)
+        // totally_ordered
+        .def(self == self)
+        .def(self != self)
+        .def(self < self)
+        .def(self <= self)
+        .def(self > self)
+        .def(self >= self)
 
-      .def(str(self))
-      .def("__repr__", _Repr)
-      .def("__hash__", &This::Hash)
-      .def("__iter__", iterator<This>());
+        .def(str(self))
+        .def("__repr__", _Repr)
+        .def("__hash__", &This::Hash)
+        .def("__iter__", iterator<This>())
+        ;
 }

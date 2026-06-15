@@ -7,8 +7,8 @@
 #ifndef PXR_BASE_TF_DEBUG_CODES_H
 #define PXR_BASE_TF_DEBUG_CODES_H
 
-#include "Tf/debug.h"
 #include "pxr/pxrns.h"
+#include "Tf/debug.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -19,13 +19,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEBUG_CODES(
 
-    TF_DISCOVERY_TERSE,     // these are special in that they don't have a
-    TF_DISCOVERY_DETAILED,  // corresponding entry in debugCodes.cpp; see
+    TF_DISCOVERY_TERSE,     // these are special in that they don't have a 
+    TF_DISCOVERY_DETAILED,  // corresponding entry in debugCodes.cpp; see 
     TF_DEBUG_REGISTRY,      // registryManager.cpp and debug.cpp for the reason.
     TF_DLOPEN,
     TF_DLCLOSE,
 
     TF_SCRIPT_MODULE_LOADER,
+    TF_SCRIPT_MODULE_LOADER_EXTRA,
 
     TF_TYPE_REGISTRY,
 

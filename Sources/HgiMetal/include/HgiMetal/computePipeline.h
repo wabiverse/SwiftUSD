@@ -7,10 +7,11 @@
 #ifndef PXR_IMAGING_HGI_METAL_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGI_METAL_COMPUTE_PIPELINE_H
 
-#include "Hgi/computePipeline.h"
 #include "pxr/pxrns.h"
+#include "Hgi/computePipeline.h"
 
 #include "HgiMetal/api.h"
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -20,28 +21,30 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiComputePipeline.
 ///
-class HgiMetalComputePipeline final : public HgiComputePipeline {
- public:
-  HGIMETAL_API
-  HgiMetalComputePipeline(HgiMetal *hgi, HgiComputePipelineDesc const &desc);
+class HgiMetalComputePipeline final : public HgiComputePipeline
+{
+public:
+    HGIMETAL_API
+    HgiMetalComputePipeline(HgiMetal *hgi, HgiComputePipelineDesc const& desc);
 
-  HGIMETAL_API
-  ~HgiMetalComputePipeline() override;
+    HGIMETAL_API
+    ~HgiMetalComputePipeline() override;
 
-  /// Apply pipeline state
-  HGIMETAL_API
-  void BindPipeline(id<MTLComputeCommandEncoder> computeEncoder);
+    /// Apply pipeline state
+    HGIMETAL_API
+    void BindPipeline(id<MTLComputeCommandEncoder> computeEncoder);
+    
+    HGIMETAL_API
+    id<MTLComputePipelineState> GetMetalPipelineState();
 
-  HGIMETAL_API
-  id<MTLComputePipelineState> GetMetalPipelineState();
-
- private:
-  HgiMetalComputePipeline() = delete;
-  HgiMetalComputePipeline &operator=(const HgiMetalComputePipeline &) = delete;
-  HgiMetalComputePipeline(const HgiMetalComputePipeline &) = delete;
-
-  id<MTLComputePipelineState> _computePipelineState;
+private:
+    HgiMetalComputePipeline() = delete;
+    HgiMetalComputePipeline & operator=(const HgiMetalComputePipeline&) = delete;
+    HgiMetalComputePipeline(const HgiMetalComputePipeline&) = delete;
+    
+    id<MTLComputePipelineState> _computePipelineState;
 };
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

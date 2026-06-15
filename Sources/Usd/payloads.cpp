@@ -4,10 +4,10 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Usd/payloads.h"
-#include "Usd/common.h"
-#include "Usd/listEditImpl.h"
 #include "pxr/pxrns.h"
+#include "Usd/common.h"
+#include "Usd/payloads.h"
+#include "Usd/listEditImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -15,58 +15,69 @@ PXR_NAMESPACE_OPEN_SCOPE
 // UsdPayloads
 // ------------------------------------------------------------------------- //
 
-using _ListEditImpl = Usd_ListEditImpl<UsdPayloads, SdfPayloadsProxy>;
+using _ListEditImpl = 
+    Usd_ListEditImpl<UsdPayloads, SdfPayloadsProxy>;
 
 // The implementation doesn't define this function as it needs to be specialized
 // so we implement it here.
-template<> SdfPayloadsProxy _ListEditImpl::_GetListEditorForSpec(const SdfPrimSpecHandle &spec)
+template <>
+SdfPayloadsProxy 
+_ListEditImpl::_GetListEditorForSpec(const SdfPrimSpecHandle &spec)
 {
-  return spec->GetPayloadList();
+    return spec->GetPayloadList();
 }
 
-bool UsdPayloads::AddPayload(const SdfPayload &refIn, UsdListPosition position)
+bool
+UsdPayloads::AddPayload(const SdfPayload& refIn, UsdListPosition position)
 {
-  return _ListEditImpl::Add(*this, refIn, position);
+    return _ListEditImpl::Add(*this, refIn, position);
 }
 
-bool UsdPayloads::AddPayload(const std::string &assetPath,
-                             const SdfPath &primPath,
-                             const SdfLayerOffset &layerOffset,
-                             UsdListPosition position)
+bool
+UsdPayloads::AddPayload(const std::string &assetPath,
+                        const SdfPath &primPath,
+                        const SdfLayerOffset &layerOffset,
+                        UsdListPosition position)
 {
-  SdfPayload payload(assetPath, primPath, layerOffset);
-  return AddPayload(payload, position);
+    SdfPayload payload(assetPath, primPath, layerOffset);
+    return AddPayload(payload, position);
 }
 
-bool UsdPayloads::AddPayload(const std::string &assetPath,
-                             const SdfLayerOffset &layerOffset,
-                             UsdListPosition position)
+bool
+UsdPayloads::AddPayload(const std::string &assetPath,
+                        const SdfLayerOffset &layerOffset,
+                        UsdListPosition position)
 {
-  SdfPayload payload(assetPath, SdfPath(), layerOffset);
-  return AddPayload(payload, position);
+    SdfPayload payload(assetPath, SdfPath(), layerOffset);
+    return AddPayload(payload, position);
 }
 
-bool UsdPayloads::AddInternalPayload(const SdfPath &primPath,
-                                     const SdfLayerOffset &layerOffset,
-                                     UsdListPosition position)
+bool 
+UsdPayloads::AddInternalPayload(const SdfPath &primPath,
+                                const SdfLayerOffset &layerOffset,
+                                UsdListPosition position)
 {
-  SdfPayload payload(std::string(), primPath, layerOffset);
-  return AddPayload(payload, position);
+    SdfPayload payload(std::string(), primPath, layerOffset);
+    return AddPayload(payload, position);
 }
 
-bool UsdPayloads::RemovePayload(const SdfPayload &refIn)
+bool
+UsdPayloads::RemovePayload(const SdfPayload& refIn)
 {
-  return _ListEditImpl::Remove(*this, refIn);
+    return _ListEditImpl::Remove(*this, refIn);
 }
 
-bool UsdPayloads::ClearPayloads()
+bool
+UsdPayloads::ClearPayloads()
 {
-  return _ListEditImpl::Clear(*this);
+    return _ListEditImpl::Clear(*this);
 }
 
-bool UsdPayloads::SetPayloads(const SdfPayloadVector &itemsIn)
+bool 
+UsdPayloads::SetPayloads(const SdfPayloadVector& itemsIn)
 {
-  return _ListEditImpl::Set(*this, itemsIn);
+    return _ListEditImpl::Set(*this, itemsIn);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+

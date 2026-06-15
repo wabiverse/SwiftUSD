@@ -6,6 +6,7 @@
 //
 #include "UsdImaging/planeAdapter.h"
 
+#include "UsdImaging/dataSourceImplicits-Impl.h"
 #include "UsdImaging/delegate.h"
 #include "UsdImaging/implicitSurfaceMeshUtils.h"
 #include "UsdImaging/indexProxy.h"
@@ -14,6 +15,7 @@
 #include "Hd/mesh.h"
 #include "Hd/meshTopology.h"
 #include "Hd/perfLog.h"
+#include "Hd/planeSchema.h"
 #include "Hd/tokens.h"
 
 #include "UsdGeom/plane.h"
@@ -23,113 +25,173 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+namespace {
+using _PrimSource = UsdImagingDataSourceImplicitsPrim<UsdGeomPlane, HdPlaneSchema>;
+}
+
 TF_REGISTRY_FUNCTION(TfType)
 {
-  typedef UsdImagingPlaneAdapter Adapter;
-  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
-  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
+    typedef UsdImagingPlaneAdapter Adapter;
+    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
+    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
 }
 
-UsdImagingPlaneAdapter::~UsdImagingPlaneAdapter() {}
-
-bool UsdImagingPlaneAdapter::IsSupported(UsdImagingIndexProxy const *index) const
+UsdImagingPlaneAdapter::~UsdImagingPlaneAdapter() 
 {
-  return index->IsRprimTypeSupported(HdPrimTypeTokens->mesh);
 }
 
-SdfPath UsdImagingPlaneAdapter::Populate(UsdPrim const &prim,
-                                         UsdImagingIndexProxy *index,
-                                         UsdImagingInstancerContext const *instancerContext)
+TfTokenVector
+UsdImagingPlaneAdapter::GetImagingSubprims(UsdPrim const& prim)
 {
-  return _AddRprim(
-      HdPrimTypeTokens->mesh, prim, index, GetMaterialUsdPath(prim), instancerContext);
+    return { TfToken() };
 }
 
-void UsdImagingPlaneAdapter::TrackVariability(
-    UsdPrim const &prim,
-    SdfPath const &cachePath,
-    HdDirtyBits *timeVaryingBits,
-    UsdImagingInstancerContext const *instancerContext) const
+TfToken
+UsdImagingPlaneAdapter::GetImagingSubprimType(
+        UsdPrim const& prim,
+        TfToken const& subprim)
 {
-  BaseAdapter::TrackVariability(prim, cachePath, timeVaryingBits, instancerContext);
-
-  // Check DirtyPoints before doing variability checks, in case we can skip
-  // any of them...
-  if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
-    _IsVarying(prim,
-               UsdGeomTokens->width,
-               HdChangeTracker::DirtyPoints,
-               UsdImagingTokens->usdVaryingPrimvar,
-               timeVaryingBits,
-               /*inherited*/ false);
-  }
-  if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
-    _IsVarying(prim,
-               UsdGeomTokens->length,
-               HdChangeTracker::DirtyPoints,
-               UsdImagingTokens->usdVaryingPrimvar,
-               timeVaryingBits,
-               /*inherited*/ false);
-  }
-  if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
-    _IsVarying(prim,
-               UsdGeomTokens->axis,
-               HdChangeTracker::DirtyPoints,
-               UsdImagingTokens->usdVaryingPrimvar,
-               timeVaryingBits,
-               /*inherited*/ false);
-  }
+    if (subprim.IsEmpty()) {
+        return HdPrimTypeTokens->plane;
+    }
+    return TfToken();
 }
 
-HdDirtyBits UsdImagingPlaneAdapter::ProcessPropertyChange(UsdPrim const &prim,
-                                                          SdfPath const &cachePath,
-                                                          TfToken const &propertyName)
+HdContainerDataSourceHandle
+UsdImagingPlaneAdapter::GetImagingSubprimData(
+        UsdPrim const& prim,
+        TfToken const& subprim,
+        const UsdImagingDataSourceStageGlobals &stageGlobals)
 {
-  if (propertyName == UsdGeomTokens->width || propertyName == UsdGeomTokens->length ||
-      propertyName == UsdGeomTokens->axis)
-  {
-    return HdChangeTracker::DirtyPoints;
-  }
+    if (subprim.IsEmpty()) {
+        return _PrimSource::New(
+            prim.GetPath(),
+            prim,
+            stageGlobals);
+    }
+    return nullptr;
+}
 
-  // Allow base class to handle change processing.
-  return BaseAdapter::ProcessPropertyChange(prim, cachePath, propertyName);
+HdDataSourceLocatorSet
+UsdImagingPlaneAdapter::InvalidateImagingSubprim(
+        UsdPrim const& prim,
+        TfToken const& subprim,
+        TfTokenVector const& properties,
+        const UsdImagingPropertyInvalidationType invalidationType)
+{
+    if (subprim.IsEmpty()) {
+        return _PrimSource::Invalidate(
+            prim, subprim, properties, invalidationType);
+    }
+    
+    return HdDataSourceLocatorSet();
+}
+
+
+bool
+UsdImagingPlaneAdapter::IsSupported(UsdImagingIndexProxy const* index) const
+{
+    return index->IsRprimTypeSupported(HdPrimTypeTokens->mesh);
+}
+
+SdfPath
+UsdImagingPlaneAdapter::Populate(UsdPrim const& prim, 
+                            UsdImagingIndexProxy* index,
+                            UsdImagingInstancerContext const* instancerContext)
+{
+    return _AddRprim(HdPrimTypeTokens->mesh,
+                     prim, index, GetMaterialUsdPath(prim), instancerContext);
+}
+
+void 
+UsdImagingPlaneAdapter::TrackVariability(UsdPrim const& prim,
+                                        SdfPath const& cachePath,
+                                        HdDirtyBits* timeVaryingBits,
+                                        UsdImagingInstancerContext const* 
+                                            instancerContext) const
+{
+    BaseAdapter::TrackVariability(
+        prim, cachePath, timeVaryingBits, instancerContext);
+
+    // Check DirtyPoints before doing variability checks, in case we can skip
+    // any of them...
+    if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
+        _IsVarying(prim, UsdGeomTokens->width,
+                   HdChangeTracker::DirtyPoints,
+                   UsdImagingTokens->usdVaryingPrimvar,
+                   timeVaryingBits, /*inherited*/false);
+    }
+    if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
+        _IsVarying(prim, UsdGeomTokens->length,
+                   HdChangeTracker::DirtyPoints,
+                   UsdImagingTokens->usdVaryingPrimvar,
+                   timeVaryingBits, /*inherited*/false);
+    }
+    if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
+        _IsVarying(prim, UsdGeomTokens->axis,
+                   HdChangeTracker::DirtyPoints,
+                   UsdImagingTokens->usdVaryingPrimvar,
+                   timeVaryingBits, /*inherited*/false);
+    }
+}
+
+HdDirtyBits
+UsdImagingPlaneAdapter::ProcessPropertyChange(UsdPrim const& prim,
+                                             SdfPath const& cachePath,
+                                             TfToken const& propertyName)
+{
+    if (propertyName == UsdGeomTokens->width ||
+        propertyName == UsdGeomTokens->length ||
+        propertyName == UsdGeomTokens->axis) {
+        return HdChangeTracker::DirtyPoints;
+    }
+
+    // Allow base class to handle change processing.
+    return BaseAdapter::ProcessPropertyChange(prim, cachePath, propertyName);
 }
 
 /*virtual*/
-VtValue UsdImagingPlaneAdapter::GetPoints(UsdPrim const &prim, UsdTimeCode time) const
+VtValue
+UsdImagingPlaneAdapter::GetPoints(UsdPrim const& prim,
+                                 UsdTimeCode time) const
 {
-  return GetMeshPoints(prim, time);
+    return GetMeshPoints(prim, time);
 }
 
 /*static*/
-VtValue UsdImagingPlaneAdapter::GetMeshPoints(UsdPrim const &prim, UsdTimeCode time)
+VtValue
+UsdImagingPlaneAdapter::GetMeshPoints(UsdPrim const& prim,
+                                     UsdTimeCode time)
 {
-  UsdGeomPlane plane(prim);
-  double width = 2.0;
-  double length = 2.0;
-  TfToken axis = UsdGeomTokens->z;
-  TF_VERIFY(plane.GetWidthAttr().Get(&width, time));
-  TF_VERIFY(plane.GetLengthAttr().Get(&length, time));
-  TF_VERIFY(plane.GetAxisAttr().Get(&axis, time));
+    UsdGeomPlane plane(prim);
+    double width = 2.0;
+    double length = 2.0;
+    TfToken axis = UsdGeomTokens->z;
+    TF_VERIFY(plane.GetWidthAttr().Get(&width, time));
+    TF_VERIFY(plane.GetLengthAttr().Get(&length, time));
+    TF_VERIFY(plane.GetAxisAttr().Get(&axis, time));
 
-  return VtValue(UsdImagingGeneratePlaneMeshPoints(width, length, axis));
+    return VtValue(UsdImagingGeneratePlaneMeshPoints(width, length, axis)); 
 }
 
 /*static*/
-VtValue UsdImagingPlaneAdapter::GetMeshTopology()
+VtValue
+UsdImagingPlaneAdapter::GetMeshTopology()
 {
-  // Topology is constant and identical for all planes.
-  return VtValue(HdMeshTopology(UsdImagingGetPlaneTopology()));
+    // Topology is constant and identical for all planes.
+    return VtValue(HdMeshTopology(UsdImagingGetPlaneTopology()));
 }
 
-/*virtual*/
-VtValue UsdImagingPlaneAdapter::GetTopology(UsdPrim const &prim,
-                                            SdfPath const &cachePath,
-                                            UsdTimeCode time) const
+/*virtual*/ 
+VtValue
+UsdImagingPlaneAdapter::GetTopology(UsdPrim const& prim,
+                                   SdfPath const& cachePath,
+                                   UsdTimeCode time) const
 {
-  TRACE_FUNCTION();
-  HF_MALLOC_TAG_FUNCTION();
-  return GetMeshTopology();
+    TRACE_FUNCTION();
+    HF_MALLOC_TAG_FUNCTION();
+    return GetMeshTopology();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
