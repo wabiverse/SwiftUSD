@@ -2,7 +2,6 @@
 #define __PXR_USD_USDUI_H__
 
 // UsdUI
-#include <UsdUI/generatedSchema.module.h>
 #include <UsdUI/primHints.h>
 #include <UsdUI/sceneGraphPrimAPI.h>
 #include <UsdUI/propertyHints.h>

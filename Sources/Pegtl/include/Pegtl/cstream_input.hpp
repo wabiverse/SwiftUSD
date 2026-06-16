@@ -6,9 +6,9 @@
 
 #include <cstdio>
 
-#include "buffer_input.hpp"
-#include "config.hpp"
-#include "eol.hpp"
+#include <Pegtl/buffer_input.hpp>
+#include <Pegtl/config.hpp>
+#include <Pegtl/eol.hpp>
 
 #include "internal/cstream_reader.hpp"
 

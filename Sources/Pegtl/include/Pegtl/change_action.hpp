@@ -6,10 +6,10 @@
 
 #include <type_traits>
 
-#include "apply_mode.hpp"
-#include "config.hpp"
-#include "nothing.hpp"
-#include "rewind_mode.hpp"
+#include <Pegtl/apply_mode.hpp>
+#include <Pegtl/config.hpp>
+#include <Pegtl/nothing.hpp>
+#include <Pegtl/rewind_mode.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

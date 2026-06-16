@@ -13,7 +13,7 @@
                 "ShaderResources": "shaders"
             },
             "LibraryPath": "",
-            "Name": "usdShaders",
+            "Name": "UsdShaders",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

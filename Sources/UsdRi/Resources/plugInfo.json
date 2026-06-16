@@ -42,7 +42,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdRi", 
+            "Name": "UsdRi", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

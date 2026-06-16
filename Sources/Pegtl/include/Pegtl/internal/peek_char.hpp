@@ -8,7 +8,7 @@
 
 #include "../config.hpp"
 
-#include "input_pair.hpp"
+#include <Pegtl/internal/input_pair.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

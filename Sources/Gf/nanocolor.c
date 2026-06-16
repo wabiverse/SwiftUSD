@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 
-#include "nanocolor.h"
+#include <Gf/nc/nanocolor.h>
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>

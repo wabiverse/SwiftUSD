@@ -13,10 +13,6 @@
 import ArgumentParser
 import Foundation
 
-/**
- * The subcommand for changing the pixar
- * usd version for a specified package.
- */
 struct UpdateCommand: AsyncCommand
 {
   static let configuration = CommandConfiguration(
@@ -92,15 +88,9 @@ struct UpdateCommand: AsyncCommand
   }
 }
 
-/**
- * Basenames of source files that `enumerate()`/`updateSource()` treat
- * specially, collected once per checkout and threaded through to every
- * `Pxr.enumerate()` call. */
 public struct SourceExclusions: Sendable
 {
-  /** Files only built when `PXR_ENABLE_PYTHON_SUPPORT` is on. */
   let pythonOnly: Set<String>
-  /** Files only built when `PXR_BUILD_TESTS` is on. */
   let testOnly: Set<String>
 
   public init(checkoutRoot: String)
@@ -110,9 +100,6 @@ public struct SourceExclusions: Sendable
   }
 }
 
-/**
- * Find all `<lib>Test_<Name>` files (ex. "tsTest_Museum.cpp") -- only
- * built when PXR_BUILD_TESTS is on, so enumerate() skips them. */
 private func collectTestingFiles(checkoutRoot: String) -> Set<String>
 {
   var basenames: Set<String> = ["examples_usd", "examples_usdGeom"]
@@ -139,12 +126,6 @@ private func collectTestingFiles(checkoutRoot: String) -> Set<String>
   return basenames
 }
 
-/**
- * Scans every `CMakeLists.txt` for sources only built when
- * `PXR_ENABLE_PYTHON_SUPPORT` is on (`PYTHON_*_CLASSES`/`HEADERS`, plus
- * `PYMODULE_CPPFILES` entries without "wrap"/"module", ex.
- * `pyWeakObject.cpp`). `Patch.pythonGuards` wraps these files in
- * `#if PXR_PYTHON_SUPPORT_ENABLED`. */
 private func collectPythonOnlyBasenames(checkoutRoot: String) -> Set<String>
 {
   var basenames: Set<String> = []
@@ -199,68 +180,40 @@ private func collectPythonOnlyBasenames(checkoutRoot: String) -> Set<String>
   return basenames
 }
 
-/**
- * The Pixar packages to update.
- */
 public enum Pxr: String, CaseIterable
 {
-  /** The pxr.base package. */
   case base
-  /** The pxr.imaging package. */
   case imaging
-  /** The pxr.usd package. */
   case usd
-  /** The pxr.usdImaging imaging package. */
   case usdImaging
-  /** The pxr.exec package. */
   case exec
 
-  /**
-   * List the given package path, updating the source files for this
-   * package from upstream pixar, and return a list of updated files.
-   */
   public func enumerate(packagePath: String, exclusions: SourceExclusions) async throws -> [URL]
   {
-    // ------------- list all files in the directory -------------
-
     guard let list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/\(rawValue)")
     else { log.critical("Failed to list \(rawValue) directory."); return [] }
 
-    // ----- clear out stale generated files before repopulating -----
-
-    // remember which targets already declare resource dirs before nuking
-    // them, so we don't create new ones Package.swift doesn't declare.
     let existingResourceDirs = resourceDirectories(packagePath: packagePath)
-
     try nukeStaleTargetFiles(packagePath: packagePath, resourceDirectories: existingResourceDirs)
-
-    // ---------------- process each file in list ----------------
 
     let updatedFiles: [URL] = try list.compactMap
     { pxrPath in
-
-      // ----------- determine target and source paths -----------
 
       let suffix = path(from: pxrPath).split(separator: "pxr/\(rawValue)/").last ?? ""
       let source = URL(fileURLWithPath: ".build/OpenUSD/pxr/\(rawValue)/\(path(from: pxrPath))")
       let suffixParts = suffix.split(separator: "/")
 
-      // plugin/ libs (ex. usdAbc, hdStorm) are named by their second path
-      // component, "plugin" is just a grouping dir, not a target.
+      // plugin/ is a grouping dir; the actual target name is the second component.
       let isPluginLibrary = suffixParts.first == "plugin"
       var target = String((isPluginLibrary ? suffixParts.dropFirst().first : suffixParts.first) ?? "").capitalized
-
       ensureCasing(for: &target)
 
-      // plugins we don't build yet (hioAvif, hioOpenEXR, hioOiio, hioImageIO,
-      // hdEmbree -- vendored codec libs) have no Sources/<Target>, skip them.
+      // skip plugins with no Sources/<Target> (hioAvif, hdEmbree, etc.).
       let isUnbuiltPlugin = isPluginLibrary && !FileManager.default.fileExists(atPath: "\(packagePath)/Sources/\(target)")
-
-      // --------------------- skipped source --------------------
 
       #if os(Windows)
         let platformExcludes = false
-      #else /* !os(Windows) */
+      #else
         let platformExcludes = source.path.lowercased().contains("msinttypes")
       #endif
       if source.path.contains("testenv") ||
@@ -273,8 +226,6 @@ public enum Pxr: String, CaseIterable
         platformExcludes ||
         isUnbuiltPlugin
       { return nil }
-
-      // --------------- create target directories ---------------
 
       try createTargetDirectories(packagePath: packagePath, target: target)
       try createPythonDirectories(packagePath: packagePath, target: target)
@@ -290,39 +241,35 @@ public enum Pxr: String, CaseIterable
         sourceFile = "hgiInterop.mm"
       }
 
-      // ------ copy source files to dest (Sources/Target/*) -----
-
       if ["m", "mm", "cpp", "cc", "c", "cxx"].contains(source.pathExtension)
       {
         if sourceFile.contains("wrap") || sourceFile.contains("module")
         {
           let dest = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/\(sourceFile)")
-
-          // move wrap and module files to Python/PyTarget/*
+          let priorPy = try? String(contentsOf: dest, encoding: .utf8)
           try? FileManager.default.removeItem(at: dest)
           try FileManager.default.moveItem(at: source, to: dest)
-          log.info("updating python module: \(dest.path)")
-          updateSource(fileURL: dest, target: target, exclusions: exclusions)
+          if updateSource(fileURL: dest, target: target, exclusions: exclusions, priorContent: priorPy) {
+            log.info("updating python module: \(dest.path)")
+          }
 
           return dest
         }
         else
         {
           let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(sourceFile)")
-
-          // move source files to Sources/Target/*
+          let priorSrc = try? String(contentsOf: dest, encoding: .utf8)
           try? FileManager.default.removeItem(at: dest)
           try FileManager.default.moveItem(at: source, to: dest)
-          log.info("updating source: \(dest.path)")
-          updateSource(fileURL: dest, target: target, exclusions: exclusions)
+          if updateSource(fileURL: dest, target: target, exclusions: exclusions, priorContent: priorSrc) {
+            log.info("updating source: \(dest.path)")
+          }
 
           return dest
         }
       }
 
-      // ----- copy headers (Sources/Target/include/Target/*) -----
-
-      // CMake `configure_file()` templates (ex. "impl.h.in" -> "impl.h").
+      // CMake configure_file() templates (ex. "impl.h.in" -> "impl.h").
       // "pxr/pxr.h.in" is handled by hand as "pxr/pxrns.h" and lives outside
       // these enumerated package directories, so it never reaches here.
       let isConfigTemplate = source.pathExtension == "in" && source.deletingPathExtension().pathExtension == "h"
@@ -433,10 +380,12 @@ public enum Pxr: String, CaseIterable
         // ensure subdirectories (ex. Pegtl/internal/) exist before moving.
         try FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
 
+        let priorHeader = try? String(contentsOf: dest, encoding: .utf8)
         try? FileManager.default.removeItem(at: dest)
         try FileManager.default.moveItem(at: source, to: dest)
-        log.info("updating header: \(dest.path)")
-        updateSource(fileURL: dest, target: target, exclusions: exclusions)
+        if updateSource(fileURL: dest, target: target, exclusions: exclusions, priorContent: priorHeader) {
+          log.info("updating header: \(dest.path)")
+        }
 
         // headers like Tf/instantiateSingleton.h are meant to be included
         // once, directly by the .cpp that needs them -- keep out of umbrella.
@@ -448,6 +397,23 @@ public enum Pxr: String, CaseIterable
           "instantiateType.h",
           "pyModule.h",
           "CLI11.h",
+          // X-macro data fragment, only valid when included inside an enum/switch body.
+          "crateDataTypes.h",
+          // Private implementation header: includes crateDataTypes.h inside an enum
+          // body which Clang modules can't handle (converts #include to module import).
+          "crateFile.h",
+          // Python boost binding utility header (uses pxr_boost::python, PyObject).
+          "wrapUtils.h",
+          // TF_WRAP(...) fragment file, only valid inside a Python module registration
+          // body, not a standalone compilable header.
+          "generatedSchema.module.h",
+          // Raw data fragments - designed to be #included inside array/struct
+          // declarations in .cpp files; not valid as standalone headers.
+          "ilmbase_eLut.h",
+          "ilmbase_toFloat.h",
+          // Private nested struct definition for GfColorSpace::_Data; only valid
+          // after GfColorSpace is declared (included mid-class in colorSpace.h).
+          "colorSpace_data.h",
         ]
         let includeOnceHeader = blacklistedIncludes.contains(where: dest.path.contains)
         
@@ -481,11 +447,6 @@ public enum Pxr: String, CaseIterable
         return dest
       }
 
-      // ----- copy resources (Resources/, shaders/, textures/) ---
-
-      // path of this file relative to its library (ex. "plugInfo.json",
-      // "schema.usda", "shaders/simpleLighting.glslfx",
-      // "examples/usdPhysicsJoints.usda").
       let libRelative = (isPluginLibrary ? suffixParts.dropFirst(2) : suffixParts.dropFirst(1)).joined(separator: "/")
 
       var resourceRelPath: String? = nil
@@ -505,9 +466,9 @@ public enum Pxr: String, CaseIterable
         let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(resourceRelPath)")
 
         try FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let priorResource = try? String(contentsOf: dest, encoding: .utf8)
         try? FileManager.default.removeItem(at: dest)
         try FileManager.default.moveItem(at: source, to: dest)
-        log.info("updating resource: \(dest.path)")
 
         if ["json", "usda", "usd", "glslfx"].contains(source.pathExtension.lowercased())
         {
@@ -519,7 +480,20 @@ public enum Pxr: String, CaseIterable
           }
 
           Patch.apply(to: &resourceSrc, fileURL: dest, target: target, relativePath: resourceRelPath)
-          try resourceSrc.write(to: dest, atomically: true, encoding: .utf8)
+
+          if libRelative == "plugInfo.json"
+          {
+            Patch.pluginfoName(to: &resourceSrc, target: target)
+          }
+          if libRelative == "schema.usda" || libRelative == "generatedSchema.usda"
+          {
+            Patch.schemaUsda(to: &resourceSrc, target: target)
+          }
+
+          if priorResource != resourceSrc {
+            try resourceSrc.write(to: dest, atomically: true, encoding: .utf8)
+            log.info("updating resource: \(dest.path)")
+          }
         }
         else
         {
@@ -531,30 +505,21 @@ public enum Pxr: String, CaseIterable
             try? FileManager.default.removeItem(at: dest)
             try FileManager.default.copyItem(atPath: overridePath, toPath: dest.path)
           }
+          // always log binary resources can't cheaply diff binary content
+          log.info("updating resource: \(dest.path)")
         }
 
         return dest
       }
 
-      // ----------------------------------------------------------
-
       return nil
     }
-
-    // ----- restore hand-written files with no upstream pixar -----
-    // ----- counterpart (ex. Arch/swiftInterop.h) from Resources ---
 
     try restoreResourceOnlyFiles(packagePath: packagePath)
 
     return updatedFiles
   }
 
-  /**
-   * The Swift target names (ex. "Arch", "Tf", "UsdShade") for every library
-   * this package's fresh upstream checkout contains, derived from the
-   * top-level subdirectory names of `pxr/<rawValue>/`, plus the libs under
-   * `pxr/<rawValue>/plugin/` (ex. "usdAbc" -> "UsdAbc").
-   */
   private func targets(packagePath: String) -> [String]
   {
     let pxrDir = "\(packagePath)/.build/OpenUSD/pxr/\(rawValue)"
@@ -588,12 +553,6 @@ public enum Pxr: String, CaseIterable
     return result
   }
 
-  /**
-   * The `<Target>/Resources`, `shaders`, and `textures` dirs that already
-   * exist on disk, before `enumerate()` nukes and repopulates them. only
-   * dirs in this set get refreshed, so we don't create resource dirs
-   * Package.swift doesn't declare for a target.
-   */
   private func resourceDirectories(packagePath: String) -> Set<String>
   {
     var result: Set<String> = []
@@ -612,19 +571,7 @@ public enum Pxr: String, CaseIterable
     return result
   }
 
-  /**
-   * Removes generated headers/sources for every target before `enumerate()`
-   * repopulates them, so files upstream has since renamed or deleted don't
-   * survive as stale leftovers.
-   *
-   *  - `Sources/<Target>/include/<Target>/` is removed entirely.
-   *  - only top-level `.cpp`/`.cc`/`.c`/`.cxx`/`.m`/`.mm` files directly in
-   *    `Sources/<Target>/` are removed -- other files (ex.
-   *    `Gf/ilmbase_half.README`) aren't produced by `enumerate()`.
-   *  - `Resources`/`shaders`/`textures` are removed, but only if already in
-   *    `resourceDirectories`.
-   *  - `Python/Py<Target>/` is left untouched -- hand-maintained.
-   */
+  // Removes generated headers/sources so stale upstream renames/deletes don't survive across runs.
   private func nukeStaleTargetFiles(packagePath: String, resourceDirectories: Set<String>) throws
   {
     let sourceExtensions: Set<String> = ["m", "mm", "cpp", "cc", "c", "cxx"]
@@ -651,14 +598,7 @@ public enum Pxr: String, CaseIterable
     }
   }
 
-  /**
-   * Copies files from `Sources/OpenUSD/Resources/<Target>/` that have no
-   * upstream pixar counterpart (ex. `Arch/swiftInterop.h`) into
-   * `Sources/<Target>/...` -- `enumerate()`'s main loop never visits these,
-   * and `Patch.apply` can only override existing files, not add new ones.
-   * Skips files that already exist, and registers new headers in the
-   * target's umbrella header.
-   */
+  // Copies Resources/<Target>/ files with no upstream counterpart into Sources/<Target>/ (e.g. swiftInterop.h).
   private func restoreResourceOnlyFiles(packagePath: String) throws
   {
     guard let resourceRoot = Bundle.module.resourceURL
@@ -759,6 +699,13 @@ public enum Pxr: String, CaseIterable
         umbrellaHeader = "#ifndef \(includeGuard)\n#define \(includeGuard)\n\n// \(target)\n"
       }
 
+      // Tf umbrella: pxrTslRobinMap must precede all other Tf headers so dependent modules see it via the module system.
+      if target == "Tf", !umbrellaHeader.contains("<Tf/pxrTslRobinMap/robin_map.h>")
+      {
+        let mark = "#define \(includeGuard)\n"
+        umbrellaHeader = umbrellaHeader.replacingOccurrences(of: mark, with: "\(mark)#include <Tf/pxrTslRobinMap/robin_map.h>\n#include <Tf/pxrTslRobinMap/robin_set.h>\n")
+      }
+
       if umbrellaHeader.contains("#include <\(target)/\(header)>")
       {
         // already present, leave as-is.
@@ -803,7 +750,8 @@ public enum Pxr: String, CaseIterable
     }
   }
 
-  private func updateSource(fileURL: URL, target: String, exclusions: SourceExclusions)
+  @discardableResult
+  private func updateSource(fileURL: URL, target: String, exclusions: SourceExclusions, priorContent: String? = nil) -> Bool
   {
     do
     {
@@ -813,6 +761,9 @@ public enum Pxr: String, CaseIterable
 
       Patch.headers(to: &pxrSrc)
       Patch.xmacroFragmentHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.fileSystemHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.cleanupTrackerHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
       Patch.pythonIncludes(to: &pxrSrc)
@@ -852,22 +803,39 @@ public enum Pxr: String, CaseIterable
       // such headers are renamed on disk (ex. "Tf/tf.h" -> "Tf/tfImpl.h").
       Patch.collidingUmbrellaInclude(to: &pxrSrc, target: target)
       
+      // rewrite same-directory double-quote includes to angle-bracket module
+      // includes, required by SwiftPM's layout where all headers live under
+      // include/<Target>/. For files in a preserved subdirectory (e.g.
+      // Pegtl/internal/), pass the subdirectory so intra-subdir includes
+      // resolve to <Target/subdir/file> instead of the flattened <Target/file>.
+      let includeRoot = "include/\(target)/"
+      let subdirectory: String? = {
+        let p = fileURL.path
+        guard let r = p.range(of: includeRoot) else { return nil }
+        let rel = String(p[r.upperBound...])  // e.g. "internal/rules.hpp" or "foo.h"
+        let parts = rel.split(separator: "/")
+        guard parts.count > 1 else { return nil }
+        return parts.dropLast().joined(separator: "/")
+      }()
+      Patch.sameDirectoryIncludes(to: &pxrSrc, target: target, subdirectory: subdirectory)
+
       // because plain-C header/source code should not bring in Arch's entire
       // C++ clang module, which is problematic.
       Patch.nanocolorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.openexrCSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.materialXShaderGen(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
 
+      let changed = priorContent.map { $0 != pxrSrc } ?? true
       try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
+      return changed
     }
     catch
     {
       log.error("error: failed to update source '\(fileURL.path)'. \(error.localizedDescription).")
+      return false
     }
   }
 
-  /**
-   * Create target directories for the given package.
-   */
   private func createTargetDirectories(packagePath: String, target: String) throws
   {
     // create target directory, if it doesn't exist.
@@ -885,9 +853,6 @@ public enum Pxr: String, CaseIterable
     }
   }
 
-  /**
-   * Create python target directories for the given package.
-   */
   private func createPythonDirectories(packagePath: String, target: String) throws
   {
     // create python target directory, if it doesn't exist.
@@ -905,19 +870,12 @@ public enum Pxr: String, CaseIterable
     }
   }
 
-  /**
-   * Get the path from the given enumerator element.
-   */
   private func path(from enumerated: NSEnumerator.Element) -> String
   {
     enumerated as? String ?? ""
   }
 
-  /**
-   * Canonical casing for targets where `.capitalized` gets it wrong (ex.
-   * `usdImagingGL` -> `Usdimaginggl`, but the target is `UsdImagingGL`).
-   * add new libraries with internal capitalization here.
-   */
+  // Canonical casing for targets where .capitalized gets it wrong (e.g. UsdImagingGL -> Usdimaginggl).
   private static let targetCasing: [String: String] = [
     "camerautil": "CameraUtil",
     "esfusd": "EsfUsd",
@@ -970,10 +928,6 @@ public enum Pxr: String, CaseIterable
     "usdvolimaging": "UsdVolImaging",
   ]
 
-  /**
-   * Fix casing via `targetCasing` (ex. `Usdimaginggl` -> `UsdImagingGL`).
-   * targets already correct after `.capitalized` aren't in the table.
-   */
   private func ensureCasing(for target: inout String)
   {
     if let canonical = Pxr.targetCasing[target.lowercased()]
@@ -984,16 +938,9 @@ public enum Pxr: String, CaseIterable
 
   private enum Patch
   {
-    /**
-     * Overrides upstream source wholesale with the matching file from
-     * Resources/<target>/<key>, if one exists -- this is where all wabi
-     * modifications to openusd source live. `relativePath` lets resource
-     * files (ex. "shaders/simpleLighting.glslfx") be matched by their path
-     * under Resources/<target>/ instead of just their basename. */
+    /** Overrides upstream source wholesale with Resources/<target>/<key> if it exists. */
     public static func apply(to source: inout String, fileURL: URL, target: String, relativePath: String? = nil)
     {
-      // if a upstream source file matches a existing file in resources...
-
       let key = relativePath ?? fileURL.lastPathComponent
       let resourceDir = (Bundle.module.resourceURL?.path ?? ".") + "/Resources/\(target)/\(key)"
       guard
@@ -1001,17 +948,11 @@ public enum Pxr: String, CaseIterable
         let patch = FileManager.default.contents(atPath: resourceDir)
       else { return }
 
-      // then, patch the upstream source with our resources file contents.
-
       log.info("patching source: \(fileURL.path)")
       source = String(decoding: patch, as: UTF8.self)
     }
 
-    /**
-     * Resolves `@PLUG_INFO_*@` placeholders that CMake's configure_file()
-     * would normally fill in. SwiftUSD builds everything into one bundle,
-     * so `LibraryPath` is empty (statically linked) and `ResourcePath`/
-     * `Root` are ".". */
+    /** Resolves @PLUG_INFO_*@ CMake placeholders (statically linked bundle; ResourcePath = "."). */
     public static func pluginfoTemplate(to source: inout String)
     {
       source = source.replacingOccurrences(of: "\"@PLUG_INFO_LIBRARY_PATH@\"", with: "\"\"")
@@ -1019,33 +960,66 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "\"@PLUG_INFO_ROOT@\"", with: "\".\"")
     }
 
-    /**
-     * Resolves CMake `@VAR@` placeholders in `.h.in` templates, the way
-     * `configure_file()` would. `@PXR_WORK_IMPL_HEADER@` is impl.h.in's
-     * only placeholder -- point it at Work/implTBB.h, matching the rename
-     * `enumerate()` gives workTBB/impl.h. */
+    /** Fixes plugInfo.json "Name" to use SwiftUSD capitalized target name (e.g. "usdGeom" -> "UsdGeom"). */
+    public static func pluginfoName(to source: inout String, target: String)
+    {
+      let lower = target.prefix(1).lowercased() + target.dropFirst()
+      source = source.replacingOccurrences(of: "\"Name\": \"\(lower)\"", with: "\"Name\": \"\(target)\"")
+    }
+
+    /** Patches schema.usda: fixes libraryName/libraryPath, pxr/ includes, and subLayer paths to SwiftUSD conventions. */
+    public static func schemaUsda(to source: inout String, target: String)
+    {
+      let lower = target.prefix(1).lowercased() + target.dropFirst()
+
+      // libraryName/libraryPath: strip pxr/ prefix, capitalize to match SwiftUSD target.
+      source = source.replacingOccurrences(of: "= \"\(lower)\"",           with: "= \"\(target)\"")
+      source = source.replacingOccurrences(of: "= \"pxr/base/\(lower)\"",  with: "= \"\(target)\"")
+      source = source.replacingOccurrences(of: "= \"pxr/usd/\(lower)\"",   with: "= \"\(target)\"")
+
+      // pxr/ includes embedded in customData C++ snippets -> SwiftUSD target paths.
+      for (pxr, swift) in [
+        ("pxr/base/gf/",      "Gf/"),
+        ("pxr/base/tf/",      "Tf/"),
+        ("pxr/usd/sdf/",      "Sdf/"),
+        ("pxr/usd/sdr/",      "Sdr/"),
+        ("pxr/usd/usd/",      "Usd/"),
+        ("pxr/usd/usdGeom/",  "UsdGeom/"),
+        ("pxr/usd/usdShade/", "UsdShade/"),
+        ("pxr/usd/usdLux/",   "UsdLux/"),
+        ("pxr/usd/usdSkel/",  "UsdSkel/"),
+        ("pxr/usd/usdVol/",   "UsdVol/"),
+        ("pxr/usd/usdPhysics/","UsdPhysics/"),
+        ("pxr/usd/usdRender/","UsdRender/"),
+        ("pxr/usd/usdRi/",    "UsdRi/"),
+      ] {
+        source = source.replacingOccurrences(of: "\"\(pxr)", with: "\"\(swift)")
+      }
+
+      // subLayer references: @usd/schema.usda@ -> @Usd/schema.usda@ etc.
+      for (lower, upper) in [
+        ("usd/schema.usda",     "Usd/schema.usda"),
+        ("usdGeom/schema.usda", "UsdGeom/schema.usda"),
+        ("usdShade/schema.usda","UsdShade/schema.usda"),
+      ] {
+        source = source.replacingOccurrences(of: "@\(lower)@", with: "@\(upper)@")
+      }
+    }
+
+    /** Resolves @PXR_WORK_IMPL_HEADER@ in impl.h.in to Work/implTBB.h (matching enumerate()'s rename). */
     public static func configureTemplate(to source: inout String)
     {
       source = source.replacingOccurrences(of: "@PXR_WORK_IMPL_HEADER@", with: "\"Work/implTBB.h\"")
     }
 
-    /**
-     * Collapses doubled directory segments left after the include-rewrite
-     * loop capitalizes vendored lib prefixes (ex. `Pegtl/pegtl/config.hpp`
-     * -> `Pegtl/config.hpp`). must run after that loop. */
+    /** Collapses doubled directory segments from vendored-lib prefix capitalisation (e.g. Pegtl/pegtl/ -> Pegtl/). */
     public static func vendoredIncludes(to source: inout String, target: String)
     {
-      // only collapse the doubled directory segment (trailing slash) --
-      // "Pegtl/pegtl.hpp" itself is a real header and must be left alone.
       source = source.replacingOccurrences(of: "Pegtl/pegtl/", with: "Pegtl/")
-      source = source.replacingOccurrences(of: "Work/workTBB", with: "Work")
+      source = source.replacingOccurrences(of: "Work/workTBB",  with: "Work")
     }
 
-    /**
-     * Rewrites `#include "<Target>/<target>.h"` to `.../<target>Impl.h"`,
-     * matching `enumerate()`'s rename of pristine headers that'd collide
-     * (case-insensitively) with the generated umbrella (ex. `tf.h` ->
-     * `tfImpl.h`, vs generated `Tf.h`). no-op if no such collision. */
+    /** Rewrites #include "<Target>/<target>.h" -> <target>Impl.h to avoid umbrella-name collisions. */
     public static func collidingUmbrellaInclude(to source: inout String, target: String)
     {
       let lower = target.lowercased()
@@ -1058,21 +1032,45 @@ public enum Pxr: String, CaseIterable
       }
     }
 
-    /**
-     * `crateDataTypes.h` is an X-macro fragment `#include`-d inside an
-     * `enum class TypeEnum { ... }` body. its leading
-     * `#include "pxr/pxrns.h"` re-imports the module inside that enum body,
-     * which trips `-Wmodules-import-nested-redundant`. strip it. */
+    /** crateDataTypes.h is an X-macro fragment; strip its pxrns.h import to avoid redundant-module-import inside enum body. */
     public static func xmacroFragmentHeader(to source: inout String, fileBaseName: String)
     {
       guard fileBaseName == "crateDataTypes.h" else { return }
       source = source.replacingOccurrences(of: "#include \"pxr/pxrns.h\"\n\n", with: "")
     }
 
-    /**
-     * Some libararies (from 'dev') reference tokens that do not yet exist, such as the in-development UsdExecImaging/UsdIRImaging
-     * targets referencing nonexistent ExecIr tokens, minor modifications needed in order to pre-release these libraries with v26.05,
-     * append them to their existing `*_TOKENS` declarations here. */
+    /** Hoists <limits.h>/<sys/param.h> above PXR_NAMESPACE_OPEN_SCOPE in fileSystem.h (modules forbid sys includes inside namespaces). */
+    public static func fileSystemHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "fileSystem.h" else { return }
+      source = source.replacingOccurrences(
+        of: "PXR_NAMESPACE_OPEN_SCOPE\n\n/// \\addtogroup group_arch_SystemFunctions\n///@{\n#if !defined(ARCH_OS_WINDOWS)\n    #ifdef _POSIX_VERSION\n        #include <limits.h>                     /* for PATH_MAX */\n    #else\n        #include <sys/param.h>                  /* for MAXPATHLEN */\n    #endif\n#else",
+        with: "#if !defined(ARCH_OS_WINDOWS)\n    #ifdef _POSIX_VERSION\n        #include <limits.h>                     /* for PATH_MAX */\n    #else\n        #include <sys/param.h>                  /* for MAXPATHLEN */\n    #endif\n#endif\n\nPXR_NAMESPACE_OPEN_SCOPE\n\n/// \\addtogroup group_arch_SystemFunctions\n///@{\n#if defined(ARCH_OS_WINDOWS)"
+      )
+    }
+
+    /** Hoists #include <vector> above PXR_NAMESPACE_OPEN_SCOPE in cleanupTracker.h. */
+    public static func cleanupTrackerHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "cleanupTracker.h" else { return }
+      source = source.replacingOccurrences(
+        of: "#include \"Sdf/spec.h\"\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);\n\n#include <vector>",
+        with: "#include \"Sdf/spec.h\"\n\n#include <vector>\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);"
+      )
+    }
+
+    /** Replaces duplicate-default-arg fwd-decl of Sdf_EvalQuotedString with #include parserHelpers.h before the namespace. */
+    public static func predicateExpressionParserHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "predicateExpressionParser.h" else { return }
+      // Replace: fwd-decl inside namespace -> include parserHelpers.h before namespace
+      source = source.replacingOccurrences(
+        of: "#include <memory>\n\nPXR_NAMESPACE_OPEN_SCOPE\n\n// fwd decl, from parserHelpers.cpp.\nstd::string\nSdf_EvalQuotedString(const char* x, size_t n,\n                     size_t trimBothSides, unsigned int* numLines=NULL);",
+        with: "#include <memory>\n\n#include \"Sdf/parserHelpers.h\"\n\nPXR_NAMESPACE_OPEN_SCOPE"
+      )
+    }
+
+    /** Appends missing token declarations for in-dev targets (e.g. ExecIr tokens needed by UsdExecImaging). */
     public static func addMissingTokens(to source: inout String, fileBaseName: String, target: String)
     {
       guard fileBaseName == "tokens.h" else { return }
@@ -1092,9 +1090,7 @@ public enum Pxr: String, CaseIterable
       }
     }
 
-    /**
-     * replace `ARCH_PRAGMA_UNUSED_FUNCTION` with a self-contained fallback instead,
-     * so openexr-c.c (a plain-C source file) never needs to import the entire Arch C++ Clang module. */
+    /** Replaces ARCH_PRAGMA_UNUSED_FUNCTION with inline _Pragma equivalent so openexr-c.c avoids importing the Arch C++ module. */
     public static func openexrCSource(to source: inout String, fileBaseName: String)
     {
       guard fileBaseName == "openexr-c.c" else { return }
@@ -1112,9 +1108,60 @@ public enum Pxr: String, CaseIterable
       )
     }
 
-    /**
-     * give NCAPI a self-contained fallback instead, so nanocolor.h (a plain-C header) never needs to import
-     * the entire Arch C++ Clang module. */
+    /** MaterialX 1.38.X TypeDesc has no operator==; use getName() string comparison. */
+    public static func materialXShaderGen(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "materialXShaderGen.cpp" else { return }
+      for (old, new) in [
+        ("return typeDesc == *mx::Type::NONE;",          "return typeDesc.getName() == mx::Type::NONE->getName();"),
+        ("return typeDesc == *mx::Type::SURFACESHADER;", "return typeDesc.getName() == mx::Type::SURFACESHADER->getName();"),
+        ("return typeDesc == *mx::Type::FILENAME;",      "return typeDesc.getName() == mx::Type::FILENAME->getName();"),
+      ] { source = source.replacingOccurrences(of: old, with: new) }
+    }
+
+    /** Rewrites double-quote same-directory includes to angle-bracket module includes (e.g. "foo.h" -> <Target/foo.h>). subdirectory preserves vendored sub-paths. */
+    public static func sameDirectoryIncludes(to source: inout String, target: String, subdirectory: String? = nil)
+    {
+      // Apple SDK header - angle brackets.
+      source = source.replacingOccurrences(of: "#include \"TargetConditionals.h\"", with: "#include <TargetConditionals.h>")
+
+      // Gf/nc/ vendored nanocolor sub-library.
+      source = source.replacingOccurrences(of: "#include \"nanocolor.h\"", with: "#include <Gf/nc/nanocolor.h>")
+
+      // Tf/pxrLZ4/ vendored LZ4 sub-library.
+      source = source.replacingOccurrences(of: "#include \"lz4.h\"", with: "#include <Tf/pxrLZ4/lz4.h>")
+
+      // Tf/pxrDoubleConversion/ vendored double-conversion sub-library.
+      if target == "Tf"
+      {
+        for h in ["bignum.h", "bignum-dtoa.h", "cached-powers.h", "diy-fp.h",
+                  "double-to-string.h", "fast-dtoa.h", "fixed-dtoa.h", "ieee.h",
+                  "string-to-double.h", "strtod.h", "utils.h"]
+        {
+          source = source.replacingOccurrences(of: "#include \"\(h)\"", with: "#include <Tf/pxrDoubleConversion/\(h)>")
+        }
+        // Tf/pxrTslRobinMap/ vendored robin-map sub-library. The general rule below
+        // would produce <Tf/robin_hash.h> etc. (flattened), but the files live under
+        // pxrTslRobinMap/ and must be included with that sub-path.
+        for h in ["robin_hash.h", "robin_growth_policy.h", "robin_map.h", "robin_set.h"]
+        {
+          source = source.replacingOccurrences(of: "#include \"\(h)\"", with: "#include <Tf/pxrTslRobinMap/\(h)>")
+        }
+      }
+
+      // general rule: any remaining `#include "X.h"` with no path separator ->
+      // `#include <Target/X.h>` (top-level) or `#include <Target/subdir/X.h>` when
+      // the file lives in a preserved subdirectory (e.g. Pegtl/internal/).
+      guard let regex = try? NSRegularExpression(pattern: #"#include "([^/"]+\.(?:h|hpp|hxx))""#)
+      else { return }
+
+      let nsSource = source as NSString
+      let range = NSRange(location: 0, length: nsSource.length)
+      let prefix = subdirectory.map { "\(target)/\($0)" } ?? target
+      source = regex.stringByReplacingMatches(in: source, range: range, withTemplate: "#include <\(prefix)/$1>")
+    }
+
+    /** Replaces ARCH_HIDDEN-based NCAPI in nanocolor.h with a self-contained visibility macro (avoids importing Arch C++ module). */
     public static func nanocolorHeader(to source: inout String, fileBaseName: String)
     {
       guard fileBaseName == "nanocolor.h" else { return }
@@ -1136,12 +1183,7 @@ public enum Pxr: String, CaseIterable
       )
     }
 
-    /**
-     * Garch's per-platform GL `.cpp` variants (ex.
-     * `glPlatformContextWindows.cpp`, `glPlatformDebugWindowGLX.cpp`) have
-     * no guard of their own, so SwiftPM compiles all of them on every
-     * platform -- wrap each in `#if` for its platform, mirroring the Darwin
-     * `.mm` counterparts. idempotent: bails if guard already present. */
+    /** Wraps platform-specific Garch .cpp variants in #if guards (SwiftPM compiles all sources; upstream relied on CMake exclusion). */
     public static func platformGuardedSource(to source: inout String, fileBaseName: String)
     {
       let guardMacro: String
@@ -1169,11 +1211,7 @@ public enum Pxr: String, CaseIterable
       source = prefix + "#if \(guardMacro)\n\n" + source + "\n#endif // \(guardMacro)\n"
     }
 
-    /**
-     * Guards `#include "boost/python/..."` with
-     * `#if PXR_PYTHON_SUPPORT_ENABLED`, since those headers aren't available
-     * when python support is off. skipped if the file already has the
-     * guard, so re-running doesn't re-wrap. */
+    /** Guards boost/python includes and rewrites #ifdef->#if checks for PXR_PYTHON_SUPPORT_ENABLED. */
     public static func pythonIncludes(to source: inout String)
     {
       // Package.swift always defines PXR_PYTHON_SUPPORT_ENABLED (to 0 or 1),
@@ -1206,11 +1244,7 @@ public enum Pxr: String, CaseIterable
       source = result.joined(separator: "\n")
     }
 
-    /**
-     * Wraps a file's body (everything after license/guard/#includes) in
-     * `#if PXR_PYTHON_SUPPORT_ENABLED`, if its basename is in
-     * `pythonOnlyBasenames` -- mirrors upstream CMake excluding these
-     * entirely when python support is off. no-op otherwise. */
+    /** Wraps python-only files in #if PXR_PYTHON_SUPPORT_ENABLED (mirrors CMake's source exclusion when python is off). */
     public static func pythonGuards(to source: inout String, fileBaseName: String, pythonOnlyBasenames: Set<String>)
     {
       guard pythonOnlyBasenames.contains(fileBaseName) else { return }
@@ -1277,159 +1311,121 @@ public enum Pxr: String, CaseIterable
       source = result.joined(separator: "\n")
     }
 
-    /**
-     * Patches openusd headers for the pxr namespace, tbb headers, etc. */
+    /** Global source patches: namespace, include paths, ABI fixes. */
     public static func headers(to source: inout String)
     {
-      /* ----- pxr namespace headers. ----- */
+      source = source.replacingOccurrences(of: "pxr/pxr.h",    with: "pxr/pxrns.h")
+      source = source.replacingOccurrences(of: "pxr/external/", with: "")
 
-      source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
-      
-      /* ----- umbrella collisions. ------- */
-      
-      // we never want to bring in the entire tf module (umbrella header),
-      // we want openusd's tf.h header implementation that we renamed to
-      // tf/tfImpl.h (see `collidingUmbrellaInclude(to:target:)`).
-      source = source.replacingOccurrences(of: "tf/tf.h", with: "Tf/tfImpl.h")
+      // Impl-renamed umbrella headers (see collidingUmbrellaInclude).
+      source = source.replacingOccurrences(of: "tf/tf.h",      with: "Tf/tfImpl.h")
       source = source.replacingOccurrences(of: "trace/trace.h", with: "Trace/traceImpl.h")
-      source = source.replacingOccurrences(of: "ar/ar.h", with: "Ar/arImpl.h")
-      source = source.replacingOccurrences(of: "hgi/hgi.h", with: "Hgi/hgiImpl.h")
-      
-      source = source.replacingOccurrences(of: "#include \"pegtl/", with: "#include \"Pegtl/")
-      
+      source = source.replacingOccurrences(of: "ar/ar.h",      with: "Ar/arImpl.h")
+      source = source.replacingOccurrences(of: "hgi/hgi.h",    with: "Hgi/hgiImpl.h")
+      source = source.replacingOccurrences(of: "hgiInterop.h", with: "hgiInteropImpl.h")
+
+      source = source.replacingOccurrences(of: "#include \"pegtl/",           with: "#include \"Pegtl/")
+      source = source.replacingOccurrences(of: "#include \"pxr/imaging/hdsi/", with: "#include \"HdSi/")
+      source = source.replacingOccurrences(of: "#include \"shaderSection.h\"",  with: "#include \"Hgi/shaderSection.h\"")
+
+      // Inject Tf_RetainReleaseHelper friendship alongside Tf_RefPtr_Counter.
       source = source.replacingOccurrences(of: "friend struct Tf_RefPtr_Counter;", with: "friend struct Tf_RefPtr_Counter;\n    friend class Tf_RetainReleaseHelper;")
-      
-      // we cannot have includes within namespaces, so we close -> include -> open back up.
+
+      // vt/dictionary.h + sdf/types.h included inside a namespace - hoist around it.
       source = source.replacingOccurrences(
         of: "#include \"pxr/base/vt/dictionary.h\"\n#include \"pxr/usd/sdf/types.h\"",
         with: "PXR_NAMESPACE_CLOSE_SCOPE\n#include \"pxr/base/vt/dictionary.h\"\n#include \"pxr/usd/sdf/types.h\"\nPXR_NAMESPACE_OPEN_SCOPE"
       )
-      
-      /* ----- pxr external headers. ----- */
 
-      source = source.replacingOccurrences(of: "pxr/external/", with: "")
-      
-      /* ----- hgi headers. -------------- */
-
-      source = source.replacingOccurrences(of: "#include \"pxr/imaging/hdsi/", with: "#include \"HdSi/")
-
-      source = source.replacingOccurrences(of: "#include \"shaderSection.h\"", with: "#include \"Hgi/shaderSection.h\"")
-      
-      // bad things happen if you attempt to import a module's own umbrella into itself.
-      source = source.replacingOccurrences(of: "hgiInterop.h", with: "hgiInteropImpl.h")
-      
-      source = source.replacingOccurrences(of: "#if defined(PXR_GL_SUPPORT_ENABLED)", with: "#if PXR_GL_SUPPORT_ENABLED")
+      // Normalize feature-flag macros from defined() to direct #if form.
+      source = source.replacingOccurrences(of: "#if defined(PXR_GL_SUPPORT_ENABLED)",     with: "#if PXR_GL_SUPPORT_ENABLED")
       source = source.replacingOccurrences(of: "#if defined(PXR_VULKAN_SUPPORT_ENABLED)", with: "#if PXR_VULKAN_SUPPORT_ENABLED")
-      source = source.replacingOccurrences(of: "#if defined(PXR_METAL_SUPPORT_ENABLED)", with: "#if PXR_METAL_SUPPORT_ENABLED")
-      
-      /* ------ refbase ------------------- */
+      source = source.replacingOccurrences(of: "#if defined(PXR_METAL_SUPPORT_ENABLED)",  with: "#if PXR_METAL_SUPPORT_ENABLED")
 
+      // noexcept on virtual dtors avoids ABI-mismatch warnings.
       source = source.replacingOccurrences(of: "virtual ~SdfLayer();", with: "virtual ~SdfLayer() noexcept;")
       source = source.replacingOccurrences(of: "virtual ~UsdStage();", with: "virtual ~UsdStage() noexcept;")
 
-      /* ----- tbb headers. --------------- */
+      // TF_FATAL_ERROR / TF_RUNTIME_ERROR: printf-style macros - pass c_str() for std::string args.
+      source = source.replacingOccurrences(
+        of: "TF_FATAL_ERROR(\"Attempted to get value for key '\" + key +\n                       \"', which is not in the dictionary.\");",
+        with: "TF_FATAL_ERROR(\"Attempted to get value for key '%s', \"\n                       \"which is not in the dictionary.\", key.c_str());"
+      )
+      source = source.replacingOccurrences(of: "TF_RUNTIME_ERROR(errs);", with: "TF_RUNTIME_ERROR(\"%s\", errs.c_str());")
 
-      // currently, metaversekit places tbb in a OneTBB parent directory, so add that here.
-      // the normal <tbb/xxx.h> include paths can only be utilized once Swift on Linux is
-      // fixed, possibly as soon as Swift 6, refer to the following PR:
-      // https://github.com/swiftlang/swift/pull/75662
-      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_queue.h\"", with: "#include <OneTBB/tbb/concurrent_queue.h>")
-      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_unordered_map.h\"", with: "#include <OneTBB/tbb/concurrent_unordered_map.h>")
-      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_vector.h\"", with: "#include <OneTBB/tbb/concurrent_vector.h>")
-      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_hash_map.h\"", with: "#include <OneTBB/tbb/concurrent_hash_map.h>")
-      source = source.replacingOccurrences(of: "#include \"tbb/concurrent_unordered_set.h\"", with: "#include <OneTBB/tbb/concurrent_unordered_set.h>")
+      // TBB: MetaverseKit places tbb under OneTBB/; deprecated atomic/mutex/task_scheduler_init -> std.
       source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
-      // modern versions of tbb no longer have atomic, get it from std.
+      source = source.replacingOccurrences(of: "\"tbb/", with: "\"OneTBB/tbb/")
       source = source.replacingOccurrences(of: "<tbb/atomic.h>", with: "<atomic>")
       source = source.replacingOccurrences(of: "tbb::atomic", with: "std::atomic")
-      // modern versions of tbb no longer have mutex, get it from std.
       source = source.replacingOccurrences(of: "<tbb/mutex.h>", with: "<mutex>")
       source = source.replacingOccurrences(of: "tbb::mutex", with: "std::mutex")
-      // modern versions of tbb no longer contain a task_scheduler_init.
-      source = source.replacingOccurrences(of: "#include <tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <OneTBB/tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
+      source = source.replacingOccurrences(of: "#include <OneTBB/tbb/task_scheduler_init.h>",
+        with: "#if WITH_TBB_LEGACY\n#include <OneTBB/tbb/task_scheduler_init.h>\n#endif")
 
-      /* ---- materialx headers ----------- */
+      // MaterialX: upstream uses per-submodule paths; MetaverseKit exposes a flat MX*.h layout.
+      let materialXHeaders: [(String, String)] = [
+        ("MaterialXCore/Document.h",                         "MaterialX/MXCoreDocument.h"),
+        ("MaterialXCore/Util.h",                             "MaterialX/MXCoreUtil.h"),
+        ("MaterialXCore/Library.h",                          "MaterialX/MXCoreLibrary.h"),
+        ("MaterialXCore/Node.h",                             "MaterialX/MXCoreNode.h"),
+        ("MaterialXCore/Value.h",                            "MaterialX/MXCoreValue.h"),
+        ("MaterialXCore/Generated.h",                        "MaterialX/MXCoreGenerated.h"),
+        ("MaterialXFormat/Util.h",                           "MaterialX/MXFormatUtil.h"),
+        ("MaterialXFormat/XmlIo.h",                          "MaterialX/MXFormatXmlIo.h"),
+        ("MaterialXFormat/Environ.h",                        "MaterialX/MXFormatEnviron.h"),
+        ("MaterialXGenShader/Shader.h",                      "MaterialX/MXGenShader.h"),
+        ("MaterialXGenShader/ShaderGenerator.h",             "MaterialX/MXGenShaderGenerator.h"),
+        ("MaterialXGenShader/Syntax.h",                      "MaterialX/MXGenShaderSyntax.h"),
+        ("MaterialXGenShader/Util.h",                        "MaterialX/MXGenShaderUtil.h"),
+        ("MaterialXGenShader/DefaultColorManagementSystem.h","MaterialX/MXGenShaderDefaultColorManagementSystem.h"),
+        ("MaterialXGenGlsl/GlslShaderGenerator.h",           "MaterialX/MXGenGlslShaderGenerator.h"),
+        ("MaterialXGenGlsl/Nodes/SurfaceNodeGlsl.h",         "MaterialX/MXGenGlslSurfaceNodeGlsl.h"),
+        ("MaterialXGenGlsl/VkShaderGenerator.h",             "MaterialX/MXGenGlslVkShaderGenerator.h"),
+        ("MaterialXGenMsl/MslShaderGenerator.h",             "MaterialX/MXGenMslShaderGenerator.h"),
+        ("MaterialXGenMsl/Nodes/SurfaceNodeMsl.h",           "MaterialX/MXGenMslSurfaceNodeMsl.h"),
+        ("MaterialXGenMsl/MslResourceBindingContext.h",      "MaterialX/MXGenMslResourceBindingContext.h"),
+        ("MaterialXRender/Util.h",                           "MaterialX/MXRenderUtil.h"),
+        ("MaterialXRender/LightHandler.h",                   "MaterialX/MXRenderLightHandler.h"),
+        ("MaterialXRenderGlsl/TextureBaker.h",               "MaterialX/MXRenderGlslTextureBaker.h"),
+      ]
+      for (upstream, flat) in materialXHeaders
+      {
+        source = source.replacingOccurrences(of: "#include <\(upstream)>", with: "#include <\(flat)>")
+      }
 
-      source = source.replacingOccurrences(of: "#include <MaterialXCore/Document.h>", with: "#include <MaterialX/MXCoreDocument.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXCore/Util.h>", with: "#include <MaterialX/MXCoreUtil.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXFormat/Util.h>", with: "#include <MaterialX/MXFormatUtil.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXFormat/XmlIo.h>", with: "#include <MaterialX/MXFormatXmlIo.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXCore/Library.h>", with: "#include <MaterialX/MXCoreLibrary.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXCore/Node.h>", with: "#include <MaterialX/MXCoreNode.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXCore/Value.h>", with: "#include <MaterialX/MXCoreValue.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXCore/Generated.h>", with: "#include <MaterialX/MXCoreGenerated.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenShader/Shader.h>", with: "#include <MaterialX/MXGenShader.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenShader/ShaderGenerator.h>", with: "#include <MaterialX/MXGenShaderGenerator.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenShader/Syntax.h>", with: "#include <MaterialX/MXGenShaderSyntax.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenGlsl/GlslShaderGenerator.h>", with: "#include <MaterialX/MXGenGlslShaderGenerator.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenGlsl/Nodes/SurfaceNodeGlsl.h>", with: "#include <MaterialX/MXGenGlslSurfaceNodeGlsl.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenGlsl/VkShaderGenerator.h>", with: "#include <MaterialX/MXGenGlslVkShaderGenerator.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenMsl/MslShaderGenerator.h>", with: "#include <MaterialX/MXGenMslShaderGenerator.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenMsl/Nodes/SurfaceNodeMsl.h>", with: "#include <MaterialX/MXGenMslSurfaceNodeMsl.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenMsl/MslResourceBindingContext.h>", with: "#include <MaterialX/MXGenMslResourceBindingContext.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenShader/Util.h>", with: "#include <MaterialX/MXGenShaderUtil.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXGenShader/DefaultColorManagementSystem.h>", with: "#include <MaterialX/MXGenShaderDefaultColorManagementSystem.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXRender/Util.h>", with: "#include <MaterialX/MXRenderUtil.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXRender/LightHandler.h>", with: "#include <MaterialX/MXRenderLightHandler.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXRenderGlsl/TextureBaker.h>", with: "#include <MaterialX/MXRenderGlslTextureBaker.h>")
-      source = source.replacingOccurrences(of: "#include <MaterialXFormat/Environ.h>", with: "#include <MaterialX/MXFormatEnviron.h>")
-
-      /* ---- opensubdiv headers ----------- */
-
-      // MetaverseKit's OpenSubdiv module exposes a flattened
-      // "OpenSubdiv/OSD*.h" set, not upstream's "opensubdiv/<lib>/<header>.h"
-      // layout -- rewrite PxOsd/HdSt's includes to match.
+      // OpenSubdiv: upstream uses "opensubdiv/<lib>/<hdr>"; MetaverseKit exposes flat "OpenSubdiv/OSD*.h".
       let openSubdivHeaders: [(String, String)] = [
-        ("opensubdiv/version.h", "OpenSubdiv/OSDVersion.h"),
-        ("opensubdiv/far/topologyRefiner.h", "OpenSubdiv/OSDAdaptiveTopologyRefiner.h"),
+        ("opensubdiv/version.h",                    "OpenSubdiv/OSDVersion.h"),
+        ("opensubdiv/far/topologyRefiner.h",        "OpenSubdiv/OSDAdaptiveTopologyRefiner.h"),
         ("opensubdiv/far/topologyRefinerFactory.h", "OpenSubdiv/OSDAdaptiveTopologyRefinerFactory.h"),
-        ("opensubdiv/far/patchTable.h", "OpenSubdiv/OSDAdaptivePatchTable.h"),
-        ("opensubdiv/far/patchTableFactory.h", "OpenSubdiv/OSDAdaptivePatchTableFactory.h"),
-        ("opensubdiv/far/stencilTable.h", "OpenSubdiv/OSDAdaptiveStencilTable.h"),
-        ("opensubdiv/far/stencilTableFactory.h", "OpenSubdiv/OSDAdaptiveStencilTableFactory.h"),
-        ("opensubdiv/osd/mtlPatchShaderSource.h", "OpenSubdiv/OSDSurfaceMTLPatchShaderSource.h"),
-        ("opensubdiv/osd/glslPatchShaderSource.h", "OpenSubdiv/OSDSurfaceGLSLPatchShaderSource.h"),
+        ("opensubdiv/far/patchTable.h",             "OpenSubdiv/OSDAdaptivePatchTable.h"),
+        ("opensubdiv/far/patchTableFactory.h",      "OpenSubdiv/OSDAdaptivePatchTableFactory.h"),
+        ("opensubdiv/far/stencilTable.h",           "OpenSubdiv/OSDAdaptiveStencilTable.h"),
+        ("opensubdiv/far/stencilTableFactory.h",    "OpenSubdiv/OSDAdaptiveStencilTableFactory.h"),
+        ("opensubdiv/osd/mtlPatchShaderSource.h",   "OpenSubdiv/OSDSurfaceMTLPatchShaderSource.h"),
+        ("opensubdiv/osd/glslPatchShaderSource.h",  "OpenSubdiv/OSDSurfaceGLSLPatchShaderSource.h"),
       ]
       for (upstream, flattened) in openSubdivHeaders
       {
         source = source.replacingOccurrences(of: "#include <\(upstream)>", with: "#include <\(flattened)>")
       }
       
-      /* ---- nanocolor headers ------------ */
-      
-      source = source.replacingOccurrences(of: "#include \"nc/nanocolor.h\"", with: "#include \"nanocolor.h\"")
-      
-      /* ---- gf headers ------------------- */
-      
-      source = source.replacingOccurrences(of: "#include \"colorSpace_data.h\"", with: "#include \"Gf/colorSpace_data.h\"")
+      source = source.replacingOccurrences(of: "#include \"nc/nanocolor.h\"",      with: "#include \"nanocolor.h\"")
+      source = source.replacingOccurrences(of: "#include \"colorSpace_data.h\"",   with: "#include \"Gf/colorSpace_data.h\"")
 
-      /* ---- metal types ------------------ */
-
-      // `didModifyRange:` is on MTLBuffer, not MTLResource --
-      // HgiMetalBlitCmds::CopyTextureCpuToGpu assigns to an
-      // id<MTLResource> local before calling it.
+      // didModifyRange: is on MTLBuffer, not MTLResource.
       source = source.replacingOccurrences(of: "id<MTLResource> resource = metalBuffer->GetBufferId();", with: "id<MTLBuffer> resource = metalBuffer->GetBufferId();")
 
-      /* ---- objc id -> void* bridging ---- */
-
-      // GarchSelectCoreProfileMacVisual returns void*, but
-      // NSOpenGLPixelFormat alloc is an objc object pointer -- needs an
-      // explicit __bridge cast.
+      // ObjC id -> void* bridging: NSOpenGLPixelFormat alloc needs __bridge for a void* return.
       source = source.replacingOccurrences(of: "return [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];", with: "return (__bridge void*)[[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];")
 
-      // GetRawResource() returns a uint64_t, but id<MTLTexture> is an objc
-      // object pointer -- a C-style cast from integer to objc pointer is
-      // disallowed under ARC, so round-trip through void* with __bridge.
+      // GetRawResource() is uint64_t; C-style cast to id<MTLTexture> disallowed under ARC - go via void*.
       source = source.replacingOccurrences(of: "colorTexture = id<MTLTexture>(color->GetRawResource());", with: "colorTexture = (__bridge id<MTLTexture>)(void*)color->GetRawResource();")
       source = source.replacingOccurrences(of: "depthTexture = id<MTLTexture>(depth->GetRawResource());", with: "depthTexture = (__bridge id<MTLTexture>)(void*)depth->GetRawResource();")
     }
 
-    /**
-     * Guards `retain`/`release` calls in `.m`/`.mm` files with
-     * `#if !__has_feature(objc_arc)`, since they're a compile error under
-     * ARC but required without it. consecutive retain/release-only lines
-     * are wrapped together. lines already inside such a guard are left
-     * as-is. */
+    /** Wraps [obj retain]/[obj release] lines in #if !__has_feature(objc_arc) guards (.m/.mm only). */
     public static func arcRetainReleaseGuards(to source: inout String, fileExtension: String)
     {
       guard fileExtension == "m" || fileExtension == "mm" else { return }

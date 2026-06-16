@@ -6,11 +6,11 @@
 
 #include <type_traits>
 
-#include "apply_mode.hpp"
-#include "config.hpp"
-#include "match.hpp"
-#include "nothing.hpp"
-#include "rewind_mode.hpp"
+#include <Pegtl/apply_mode.hpp>
+#include <Pegtl/config.hpp>
+#include <Pegtl/match.hpp>
+#include <Pegtl/nothing.hpp>
+#include <Pegtl/rewind_mode.hpp>
 
 #include "internal/dependent_false.hpp"
 

@@ -63,7 +63,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdUI", 
+            "Name": "UsdUI", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

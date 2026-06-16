@@ -5,10 +5,10 @@
 // https://openusd.org/license.
 //
 
-#include "attributeDescriptor.h"
-#include "attributeFactory.h"
-#include "exportAttribute.h"
-#include "exportTranslator.h"
+#include <UsdDraco/attributeDescriptor.h>
+#include <UsdDraco/attributeFactory.h>
+#include <UsdDraco/exportAttribute.h>
+#include <UsdDraco/exportTranslator.h>
 
 #include "pxr/pxrns.h"
 #include "UsdGeom/mesh.h"

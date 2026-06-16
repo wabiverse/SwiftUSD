@@ -75,7 +75,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "sdf",
+            "Name": "Sdf",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

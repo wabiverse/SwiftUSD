@@ -8,7 +8,7 @@
 
 #include "../../config.hpp"
 
-#include "endian.hpp"
+#include <Pegtl/contrib/internal/endian.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

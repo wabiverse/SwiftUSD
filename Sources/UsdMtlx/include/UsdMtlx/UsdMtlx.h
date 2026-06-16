@@ -3,7 +3,6 @@
 
 // UsdMtlx
 #include <UsdMtlx/utils.h>
-#include <UsdMtlx/generatedSchema.module.h>
 #include <UsdMtlx/reader.h>
 #include <UsdMtlx/fileFormat.h>
 #include <UsdMtlx/materialXConfigAPI.h>

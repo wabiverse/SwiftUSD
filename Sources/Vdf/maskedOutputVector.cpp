@@ -4,7 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "maskedOutputVector.h"
+#include <Vdf/maskedOutputVector.h>
 
 #include "Vdf/maskedOutput.h"
 #include "Vdf/node.h"

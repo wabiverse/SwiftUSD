@@ -17,5 +17,5 @@ TF_WRAP_MODULE
     TF_WRAP(UsdUIAttributeHints);
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <UsdUI/generatedSchema.module.h>
 }

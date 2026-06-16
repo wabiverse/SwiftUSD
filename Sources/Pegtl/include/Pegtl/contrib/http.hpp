@@ -14,10 +14,10 @@
 #include "../rules.hpp"
 #include "../utf8.hpp"
 
-#include "abnf.hpp"
-#include "forward.hpp"
-#include "remove_first_state.hpp"
-#include "uri.hpp"
+#include <Pegtl/contrib/abnf.hpp>
+#include <Pegtl/contrib/forward.hpp>
+#include <Pegtl/contrib/remove_first_state.hpp>
+#include <Pegtl/contrib/uri.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::http
 {

@@ -14,7 +14,7 @@
                 }
             },
             "LibraryPath": "", 
-            "Name": "ar", 
+            "Name": "Ar", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

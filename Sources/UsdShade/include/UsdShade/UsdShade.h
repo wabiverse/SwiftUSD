@@ -4,7 +4,6 @@
 // UsdShade
 #include <UsdShade/connectableAPIBehavior.h>
 #include <UsdShade/utils.h>
-#include <UsdShade/generatedSchema.module.h>
 #include <UsdShade/input.h>
 #include <UsdShade/shader.h>
 #include <UsdShade/connectableAPI.h>

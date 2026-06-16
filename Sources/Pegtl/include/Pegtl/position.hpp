@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 #include "internal/iterator.hpp"
 

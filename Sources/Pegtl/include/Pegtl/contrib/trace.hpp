@@ -10,7 +10,7 @@
 #include <string_view>
 #include <tuple>
 
-#include "state_control.hpp"
+#include <Pegtl/contrib/state_control.hpp>
 
 #include "../apply_mode.hpp"
 #include "../config.hpp"

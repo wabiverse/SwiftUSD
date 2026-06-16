@@ -11,7 +11,7 @@
 #include "../rules.hpp"
 #include "../type_list.hpp"
 
-#include "forward.hpp"
+#include <Pegtl/contrib/forward.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

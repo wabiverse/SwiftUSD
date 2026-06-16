@@ -14,8 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include "remove_first_state.hpp"
-#include "shuffle_states.hpp"
+#include <Pegtl/contrib/remove_first_state.hpp>
+#include <Pegtl/contrib/shuffle_states.hpp>
 
 #include "../apply_mode.hpp"
 #include "../config.hpp"

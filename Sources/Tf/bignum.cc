@@ -28,8 +28,8 @@
 #include <algorithm>
 #include <cstring>
 
-#include "bignum.h"
-#include "utils.h"
+#include <Tf/pxrDoubleConversion/bignum.h>
+#include <Tf/pxrDoubleConversion/utils.h>
 
 #include "pxr/pxrns.h"
 

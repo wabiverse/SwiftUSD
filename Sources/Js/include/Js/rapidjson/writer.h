@@ -15,14 +15,14 @@
 #ifndef RAPIDJSON_WRITER_H_
 #define RAPIDJSON_WRITER_H_
 
-#include "stream.h"
+#include <Js/rapidjson/stream.h>
 #include "internal/clzll.h"
 #include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
 #include "internal/dtoa.h"
 #include "internal/itoa.h"
-#include "stringbuffer.h"
+#include <Js/rapidjson/stringbuffer.h>
 #include <new>      // placement new
 
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)

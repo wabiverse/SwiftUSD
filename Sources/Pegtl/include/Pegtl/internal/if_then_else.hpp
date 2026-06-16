@@ -6,10 +6,10 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
-#include "not_at.hpp"
-#include "seq.hpp"
-#include "sor.hpp"
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/not_at.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/sor.hpp>
 
 #include "../apply_mode.hpp"
 #include "../rewind_mode.hpp"

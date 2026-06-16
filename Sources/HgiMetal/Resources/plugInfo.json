@@ -9,7 +9,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "hgiMetal",
+            "Name": "HgiMetal",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

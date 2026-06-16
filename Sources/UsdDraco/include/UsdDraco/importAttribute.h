@@ -8,8 +8,8 @@
 #ifndef PXR_USD_PLUGIN_USD_DRACO_IMPORT_ATTRIBUTE_H
 #define PXR_USD_PLUGIN_USD_DRACO_IMPORT_ATTRIBUTE_H
 
-#include "attributeDescriptor.h"
-#include "attributeFactory.h"
+#include <UsdDraco/attributeDescriptor.h>
+#include <UsdDraco/attributeFactory.h>
 
 #include "pxr/pxrns.h"
 #include "UsdGeom/mesh.h"

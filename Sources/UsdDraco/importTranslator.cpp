@@ -5,10 +5,10 @@
 // https://openusd.org/license.
 //
 
-#include "importTranslator.h"
+#include <UsdDraco/importTranslator.h>
 
-#include "attributeFactory.h"
-#include "importAttribute.h"
+#include <UsdDraco/attributeFactory.h>
+#include <UsdDraco/importAttribute.h>
 
 #include "pxr/pxrns.h"
 #include "Vt/array.h"

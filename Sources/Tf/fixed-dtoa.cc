@@ -27,8 +27,8 @@
 
 #include <cmath>
 
-#include "fixed-dtoa.h"
-#include "ieee.h"
+#include <Tf/pxrDoubleConversion/fixed-dtoa.h>
+#include <Tf/pxrDoubleConversion/ieee.h>
 
 #include "pxr/pxrns.h"
 

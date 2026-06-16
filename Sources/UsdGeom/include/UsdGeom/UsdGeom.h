@@ -4,7 +4,6 @@
 // UsdGeom
 #include <UsdGeom/cone.h>
 #include <UsdGeom/primvarsAPI.h>
-#include <UsdGeom/generatedSchema.module.h>
 #include <UsdGeom/xformCache.h>
 #include <UsdGeom/nurbsCurves.h>
 #include <UsdGeom/boundableComputeExtent.h>

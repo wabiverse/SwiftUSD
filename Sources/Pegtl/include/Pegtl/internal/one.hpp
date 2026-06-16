@@ -8,11 +8,11 @@
 
 #include "../config.hpp"
 
-#include "any.hpp"
-#include "bump_help.hpp"
-#include "enable_control.hpp"
-#include "failure.hpp"
-#include "result_on_found.hpp"
+#include <Pegtl/internal/any.hpp>
+#include <Pegtl/internal/bump_help.hpp>
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/failure.hpp>
+#include <Pegtl/internal/result_on_found.hpp>
 
 #include "../type_list.hpp"
 

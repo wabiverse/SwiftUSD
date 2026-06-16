@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <utility>
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

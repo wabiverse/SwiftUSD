@@ -20,7 +20,7 @@
 #define RAPIDJSON_DIYFP_H_
 
 #include "../rapidjson.h"
-#include "clzll.h"
+#include <Js/rapidjson/internal/clzll.h>
 #include <limits>
 
 #if defined(_MSC_VER) && defined(_M_AMD64) && !defined(__INTEL_COMPILER)

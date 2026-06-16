@@ -10,8 +10,8 @@
 
 #include "../config.hpp"
 
-#include "if_then_else.hpp"
-#include "must.hpp"
+#include <Pegtl/internal/if_then_else.hpp>
+#include <Pegtl/internal/must.hpp>
 
 #include "../type_list.hpp"
 

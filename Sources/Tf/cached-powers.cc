@@ -29,9 +29,9 @@
 #include <cmath>
 #include <cstdarg>
 
-#include "utils.h"
+#include <Tf/pxrDoubleConversion/utils.h>
 
-#include "cached-powers.h"
+#include <Tf/pxrDoubleConversion/cached-powers.h>
 
 #include "pxr/pxrns.h"
 

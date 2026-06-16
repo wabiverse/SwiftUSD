@@ -8,9 +8,9 @@
 #ifndef PXR_USD_PLUGIN_USD_DRACO_EXPORT_TRANSLATOR_H
 #define PXR_USD_PLUGIN_USD_DRACO_EXPORT_TRANSLATOR_H
 
-#include "attributeDescriptor.h"
-#include "exportAttribute.h"
-#include "flag.h"
+#include <UsdDraco/attributeDescriptor.h>
+#include <UsdDraco/exportAttribute.h>
+#include <UsdDraco/flag.h>
 
 #include "pxr/pxrns.h"
 #include "UsdGeom/mesh.h"

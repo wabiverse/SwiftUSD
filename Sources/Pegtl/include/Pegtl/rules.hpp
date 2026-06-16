@@ -4,8 +4,8 @@
 #ifndef PXR_PEGTL_RULES_HPP
 #define PXR_PEGTL_RULES_HPP
 
-#include "config.hpp"
-#include "parse_error.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/parse_error.hpp>
 
 #include "internal/rules.hpp"
 

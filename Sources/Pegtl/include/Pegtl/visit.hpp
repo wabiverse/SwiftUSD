@@ -6,8 +6,8 @@
 
 #include <type_traits>
 
-#include "config.hpp"
-#include "type_list.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/type_list.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

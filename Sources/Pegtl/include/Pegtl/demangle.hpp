@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 // ensure a consistent interface
 namespace PXR_PEGTL_NAMESPACE

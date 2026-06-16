@@ -19,9 +19,9 @@
 #include "Tf/smallVector.h"
 #include "Tf/span.h"
 
-#include <OneTBB/tbb/concurrent_queue.h>
-#include <OneTBB/tbb/concurrent_unordered_map.h>
-#include <OneTBB/tbb/concurrent_vector.h>
+#include "OneTBB/tbb/concurrent_queue.h"
+#include "OneTBB/tbb/concurrent_unordered_map.h"
+#include "OneTBB/tbb/concurrent_vector.h"
 
 #include <atomic>
 #include <cstdint>

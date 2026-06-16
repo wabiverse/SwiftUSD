@@ -20,7 +20,7 @@
 #include "../parse_error.hpp"
 #include "../rules.hpp"
 
-#include "analyze_traits.hpp"
+#include <Pegtl/contrib/analyze_traits.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

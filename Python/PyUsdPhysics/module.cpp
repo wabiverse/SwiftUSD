@@ -24,5 +24,5 @@ TF_WRAP_MODULE
 	TF_WRAP(ParseUtils);
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <UsdPhysics/generatedSchema.module.h>
 }

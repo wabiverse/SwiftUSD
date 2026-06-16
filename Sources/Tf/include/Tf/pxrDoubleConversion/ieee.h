@@ -28,7 +28,7 @@
 #ifndef DOUBLE_CONVERSION_DOUBLE_H_
 #define DOUBLE_CONVERSION_DOUBLE_H_
 
-#include "diy-fp.h"
+#include <Tf/pxrDoubleConversion/diy-fp.h>
 
 #include "pxr/pxrns.h"
 

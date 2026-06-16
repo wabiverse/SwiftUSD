@@ -6,12 +6,12 @@
 
 #include <type_traits>
 
-#include "apply_mode.hpp"
-#include "config.hpp"
-#include "nothing.hpp"
-#include "require_apply.hpp"
-#include "require_apply0.hpp"
-#include "rewind_mode.hpp"
+#include <Pegtl/apply_mode.hpp>
+#include <Pegtl/config.hpp>
+#include <Pegtl/nothing.hpp>
+#include <Pegtl/require_apply.hpp>
+#include <Pegtl/require_apply0.hpp>
+#include <Pegtl/rewind_mode.hpp>
 
 #include "internal/has_apply.hpp"
 #include "internal/has_apply0.hpp"

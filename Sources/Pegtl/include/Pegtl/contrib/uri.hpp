@@ -15,8 +15,8 @@
 #include "../rules.hpp"
 #include "../utf8.hpp"
 
-#include "abnf.hpp"
-#include "integer.hpp"
+#include <Pegtl/contrib/abnf.hpp>
+#include <Pegtl/contrib/integer.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::uri
 {

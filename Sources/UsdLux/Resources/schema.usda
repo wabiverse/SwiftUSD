@@ -2,14 +2,14 @@
 (
     "This file describes the USD Lux light schemata for code generation."
     subLayers = [
-        @usdGeom/schema.usda@
+        @UsdGeom/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName      = "usdLux"
-        string libraryPath      = "pxr/usd/usdLux"
+        string libraryName      = "UsdLux"
+        string libraryPath      = "UsdLux"
         dictionary libraryTokens = {
             dictionary lightLink = {
                 string doc = """
@@ -118,9 +118,9 @@ class "LightAPI" (
             bool providesUsdShadeConnectableAPIBehavior = 1
         }
         string extraIncludes = """
-#include "pxr/usd/usd/collectionAPI.h"
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h" """
+#include "Usd/collectionAPI.h"
+#include "UsdShade/input.h"
+#include "UsdShade/output.h" """
     }
     prepend apiSchemas = ["CollectionAPI:lightLink", "CollectionAPI:shadowLink"]
 ) {
@@ -667,8 +667,8 @@ class "ShapingAPI" (
     doc = """Controls for shaping a light's emission."""
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h" """
+#include "UsdShade/input.h"
+#include "UsdShade/output.h" """
     }
 
 ) {
@@ -936,8 +936,8 @@ class "ShadowAPI" (
     non-physical controls that are valuable for visual lighting work."""
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h" """
+#include "UsdShade/input.h"
+#include "UsdShade/output.h" """
     }
 
 ) {
@@ -1023,9 +1023,9 @@ class LightFilter "LightFilter" (
             bool providesUsdShadeConnectableAPIBehavior = 1
         }
         string extraIncludes = """
-#include "pxr/usd/usd/collectionAPI.h"
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h" """
+#include "Usd/collectionAPI.h"
+#include "UsdShade/input.h"
+#include "UsdShade/output.h" """
     }
     prepend apiSchemas = ["CollectionAPI:filterLink"]
 ) {
@@ -1060,7 +1060,7 @@ class "BoundableLightBase" (
     functions provided by LightAPI for concrete derived light types.
     """
     customData = {
-        string extraIncludes = """#include "pxr/usd/usdLux/lightAPI.h" """
+        string extraIncludes = """#include "UsdLux/lightAPI.h" """
         token[] reflectedAPISchemas = ["LightAPI"]
     }
     prepend apiSchemas = ["LightAPI"]
@@ -1075,7 +1075,7 @@ class "NonboundableLightBase" (
     functions provided by LightAPI for concrete derived light types.
     """
     customData = {
-        string extraIncludes = """#include "pxr/usd/usdLux/lightAPI.h" """
+        string extraIncludes = """#include "UsdLux/lightAPI.h" """
         token[] reflectedAPISchemas = ["LightAPI"]
     }
     prepend apiSchemas = ["LightAPI"]
@@ -1511,7 +1511,7 @@ class PluginLight "PluginLight" (
     prepend apiSchemas = ["NodeDefAPI", "LightAPI"]
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdShade/nodeDefAPI.h" """
+#include "UsdShade/nodeDefAPI.h" """
     }
 ) {
 }
@@ -1528,7 +1528,7 @@ class PluginLightFilter "PluginLightFilter" (
     prepend apiSchemas = ["NodeDefAPI"]
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdShade/nodeDefAPI.h" """
+#include "UsdShade/nodeDefAPI.h" """
     }
 ) {
 }

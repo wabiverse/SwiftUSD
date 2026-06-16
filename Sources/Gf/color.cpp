@@ -11,7 +11,7 @@
 #include "Gf/vec3f.h"
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
-#include "nanocolor.h"
+#include <Gf/nc/nanocolor.h>
 #include "Gf/colorSpace_data.h"
 #include <iostream>
 

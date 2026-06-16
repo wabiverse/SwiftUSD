@@ -206,7 +206,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdPhysics", 
+            "Name": "UsdPhysics", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

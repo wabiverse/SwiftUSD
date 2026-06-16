@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_CONTRIB_ICU_UTF8_HPP
 #define PXR_PEGTL_CONTRIB_ICU_UTF8_HPP
 
-#include "internal.hpp"
+#include <Pegtl/contrib/icu/internal.hpp>
 
 #include "../../config.hpp"
 #include "../../utf8.hpp"

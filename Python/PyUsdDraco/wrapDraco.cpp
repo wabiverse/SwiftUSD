@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 
-#include "writer.h"
+#include <UsdDraco/writer.h>
 
 #include "pxr/pxrns.h"
 

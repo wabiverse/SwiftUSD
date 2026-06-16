@@ -2,7 +2,6 @@
 #define __PXR_BASE_GF_H__
 
 // Gf
-#include <Gf/ilmbase_eLut.h>
 #include <Gf/matrix4d.h>
 #include <Gf/vec2i.h>
 #include <Gf/half.h>
@@ -14,7 +13,6 @@
 #include <Gf/ilmbase_halfLimits.h>
 #include <Gf/vec4f.h>
 #include <Gf/traits.h>
-#include <Gf/colorSpace_data.h>
 #include <Gf/lineSeg2d.h>
 #include <Gf/dualQuatd.h>
 #include <Gf/vec3i.h>
@@ -55,7 +53,6 @@
 #include <Gf/ilmbase_half.h>
 #include <Gf/vec4i.h>
 #include <Gf/vec2h.h>
-#include <Gf/ilmbase_toFloat.h>
 #include <Gf/vec2f.h>
 #include <Gf/lineSeg.h>
 #include <Gf/vec3f.h>

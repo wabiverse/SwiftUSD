@@ -253,7 +253,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdVol", 
+            "Name": "UsdVol", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

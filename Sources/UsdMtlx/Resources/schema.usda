@@ -2,14 +2,14 @@
 (
     "This file describes the USD MaterialX schemata for code generation."
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName       = "usdMtlx"
-        string libraryPath       = "pxr/usd/usdMtlx"
+        string libraryName       = "UsdMtlx"
+        string libraryPath       = "UsdMtlx"
         dictionary libraryTokens = {
             dictionary DefaultOutputName = {
                 string value = "out"

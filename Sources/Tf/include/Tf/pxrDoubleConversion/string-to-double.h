@@ -28,7 +28,7 @@
 #ifndef DOUBLE_CONVERSION_STRING_TO_DOUBLE_H_
 #define DOUBLE_CONVERSION_STRING_TO_DOUBLE_H_
 
-#include "utils.h"
+#include <Tf/pxrDoubleConversion/utils.h>
 
 #include "pxr/pxrns.h"
 

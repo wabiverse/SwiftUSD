@@ -10,9 +10,9 @@
 #include "../../config.hpp"
 
 #if defined( _WIN32 ) && !defined( __MINGW32__ ) && !defined( __CYGWIN__ )
-#include "endian_win.hpp"
+#include <Pegtl/contrib/internal/endian_win.hpp>
 #else
-#include "endian_gcc.hpp"
+#include <Pegtl/contrib/internal/endian_gcc.hpp>
 #endif
 
 namespace PXR_PEGTL_NAMESPACE::internal

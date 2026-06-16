@@ -177,7 +177,7 @@
                 "ShaderResources": "shaders"
             },
             "LibraryPath": "",
-            "Name": "hdSt",
+            "Name": "HdSt",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

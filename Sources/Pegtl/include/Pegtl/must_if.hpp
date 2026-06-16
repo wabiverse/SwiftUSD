@@ -10,8 +10,8 @@
 
 #include <type_traits>
 
-#include "config.hpp"
-#include "normal.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/normal.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

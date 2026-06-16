@@ -3,7 +3,7 @@
         {
             "Info" : {},
             "LibraryPath": "",
-            "Name": "usdImagingGL",
+            "Name": "UsdImagingGL",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

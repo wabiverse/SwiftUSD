@@ -40,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-#include "robin_growth_policy.h"
+#include <Tf/pxrTslRobinMap/robin_growth_policy.h>
 
 // Pixar modification, modify namespace for isolation.
 #include "pxr/pxrns.h"

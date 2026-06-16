@@ -9,11 +9,11 @@
 
 #include "../config.hpp"
 
-#include "bump_help.hpp"
-#include "enable_control.hpp"
-#include "one.hpp"
-#include "result_on_found.hpp"
-#include "success.hpp"
+#include <Pegtl/internal/bump_help.hpp>
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/one.hpp>
+#include <Pegtl/internal/result_on_found.hpp>
+#include <Pegtl/internal/success.hpp>
 
 #include "../type_list.hpp"
 

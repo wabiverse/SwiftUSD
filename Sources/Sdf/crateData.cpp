@@ -7,7 +7,7 @@
 #include "pxr/pxrns.h"
 #include "Sdf/crateData.h"
 
-#include "crateFile.h"
+#include <Sdf/crateFile.h>
 
 #include "Tf/bitUtils.h"
 #include "Tf/mallocTag.h"

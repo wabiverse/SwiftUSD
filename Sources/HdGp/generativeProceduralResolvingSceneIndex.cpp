@@ -4,8 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "generativeProceduralResolvingSceneIndex.h"
-#include "generativeProceduralPluginRegistry.h"
+#include <HdGp/generativeProceduralResolvingSceneIndex.h>
+#include <HdGp/generativeProceduralPluginRegistry.h>
 
 #include "Hd/primvarsSchema.h"
 #include "Hd/systemMessages.h"

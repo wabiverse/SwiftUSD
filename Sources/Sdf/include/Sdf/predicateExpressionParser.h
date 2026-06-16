@@ -18,12 +18,9 @@
 
 #include <memory>
 
-PXR_NAMESPACE_OPEN_SCOPE
+#include "Sdf/parserHelpers.h"
 
-// fwd decl, from parserHelpers.cpp.
-std::string
-Sdf_EvalQuotedString(const char* x, size_t n,
-                     size_t trimBothSides, unsigned int* numLines=NULL);
+PXR_NAMESPACE_OPEN_SCOPE
 
 struct SdfPredicateExprBuilder
 {

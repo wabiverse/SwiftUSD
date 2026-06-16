@@ -257,7 +257,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdLux", 
+            "Name": "UsdLux", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

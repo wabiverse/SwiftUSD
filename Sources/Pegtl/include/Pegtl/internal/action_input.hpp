@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include "iterator.hpp"
+#include <Pegtl/internal/iterator.hpp>
 
 #include "../config.hpp"
 #include "../position.hpp"

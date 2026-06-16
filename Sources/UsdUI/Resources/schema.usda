@@ -2,14 +2,14 @@
 (
     "This file describes the USD User Interface schemata for code generation."
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName      = "usdUI"
-        string libraryPath      = "pxr/usd/usdUI"
+        string libraryName      = "UsdUI"
+        string libraryPath      = "UsdUI"
         dictionary libraryTokens = {
             dictionary default_ = {
                 string value = "default"

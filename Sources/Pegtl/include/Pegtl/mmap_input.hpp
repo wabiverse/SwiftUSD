@@ -6,10 +6,10 @@
 
 #include <string>
 
-#include "config.hpp"
-#include "eol.hpp"
-#include "memory_input.hpp"
-#include "tracking_mode.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/eol.hpp>
+#include <Pegtl/memory_input.hpp>
+#include <Pegtl/tracking_mode.hpp>
 
 #include "internal/filesystem.hpp"
 #include "internal/path_to_string.hpp"

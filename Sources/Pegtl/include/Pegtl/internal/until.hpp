@@ -6,12 +6,12 @@
 
 #include "../config.hpp"
 
-#include "bytes.hpp"
-#include "enable_control.hpp"
-#include "eof.hpp"
-#include "not_at.hpp"
-#include "seq.hpp"
-#include "star.hpp"
+#include <Pegtl/internal/bytes.hpp>
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/eof.hpp>
+#include <Pegtl/internal/not_at.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/star.hpp>
 
 #include "../apply_mode.hpp"
 #include "../rewind_mode.hpp"

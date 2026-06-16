@@ -8,17 +8,17 @@
 #include <type_traits>
 #include <utility>
 
-#include "apply_mode.hpp"
-#include "config.hpp"
-#include "match.hpp"
-#include "parse_error.hpp"
-#include "rewind_mode.hpp"
+#include <Pegtl/apply_mode.hpp>
+#include <Pegtl/config.hpp>
+#include <Pegtl/match.hpp>
+#include <Pegtl/parse_error.hpp>
+#include <Pegtl/rewind_mode.hpp>
 
 #include "internal/enable_control.hpp"
 #include "internal/has_match.hpp"
 
 #if defined( __cpp_exceptions )
-#include "demangle.hpp"
+#include <Pegtl/demangle.hpp>
 #else
 #include "internal/dependent_false.hpp"
 #include <exception>

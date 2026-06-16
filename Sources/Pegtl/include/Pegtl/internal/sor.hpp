@@ -8,8 +8,8 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
-#include "failure.hpp"
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/failure.hpp>
 
 #include "../apply_mode.hpp"
 #include "../rewind_mode.hpp"

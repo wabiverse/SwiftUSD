@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_NOTHING_HPP
 #define PXR_PEGTL_NOTHING_HPP
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

@@ -10,8 +10,8 @@
 #include "pxr/pxrns.h"
 #include "Sdf/crateData.h"
 
-#include "crateValueInliners.h"
-#include "shared.h"
+#include <Sdf/crateValueInliners.h>
+#include <Sdf/shared.h>
 
 #include "Arch/fileSystem.h"
 #include "Tf/delegatedCountPtr.h"
@@ -205,7 +205,7 @@ enum class TypeEnum {
 #define xx(ENUMNAME, ENUMVALUE, _unused1, _unused2)     \
     ENUMNAME = ENUMVALUE,
 
-#include "crateDataTypes.h"
+#include <Sdf/crateDataTypes.h>
 
 #undef xx
     NumTypes

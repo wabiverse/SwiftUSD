@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_CURSORSTREAMWRAPPER_H_
 #define RAPIDJSON_CURSORSTREAMWRAPPER_H_
 
-#include "stream.h"
+#include <Js/rapidjson/stream.h>
 
 #if defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH

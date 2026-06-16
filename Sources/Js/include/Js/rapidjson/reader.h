@@ -17,9 +17,9 @@
 
 /*! \file reader.h */
 
-#include "allocators.h"
-#include "stream.h"
-#include "encodedstream.h"
+#include <Js/rapidjson/allocators.h>
+#include <Js/rapidjson/stream.h>
+#include <Js/rapidjson/encodedstream.h>
 #include "internal/clzll.h"
 #include "internal/meta.h"
 #include "internal/stack.h"

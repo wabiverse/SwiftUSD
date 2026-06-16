@@ -17,11 +17,11 @@
 
 /*! \file document.h */
 
-#include "reader.h"
+#include <Js/rapidjson/reader.h>
 #include "internal/meta.h"
 #include "internal/strfunc.h"
-#include "memorystream.h"
-#include "encodedstream.h"
+#include <Js/rapidjson/memorystream.h>
+#include <Js/rapidjson/encodedstream.h>
 #include <new>      // placement new
 #include <limits>
 #ifdef __cpp_lib_three_way_comparison

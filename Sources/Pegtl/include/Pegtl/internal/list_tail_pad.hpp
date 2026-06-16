@@ -6,11 +6,11 @@
 
 #include "../config.hpp"
 
-#include "list.hpp"
-#include "opt.hpp"
-#include "pad.hpp"
-#include "seq.hpp"
-#include "star.hpp"
+#include <Pegtl/internal/list.hpp>
+#include <Pegtl/internal/opt.hpp>
+#include <Pegtl/internal/pad.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/star.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

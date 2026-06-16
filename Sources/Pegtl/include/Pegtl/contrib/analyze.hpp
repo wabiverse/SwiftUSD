@@ -17,7 +17,7 @@
 #include "../config.hpp"
 #include "../demangle.hpp"
 
-#include "analyze_traits.hpp"
+#include <Pegtl/contrib/analyze_traits.hpp>
 
 #include "internal/set_stack_guard.hpp"
 #include "internal/vector_stack_guard.hpp"

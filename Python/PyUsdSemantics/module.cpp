@@ -14,5 +14,5 @@ TF_WRAP_MODULE {
     TF_WRAP(UsdSemanticsLabelsQuery); 
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <UsdSemantics/generatedSchema.module.h>
 }

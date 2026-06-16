@@ -6,7 +6,7 @@
 
 #include <ostream>
 
-#include "coverage.hpp"
+#include <Pegtl/contrib/coverage.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

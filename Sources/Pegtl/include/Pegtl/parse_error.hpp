@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 
-#include "config.hpp"
-#include "position.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/position.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

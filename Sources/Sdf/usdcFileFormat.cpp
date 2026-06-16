@@ -16,7 +16,7 @@
 
 #include "Tf/registryManager.h"
 
-#include "crateData.h"
+#include <Sdf/crateData.h>
 
 #include <iosfwd>
 

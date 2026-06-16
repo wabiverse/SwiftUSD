@@ -6,7 +6,7 @@
 
 #include "../config.hpp"
 
-#include "iterator.hpp"
+#include <Pegtl/internal/iterator.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

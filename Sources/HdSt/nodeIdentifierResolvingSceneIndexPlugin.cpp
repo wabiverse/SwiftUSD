@@ -3,7 +3,7 @@
 //
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
-#include "nodeIdentifierResolvingSceneIndexPlugin.h"
+#include <HdSt/nodeIdentifierResolvingSceneIndexPlugin.h>
 
 #include "HdSi/nodeIdentifierResolvingSceneIndex.h"
 

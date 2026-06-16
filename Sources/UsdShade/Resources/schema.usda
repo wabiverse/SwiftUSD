@@ -2,14 +2,14 @@
 (
     "This file describes the USD Shader schemata for code generation."
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName      = "usdShade"
-        string libraryPath      = "pxr/usd/usdShade"
+        string libraryName      = "UsdShade"
+        string libraryPath      = "UsdShade"
         dictionary libraryTokens = {
             dictionary materialBind = {
                 string doc = """The name of the GeomSubset family used to 
@@ -75,12 +75,12 @@ class NodeGraph "NodeGraph" (
         }
         string extraIncludes = '''
 #include <utility>
-#include "pxr/usd/usd/editTarget.h"
-#include "pxr/usd/usd/relationship.h"
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h"
-#include "pxr/usd/usdShade/shader.h"
-#include "pxr/usd/usdShade/connectableAPIBehavior.h"'''
+#include "Usd/editTarget.h"
+#include "Usd/relationship.h"
+#include "UsdShade/input.h"
+#include "UsdShade/output.h"
+#include "UsdShade/shader.h"
+#include "UsdShade/connectableAPIBehavior.h"'''
     }
 ) {
 
@@ -149,9 +149,9 @@ class Material "Material" (
             bool providesUsdShadeConnectableAPIBehavior = 1
         }
         string extraIncludes = '''
-#include "pxr/usd/usd/variantSets.h"
-#include "pxr/usd/usdGeom/subset.h"
-#include "pxr/usd/usdShade/connectableAPI.h"'''
+#include "Usd/variantSets.h"
+#include "UsdGeom/subset.h"
+#include "UsdShade/connectableAPI.h"'''
         dictionary schemaTokens = {
             dictionary materialVariant = {
                 string doc = """The variant name of material variation
@@ -249,11 +249,11 @@ class Shader "Shader" (
             bool providesUsdShadeConnectableAPIBehavior = 1
         }
         string extraIncludes = '''
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h"
-#include "pxr/usd/usdShade/tokens.h"
-#include "pxr/usd/sdr/declare.h"
-#include "pxr/usd/sdr/shaderNode.h"'''
+#include "UsdShade/input.h"
+#include "UsdShade/output.h"
+#include "UsdShade/tokens.h"
+#include "Sdr/declare.h"
+#include "Sdr/shaderNode.h"'''
     }
 ) {
 }
@@ -283,8 +283,8 @@ class "NodeDefAPI"
     customData = {
         token apiSchemaType = "singleApply"
         string extraIncludes = """
-#include "pxr/usd/sdr/declare.h"
-#include "pxr/usd/sdr/shaderNode.h"
+#include "Sdr/declare.h"
+#include "Sdr/shaderNode.h"
     """
         dictionary schemaTokens = {
             dictionary universalSourceType = {
@@ -376,11 +376,11 @@ class "ConnectableAPI"
     customData = {
         token apiSchemaType = "nonApplied"
         string extraIncludes = '''
-#include "pxr/usd/usd/typed.h"
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h"
-#include "pxr/usd/usdShade/tokens.h"
-#include "pxr/usd/usdShade/types.h"'''
+#include "Usd/typed.h"
+#include "UsdShade/input.h"
+#include "UsdShade/output.h"
+#include "UsdShade/tokens.h"
+#include "UsdShade/types.h"'''
     }
 )
 {
@@ -481,9 +481,9 @@ class "MaterialBindingAPI"
     """ 
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usd/collectionAPI.h"
-#include "pxr/usd/usdGeom/subset.h"
-#include "pxr/usd/usdShade/material.h"
+#include "Usd/collectionAPI.h"
+#include "UsdGeom/subset.h"
+#include "UsdShade/material.h"
 #include <tbb/concurrent_unordered_map.h>"""
          dictionary schemaTokens = {
             dictionary materialBinding = {
@@ -592,7 +592,7 @@ class "CoordSysAPI"
         token apiSchemaType = "multipleApply"
         token propertyNamespacePrefix  = "coordSys"
         string extraIncludes = '''
-#include "pxr/usd/usdGeom/xformable.h"'''
+#include "UsdGeom/xformable.h"'''
     }
 )
 {

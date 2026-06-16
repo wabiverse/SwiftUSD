@@ -4,7 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "dataSourceParticleField.h"
+#include <UsdVolImaging/dataSourceParticleField.h>
 
 #include "UsdImaging/dataSourcePrimvars.h"
 

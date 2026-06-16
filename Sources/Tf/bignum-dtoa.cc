@@ -27,10 +27,10 @@
 
 #include <cmath>
 
-#include "bignum-dtoa.h"
+#include <Tf/pxrDoubleConversion/bignum-dtoa.h>
 
-#include "bignum.h"
-#include "ieee.h"
+#include <Tf/pxrDoubleConversion/bignum.h>
+#include <Tf/pxrDoubleConversion/ieee.h>
 
 #include "pxr/pxrns.h"
 

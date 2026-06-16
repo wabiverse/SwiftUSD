@@ -6,9 +6,9 @@
 
 #include "../config.hpp"
 
-#include "opt.hpp"
-#include "seq.hpp"
-#include "star.hpp"
+#include <Pegtl/internal/opt.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/star.hpp>
 
 #include "../type_list.hpp"
 

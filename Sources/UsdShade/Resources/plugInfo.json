@@ -136,7 +136,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdShade", 
+            "Name": "UsdShade", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

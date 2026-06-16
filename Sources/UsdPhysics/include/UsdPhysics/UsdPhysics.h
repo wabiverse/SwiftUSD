@@ -2,7 +2,6 @@
 #define __PXR_USD_USDPHYSICS_H__
 
 // UsdPhysics
-#include <UsdPhysics/generatedSchema.module.h>
 #include <UsdPhysics/articulationRootAPI.h>
 #include <UsdPhysics/driveAPI.h>
 #include <UsdPhysics/collisionAPI.h>

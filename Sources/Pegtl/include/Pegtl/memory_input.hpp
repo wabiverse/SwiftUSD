@@ -13,12 +13,12 @@
 #include <type_traits>
 #include <utility>
 
-#include "config.hpp"
-#include "eol.hpp"
-#include "normal.hpp"
-#include "nothing.hpp"
-#include "position.hpp"
-#include "tracking_mode.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/eol.hpp>
+#include <Pegtl/normal.hpp>
+#include <Pegtl/nothing.hpp>
+#include <Pegtl/position.hpp>
+#include <Pegtl/tracking_mode.hpp>
 
 #include "internal/action_input.hpp"
 #include "internal/at.hpp"

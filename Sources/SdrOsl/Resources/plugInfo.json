@@ -2,7 +2,7 @@
     "Plugins": [
         {
             "Type": "library",
-            "Name": "sdrOsl",
+            "Name": "SdrOsl",
             "Root": ".",
             "LibraryPath": "",
             "ResourcePath": ".",
