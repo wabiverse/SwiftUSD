@@ -20,10 +20,10 @@
 #include "UsdShade/shader.h"
 
 #include <MaterialX/MXCoreDocument.h>
-#include <MaterialXCore/Node.h>
+#include <MaterialX/MXCoreNode.h>
 #include <MaterialX/MXFormatUtil.h>
 #include <MaterialX/MXFormatXmlIo.h>
-#include <MaterialXRenderGlsl/TextureBaker.h>
+#include <MaterialX/MXRenderGlslTextureBaker.h>
 
 
 #include <fstream>

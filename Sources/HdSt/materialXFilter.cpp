@@ -26,10 +26,10 @@
 
 #include "Tf/diagnostic.h"
 
-#include <MaterialXGenShader/Util.h>
-#include <MaterialXGenShader/DefaultColorManagementSystem.h>
-#include <MaterialXRender/Util.h>
-#include <MaterialXRender/LightHandler.h> 
+#include <MaterialX/MXGenShaderUtil.h>
+#include <MaterialX/MXGenShaderDefaultColorManagementSystem.h>
+#include <MaterialX/MXRenderUtil.h>
+#include <MaterialX/MXRenderLightHandler.h> 
 
 #include <fstream>
 

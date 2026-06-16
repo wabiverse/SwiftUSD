@@ -29,8 +29,8 @@
 #include "UsdMtlx/utils.h"
 
 #include <MaterialX/MXCoreDocument.h>
-#include <MaterialXCore/Node.h>
-#include <MaterialXFormat/Environ.h>
+#include <MaterialX/MXCoreNode.h>
+#include <MaterialX/MXFormatEnviron.h>
 #include <MaterialX/MXFormatUtil.h>
 #include <MaterialX/MXFormatXmlIo.h>
 
