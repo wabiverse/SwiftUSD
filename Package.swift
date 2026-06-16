@@ -295,6 +295,31 @@ let package = Package(
       name: "ExecIr",
       targets: ["ExecIr"]
     ),
+    // ------- Pixar.UsdValidation -----
+    .library(
+      name: "UsdValidation",
+      targets: ["UsdValidation"]
+    ),
+    .library(
+      name: "UsdGeomValidators",
+      targets: ["UsdGeomValidators"]
+    ),
+    .library(
+      name: "UsdPhysicsValidators",
+      targets: ["UsdPhysicsValidators"]
+    ),
+    .library(
+      name: "UsdShadeValidators",
+      targets: ["UsdShadeValidators"]
+    ),
+    .library(
+      name: "UsdSkelValidators",
+      targets: ["UsdSkelValidators"]
+    ),
+    .library(
+      name: "UsdUtilsValidators",
+      targets: ["UsdUtilsValidators"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -1983,6 +2008,131 @@ let package = Package(
     ),
 
     .target(
+      name: "UsdValidation",
+      dependencies: [
+        .target(name: "Gf"),
+        .target(name: "Plug"),
+        .target(name: "Sdf"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "Work"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdValidation"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdValidation"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdValidation"),
+        .define("USDVALIDATION_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdGeomValidators",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Sdf"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdValidation"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdGeomValidators"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeomValidators"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdGeomValidators"),
+        .define("USDGEOMVALIDATORS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdPhysicsValidators",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdPhysics"),
+        .target(name: "UsdValidation"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdPhysicsValidators"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysicsValidators"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdPhysicsValidators"),
+        .define("USDPHYSICSVALIDATORS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdShadeValidators",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Sdf"),
+        .target(name: "Sdr"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdShade"),
+        .target(name: "UsdValidation"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdShadeValidators"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShadeValidators"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdShadeValidators"),
+        .define("USDSHADEVALIDATORS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdSkelValidators",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdSkel"),
+        .target(name: "UsdValidation"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdSkelValidators"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkelValidators"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdSkelValidators"),
+        .define("USDSKELVALIDATORS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdUtilsValidators",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdUtils"),
+        .target(name: "UsdValidation"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdUtilsValidators"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtilsValidators"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdUtilsValidators"),
+        .define("USDUTILSVALIDATORS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
       name: "UsdExecImaging",
       dependencies: [
         .target(name: "Arch"),
@@ -2292,6 +2442,13 @@ let package = Package(
         .target(name: "ExecGeom"),
         .target(name: "ExecIr"),
         .target(name: "UsdExecImaging"),
+        // --- usd validation. ------
+        .target(name: "UsdValidation"),
+        .target(name: "UsdGeomValidators"),
+        .target(name: "UsdPhysicsValidators"),
+        .target(name: "UsdShadeValidators"),
+        .target(name: "UsdSkelValidators"),
+        .target(name: "UsdUtilsValidators"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
