@@ -1190,6 +1190,8 @@ public enum Pxr: String, CaseIterable
       var prefix = ""
       switch fileBaseName
       {
+      case "glPlatformContextDarwin.mm", "glPlatformDebugWindowDarwin.mm":
+        guardMacro = "defined(__APPLE__)"
       case "glPlatformContextWindows.cpp", "glPlatformDebugWindowWindows.cpp":
         guardMacro = "defined(_WIN32)"
       case "glPlatformContextGLX.cpp", "glPlatformDebugWindowGLX.cpp":

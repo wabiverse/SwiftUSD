@@ -1,3 +1,5 @@
+#if defined(__APPLE__)
+
 //
 // Copyright 2016 Pixar
 //
@@ -116,3 +118,5 @@ GarchSelectCoreProfileMacVisual()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(__APPLE__)

@@ -1,3 +1,5 @@
+#if defined(__APPLE__)
+
 //
 // Copyright 2016 Pixar
 //
@@ -255,3 +257,5 @@ Garch_GLPlatformDebugWindow::ExitApp()
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif
+
+#endif // defined(__APPLE__)
