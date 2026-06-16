@@ -1756,6 +1756,7 @@ let package = Package(
         .target(name: "UsdLux"),
         .target(name: "UsdRender"),
         .target(name: "UsdShade"),
+        .target(name: "UsdSkel"),
         .target(name: "UsdVol"),
       ],
       resources: [
