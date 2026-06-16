@@ -43,8 +43,10 @@
 #include <Gf/transform.h>
 #include <Gf/quath.h>
 #include <Gf/size3.h>
+#include <Gf/quatf.h>
 #include <Gf/ray.h>
 #include <Gf/gamma.h>
+#include <Gf/dualQuatf.h>
 #include <Gf/math.h>
 #include <Gf/colorSpace.h>
 #include <Gf/range3f.h>

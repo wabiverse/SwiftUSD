@@ -425,7 +425,10 @@ public enum Pxr: String, CaseIterable
           // after GfColorSpace is declared (included mid-class in colorSpace.h).
           "colorSpace_data.h",
         ]
-        let includeOnceHeader = blacklistedIncludes.contains(where: dest.path.contains)
+        // Use exact filename match - substring match on dest.path would
+        // accidentally catch files whose names end in a blacklisted name
+        // (e.g. "tf.h" would match "quatf.h" and "dualQuatf.h").
+        let includeOnceHeader = blacklistedIncludes.contains(dest.lastPathComponent)
         
         // Garch's per-platform GL headers (ex. glPlatformContextDarwin.h,
         // glPlatformDebugWindowGLX.h) would pull in Windows.h/GL/glx.h on
