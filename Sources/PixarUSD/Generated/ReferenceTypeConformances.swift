@@ -22,6 +22,7 @@
 import Tf
 @_exported import USDOverlays
 
+
 // MARK: Special case TfRefBase
 
 /// TfRefPtr<TfRefBase> is not a supported template, so we handle
@@ -56,52 +57,35 @@ extension Pixar.TfAnyWeakPtr: Equatable {}
 extension Pixar.TfType: Equatable {}
 extension Pixar.TfRefBase: Equatable {
   public static func ==(lhs: Pixar.TfRefBase, rhs: Pixar.TfRefBase) -> Bool {
-    // __Overlay.operatorEqualsEquals(lhs, rhs)
-    false
+    __Overlay.operatorEqualsEquals(lhs, rhs)
   }
 }
 
 extension Pixar.TfSimpleRefBase: Equatable {
   public static func ==(lhs: Pixar.TfSimpleRefBase, rhs: Pixar.TfSimpleRefBase) -> Bool {
-    // __Overlay.operatorEqualsEquals(lhs, rhs)
-    false
+    __Overlay.operatorEqualsEquals(lhs, rhs)
   }
 }
 
 extension Pixar.TfSimpleRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
-    public var _address: UnsafeMutableRawPointer {
-      var mutableSelf = self
-      return withUnsafeMutablePointer(to: &mutableSelf) {
-        UnsafeMutableRawPointer($0)
-      }
-    }
-  
-    public typealias _SelfType = Pixar.TfSimpleRefBase
+  public typealias _SelfType = Pixar.TfSimpleRefBase
 }
-// extension Pixar.TfSimpleRefBase: Overlay._TfRefBaseProtocol {}
-// extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr: Overlay._TfRefPtrProtocol {
-//   public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
-// }
-// extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_ConstRefPtr: Overlay._TfConstRefPtrProtocol {
-//   public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
-// }
+ extension Pixar.TfSimpleRefBase: Overlay._TfRefBaseProtocol {}
+ extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr: Overlay._TfRefPtrProtocol {
+   public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
+ }
+ extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_ConstRefPtr: Overlay._TfConstRefPtrProtocol {
+   public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
+ }
 
 
 extension Pixar.TfRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
-  public var _address: UnsafeMutableRawPointer {
-    var mutableSelf = self
-    return withUnsafeMutablePointer(to: &mutableSelf) {
-      UnsafeMutableRawPointer($0)
-    }
-  }
-
   public typealias _SelfType = Pixar.TfRefBase
 }
 
 extension Pixar.UsdStage: Equatable {
   public static func ==(lhs: Pixar.UsdStage, rhs: Pixar.UsdStage) -> Bool {
-    // __Overlay.operatorEqualsEquals(lhs, rhs)
-    false
+    __Overlay.operatorEqualsEquals(lhs, rhs)
   }
 }
 

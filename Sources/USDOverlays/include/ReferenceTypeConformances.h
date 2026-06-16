@@ -33,6 +33,10 @@
 namespace __Overlay {
   bool operatorEqualsEquals(const Pixar::TfRefBase& l,
                             const Pixar::TfRefBase& r);
+  bool operatorEqualsEquals(const Pixar::TfSimpleRefBase& l,
+                            const Pixar::TfSimpleRefBase& r);
+  bool operatorEqualsEquals(const Pixar::UsdStage& l,
+                            const Pixar::UsdStage& r);
 }
 
 namespace Overlay {}
@@ -41,23 +45,17 @@ typedef Pixar::TfRefBase __SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE;
 typedef Pixar::TfRefPtr<Pixar::TfRefBase> __SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE_RefPtr;
 typedef Pixar::TfRefPtr<const Pixar::TfRefBase> __SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE_ConstRefPtr;
 void* _Nonnull _address(Pixar::TfRefBase* _Nonnull)
-    SWIFT_NAME(getter:__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._address(self:));
+  SWIFT_NAME(getter:__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._address(self:));
 inline void __retain__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase* _Nonnull x) {
-    Pixar::Tf_RetainReleaseHelper::retain(x);
+  Pixar::Tf_RetainReleaseHelper::retain(x);
 }
 inline void __release__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase* _Nonnull x) {
-    Pixar::Tf_RetainReleaseHelper::release(x);
+  Pixar::Tf_RetainReleaseHelper::release(x);
 }
-// NOTE: deliberately not declaring `_fromRawPointer__ZN3Pixar9TfRefBaseE` here.
-// `TfRefBase` is an abstract intrusive-refcount base (not itself annotated
-// `SWIFT_SHARED_REFERENCE` - only its concrete `TfRefPtr`-managed subclasses,
-// like `UsdStage` below, are), so a `SWIFT_RETURNS_RETAINED` thunk returning
-// `TfRefBase *` fails Clang's Sema check ("not returning a SWIFT_SHARED_REFERENCE
-// type") - fatally so on Debug builds. Its definition was already commented out
-// in ReferenceTypeConformances.cpp; this just removes the orphaned declaration.
-//  Pixar::TfRefBase * _Nullable _fromRawPointer__ZN3Pixar9TfRefBaseE(void* _Nullable)
-//    SWIFT_RETURNS_RETAINED
-//    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._fromRawPointer(_:));
+
+Pixar::TfRefBase * _Nullable _fromRawPointer__ZN3Pixar9TfRefBaseE(void* _Nullable)
+  SWIFT_RETURNS_RETAINED
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._fromRawPointer(_:));
 
 typedef Pixar::UsdStage __SwiftUSDImportAsMemberTypedef___ZN3pxr8UsdStageE;
 
@@ -67,7 +65,7 @@ typedef Pixar::TfRefPtr<const Pixar::UsdStage> __SwiftUSD_Typedef___ZN3Pixar8Usd
 typedef Pixar::TfWeakPtr<Pixar::UsdStage> __SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr;
 typedef Pixar::TfWeakPtr<const Pixar::UsdStage> __SwiftUSD_Typedef___ZN3Pixar8UsdStageE_ConstWeakPtr;
 void* _Nonnull _address(Pixar::UsdStage* _Nonnull)
-    SWIFT_NAME(getter:__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._address(self:));
+  SWIFT_NAME(getter:__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._address(self:));
 inline void __retain__ZN3Pixar8UsdStageE(Pixar::UsdStage* _Nonnull x)
 {
   PXR_NS::Tf_RetainReleaseHelper::retain(x);
@@ -77,39 +75,39 @@ inline void __release__ZN3Pixar8UsdStageE(Pixar::UsdStage* _Nonnull x)
   PXR_NS::Tf_RetainReleaseHelper::release(x);
 }
 Pixar::TfRefPtr<Pixar::UsdStage> _asRefPtrType(Pixar::UsdStage* _Nonnull)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._asRefPtrType(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._asRefPtrType(self:));
 Pixar::UsdStage * _Nullable _fromRefPtrType(const Pixar::TfRefPtr<Pixar::UsdStage>&)
-    SWIFT_RETURNS_RETAINED
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromRefPtrType(_:));
+  SWIFT_RETURNS_RETAINED
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromRefPtrType(_:));
 Pixar::UsdStage * _Nullable _fromConstRefPtrType(const Pixar::TfRefPtr<const Pixar::UsdStage>&)
-    SWIFT_RETURNS_RETAINED
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromConstRefPtrType(_:));
+  SWIFT_RETURNS_RETAINED
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromConstRefPtrType(_:));
 Pixar::UsdStage * _Nullable _fromRawPointer__ZN3Pixar8UsdStageE(void* _Nullable)
-    SWIFT_RETURNS_RETAINED
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromRawPointer(_:));
+  SWIFT_RETURNS_RETAINED
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromRawPointer(_:));
 Pixar::TfRefPtr<Pixar::UsdStage>_nullRefPtr__ZN3Pixar8UsdStageE()
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_RefPtr._nullPtr());
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_RefPtr._nullPtr());
 bool _isNonnull(const Pixar::TfRefPtr<Pixar::UsdStage> &)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_RefPtr._isNonnull(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_RefPtr._isNonnull(self:));
 bool _isNonnull(const Pixar::TfRefPtr<const Pixar::UsdStage> &)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_ConstRefPtr._isNonnull(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_ConstRefPtr._isNonnull(self:));
 Pixar::TfWeakPtr<Pixar::UsdStage> _asWeakPtrType(Pixar::UsdStage* _Nonnull)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._asWeakPtrType(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._asWeakPtrType(self:));
 Pixar::UsdStage * _Nullable _fromWeakPtrType(const Pixar::TfWeakPtr<Pixar::UsdStage>&)
-    SWIFT_RETURNS_RETAINED
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromWeakPtrType(_:));
+  SWIFT_RETURNS_RETAINED
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromWeakPtrType(_:));
 Pixar::UsdStage * _Nullable _fromConstWeakPtrType(const Pixar::TfWeakPtr<const Pixar::UsdStage> &)
-    SWIFT_RETURNS_RETAINED
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromConstWeakPtrType(_:));
+  SWIFT_RETURNS_RETAINED
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE._fromConstWeakPtrType(_:));
 Pixar::TfAnyWeakPtr _asAnyWeakPtr(const Pixar::TfWeakPtr<Pixar::UsdStage>&)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._asAnyWeakPtr(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._asAnyWeakPtr(self:));
 Pixar::TfWeakPtr<Pixar::UsdStage>_fromAnyWeakPtr__ZN3Pixar8UsdStageE(const Pixar::TfAnyWeakPtr&)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._fromAnyWeakPtr(_:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._fromAnyWeakPtr(_:));
 Pixar::TfWeakPtr<Pixar::UsdStage>_nullWeakPtr__ZN3Pixar8UsdStageE()
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._nullPtr());
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._nullPtr());
 bool _isNonnull(const Pixar::TfWeakPtr<Pixar::UsdStage> &)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._isNonnull(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr._isNonnull(self:));
 bool _isNonnull(const Pixar::TfWeakPtr<const Pixar::UsdStage> &)
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_ConstWeakPtr._isNonnull(self:));
+  SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar8UsdStageE_ConstWeakPtr._isNonnull(self:));
 
 #endif // __SWIFTUSD_GENERATED_REFERENCE_TYPE_CONFORMANCES_H__

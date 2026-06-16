@@ -60,8 +60,8 @@ public extension Overlay {
     /// Dereferences the `Pixar::TfRefPtr`, returning either `Self` or nil
     static func _fromConstRefPtrType(_ p: _TfConstRefPtrType) -> _SelfType?
 
-    // Performs a dynamic cast from the raw pointer
-    // static func _fromRawPointer(_ p: UnsafeMutableRawPointer?) -> _SelfType?
+    /// Performs a dynamic cast from the raw pointer
+    static func _fromRawPointer(_ p: UnsafeMutableRawPointer?) -> _SelfType?
   }
 
   /// Protocol representing `Pixar::TfRefPtr<T>` specializations. Don't use this unless you know what you're doing
