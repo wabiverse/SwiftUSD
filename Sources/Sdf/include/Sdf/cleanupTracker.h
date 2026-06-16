@@ -13,11 +13,11 @@
 #include "Sdf/declareHandles.h"
 #include "Sdf/spec.h"
 
+#include <vector>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 SDF_DECLARE_HANDLES(SdfSpec);
-
-#include <vector>
 
 /// \class Sdf_CleanupTracker
 ///
