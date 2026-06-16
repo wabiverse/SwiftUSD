@@ -9,9 +9,9 @@
 
 #include "pxr/pxrns.h"
 
-#include <MaterialXGenGlsl/GlslShaderGenerator.h>
-#include <MaterialXGenMsl/MslShaderGenerator.h>
-#include <MaterialXGenGlsl/VkShaderGenerator.h>
+#include <MaterialX/MXGenGlslShaderGenerator.h>
+#include <MaterialX/MXGenMslShaderGenerator.h>
+#include <MaterialX/MXGenGlslVkShaderGenerator.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

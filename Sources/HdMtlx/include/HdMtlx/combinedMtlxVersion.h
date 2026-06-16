@@ -8,7 +8,7 @@
 #ifndef PXR_IMAGING_HD_MTLX_COMBINEDVERSION_H
 #define PXR_IMAGING_HD_MTLX_COMBINEDVERSION_H
 
-#include <MaterialXCore/Generated.h>
+#include <MaterialX/MXCoreGenerated.h>
 
 #define MTLX_COMBINED_VERSION                                                  \
     ((MATERIALX_MAJOR_VERSION * 100 * 100) + (MATERIALX_MINOR_VERSION * 100) \
