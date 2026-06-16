@@ -9,7 +9,7 @@
 #include "pxr/pxrns.h"
 
 #include "Hd/filteringSceneIndex.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

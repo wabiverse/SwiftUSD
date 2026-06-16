@@ -31,7 +31,7 @@
 #include "Hd/retainedDataSource.h"
 #include "Hd/sceneIndexUtil.h"
 #include "Hd/tokens.h"
-#include "Hdsi/locatorCachingSceneIndex.h"
+#include "HdSi/locatorCachingSceneIndex.h"
 
 #include "Tf/envSetting.h"
 #include "Tf/getenv.h"

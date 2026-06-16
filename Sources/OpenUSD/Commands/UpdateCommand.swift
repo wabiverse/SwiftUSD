@@ -1303,6 +1303,8 @@ public enum Pxr: String, CaseIterable
       
       /* ----- hgi headers. -------------- */
 
+      source = source.replacingOccurrences(of: "#include \"pxr/imaging/hdsi/", with: "#include \"HdSi/")
+
       source = source.replacingOccurrences(of: "#include \"shaderSection.h\"", with: "#include \"Hgi/shaderSection.h\"")
       
       // bad things happen if you attempt to import a module's own umbrella into itself.

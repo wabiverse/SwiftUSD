@@ -8,7 +8,7 @@
 #define PXR_IMAGING_HDSI_DEBUGGING_SCENE_INDEX_H
 
 #include "Hd/filteringSceneIndex.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 #include "pxr/pxrns.h"
 
 #include <optional>

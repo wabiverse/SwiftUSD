@@ -7,7 +7,7 @@
 #define PXR_IMAGING_HD_SI_NODE_IDENTIFIER_RESOLVING_SCENE_INDEX_H
 
 #include "Hd/materialFilteringSceneIndexBase.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 
 #include "pxr/pxrns.h"
 

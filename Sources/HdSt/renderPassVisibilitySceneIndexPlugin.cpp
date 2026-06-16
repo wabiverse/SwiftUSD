@@ -23,7 +23,7 @@
 #include "Hd/schema.h" 
 #include "Hd/tokens.h"
 #include "Hd/visibilitySchema.h"
-#include "Hdsi/utils.h"
+#include "HdSi/utils.h"
 #include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

@@ -9,8 +9,8 @@
 #include "pxr/pxrns.h"
 
 #include "Hd/filteringSceneIndex.h"
-#include "Hdsi/api.h"
-#include "Hdsi/computeSceneIndexDiff.h"
+#include "HdSi/api.h"
+#include "HdSi/computeSceneIndexDiff.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
