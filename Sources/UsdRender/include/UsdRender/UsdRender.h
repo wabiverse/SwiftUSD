@@ -2,7 +2,6 @@
 #define __PXR_USD_USDRENDER_H__
 
 // UsdRender
-#include <UsdRender/generatedSchema.module.h>
 #include <UsdRender/product.h>
 #include <UsdRender/settingsBase.h>
 #include <UsdRender/settings.h>

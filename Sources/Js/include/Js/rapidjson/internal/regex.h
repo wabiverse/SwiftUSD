@@ -17,7 +17,7 @@
 
 #include "../allocators.h"
 #include "../stream.h"
-#include "stack.h"
+#include <Js/rapidjson/internal/stack.h>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH

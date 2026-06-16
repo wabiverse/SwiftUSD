@@ -8,7 +8,7 @@
 #ifndef PXR_USD_PLUGIN_USD_DRACO_EXPORT_ATTRIBUTE_H
 #define PXR_USD_PLUGIN_USD_DRACO_EXPORT_ATTRIBUTE_H
 
-#include "attributeDescriptor.h"
+#include <UsdDraco/attributeDescriptor.h>
 
 #include "Gf/matrix2f.h"
 #include "pxr/pxrns.h"

@@ -2,14 +2,14 @@
 (
     "This file describes the USD Render schemata for code generation."
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName      = "usdRender"
-        string libraryPath      = "pxr/usd/usdRender"
+        string libraryName      = "UsdRender"
+        string libraryPath      = "UsdRender"
         dictionary libraryTokens = {
             dictionary renderSettingsPrimPath = {
                 string doc = """Stage-level metadata that encodes the
@@ -346,7 +346,7 @@ class RenderPass "RenderPass" (
     customData = {
          string className = "Pass"
          string extraIncludes = """
-#include "pxr/usd/usd/collectionAPI.h" """
+#include "Usd/collectionAPI.h" """
     }
     prepend apiSchemas = ["CollectionAPI:renderVisibility", "CollectionAPI:cameraVisibility", "CollectionAPI:prune", "CollectionAPI:matte"]
 ) {

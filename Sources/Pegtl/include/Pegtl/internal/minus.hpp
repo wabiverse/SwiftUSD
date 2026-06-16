@@ -6,10 +6,10 @@
 
 #include "../config.hpp"
 
-#include "eof.hpp"
-#include "not_at.hpp"
-#include "rematch.hpp"
-#include "seq.hpp"
+#include <Pegtl/internal/eof.hpp>
+#include <Pegtl/internal/not_at.hpp>
+#include <Pegtl/internal/rematch.hpp>
+#include <Pegtl/internal/seq.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

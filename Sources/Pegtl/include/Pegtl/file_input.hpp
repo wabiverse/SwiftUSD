@@ -4,18 +4,18 @@
 #ifndef PXR_PEGTL_FILE_INPUT_HPP
 #define PXR_PEGTL_FILE_INPUT_HPP
 
-#include "config.hpp"
-#include "eol.hpp"
-#include "tracking_mode.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/eol.hpp>
+#include <Pegtl/tracking_mode.hpp>
 
 #if defined( __unix__ ) || ( defined( __APPLE__ ) && defined( __MACH__ ) )
 #include <unistd.h>  // Required for _POSIX_MAPPED_FILES
 #endif
 
 #if defined( _POSIX_MAPPED_FILES ) || defined( _WIN32 )
-#include "mmap_input.hpp"
+#include <Pegtl/mmap_input.hpp>
 #else
-#include "read_input.hpp"
+#include <Pegtl/read_input.hpp>
 #endif
 
 namespace PXR_PEGTL_NAMESPACE

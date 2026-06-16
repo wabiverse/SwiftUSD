@@ -104,7 +104,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usd", 
+            "Name": "Usd", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

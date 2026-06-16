@@ -1,14 +1,14 @@
 #usda 1.0
 (
 	subLayers = [
-        @usdGeom/schema.usda@
+        @UsdGeom/schema.usda@
 	]
 )
 
 over "GLOBAL" (
 	customData = {
-	string libraryName = "usdPhysics"
-	string libraryPath = "pxr/usd/usdPhysics"
+	string libraryName = "UsdPhysics"
+	string libraryPath = "UsdPhysics"
     bool useLiteralIdentifier = 0
     dictionary libraryTokens = {
         dictionary colliders = {
@@ -120,8 +120,8 @@ class "PhysicsRigidBodyAPI"
     customData = {
         string className = "RigidBodyAPI"
         string extraIncludes = """
-#include "pxr/base/gf/matrix3f.h"
-#include "pxr/base/gf/quatf.h" """
+#include "Gf/matrix3f.h"
+#include "Gf/quatf.h" """
     }
     doc = """Applies physics body attributes to any UsdGeomXformable prim and
     marks that prim to be driven by a simulation. If a simulation is running
@@ -394,7 +394,7 @@ class PhysicsCollisionGroup "PhysicsCollisionGroup"
     customData = {
         string className = "CollisionGroup"
         string extraIncludes = """
-#include "pxr/usd/usd/collectionAPI.h" """
+#include "Usd/collectionAPI.h" """
     }    
     doc = """Defines a collision group for coarse filtering. When a collision 
     occurs between two objects that have a PhysicsCollisionGroup assigned,

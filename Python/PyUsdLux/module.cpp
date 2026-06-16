@@ -19,5 +19,5 @@ TF_WRAP_MODULE
                        UsdLuxBlackbodyTemperatureAsRgb);
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <UsdLux/generatedSchema.module.h>
 }

@@ -7,7 +7,7 @@
 #include "pxr/pxrns.h"
 #include "Sdf/crateInfo.h"
 
-#include "crateFile.h"
+#include <Sdf/crateFile.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

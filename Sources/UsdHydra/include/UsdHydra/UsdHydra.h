@@ -3,7 +3,6 @@
 
 // UsdHydra
 #include <UsdHydra/discoveryPlugin.h>
-#include <UsdHydra/generatedSchema.module.h>
 #include <UsdHydra/generativeProceduralAPI.h>
 #include <UsdHydra/tokens.h>
 #include <UsdHydra/api.h>

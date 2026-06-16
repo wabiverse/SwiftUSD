@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 #include "pxr/pxrns.h"
-#include "typeUtils.h"
+#include <UsdRi/typeUtils.h>
 #include "Sdf/schema.h"
 #include "Sdf/types.h"
 

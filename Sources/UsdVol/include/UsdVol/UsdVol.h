@@ -3,7 +3,6 @@
 
 // UsdVol
 #include <UsdVol/particleField3DGaussianSplat.h>
-#include <UsdVol/generatedSchema.module.h>
 #include <UsdVol/particleFieldPositionBaseAPI.h>
 #include <UsdVol/particleFieldOrientationAttributeAPI.h>
 #include <UsdVol/field3DAsset.h>

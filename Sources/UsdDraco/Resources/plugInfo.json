@@ -20,7 +20,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "usdDraco",
+            "Name": "UsdDraco",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

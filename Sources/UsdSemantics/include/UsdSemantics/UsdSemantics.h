@@ -2,7 +2,6 @@
 #define __PXR_USD_USDSEMANTICS_H__
 
 // UsdSemantics
-#include <UsdSemantics/generatedSchema.module.h>
 #include <UsdSemantics/labelsQuery.h>
 #include <UsdSemantics/tokens.h>
 #include <UsdSemantics/labelsAPI.h>

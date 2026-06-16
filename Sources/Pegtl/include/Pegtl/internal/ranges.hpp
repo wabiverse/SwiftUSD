@@ -8,11 +8,11 @@
 
 #include <utility>
 
-#include "bump_help.hpp"
-#include "enable_control.hpp"
-#include "failure.hpp"
-#include "one.hpp"
-#include "range.hpp"
+#include <Pegtl/internal/bump_help.hpp>
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/failure.hpp>
+#include <Pegtl/internal/one.hpp>
+#include <Pegtl/internal/range.hpp>
 
 #include "../type_list.hpp"
 

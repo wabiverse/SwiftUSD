@@ -5,8 +5,8 @@
 // https://openusd.org/license.
 //
 
-#include "fileFormat.h"
-#include "importTranslator.h"
+#include <UsdDraco/fileFormat.h>
+#include <UsdDraco/importTranslator.h>
 
 #include "pxr/pxrns.h"
 #include "Tf/fileUtils.h"

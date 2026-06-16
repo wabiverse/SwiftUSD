@@ -110,7 +110,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-#include "typeUtils.h"
+#include <UsdRi/typeUtils.h>
 #include "Sdf/types.h"
 #include "Tf/envSetting.h"
 #include <string>

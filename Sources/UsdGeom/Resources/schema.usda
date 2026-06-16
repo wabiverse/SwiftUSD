@@ -2,14 +2,14 @@
 (
     "This file describes the USD Geometric schemata for code generation."
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName           = "usdGeom"
-        string libraryPath           = "pxr/usd/usdGeom"
+        string libraryName           = "UsdGeom"
+        string libraryPath           = "UsdGeom"
         # string libraryPrefix       = "UsdGeom"
         # string tokensPrefix        = "UsdGeom"
         bool useLiteralIdentifier = 0
@@ -110,8 +110,8 @@ class "Imageable" (
     to be removed, UsdGeomPrimvarsAPI should be used directly instead."""
     customData = {
         string extraIncludes = """
-#include "pxr/base/gf/bbox3d.h"
-#include "pxr/usd/usdGeom/primvar.h" """
+#include "Gf/bbox3d.h"
+#include "UsdGeom/primvar.h" """
     }
 ) {
     token visibility = "inherited" (
@@ -303,7 +303,7 @@ class "PrimvarsAPI" (
     customData = {
         token apiSchemaType = "nonApplied"
         string extraIncludes = """
-#include "pxr/usd/usdGeom/primvar.h" """
+#include "UsdGeom/primvar.h" """
     }
 ) {
 }
@@ -312,7 +312,7 @@ class "Xformable" (
     inherits = </Imageable>
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdGeom/xformOp.h" 
+#include "UsdGeom/xformOp.h" 
 #include <vector> """
     }
     doc = """Base class for all transformable prims, which allows arbitrary
@@ -1021,7 +1021,7 @@ class Mesh "Mesh" (
     inherits = </PointBased>
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usd/timeCode.h" """
+#include "Usd/timeCode.h" """
     }
     doc="""Encodes a mesh with optional subdivision properties and features.
 
@@ -1233,7 +1233,7 @@ class TetMesh "TetMesh" (
     inherits = </PointBased>
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usd/timeCode.h" """
+#include "Usd/timeCode.h" """
     }
     doc="""Encodes a tetrahedral mesh. A tetrahedral mesh is defined as a set of 
     tetrahedra. Each tetrahedron is defined by a set of 4 points, with the 
@@ -1307,11 +1307,11 @@ class GeomSubset "GeomSubset" (
     customData = {
         string className = "Subset"
         string extraIncludes = """
-#include "pxr/base/tf/token.h"
-#include "pxr/usd/usdGeom/imageable.h"
-#include "pxr/usd/usdGeom/mesh.h"
-#include "pxr/usd/usdGeom/tetMesh.h"
-#include "pxr/usd/usdGeom/basisCurves.h"
+#include "Tf/token.h"
+#include "UsdGeom/imageable.h"
+#include "UsdGeom/mesh.h"
+#include "UsdGeom/tetMesh.h"
+#include "UsdGeom/basisCurves.h"
 """
     }
 )
@@ -2351,7 +2351,7 @@ class Camera "Camera" (
     inherits = </Xformable>
     customData = {
         string extraIncludes = """
-#include "pxr/base/gf/camera.h" """
+#include "Gf/camera.h" """
     }
 ) {
     # viewing frustum
@@ -2455,9 +2455,9 @@ class "GeomModelAPI"
     customData = {
         string className = "ModelAPI"
         string extraIncludes = """
-#include "pxr/usd/usdGeom/bboxCache.h"
-#include "pxr/usd/usdGeom/constraintTarget.h"
-#include "pxr/usd/usdGeom/imageable.h" """
+#include "UsdGeom/bboxCache.h"
+#include "UsdGeom/constraintTarget.h"
+#include "UsdGeom/imageable.h" """
         dictionary schemaTokens = {
             dictionary extentsHint = {
                 string doc = """Name of the attribute used to author extents
@@ -2728,8 +2728,8 @@ class "XformCommonAPI"
     customData = {
         string apiSchemaType = "nonApplied"
         string extraIncludes = """
-#include "pxr/usd/usdGeom/xformable.h"
-#include "pxr/usd/usdGeom/xformOp.h" """
+#include "UsdGeom/xformable.h"
+#include "UsdGeom/xformOp.h" """
         dictionary schemaTokens = {
             dictionary pivot = {
                 string doc = """Op suffix for the standard scale-rotate pivot

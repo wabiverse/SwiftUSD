@@ -5,8 +5,8 @@
 
 def "GLOBAL" (
     customData = {
-        string libraryName      = "usd"
-        string libraryPath      = "pxr/usd/usd"
+        string libraryName      = "Usd"
+        string libraryPath      = "Usd"
         # string libraryPrefix  = "Usd"
         # string tokensPrefix   = "Usd"
         dictionary libraryTokens = {
@@ -186,8 +186,8 @@ class "ColorSpaceAPI"
     customData = {
         string apiSchemaType = "singleApply"
         string extraIncludes = """
-#include "pxr/base/gf/colorSpace.h"
-#include "pxr/base/tf/bigRWMutex.h"
+#include "Gf/colorSpace.h"
+#include "Tf/bigRWMutex.h"
 """
     }
 )
@@ -220,7 +220,7 @@ class "ColorSpaceDefinitionAPI"
         string apiSchemaType = "multipleApply"
         token propertyNamespacePrefix  = "colorSpaceDefinition"
         string extraIncludes = """
-#include "pxr/base/gf/colorSpace.h"
+#include "Gf/colorSpace.h"
 """
     }
 )
@@ -393,10 +393,10 @@ class "CollectionAPI"
 
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usd/collectionMembershipQuery.h"
-#include "pxr/usd/usd/primFlags.h"
-#include "pxr/usd/usd/tokens.h"
-#include "pxr/usd/sdf/pathExpression.h"
+#include "Usd/collectionMembershipQuery.h"
+#include "Usd/primFlags.h"
+#include "Usd/tokens.h"
+#include "Sdf/pathExpression.h"
 """
         token apiSchemaType = "multipleApply"
         token propertyNamespacePrefix  = "collection"

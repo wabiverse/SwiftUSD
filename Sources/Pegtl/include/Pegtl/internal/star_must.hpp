@@ -10,8 +10,8 @@
 
 #include "../config.hpp"
 
-#include "if_must.hpp"
-#include "star.hpp"
+#include <Pegtl/internal/if_must.hpp>
+#include <Pegtl/internal/star.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

@@ -20,7 +20,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdProc", 
+            "Name": "UsdProc", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

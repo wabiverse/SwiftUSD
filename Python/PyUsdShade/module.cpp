@@ -20,5 +20,5 @@ TF_WRAP_MODULE
     TF_WRAP(UsdShadeShaderDefUtils);
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <UsdShade/generatedSchema.module.h>
 }

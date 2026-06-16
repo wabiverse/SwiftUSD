@@ -10,9 +10,9 @@
 
 #include "../config.hpp"
 
-#include "must.hpp"
-#include "seq.hpp"
-#include "star.hpp"
+#include <Pegtl/internal/must.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/star.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

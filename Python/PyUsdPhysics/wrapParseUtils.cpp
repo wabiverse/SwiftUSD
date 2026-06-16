@@ -6,8 +6,8 @@
 //
 #include "pxr/pxrns.h"
 
-#include "parseUtils.h"
-#include "parseDesc.h"
+#include <UsdPhysics/parseUtils.h>
+#include <UsdPhysics/parseDesc.h>
 
 #include "Usd/stage.h"
 #include "Usd/primRange.h"

@@ -28,10 +28,10 @@
 #include <climits>
 #include <cstdarg>
 
-#include "bignum.h"
-#include "cached-powers.h"
-#include "ieee.h"
-#include "strtod.h"
+#include <Tf/pxrDoubleConversion/bignum.h>
+#include <Tf/pxrDoubleConversion/cached-powers.h>
+#include <Tf/pxrDoubleConversion/ieee.h>
+#include <Tf/pxrDoubleConversion/strtod.h>
 
 #include "pxr/pxrns.h"
 

@@ -3,7 +3,6 @@
 
 // UsdSkel
 #include <UsdSkel/utils.h>
-#include <UsdSkel/generatedSchema.module.h>
 #include <UsdSkel/animation.h>
 #include <UsdSkel/cacheImpl.h>
 #include <UsdSkel/blendShape.h>

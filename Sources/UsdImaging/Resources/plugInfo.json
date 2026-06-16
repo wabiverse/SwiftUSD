@@ -331,7 +331,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "usdImaging",
+            "Name": "UsdImaging",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

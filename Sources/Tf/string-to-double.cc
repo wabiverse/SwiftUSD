@@ -29,11 +29,11 @@
 #include <locale>
 #include <cmath>
 
-#include "string-to-double.h"
+#include <Tf/pxrDoubleConversion/string-to-double.h>
 
-#include "ieee.h"
-#include "strtod.h"
-#include "utils.h"
+#include <Tf/pxrDoubleConversion/ieee.h>
+#include <Tf/pxrDoubleConversion/strtod.h>
+#include <Tf/pxrDoubleConversion/utils.h>
 
 #ifdef _MSC_VER
 #  if _MSC_VER >= 1900

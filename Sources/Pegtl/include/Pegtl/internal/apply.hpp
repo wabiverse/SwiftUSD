@@ -6,8 +6,8 @@
 
 #include "../config.hpp"
 
-#include "apply_single.hpp"
-#include "enable_control.hpp"
+#include <Pegtl/internal/apply_single.hpp>
+#include <Pegtl/internal/enable_control.hpp>
 
 #include "../apply_mode.hpp"
 #include "../rewind_mode.hpp"

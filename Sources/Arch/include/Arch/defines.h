@@ -15,7 +15,7 @@
 #elif defined(__linux__)
 #define ARCH_OS_LINUX
 #elif defined(__APPLE__)
-#include "TargetConditionals.h"
+#include <TargetConditionals.h>
 #define ARCH_OS_DARWIN
 #if TARGET_OS_IPHONE
 // TARGET_OS_IPHONE refers to all iOS derivative platforms

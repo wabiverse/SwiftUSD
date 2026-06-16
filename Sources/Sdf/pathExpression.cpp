@@ -17,7 +17,7 @@
 #include "Vt/value.h"
 #include "Vt/valueComposeOver.h"
 
-#include "predicateExpressionParser.h"
+#include <Sdf/predicateExpressionParser.h>
 
 #include <memory>
 

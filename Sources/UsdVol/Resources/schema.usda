@@ -2,14 +2,14 @@
 
 (
     subLayers = [
-        @usdGeom/schema.usda@
+        @UsdGeom/schema.usda@
     ]
 )
  
 over "GLOBAL" (
     customData = {
-        string libraryName = "usdVol"
-        string libraryPath = "pxr/usd/usdVol"
+        string libraryName = "UsdVol"
+        string libraryPath = "UsdVol"
         dictionary libraryTokens = {
             dictionary field = {
                 string doc = """This is the namespace prefix used to 
@@ -230,7 +230,7 @@ class "ParticleFieldPositionAttributeAPI" (
         token apiSchemaType = "singleApply"
         token[] apiSchemaCanOnlyApplyTo = ["ParticleField"]
         string extraIncludes = """
-            #include "pxr/usd/usdVol/particleFieldPositionBaseAPI.h"
+            #include "UsdVol/particleFieldPositionBaseAPI.h"
         """
         token[] reflectedAPISchemas = [
             "ParticleFieldPositionBaseAPI"
@@ -395,7 +395,7 @@ class "ParticleFieldKernelGaussianEllipsoidAPI" (
         token apiSchemaType = "singleApply"
         token[] apiSchemaCanOnlyApplyTo = ["ParticleField"]
         string extraIncludes = '''
-#include "pxr/usd/usdVol/particleFieldKernelBaseAPI.h"
+#include "UsdVol/particleFieldKernelBaseAPI.h"
         '''
         token[] reflectedAPISchemas = [
             "ParticleFieldKernelBaseAPI"
@@ -427,7 +427,7 @@ class "ParticleFieldKernelGaussianSurfletAPI" (
         token apiSchemaType = "singleApply"
         token[] apiSchemaCanOnlyApplyTo = ["ParticleField"]
         string extraIncludes = '''
-#include "pxr/usd/usdVol/particleFieldKernelBaseAPI.h"
+#include "UsdVol/particleFieldKernelBaseAPI.h"
         '''
         token[] reflectedAPISchemas = [
             "ParticleFieldKernelBaseAPI"
@@ -457,7 +457,7 @@ class "ParticleFieldKernelConstantSurfletAPI" (
         token apiSchemaType = "singleApply"
         token[] apiSchemaCanOnlyApplyTo = ["ParticleField"]
         string extraIncludes = '''
-#include "pxr/usd/usdVol/particleFieldKernelBaseAPI.h"
+#include "UsdVol/particleFieldKernelBaseAPI.h"
         '''
         token[] reflectedAPISchemas = [
             "ParticleFieldKernelBaseAPI"
@@ -514,7 +514,7 @@ class "ParticleFieldSphericalHarmonicsAttributeAPI" (
         token apiSchemaType = "singleApply"
         token[] apiSchemaCanOnlyApplyTo = ["ParticleField"]
         string extraIncludes = '''
-#include "pxr/usd/usdVol/particleFieldRadianceBaseAPI.h"
+#include "UsdVol/particleFieldRadianceBaseAPI.h"
         '''
         token[] reflectedAPISchemas = [
             "ParticleFieldRadianceBaseAPI"
@@ -566,12 +566,12 @@ class ParticleField3DGaussianSplat "ParticleField3DGaussianSplat" (
 
     customData = {
         string extraIncludes = '''
-#include "pxr/usd/usdVol/particleFieldPositionAttributeAPI.h"
-#include "pxr/usd/usdVol/particleFieldOrientationAttributeAPI.h"
-#include "pxr/usd/usdVol/particleFieldScaleAttributeAPI.h"
-#include "pxr/usd/usdVol/particleFieldOpacityAttributeAPI.h"
-#include "pxr/usd/usdVol/particleFieldKernelGaussianEllipsoidAPI.h"
-#include "pxr/usd/usdVol/particleFieldSphericalHarmonicsAttributeAPI.h"
+#include "UsdVol/particleFieldPositionAttributeAPI.h"
+#include "UsdVol/particleFieldOrientationAttributeAPI.h"
+#include "UsdVol/particleFieldScaleAttributeAPI.h"
+#include "UsdVol/particleFieldOpacityAttributeAPI.h"
+#include "UsdVol/particleFieldKernelGaussianEllipsoidAPI.h"
+#include "UsdVol/particleFieldSphericalHarmonicsAttributeAPI.h"
         '''
         token[] reflectedAPISchemas = [
             "ParticleFieldPositionAttributeAPI",

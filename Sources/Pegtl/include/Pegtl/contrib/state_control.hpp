@@ -6,7 +6,7 @@
 
 #include <type_traits>
 
-#include "shuffle_states.hpp"
+#include <Pegtl/contrib/shuffle_states.hpp>
 
 #include "../config.hpp"
 #include "../internal/has_unwind.hpp"

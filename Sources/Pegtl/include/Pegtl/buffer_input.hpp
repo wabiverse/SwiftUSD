@@ -19,11 +19,11 @@
 #include <exception>
 #endif
 
-#include "config.hpp"
-#include "eol.hpp"
-#include "memory_input.hpp"
-#include "position.hpp"
-#include "tracking_mode.hpp"
+#include <Pegtl/config.hpp>
+#include <Pegtl/eol.hpp>
+#include <Pegtl/memory_input.hpp>
+#include <Pegtl/position.hpp>
+#include <Pegtl/tracking_mode.hpp>
 
 #include "internal/action_input.hpp"
 #include "internal/bump.hpp"

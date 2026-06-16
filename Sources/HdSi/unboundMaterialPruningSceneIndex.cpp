@@ -15,7 +15,7 @@
 #include "Trace/traceImpl.h"
 #include "Work/loops.h"
 
-#include <OneTBB/tbb/concurrent_vector.h>
+#include "OneTBB/tbb/concurrent_vector.h"
 
 #include <algorithm>
 

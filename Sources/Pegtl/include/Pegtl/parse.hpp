@@ -6,13 +6,13 @@
 
 #include <type_traits>
 
-#include "apply_mode.hpp"
-#include "config.hpp"
-#include "normal.hpp"
-#include "nothing.hpp"
-#include "parse_error.hpp"
-#include "position.hpp"
-#include "rewind_mode.hpp"
+#include <Pegtl/apply_mode.hpp>
+#include <Pegtl/config.hpp>
+#include <Pegtl/normal.hpp>
+#include <Pegtl/nothing.hpp>
+#include <Pegtl/parse_error.hpp>
+#include <Pegtl/position.hpp>
+#include <Pegtl/rewind_mode.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

@@ -49,7 +49,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdMtlx", 
+            "Name": "UsdMtlx", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

@@ -10,7 +10,7 @@
 #include "../../config.hpp"
 #include "../../internal/input_pair.hpp"
 
-#include "read_uint.hpp"
+#include <Pegtl/contrib/internal/read_uint.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

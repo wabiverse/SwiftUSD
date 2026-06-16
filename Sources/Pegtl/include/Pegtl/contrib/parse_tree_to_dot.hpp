@@ -8,7 +8,7 @@
 #include <ostream>
 #include <string>
 
-#include "parse_tree.hpp"
+#include <Pegtl/contrib/parse_tree.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::parse_tree
 {

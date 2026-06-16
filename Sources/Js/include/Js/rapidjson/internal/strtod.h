@@ -15,10 +15,10 @@
 #ifndef RAPIDJSON_STRTOD_
 #define RAPIDJSON_STRTOD_
 
-#include "ieee754.h"
-#include "biginteger.h"
-#include "diyfp.h"
-#include "pow10.h"
+#include <Js/rapidjson/internal/ieee754.h>
+#include <Js/rapidjson/internal/biginteger.h>
+#include <Js/rapidjson/internal/diyfp.h>
+#include <Js/rapidjson/internal/pow10.h>
 #include <climits>
 #include <limits>
 

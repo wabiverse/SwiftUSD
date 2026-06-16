@@ -2,14 +2,14 @@
 (
     "This file describes the Pixar-specific USD Geometric schemata for code generation."
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName           = "usdHydra"
-        string libraryPath           = "pxr/usd/usdHydra"
+        string libraryName           = "UsdHydra"
+        string libraryPath           = "UsdHydra"
         dictionary libraryTokens = {
 
             dictionary HwPrimvar_1 = {

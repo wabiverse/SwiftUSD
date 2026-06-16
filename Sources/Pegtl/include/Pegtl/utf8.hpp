@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_UTF8_HPP
 #define PXR_PEGTL_UTF8_HPP
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 #include "internal/peek_utf8.hpp"
 #include "internal/result_on_found.hpp"

@@ -4,7 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "generativeProceduralPluginRegistry.h"
+#include <HdGp/generativeProceduralPluginRegistry.h>
 
 #include "Plug/registry.h"
 #include "Tf/getenv.h"

@@ -5,9 +5,9 @@
 // https://openusd.org/license.
 //
 
-#include "exportTranslator.h"
-#include "flag.h"
-#include "writer.h"
+#include <UsdDraco/exportTranslator.h>
+#include <UsdDraco/flag.h>
+#include <UsdDraco/writer.h>
 
 #include "pxr/pxrns.h"
 

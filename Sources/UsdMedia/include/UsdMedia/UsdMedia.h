@@ -2,7 +2,6 @@
 #define __PXR_USD_USDMEDIA_H__
 
 // UsdMedia
-#include <UsdMedia/generatedSchema.module.h>
 #include <UsdMedia/assetPreviewsAPI.h>
 #include <UsdMedia/spatialAudio.h>
 #include <UsdMedia/tokens.h>

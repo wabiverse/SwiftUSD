@@ -13,8 +13,8 @@
 #include "../rules.hpp"
 #include "../utf8.hpp"
 
-#include "abnf.hpp"
-#include "uri.hpp"
+#include <Pegtl/contrib/abnf.hpp>
+#include <Pegtl/contrib/uri.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::iri
 {

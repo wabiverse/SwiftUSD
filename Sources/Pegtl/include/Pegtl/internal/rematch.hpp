@@ -6,7 +6,7 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
+#include <Pegtl/internal/enable_control.hpp>
 
 #include "../apply_mode.hpp"
 #include "../memory_input.hpp"

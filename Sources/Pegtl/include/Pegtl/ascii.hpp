@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_ASCII_HPP
 #define PXR_PEGTL_ASCII_HPP
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 #include "internal/result_on_found.hpp"
 #include "internal/rules.hpp"

@@ -29,7 +29,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdHydra", 
+            "Name": "UsdHydra", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

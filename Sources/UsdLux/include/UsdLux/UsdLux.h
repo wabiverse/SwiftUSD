@@ -5,7 +5,6 @@
 #include <UsdLux/discoveryPlugin.h>
 #include <UsdLux/meshLightAPI.h>
 #include <UsdLux/pluginLight.h>
-#include <UsdLux/generatedSchema.module.h>
 #include <UsdLux/nonboundableLightBase.h>
 #include <UsdLux/domeLight_1.h>
 #include <UsdLux/sphereLight.h>

@@ -4,7 +4,6 @@
 // Usd
 #include <Usd/attributeLimits.h>
 #include <Usd/colorSpaceAPI.h>
-#include <Usd/generatedSchema.module.h>
 #include <Usd/instanceCache.h>
 #include <Usd/stagePopulationMask.h>
 #include <Usd/primDataHandle.h>
@@ -12,7 +11,6 @@
 #include <Usd/stageCache.h>
 #include <Usd/clipCache.h>
 #include <Usd/primTypeInfo.h>
-#include <Usd/wrapUtils.h>
 #include <Usd/schemaBase.h>
 #include <Usd/listEditImpl.h>
 #include <Usd/variantSets.h>

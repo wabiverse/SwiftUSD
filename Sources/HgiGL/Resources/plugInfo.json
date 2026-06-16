@@ -9,7 +9,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "hgiGL",
+            "Name": "HgiGL",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

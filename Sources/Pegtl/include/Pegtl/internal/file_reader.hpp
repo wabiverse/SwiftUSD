@@ -15,7 +15,7 @@
 
 #include "../config.hpp"
 
-#include "filesystem.hpp"
+#include <Pegtl/internal/filesystem.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

@@ -9,7 +9,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "hgiVulkan",
+            "Name": "HgiVulkan",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

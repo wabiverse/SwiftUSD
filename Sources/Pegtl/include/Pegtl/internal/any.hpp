@@ -6,8 +6,8 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
-#include "peek_char.hpp"
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/peek_char.hpp>
 
 #include "../type_list.hpp"
 

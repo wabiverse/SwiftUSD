@@ -14,7 +14,7 @@
 #include "../internal/peek_char.hpp"
 #include "../internal/peek_utf8.hpp"
 
-#include "analyze_traits.hpp"
+#include <Pegtl/contrib/analyze_traits.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

@@ -2,15 +2,15 @@
 (
     "This file describes the USD RenderMan Interface (UsdRi) schemata for code generation."
     subLayers = [
-        @usd/schema.usda@,
-        @usdShade/schema.usda@,
+        @Usd/schema.usda@,
+        @UsdShade/schema.usda@,
     ]
 )
 
 def "GLOBAL" (
     customData = {
-        string libraryName      = "usdRi"
-        string libraryPath      = "pxr/usd/usdRi"
+        string libraryName      = "UsdRi"
+        string libraryPath      = "UsdRi"
         # string libraryPrefix  = "UsdRi"
         # string tokensPrefix   = "UsdRi"
         # dictionary libraryTokens = {}
@@ -79,7 +79,7 @@ class "StatementsAPI" (
     """ 
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdGeom/primvarsAPI.h"
+#include "UsdGeom/primvarsAPI.h"
 """
     }
 ) {
@@ -99,9 +99,9 @@ class "RiMaterialAPI" (
         # We want the class name to be UsdRiMaterialAPI
         string className = "MaterialAPI"    
         string extraIncludes = """
-#include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h"
-#include "pxr/usd/usdShade/material.h"
+#include "UsdShade/input.h"
+#include "UsdShade/output.h"
+#include "UsdShade/material.h"
 """
     }
 ) {

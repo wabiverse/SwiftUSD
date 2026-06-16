@@ -3,14 +3,14 @@
     """ This file contains a schema for supporting skeletal animations in USD.
     """
     subLayers = [
-        @usdGeom/schema.usda@
+        @UsdGeom/schema.usda@
     ]
 ) 
 
 over "GLOBAL" (
     customData = {
-        string libraryName       = "usdSkel"
-        string libraryPath       = "pxr/usd/usdSkel"
+        string libraryName       = "UsdSkel"
+        string libraryPath       = "UsdSkel"
 
         dictionary libraryTokens = {
             dictionary weight = {
@@ -57,7 +57,7 @@ class Skeleton "Skeleton" (
         }
 
         string extraIncludes = """
-#include "pxr/usd/usdSkel/topology.h" """
+#include "UsdSkel/topology.h" """
     }
 ) {
     uniform token[] joints (
@@ -153,9 +153,9 @@ class "SkelBindingAPI" (
     customData = {
         string className = "BindingAPI"
         string extraIncludes = """
-#include "pxr/base/tf/span.h"
-#include "pxr/usd/usdGeom/primvar.h"
-#include "pxr/usd/usdSkel/skeleton.h" """
+#include "Tf/span.h"
+#include "UsdGeom/primvar.h"
+#include "UsdSkel/skeleton.h" """
     }
 )
 {
@@ -265,8 +265,8 @@ class BlendShape "BlendShape" (
       """
     customData = {
         string extraIncludes = """
-#include "pxr/base/tf/span.h"
-#include "pxr/usd/usdSkel/inbetweenShape.h" """
+#include "Tf/span.h"
+#include "UsdSkel/inbetweenShape.h" """
     }
 )
 {

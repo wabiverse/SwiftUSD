@@ -16,7 +16,7 @@
 #define RAPIDJSON_INTERNAL_STACK_H_
 
 #include "../allocators.h"
-#include "swap.h"
+#include <Js/rapidjson/internal/swap.h>
 #include <cstddef>
 
 #if defined(__clang__)

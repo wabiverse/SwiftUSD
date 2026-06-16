@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_EOL_HPP
 #define PXR_PEGTL_EOL_HPP
 
-#include "config.hpp"
+#include <Pegtl/config.hpp>
 
 #include "internal/eol.hpp"
 

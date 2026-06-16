@@ -1434,7 +1434,7 @@ bool
 HdStMaterialXHelpers::MxTypeIsNone(mx::TypeDesc typeDesc)
 {
 #if MTLX_COMBINED_VERSION < 13900
-    return typeDesc == *mx::Type::NONE;
+    return typeDesc.getName() == mx::Type::NONE->getName();
 #else
     return typeDesc == mx::Type::NONE;
 #endif
@@ -1444,7 +1444,7 @@ bool
 HdStMaterialXHelpers::MxTypeIsSurfaceShader(mx::TypeDesc typeDesc)
 {
 #if MTLX_COMBINED_VERSION < 13900
-    return typeDesc == *mx::Type::SURFACESHADER;
+    return typeDesc.getName() == mx::Type::SURFACESHADER->getName();
 #else
     return typeDesc == mx::Type::SURFACESHADER;
 #endif
@@ -1454,7 +1454,7 @@ bool
 HdStMaterialXHelpers::MxTypeDescIsFilename(const mx::TypeDesc typeDesc)
 {
 #if MTLX_COMBINED_VERSION < 13900
-    return typeDesc == *mx::Type::FILENAME;
+    return typeDesc.getName() == mx::Type::FILENAME->getName();
 #else
     return typeDesc == mx::Type::FILENAME;
 #endif

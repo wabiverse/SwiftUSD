@@ -8,7 +8,7 @@
 #ifndef PXR_USD_PLUGIN_USD_DRACO_ATTRIBUTE_FACTORY_H
 #define PXR_USD_PLUGIN_USD_DRACO_ATTRIBUTE_FACTORY_H
 
-#include "attributeDescriptor.h"
+#include <UsdDraco/attributeDescriptor.h>
 
 #include "pxr/pxrns.h"
 #include "Tf/token.h"

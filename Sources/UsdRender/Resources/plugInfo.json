@@ -71,7 +71,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdRender", 
+            "Name": "UsdRender", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

@@ -6,10 +6,10 @@
 
 #include "../config.hpp"
 
-#include "peek_char.hpp"
-#include "ranges.hpp"
-#include "seq.hpp"
-#include "star.hpp"
+#include <Pegtl/internal/peek_char.hpp>
+#include <Pegtl/internal/ranges.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/star.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

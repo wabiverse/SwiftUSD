@@ -60,5 +60,5 @@ TF_WRAP_MODULE
     TF_WRAP(UsdFlattenUtils);
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <Usd/generatedSchema.module.h>
 }

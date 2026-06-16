@@ -7,7 +7,7 @@
 #include "../config.hpp"
 #include "../type_list.hpp"
 
-#include "enable_control.hpp"
+#include <Pegtl/internal/enable_control.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::internal
 {

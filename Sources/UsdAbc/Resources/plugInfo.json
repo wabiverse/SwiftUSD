@@ -19,7 +19,7 @@
                 }
             },
             "LibraryPath": "",
-            "Name": "usdAbc",
+            "Name": "UsdAbc",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"

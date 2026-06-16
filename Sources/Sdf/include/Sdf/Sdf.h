@@ -12,7 +12,6 @@
 #include <Sdf/attributeSpec.h>
 #include <Sdf/layerOffset.h>
 #include <Sdf/usdaData.h>
-#include <Sdf/crateDataTypes.h>
 #include <Sdf/shared.h>
 #include <Sdf/usdzFileFormat.h>
 #include <Sdf/variantSpec.h>
@@ -101,7 +100,6 @@
 #include <Sdf/mapEditProxy.h>
 #include <Sdf/variableExpressionAST.h>
 #include <Sdf/pathParser.h>
-#include <Sdf/crateFile.h>
 #include <Sdf/integerCoding.h>
 #include <Sdf/copyUtils.h>
 #include <Sdf/valueTypeName.h>

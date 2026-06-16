@@ -1,5 +1,7 @@
 #ifndef __PXR_BASE_TF_H__
 #define __PXR_BASE_TF_H__
+#include <Tf/pxrTslRobinMap/robin_map.h>
+#include <Tf/pxrTslRobinMap/robin_set.h>
 
 // Tf
 #include <Tf/type.h>

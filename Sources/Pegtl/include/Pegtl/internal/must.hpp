@@ -10,9 +10,9 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
-#include "seq.hpp"
-#include "success.hpp"
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/seq.hpp>
+#include <Pegtl/internal/success.hpp>
 
 #include "../apply_mode.hpp"
 #include "../rewind_mode.hpp"

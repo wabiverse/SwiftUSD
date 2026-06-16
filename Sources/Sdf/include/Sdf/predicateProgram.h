@@ -208,7 +208,7 @@ SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
 
     if (!errs.empty()) {
         prog = {};
-        TF_RUNTIME_ERROR(errs);
+        TF_RUNTIME_ERROR("%s", errs.c_str());
     }
     return prog;
 }

@@ -10,8 +10,8 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
-#include "must.hpp"
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/must.hpp>
 
 #include "../apply_mode.hpp"
 #include "../rewind_mode.hpp"

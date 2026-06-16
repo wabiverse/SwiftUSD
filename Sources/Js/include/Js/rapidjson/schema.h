@@ -15,11 +15,11 @@
 #ifndef RAPIDJSON_SCHEMA_H_
 #define RAPIDJSON_SCHEMA_H_
 
-#include "document.h"
-#include "pointer.h"
-#include "stringbuffer.h"
+#include <Js/rapidjson/document.h>
+#include <Js/rapidjson/pointer.h>
+#include <Js/rapidjson/stringbuffer.h>
 #include "error/en.h"
-#include "uri.h"
+#include <Js/rapidjson/uri.h>
 #include <cmath> // abs, floor
 
 #if !defined(RAPIDJSON_SCHEMA_USE_INTERNALREGEX)

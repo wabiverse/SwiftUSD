@@ -2,14 +2,14 @@
 (
     "This file describes the USD Media schemata for code generation."
     subLayers = [
-        @usdGeom/schema.usda@
+        @UsdGeom/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName      = "usdMedia"
-        string libraryPath      = "pxr/usd/usdMedia"
+        string libraryName      = "UsdMedia"
+        string libraryPath      = "UsdMedia"
     }
 )
 {
@@ -176,7 +176,7 @@ class "AssetPreviewsAPI" (
     customData = {
         token apiSchemaType = "singleApply"
         string extraIncludes = """
-#include "pxr/usd/sdf/types.h"
+#include "Sdf/types.h"
     """
         dictionary schemaTokens = {
             dictionary previews = {

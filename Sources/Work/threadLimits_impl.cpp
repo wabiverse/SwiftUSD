@@ -17,7 +17,9 @@
 #include <OneTBB/tbb/global_control.h>
 #include <OneTBB/tbb/info.h>
 #else
+#if WITH_TBB_LEGACY
 #include <OneTBB/tbb/task_scheduler_init.h>
+#endif
 #endif
 
 #include <algorithm>

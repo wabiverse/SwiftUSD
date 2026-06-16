@@ -6,8 +6,8 @@
 //
 
 #include "pxr/pxrns.h"
-#include "crateFile.h"
-#include "integerCoding.h"
+#include <Sdf/crateFile.h>
+#include <Sdf/integerCoding.h>
 
 #include "Arch/demangle.h"
 #include "Arch/errno.h"
@@ -270,7 +270,7 @@ template <> struct _TypeEnumFor<CPPTYPE> {                                     \
 template <> struct _SupportsArray<CPPTYPE> {                                   \
     static constexpr bool value = SUPPORTSARRAY;                               \
 };
-#include "crateDataTypes.h"
+#include <Sdf/crateDataTypes.h>
 #undef xx
 
 template <class T>
@@ -4279,7 +4279,7 @@ CrateFile::GetTypeid(ValueRep rep) const
                 return typeid(T);                                              \
             }
 
-#include "crateDataTypes.h"
+#include <Sdf/crateDataTypes.h>
 
 #undef xx
     default:
@@ -4327,7 +4327,7 @@ CrateFile::_DoAllTypeRegistrations() {
 #define xx(_unused1, _unused2, CPPTYPE, _unused3)       \
     _DoTypeRegistration<CPPTYPE>();
 
-#include "crateDataTypes.h"
+#include <Sdf/crateDataTypes.h>
 
 #undef xx
 }
@@ -4338,7 +4338,7 @@ CrateFile::_DeleteValueHandlers() {
     delete static_cast<_ValueHandler<T> *>(                                    \
         _valueHandlers[static_cast<int>(_TypeEnumFor<T>::value)]);
 
-#include "crateDataTypes.h"
+#include <Sdf/crateDataTypes.h>
 
 #undef xx
 }
@@ -4349,7 +4349,7 @@ CrateFile::_ClearValueHandlerDedupTables() {
     static_cast<_ValueHandler<T> *>(                                           \
         _valueHandlers[static_cast<int>(_TypeEnumFor<T>::value)])->Clear();
 
-#include "crateDataTypes.h"
+#include <Sdf/crateDataTypes.h>
 
 #undef xx
 }

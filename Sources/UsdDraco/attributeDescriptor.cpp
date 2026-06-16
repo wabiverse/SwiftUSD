@@ -5,8 +5,8 @@
 // https://openusd.org/license.
 //
 
-#include "attributeDescriptor.h"
-#include "attributeFactory.h"
+#include <UsdDraco/attributeDescriptor.h>
+#include <UsdDraco/attributeFactory.h>
 
 #include <typeinfo>
 

@@ -15,7 +15,7 @@
 #include "../internal/enable_control.hpp"
 #include "../internal/opt.hpp"
 
-#include "analyze_traits.hpp"
+#include <Pegtl/contrib/analyze_traits.hpp>
 
 namespace PXR_PEGTL_NAMESPACE
 {

@@ -15,8 +15,8 @@
 #ifndef RAPIDJSON_POINTER_H_
 #define RAPIDJSON_POINTER_H_
 
-#include "document.h"
-#include "uri.h"
+#include <Js/rapidjson/document.h>
+#include <Js/rapidjson/uri.h>
 #include "internal/itoa.h"
 #include "error/error.h" // PointerParseErrorCode
 

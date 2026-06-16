@@ -6,8 +6,8 @@
 
 #include "../config.hpp"
 
-#include "enable_control.hpp"
-#include "success.hpp"
+#include <Pegtl/internal/enable_control.hpp>
+#include <Pegtl/internal/success.hpp>
 
 #include "../type_list.hpp"
 

@@ -58,7 +58,7 @@ class TfFunctionRef;
 ///
 /// // widgetUtil.cpp //////////////////////////////
 ///
-/// #include "widgetUtil.h"
+/// #include <Tf/widgetUtil.h>
 ///
 /// bool WidgetUtil::_AnyWidgetsMatchImpl(
 ///     TfFunctionRef<bool (Widget const &)> const &pred)

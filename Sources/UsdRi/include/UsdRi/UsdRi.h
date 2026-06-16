@@ -2,7 +2,6 @@
 #define __PXR_USD_USDRI_H__
 
 // UsdRi
-#include <UsdRi/generatedSchema.module.h>
 #include <UsdRi/rmanUtilities.h>
 #include <UsdRi/tokens.h>
 #include <UsdRi/api.h>

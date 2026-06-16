@@ -424,7 +424,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdGeom", 
+            "Name": "UsdGeom", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

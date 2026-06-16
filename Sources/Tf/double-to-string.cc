@@ -29,13 +29,13 @@
 #include <climits>
 #include <cmath>
 
-#include "double-to-string.h"
+#include <Tf/pxrDoubleConversion/double-to-string.h>
 
-#include "bignum-dtoa.h"
-#include "fast-dtoa.h"
-#include "fixed-dtoa.h"
-#include "ieee.h"
-#include "utils.h"
+#include <Tf/pxrDoubleConversion/bignum-dtoa.h>
+#include <Tf/pxrDoubleConversion/fast-dtoa.h>
+#include <Tf/pxrDoubleConversion/fixed-dtoa.h>
+#include <Tf/pxrDoubleConversion/ieee.h>
+#include <Tf/pxrDoubleConversion/utils.h>
 
 #include "pxr/pxrns.h"
 

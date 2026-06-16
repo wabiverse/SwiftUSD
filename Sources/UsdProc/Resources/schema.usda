@@ -2,14 +2,14 @@
 (
     "This file describes the Pixar-specific USD Geometric schemata for code generation."
     subLayers = [
-        @usdGeom/schema.usda@
+        @UsdGeom/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName           = "usdProc"
-        string libraryPath           = "pxr/usd/usdProc"
+        string libraryName           = "UsdProc"
+        string libraryPath           = "UsdProc"
         dictionary libraryTokens = {
 
         }

@@ -77,7 +77,7 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "usdSkel", 
+            "Name": "UsdSkel", 
             "ResourcePath": ".", 
             "Root": ".", 
             "Type": "library"

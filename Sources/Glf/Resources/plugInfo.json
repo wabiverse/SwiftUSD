@@ -5,7 +5,7 @@
                 "ShaderResources": "shaders"
             },
             "LibraryPath": "",
-            "Name": "glf",
+            "Name": "Glf",
             "ResourcePath": ".",
             "Root": ".",
             "Type": "library"
