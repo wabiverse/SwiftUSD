@@ -10,7 +10,7 @@
 #if PXR_VERSION >= 2408
 #include "Hd/collectionExpressionEvaluator.h"
 #include "Hd/filteringSceneIndex.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 #include <optional>
 
 PXR_NAMESPACE_OPEN_SCOPE

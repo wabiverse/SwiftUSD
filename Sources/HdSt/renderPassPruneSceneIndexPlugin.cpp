@@ -9,7 +9,7 @@
 #if PXR_VERSION >= 2408
 
 #include "Hd/sceneIndexPluginRegistry.h"
-#include "Hdsi/renderPassPruneSceneIndex.h"
+#include "HdSi/renderPassPruneSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -8,7 +8,7 @@
 #define PXR_IMAGING_HDSI_DEBUGGING_SCENE_INDEX_PLUGIN_H
 
 #include "Hd/sceneIndexPlugin.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 #include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

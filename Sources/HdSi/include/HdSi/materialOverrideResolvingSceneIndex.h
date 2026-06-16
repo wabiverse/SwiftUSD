@@ -11,7 +11,7 @@
 #include "Hd/filteringSceneIndex.h"
 #include "Hd/materialBindingSchema.h"
 #include "Hd/materialOverrideSchema.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 
 #include <optional>
 #include <unordered_map>

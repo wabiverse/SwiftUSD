@@ -11,7 +11,7 @@
 #include "Hd/materialBindingsSchema.h"
 #include "Hd/sceneIndexPluginRegistry.h"
 #include "Hd/tokens.h"
-#include "Hdsi/unboundMaterialPruningSceneIndex.h"
+#include "HdSi/unboundMaterialPruningSceneIndex.h"
 
 #include "Tf/envSetting.h"
 

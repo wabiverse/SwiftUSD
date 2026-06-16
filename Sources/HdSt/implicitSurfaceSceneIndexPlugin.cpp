@@ -9,7 +9,7 @@
 #include "Hd/retainedDataSource.h"
 #include "Hd/sceneIndexPluginRegistry.h"
 #include "Hd/tokens.h"
-#include "Hdsi/implicitSurfaceSceneIndex.h"
+#include "HdSi/implicitSurfaceSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
