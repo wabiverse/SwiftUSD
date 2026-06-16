@@ -10,6 +10,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import Foundation
 import CxxStdlib
 @_exported import pxr
 
@@ -21,10 +22,14 @@ public extension Pixar
    * The current version of ``PixarUSD``.
    *
    * The semantic versioning used for ``PixarUSD`` tracks both the upstream
-   * Pixar USD version, as well as the evolution iteration of the ``PixarUSD``
+   * OpenUSD version, as well as the evolution iteration of the ``PixarUSD``
    * SwiftPM package, which is setup as follows:
    * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION`` */
-  static let version = "24.08.\(SWIFTUSD_EVOLUTION)"
+  static let version = String(format: "%d.%02d.%d",
+    PXR_MINOR_VERSION,
+    PXR_PATCH_VERSION,
+    SWIFTUSD_EVOLUTION
+  )
 }
 
 /* --- xxx --- */
