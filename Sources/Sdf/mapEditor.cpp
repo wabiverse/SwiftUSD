@@ -178,8 +178,10 @@ Sdf_CreateMapEditor(const SdfSpecHandle& owner, const TfToken& field)
     template std::unique_ptr<Sdf_MapEditor<MapType> >                \
         Sdf_CreateMapEditor(const SdfSpecHandle&, const TfToken&);   \
 
+PXR_NAMESPACE_CLOSE_SCOPE
 #include "Vt/dictionary.h"
 #include "Sdf/types.h"
+PXR_NAMESPACE_OPEN_SCOPE
 SDF_INSTANTIATE_MAP_EDITOR(VtDictionary); 
 SDF_INSTANTIATE_MAP_EDITOR(SdfVariantSelectionMap); 
 SDF_INSTANTIATE_MAP_EDITOR(SdfRelocatesMap); 

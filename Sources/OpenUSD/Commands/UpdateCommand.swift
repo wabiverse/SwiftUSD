@@ -1299,6 +1299,12 @@ public enum Pxr: String, CaseIterable
       
       source = source.replacingOccurrences(of: "friend struct Tf_RefPtr_Counter;", with: "friend struct Tf_RefPtr_Counter;\n    friend class Tf_RetainReleaseHelper;")
       
+      // we cannot have includes within namespaces, so we close -> include -> open back up.
+      source = source.replacingOccurrences(
+        of: "#include \"pxr/base/vt/dictionary.h\"\n#include \"pxr/usd/sdf/types.h\"",
+        with: "PXR_NAMESPACE_CLOSE_SCOPE\n#include \"pxr/base/vt/dictionary.h\"\n#include \"pxr/usd/sdf/types.h\"\nPXR_NAMESPACE_OPEN_SCOPE"
+      )
+      
       /* ----- pxr external headers. ----- */
 
       source = source.replacingOccurrences(of: "pxr/external/", with: "")
