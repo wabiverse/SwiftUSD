@@ -78,9 +78,10 @@ struct UpdateCommand: AsyncCommand
       async let usd = try Pxr.usd.enumerate(packagePath: pkgDir, exclusions: exclusions)
       async let uim = try Pxr.usdImaging.enumerate(packagePath: pkgDir, exclusions: exclusions)
       async let exc = try Pxr.exec.enumerate(packagePath: pkgDir, exclusions: exclusions)
+      async let val = try Pxr.usdValidation.enumerate(packagePath: pkgDir, exclusions: exclusions)
 
       // 4. wait for all usd source to be updated.
-      let _ = try await [bse, img, usd, uim, exc]
+      let _ = try await [bse, img, usd, uim, exc, val]
     }
 
     // output elapsed time
@@ -187,6 +188,7 @@ public enum Pxr: String, CaseIterable
   case usd
   case usdImaging
   case exec
+  case usdValidation
 
   public func enumerate(packagePath: String, exclusions: SourceExclusions) async throws -> [URL]
   {
@@ -299,16 +301,24 @@ public enum Pxr: String, CaseIterable
 
         // Tf vendors third-party libs under "pxr<Vendor>/" (ex.
         // pxrTslRobinMap/robin_map.h), included elsewhere via
-        // "Tf/pxr<Vendor>/...". preserve as a real subdirectory -- flattening
-        // leaves those includes resolving to stale copies.
+        // "Tf/pxr<Vendor>/...". preserve as a real subdirectory for HEADERS
+        // only -- flattening headers leaves those includes resolving to stale
+        // copies. Source files are flattened to top-level to avoid duplicate
+        // symbol errors when both the vendor subdir copy and a top-level copy
+        // get compiled (e.g. pxrLZ4/lz4.cpp vs lz4.cpp, pxrDoubleConversion/bignum.cc vs bignum.cc).
         else if target == "Tf"
         {
           let tfPath = suffix.split(separator: "/").dropFirst(1).joined(separator: "/")
           if let vendorDir = tfPath.split(separator: "/").first,
             vendorDir.hasPrefix("pxr"), vendorDir.dropFirst(3).first?.isUppercase == true
           {
-            sourceFile = tfPath
-            preservesSubdirectory = true
+            let isHeader = ["h", "hpp", "hxx"].contains(source.pathExtension)
+            if isHeader
+            {
+              sourceFile = tfPath
+              preservesSubdirectory = true
+            }
+            // source files (.cc/.cpp) stay at top level: pxrLZ4/lz4.cpp -> lz4.cpp
           }
         }
         
@@ -595,6 +605,23 @@ public enum Pxr: String, CaseIterable
       {
         try? FileManager.default.removeItem(atPath: "\(targetDir)/\(item)")
       }
+
+      // Tf vendor subdirs (pxrLZ4/, pxrDoubleConversion/) previously held
+      // source files that are now flattened to top-level. Nuke any stale
+      // subdirectory sources to prevent duplicate-symbol link errors.
+      if target == "Tf"
+      {
+        for vendorDir in ["pxrLZ4", "pxrDoubleConversion"]
+        {
+          let vendorPath = "\(targetDir)/\(vendorDir)"
+          guard let vendorContents = try? FileManager.default.contentsOfDirectory(atPath: vendorPath)
+          else { continue }
+          for item in vendorContents where sourceExtensions.contains((item as NSString).pathExtension)
+          {
+            try? FileManager.default.removeItem(atPath: "\(vendorPath)/\(item)")
+          }
+        }
+      }
     }
   }
 
@@ -778,7 +805,7 @@ public enum Pxr: String, CaseIterable
        * #include "[pxr/usdImaging/hd]/engine.h"
        * #include "[pxr/usd/plugin/usdAbc]/alembicData.h"
        * #include "[pxr/exec/execIr]/tokens.h" */
-      let includeMatch = /(?:\G(?!\A)\s*,\s*|\b(?:pxr\/base\/|pxr\/imaging\/|pxr\/usd\/|pxr\/usdImaging\/|pxr\/exec\/)+(?:plugin\/)?)(\w+)/
+      let includeMatch = /(?:\G(?!\A)\s*,\s*|\b(?:pxr\/base\/|pxr\/imaging\/|pxr\/usd\/|pxr\/usdImaging\/|pxr\/exec\/|pxr\/usdValidation\/)+(?:plugin\/)?)(\w+)/
       while let match = try includeMatch.firstMatch(in: pxrSrc)
       {
         /* 2. replace include with capitalized version.
@@ -923,6 +950,12 @@ public enum Pxr: String, CaseIterable
     "usdskelimaging": "UsdSkelImaging",
     "usdui": "UsdUI",
     "usdutils": "UsdUtils",
+    "usdvalidation": "UsdValidation",
+    "usdgeomvalidators": "UsdGeomValidators",
+    "usdphysicsvalidators": "UsdPhysicsValidators",
+    "usdshadevalidators": "UsdShadeValidators",
+    "usdskelvalidators": "UsdSkelValidators",
+    "usdutilsvalidators": "UsdUtilsValidators",
     "usdviewq": "UsdViewQ",
     "usdvol": "UsdVol",
     "usdvolimaging": "UsdVolImaging",
