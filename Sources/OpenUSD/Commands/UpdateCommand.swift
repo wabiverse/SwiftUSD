@@ -789,7 +789,6 @@ public enum Pxr: String, CaseIterable
       Patch.headers(to: &pxrSrc)
       Patch.xmacroFragmentHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.fileSystemHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
-      Patch.cleanupTrackerHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
@@ -1082,16 +1081,6 @@ public enum Pxr: String, CaseIterable
       )
     }
 
-    /** Hoists #include <vector> above PXR_NAMESPACE_OPEN_SCOPE in cleanupTracker.h. */
-    public static func cleanupTrackerHeader(to source: inout String, fileBaseName: String)
-    {
-      guard fileBaseName == "cleanupTracker.h" else { return }
-      source = source.replacingOccurrences(
-        of: "#include \"Sdf/spec.h\"\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);\n\n#include <vector>",
-        with: "#include \"Sdf/spec.h\"\n\n#include <vector>\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);"
-      )
-    }
-
     /** Replaces duplicate-default-arg fwd-decl of Sdf_EvalQuotedString with #include parserHelpers.h before the namespace. */
     public static func predicateExpressionParserHeader(to source: inout String, fileBaseName: String)
     {
@@ -1370,6 +1359,12 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(
         of: "#include \"pxr/base/vt/dictionary.h\"\n#include \"pxr/usd/sdf/types.h\"",
         with: "PXR_NAMESPACE_CLOSE_SCOPE\n#include \"pxr/base/vt/dictionary.h\"\n#include \"pxr/usd/sdf/types.h\"\nPXR_NAMESPACE_OPEN_SCOPE"
+      )
+
+      // cleanupTracker.h has #include <vector> inside PXR_NAMESPACE_OPEN_SCOPE - hoist above.
+      source = source.replacingOccurrences(
+        of: "PXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);\n\n#include <vector>",
+        with: "#include <vector>\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);"
       )
 
       // Normalize feature-flag macros from defined() to direct #if form.
