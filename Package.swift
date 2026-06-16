@@ -1585,6 +1585,7 @@ let package = Package(
         .target(name: "Hd"),
         .target(name: "PxOsd"),
         .target(name: "UsdShade"),
+        .target(name: "UsdVol"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "HdSi"),
