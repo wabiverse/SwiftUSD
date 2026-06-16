@@ -21,6 +21,7 @@
 #include <Arch/regex.h>
 #include <Arch/attributes.h>
 #include <Arch/threads.h>
+#include <Arch/vsnprintf.h>
 #include <Arch/defines.h>
 #include <Arch/api.h>
 #include <Arch/hints.h>
