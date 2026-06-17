@@ -103,7 +103,7 @@ public struct SourceExclusions: Sendable
 
 private func collectTestingFiles(checkoutRoot: String) -> Set<String>
 {
-  var basenames: Set<String> = ["examples_usd", "examples_usdGeom"]
+  var basenames: Set<String> = ["examples_usd", "examples_usdGeom", "stageSceneIndexFactory_execOff"]
 
   guard let regex = try? NSRegularExpression(pattern: "^[a-z]+Test_[A-Z]"),
         let enumerator = FileManager.default.enumerator(atPath: "\(checkoutRoot)/pxr")
@@ -958,6 +958,7 @@ public enum Pxr: String, CaseIterable
     "usdshadevalidators": "UsdShadeValidators",
     "usdskelvalidators": "UsdSkelValidators",
     "usdutilsvalidators": "UsdUtilsValidators",
+    "usdluxvalidators": "UsdLuxValidators",
     "usdviewq": "UsdViewQ",
     "usdvol": "UsdVol",
     "usdvolimaging": "UsdVolImaging",
