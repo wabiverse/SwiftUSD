@@ -26,7 +26,7 @@ class HgiGraphicsCmdDesc;
 /// Note: HgiGL does not concern itself with GL context management.
 ///       See notes in hgiGL/hgi.h
 ///
-class HgiGLDevice final {
+class SWIFT_UNSAFE_REFERENCE HgiGLDevice final {
 public:
     HGIGL_API
     HgiGLDevice();

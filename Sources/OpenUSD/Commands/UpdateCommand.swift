@@ -1107,7 +1107,7 @@ public enum Pxr: String, CaseIterable
         the annotation automatically. */
     public static func hgi(to source: inout String, fileBaseName: String)
     {
-      guard fileBaseName == "hgiImpl.h" || fileBaseName == "hgi.cpp"
+      guard fileBaseName == "hgiImpl.h" || fileBaseName == "hgi.cpp" || fileBaseName == "device.h"
       else { return }
       
       switch fileBaseName
@@ -1156,6 +1156,14 @@ public enum Pxr: String, CaseIterable
                 return Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(ptr);
             }
             """
+          )
+        case "device.h":
+          // HgiGLDevice is owned by HgiGL and returned as a raw pointer.
+          // SWIFT_UNSAFE_REFERENCE lets Swift import it as a reference type
+          // without ARC - caller must not outlive the owning HgiGL instance.
+          source = source.replacingOccurrences(
+            of: "class HgiGLDevice final {",
+            with: "class SWIFT_UNSAFE_REFERENCE HgiGLDevice final {"
           )
         default:
           return
