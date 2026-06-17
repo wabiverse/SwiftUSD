@@ -792,6 +792,8 @@ public enum Pxr: String, CaseIterable
       Patch.headers(to: &pxrSrc)
       Patch.xmacroFragmentHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.fileSystemHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.tfIteratorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.tfRefBaseHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
@@ -1085,6 +1087,37 @@ public enum Pxr: String, CaseIterable
       )
     }
 
+    public static func tfIteratorHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "iterator.h" else { return }
+      source = source.replacingOccurrences(
+        of: "    static_assert(std::is_same<iterator_category,\n                               std::random_access_iterator_tag>::value,\n                 \"Tf_ProxyReferenceReverseIterator must wrap a random \"\n                 \"access iterator.\");",
+        with: ""
+      )
+      source = source.replacingOccurrences(
+        of: "    static_assert(!std::is_reference<reference>::value,\n                 \"Tf_ProxyReferenceReverseIterator should only be used \"\n                 \"when the underlying iterator's reference type is a \"\n                 \"proxy (MyTypeRef) and not a true reference (MyType&).\"\n                 \"Use std::reverse_iterator instead.\");\n\n",
+        with: ""
+      )
+    }
+
+    public static func tfRefBaseHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "refBase.h" else { return }
+      source = source.replacingOccurrences(
+        of: "class TfRefBase {",
+        with: "class SWIFT_SHARED_REFERENCE(__retain__ZN3Pixar9TfRefBaseE, __release__ZN3Pixar9TfRefBaseE) TfRefBase {"
+      )
+      source = source.replacingOccurrences(
+        of: "PXR_NAMESPACE_CLOSE_SCOPE",
+        with: """
+        PXR_NAMESPACE_CLOSE_SCOPE
+
+        void __retain__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase * _Nonnull x);
+        void __release__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase * _Nonnull x);
+        """
+      )
+    }
+
     /** Replaces duplicate-default-arg fwd-decl of Sdf_EvalQuotedString with #include parserHelpers.h before the namespace. */
     public static func predicateExpressionParserHeader(to source: inout String, fileBaseName: String)
     {
@@ -1370,6 +1403,7 @@ public enum Pxr: String, CaseIterable
         of: "PXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);\n\n#include <vector>",
         with: "#include <vector>\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nSDF_DECLARE_HANDLES(SdfSpec);"
       )
+
 
       // Normalize feature-flag macros from defined() to direct #if form.
       source = source.replacingOccurrences(of: "#if defined(PXR_GL_SUPPORT_ENABLED)",     with: "#if PXR_GL_SUPPORT_ENABLED")

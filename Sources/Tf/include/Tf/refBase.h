@@ -12,6 +12,7 @@
 
 #include "pxr/pxrns.h"
 
+#include "Arch/swiftInterop.h"
 #include "Tf/api.h"
 
 #include <atomic>
@@ -21,6 +22,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 template <class T> class TfRefPtr;
 template <class T> class TfWeakPtr;
+
+class TfRefBase;
 
 /// \class TfRefBase
 /// \ingroup group_tf_Memory
@@ -53,7 +56,7 @@ template <class T> class TfWeakPtr;
 /// To disable the cost of the "unique changed" system, derive
 /// from TfSimpleRefBase instead.
 ///
-class TfRefBase {
+class SWIFT_SHARED_REFERENCE(__retain__ZN3Pixar9TfRefBaseE, __release__ZN3Pixar9TfRefBaseE) TfRefBase {
 public:
 
     typedef void (*UniqueChangedFuncPtr)(TfRefBase const *, bool);
@@ -143,5 +146,8 @@ public:
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void __retain__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase * _Nonnull x);
+void __release__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase * _Nonnull x);
 
 #endif // PXR_BASE_TF_REF_BASE_H

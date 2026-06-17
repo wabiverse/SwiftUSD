@@ -10,7 +10,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#include "XformableOverlay.h"
+#include "USDOverlays/XformableOverlay.h"
 
 namespace Overlay
 {

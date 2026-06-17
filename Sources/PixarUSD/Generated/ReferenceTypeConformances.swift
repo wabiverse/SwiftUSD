@@ -20,37 +20,23 @@
 
 @_exported import pxr
 import Tf
+import Usd
 @_exported import USDOverlays
 
 
-// MARK: Special case TfRefBase
-
-/// TfRefPtr<TfRefBase> is not a supported template, so we handle
-/// the conformance manually. (We want TfRefBase to be supported
-/// so there's more fluency with casting and testing casting,
-/// for example)
-public extension Pixar {
-  struct TfRefBase: Overlay._TfRefBaseProtocol {
-    public typealias _TfRefPtrType = Never
-    public typealias _TfConstRefPtrType = Never
-    public func _asRefPtrType() -> Never {
-      fatalError("Pixar.TfRefBase is not convertible to Pixar.TfRefPtr")
-    }
-
-    public static func _fromRefPtrType(_ p: Never) -> Pixar.TfRefBase? {}
-    public static func _fromConstRefPtrType(_ p: Never) -> Pixar.TfRefBase? {}
-  }
+extension Pixar.TfRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
+  public typealias _SelfType = Pixar.TfRefBase
 }
 
-extension Never: Overlay._TfRefPtrProtocol, Overlay._TfConstRefPtrProtocol {
-  public typealias _TfRefBaseType = Pixar.TfRefBase
-  public static func _nullPtr() -> Never {
-    fatalError("Pixar.TfRefBase has no TfRefPtr nullptr value")
-  }
-
-  public func _isNonnull() -> Bool {
-    fatalError("Pixar.TfRefBase has no TfRefPtr type")
-  }
+extension Pixar.TfSimpleRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
+  public typealias _SelfType = Pixar.TfSimpleRefBase
+}
+extension Pixar.TfSimpleRefBase: Overlay._TfRefBaseProtocol {}
+extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr: Overlay._TfRefPtrProtocol {
+  public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
+}
+extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_ConstRefPtr: Overlay._TfConstRefPtrProtocol {
+  public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
 }
 
 extension Pixar.TfAnyWeakPtr: Equatable {}
@@ -65,22 +51,6 @@ extension Pixar.TfSimpleRefBase: Equatable {
   public static func ==(lhs: Pixar.TfSimpleRefBase, rhs: Pixar.TfSimpleRefBase) -> Bool {
     __Overlay.operatorEqualsEquals(lhs, rhs)
   }
-}
-
-extension Pixar.TfSimpleRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
-  public typealias _SelfType = Pixar.TfSimpleRefBase
-}
- extension Pixar.TfSimpleRefBase: Overlay._TfRefBaseProtocol {}
- extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr: Overlay._TfRefPtrProtocol {
-   public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
- }
- extension __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_ConstRefPtr: Overlay._TfConstRefPtrProtocol {
-   public typealias _TfRefBaseType = Pixar.TfSimpleRefBase
- }
-
-
-extension Pixar.TfRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
-  public typealias _SelfType = Pixar.TfRefBase
 }
 
 extension Pixar.UsdStage: Equatable {
