@@ -794,6 +794,7 @@ public enum Pxr: String, CaseIterable
       Patch.fileSystemHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.tfIteratorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.tfRefBaseHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.hgi(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
@@ -1099,6 +1100,66 @@ public enum Pxr: String, CaseIterable
         of: "    static_assert(!std::is_reference<reference>::value,\n                 \"Tf_ProxyReferenceReverseIterator should only be used \"\n                 \"when the underlying iterator's reference type is a \"\n                 \"proxy (MyTypeRef) and not a true reference (MyType&).\"\n                 \"Use std::reverse_iterator instead.\");\n\n",
         with: ""
       )
+    }
+
+    /** Annotates Hgi with SWIFT_SHARED_REFERENCE so Swift ARC can manage it via
+        Tf_SharedPtrRetainReleaseHelper. Derived classes (HgiGL, HgiMetal, HgiVulkan) inherit
+        the annotation automatically. */
+    public static func hgi(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "hgiImpl.h" || fileBaseName == "hgi.cpp"
+      else { return }
+      
+      switch fileBaseName
+      {
+        case "hgiImpl.h":
+          source = source.replacingOccurrences(
+            of: "#include \"pxr/pxrns.h\"\n#include \"pxr/base/tf/token.h\"",
+            with: "#include \"pxr/pxrns.h\"\n#include \"Arch/swiftInterop.h\"\n#include \"Tf/sharedPtrRetainReleaseHelper.h\"\n#include \"Tf/token.h\""
+          )
+          source = source.replacingOccurrences(
+            of: "class Hgi\n{",
+            with: "class SWIFT_SHARED_REFERENCE(HgiRetain, HgiRelease) Hgi\n{"
+          )
+          source = source.replacingOccurrences(
+            of: "    static HgiUniquePtr CreatePlatformDefaultHgi();",
+            with: "    static HgiUniquePtr CreatePlatformDefaultHgi();\n\n    /// Returns a raw Hgi* registered with Tf_SharedPtrRetainReleaseHelper for Swift ARC.\n    HGI_API\n    static Hgi* CreatePlatformDefaultPtr();"
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            PXR_NAMESPACE_CLOSE_SCOPE
+
+            inline void HgiRetain(Pixar::Hgi * _Nonnull x) {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Retain(x);
+            }
+            inline void HgiRelease(Pixar::Hgi * _Nonnull x) {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Release(x);
+            }
+            """
+          )
+        case "hgi.cpp":
+          source = source.replacingOccurrences(
+            of: "HgiUniquePtr\nHgi::CreatePlatformDefaultHgi()\n{\n    return HgiUniquePtr(_MakeNewPlatformDefaultHgi());\n}",
+            with: """
+            HgiUniquePtr
+            Hgi::CreatePlatformDefaultHgi()
+            {
+                return HgiUniquePtr(_MakeNewPlatformDefaultHgi());
+            }
+
+            Hgi*
+            Hgi::CreatePlatformDefaultPtr()
+            {
+                std::shared_ptr<Hgi> ptr(_MakeNewPlatformDefaultHgi());
+                if (!ptr) { return nullptr; }
+                return Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(ptr);
+            }
+            """
+          )
+        default:
+          return
+      }
     }
 
     public static func tfRefBaseHeader(to source: inout String, fileBaseName: String)

@@ -343,6 +343,14 @@ Hgi::CreatePlatformDefaultHgi()
     return HgiUniquePtr(_MakeNewPlatformDefaultHgi());
 }
 
+Hgi*
+Hgi::CreatePlatformDefaultPtr()
+{
+    std::shared_ptr<Hgi> ptr(_MakeNewPlatformDefaultHgi());
+    if (!ptr) { return nullptr; }
+    return Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(ptr);
+}
+
 HgiUniquePtr 
 Hgi::CreateNamedHgi(const TfToken& hgiToken)
 {
