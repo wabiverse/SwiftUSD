@@ -10,7 +10,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#include "HgiMetalOverlay.h"
+#include "USDOverlays/HgiMetalOverlay.h"
 
 #if __APPLE__
 

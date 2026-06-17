@@ -24,10 +24,10 @@ import Foundation
 
 // MARK: SwiftUSDReferenceTypeProtocol definition
 
-public extension Overlay {
+extension Overlay {
   /// Protocol representing all foreign reference types in OpenUSD. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _SwiftUSDReferenceTypeProtocol: Equatable /* , Hashable, Comparable */ {
+  public protocol _SwiftUSDReferenceTypeProtocol: Equatable, Hashable, Comparable {
     /// A stand-in for `Self` that works around a compiler crash involving non-final FRT casting
     associatedtype _SelfType
 
@@ -36,18 +36,18 @@ public extension Overlay {
   }
 }
 
-public extension Overlay {
+extension Overlay {
   /// Protocol representing immortal reference types in OpenUSD. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _SwiftUSDImmortalReferenceTypeProtocol: _SwiftUSDReferenceTypeProtocol {}
+  public protocol _SwiftUSDImmortalReferenceTypeProtocol: _SwiftUSDReferenceTypeProtocol {}
 }
 
 // MARK: TfRefBaseProtocol, TfRefPtrProtocol definition
 
-public extension Overlay {
+extension Overlay {
   /// Protocol representing `Pixar::TfRefBase` subclasses. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _TfRefBaseProtocol: _SwiftUSDReferenceTypeProtocol where _SelfType: _TfRefBaseProtocol {
+  public protocol _TfRefBaseProtocol: _SwiftUSDReferenceTypeProtocol where _SelfType: _TfRefBaseProtocol {
     /// The type of `Pixar::TfRefPtr<Self>`
     associatedtype _TfRefPtrType: Overlay._TfRefPtrProtocol where _TfRefPtrType._TfRefBaseType == _SelfType
     /// The type of `Pixar::TfRefPtr<const Self>`
@@ -66,7 +66,7 @@ public extension Overlay {
 
   /// Protocol representing `Pixar::TfRefPtr<T>` specializations. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _TfRefPtrProtocol {
+  public protocol _TfRefPtrProtocol {
     /// The type of `T`
     associatedtype _TfRefBaseType: Overlay._TfRefBaseProtocol where _TfRefBaseType._TfRefPtrType == Self
     /// Returns a `Self` pointing to null
@@ -77,7 +77,7 @@ public extension Overlay {
 
   /// Protocol representing `Pixar::TfRefPtr<const T>` specializations. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _TfConstRefPtrProtocol {
+  public protocol _TfConstRefPtrProtocol {
     /// The type of `T`, without const qualification
     associatedtype _TfRefBaseType: Overlay._TfRefBaseProtocol where _TfRefBaseType._TfConstRefPtrType == Self
     /// Returns `true` is `self` is not pointing to null
@@ -87,10 +87,10 @@ public extension Overlay {
 
 // MARK: TfWeakBaseProtocol, TfWeakPtrProtocol definition
 
-public extension Overlay {
+extension Overlay {
   /// Protocol representing `Pixar::TfWeakBase` subclasses. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _TfWeakBaseProtocol: _SwiftUSDReferenceTypeProtocol where _SelfType: _TfWeakBaseProtocol {
+  public protocol _TfWeakBaseProtocol: _SwiftUSDReferenceTypeProtocol where _SelfType: _TfWeakBaseProtocol {
     /// The type of `Pixar::TfWeakPtr<Self>`
     associatedtype _TfWeakPtrType: Overlay._TfWeakPtrProtocol where _TfWeakPtrType._TfWeakBaseType == _SelfType
     /// The type of `Pixar::TfWeakPtr<const Self>`
@@ -106,7 +106,7 @@ public extension Overlay {
 
   /// Protocol representing `Pixar::TfWeakPtr<T>` specializations. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _TfWeakPtrProtocol {
+  public protocol _TfWeakPtrProtocol {
     /// The type of `T`
     associatedtype _TfWeakBaseType: Overlay._TfWeakBaseProtocol where _TfWeakBaseType._TfWeakPtrType == Self
     /// Converts `self` to a `Pixar::TfAnyWeakPtr`
@@ -121,7 +121,7 @@ public extension Overlay {
 
   /// Protocol representing `Pixar::TfWeakPtr<const T>` specializations. Don't use this unless you know what you're doing
   @_documentation(visibility: public)
-  protocol _TfConstWeakPtrProtocol {
+  public protocol _TfConstWeakPtrProtocol {
     /// The type of `T`, without const qualification
     associatedtype _TfWeakBaseType: Overlay._TfWeakBaseProtocol where _TfWeakBaseType._TfConstWeakPtrType == Self
     /// Returns `true` is `self` is not pointing to null
@@ -129,17 +129,17 @@ public extension Overlay {
   }
 }
 
-public extension Overlay {
+extension Overlay {
   /// Holds a `Pixar::TfWeakBase` subclass weakly
   @_documentation(visibility: public)
-  struct WeakReferenceHolder<T: Overlay._TfWeakBaseProtocol>: Equatable /* , Hashable, Comparable */ where T._SelfType == T {
+  public struct WeakReferenceHolder<T: Overlay._TfWeakBaseProtocol>: Equatable, Hashable, Comparable where T._SelfType == T {
     /// Holds the argument weakly
     public init(value: T?) {
       _storage = Overlay.TfWeakPtr(value)
     }
 
     /// Backing storage
-    var _storage: T._TfWeakPtrType
+    internal var _storage: T._TfWeakPtrType
 
     /// The value being held weakly
     public var value: T? {
@@ -154,30 +154,30 @@ public extension Overlay {
       lhs.value == rhs.value
     }
 
-    // public func hash(into hasher: inout Hasher) {
-    //   hasher.combine(value)
-    // }
+     public func hash(into hasher: inout Hasher) {
+       hasher.combine(value)
+     }
 
-    // public static func <(lhs: Self, rhs: Self) -> Bool {
-    //  switch (lhs.value, rhs.value) {
-    //    case let (.some(l), .some(r)): return l < r
-    //    case (nil, nil): return false
-    //    default: return lhs.value == nil
-    //  }
-    // }
+     public static func <(lhs: Self, rhs: Self) -> Bool {
+      switch (lhs.value, rhs.value) {
+        case let (.some(l), .some(r)): return l < r
+        case (nil, nil): return false
+        default: return lhs.value == nil
+      }
+     }
   }
 }
 
 // MARK: Pointer conversion functions
 
-public extension Overlay {
+extension Overlay {
   /// Dereferences a `Pixar::TfRefPtr<T>`. Crashes if the pointer is null
-  static func Dereference<T: Overlay._TfRefPtrProtocol>(_ x: T) -> T._TfRefBaseType {
+  public static func Dereference<T: Overlay._TfRefPtrProtocol>(_ x: T) -> T._TfRefBaseType {
     Overlay.DereferenceOrNil(x)!
   }
 
   /// Dereferences a `Pixar::TfWeakPtr<T>`. Crashes if the pointer is null
-  static func Dereference<T: Overlay._TfWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType {
+  public static func Dereference<T: Overlay._TfWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType {
     Overlay.DereferenceOrNil(x)!
   }
 
@@ -187,22 +187,22 @@ public extension Overlay {
   }
 
   /// Dereferences a `Pixar::TfRefPtr<const T>`. Crashes if the pointer is null
-  static func Dereference<T: Overlay._TfConstRefPtrProtocol>(_ x: T) -> T._TfRefBaseType {
+  public static func Dereference<T: Overlay._TfConstRefPtrProtocol>(_ x: T) -> T._TfRefBaseType {
     Overlay.DereferenceOrNil(x)!
   }
 
   /// Dereferences a `Pixar::TfWeakPtr<const T>`. Crashes if the pointer is null
-  static func Dereference<T: Overlay._TfConstWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType {
+  public static func Dereference<T: Overlay._TfConstWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType {
     Overlay.DereferenceOrNil(x)!
   }
 
   /// Dereferences a `Pixar::TfRefPtr<T>`, returning either `T` or `nil`
-  static func DereferenceOrNil<T: Overlay._TfRefPtrProtocol>(_ x: T) -> T._TfRefBaseType? {
+  public static func DereferenceOrNil<T: Overlay._TfRefPtrProtocol>(_ x: T) -> T._TfRefBaseType? {
     T._TfRefBaseType._fromRefPtrType(x)
   }
 
   /// Dereferences a `Pixar::TfWeakPtr<T>`, returning either `T` (held strongly) or `nil`
-  static func DereferenceOrNil<T: Overlay._TfWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType? {
+  public static func DereferenceOrNil<T: Overlay._TfWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType? {
     T._TfWeakBaseType._fromWeakPtrType(x)
   }
 
@@ -212,24 +212,24 @@ public extension Overlay {
   }
 
   /// Dereferences a `Pixar::TfRefPtr<const T>`, returning either `T` (without const qualification) or `nil`
-  static func DereferenceOrNil<T: Overlay._TfConstRefPtrProtocol>(_ x: T) -> T._TfRefBaseType? {
+  public static func DereferenceOrNil<T: Overlay._TfConstRefPtrProtocol>(_ x: T) -> T._TfRefBaseType? {
     T._TfRefBaseType._fromConstRefPtrType(x)
   }
 
   /// Dereferences a `Pixar::TfWeakPtr<const T>`, returning either `T` (without const qualification) or `nil`
-  static func DereferenceOrNil<T: Overlay._TfConstWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType? {
+  public static func DereferenceOrNil<T: Overlay._TfConstWeakPtrProtocol>(_ x: T) -> T._TfWeakBaseType? {
     T._TfWeakBaseType._fromConstWeakPtrType(x)
   }
 
   /// Wraps the argument in a `Pixar::TfRefPtr<T>`
-  static func TfRefPtr<T: Overlay._TfRefBaseProtocol>(_ x: T?) -> T._TfRefPtrType {
+  public static func TfRefPtr<T: Overlay._TfRefBaseProtocol>(_ x: T?) -> T._TfRefPtrType {
     x?._asRefPtrType() ?? ._nullPtr()
   }
 
   /// Wraps the argument in a `Pixar::TfRefPtr<T>`
   /// Disfavored overload to allow for passing nil as a literal in limited type inference contexts
   @_disfavoredOverload
-  static func TfRefPtr<T: Overlay._TfRefPtrProtocol>(_ x: T._TfRefBaseType?) -> T {
+  public static func TfRefPtr<T: Overlay._TfRefPtrProtocol>(_ x: T._TfRefBaseType?) -> T {
     x?._asRefPtrType() ?? ._nullPtr()
   }
 
@@ -239,19 +239,19 @@ public extension Overlay {
   // internal static func _TfRefPtr<T>(_ x: Pixar.TfAnyWeakPtr, pointingTo: T.Type) -> T._TfRefPtrType where T: Overlay._TfRefBaseProtocol & Overlay._TfWeakBaseProtocol, T._SelfType == T { Overlay.TfRefPtr(Overlay._DereferenceOrNil(x, as: T.self)) }
 
   /// Wraps the argument in a `Pixar::TfWeakPtr<T>`
-  static func TfWeakPtr<T: Overlay._TfWeakBaseProtocol>(_ x: T?) -> T._TfWeakPtrType {
+  public static func TfWeakPtr<T: Overlay._TfWeakBaseProtocol>(_ x: T?) -> T._TfWeakPtrType {
     x?._asWeakPtrType() ?? ._nullPtr()
   }
 
   /// Wraps the argument in a `Pixar::TfWeakPtr<T>`
   /// Disfavored overload to allow for passing nil as a literal in limited type inference contexts
   @_disfavoredOverload
-  static func TfWeakPtr<T: Overlay._TfWeakPtrProtocol>(_ x: T._TfWeakBaseType?) -> T {
+  public static func TfWeakPtr<T: Overlay._TfWeakPtrProtocol>(_ x: T._TfWeakBaseType?) -> T {
     x?._asWeakPtrType() ?? ._nullPtr()
   }
 
   /// Converts a `Pixar::TfRefPtr<T>` into a `Pixar::TfWeakPtr<T>`
-  static func TfWeakPtr<T: Overlay._TfRefPtrProtocol>(_ x: T) -> T._TfRefBaseType._TfWeakPtrType where T._TfRefBaseType: Overlay._TfWeakBaseProtocol {
+  public static func TfWeakPtr<T: Overlay._TfRefPtrProtocol>(_ x: T) -> T._TfRefBaseType._TfWeakPtrType where T._TfRefBaseType: Overlay._TfWeakBaseProtocol {
     Overlay.TfWeakPtr(Overlay.DereferenceOrNil(x))
   }
 
@@ -276,7 +276,86 @@ public extension Overlay {
   }
 }
 
-public extension Overlay._TfRefPtrProtocol {
+
+// MARK: Protocol default implementations
+
+public func ===<T: Overlay._SwiftUSDReferenceTypeProtocol>(lhs: T?, rhs: T?) -> Bool {
+  lhs?._address == rhs?._address
+}
+public func !==<T: Overlay._SwiftUSDReferenceTypeProtocol>(lhs: T?, rhs: T?) -> Bool {
+  !(lhs === rhs)
+}
+
+extension Overlay._SwiftUSDReferenceTypeProtocol {
+  public static func ==(lhs: Self, rhs: Self) -> Bool {
+    lhs._address == rhs._address
+  }
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(_address)
+  }
+  public static func <(lhs: Self, rhs: Self) -> Bool {
+    lhs._address < rhs._address
+  }
+}
+
+extension Bool {
+  /// Returns `true` if the pointer is not null
+  public init(_ p: some Overlay._TfRefPtrProtocol) {
+    self.init(p._isNonnull())
+  }
+  /// Returns `true` if the pointer is not null.
+  public init(_ p: some Overlay._TfWeakPtrProtocol) {
+    self.init(p._isNonnull())
+  }
+  /// Returns `true` if the pointer is not null
+  public init(_ p: some Overlay._TfConstRefPtrProtocol) {
+    self.init(p._isNonnull())
+  }
+  /// Returns `true` if the pointer is not null.
+  public init(_ p: some Overlay._TfConstWeakPtrProtocol) {
+    self.init(p._isNonnull())
+  }
+}
+
+extension Overlay._TfRefBaseProtocol {
+  /// Dynamically casts `self` to the argument type.
+  ///
+  /// In Swift 6.0, the built-in `as/as?/as!` operators don't work properly on foreign reference types.
+  /// Instead, use this function to conditionally cast between subclasses of `pxr::TfRefBase`
+  public func `as`<T: Overlay._TfRefBaseProtocol>(_ t: T.Type = T.self) -> T? where T._SelfType == T {
+    T._fromRawPointer(_address)
+  }
+}
+
+// MARK: Special case TfRefBase
+
+/// TfRefPtr<TfRefBase> is not a supported template, so we handle
+/// the conformance manually. (We want TfRefBase to be supported
+/// so there's more fluency with casting and testing casting,
+/// for example)
+extension Pixar.TfRefBase: Overlay._TfRefBaseProtocol {
+  public typealias _TfRefPtrType = Never
+  public typealias _TfConstRefPtrType = Never
+  public func _asRefPtrType() -> Never {
+    fatalError("Pixar.TfRefBase is not convertible to Pixar.TfRefPtr")
+  }
+
+  public static func _fromRefPtrType(_ p: Never) -> Pixar.TfRefBase? {}
+  public static func _fromConstRefPtrType(_ p: Never) -> Pixar.TfRefBase? {}
+}
+
+extension Never: Overlay._TfRefPtrProtocol, Overlay._TfConstRefPtrProtocol {
+  public typealias _TfRefBaseType = Pixar.TfRefBase
+  public static func _nullPtr() -> Never {
+    fatalError("Pixar.TfRefBase has no TfRefPtr nullptr value")
+  }
+
+  public func _isNonnull() -> Bool {
+    fatalError("Pixar.TfRefBase has no TfRefPtr type")
+  }
+}
+
+extension Overlay._TfRefPtrProtocol {
   @_documentation(visibility: internal)
   @available(*, unavailable, message: "`.pointee` is unsafe; use Overlay.Dereference(_:) instead")
   var pointee: _TfRefBaseType {
@@ -284,7 +363,7 @@ public extension Overlay._TfRefPtrProtocol {
   }
 }
 
-public extension Overlay._TfWeakPtrProtocol {
+extension Overlay._TfWeakPtrProtocol {
   @_documentation(visibility: internal)
   @available(*, unavailable, message: "`.pointee` is unsafe; use Overlay.Dereference(_:) instead")
   var pointee: _TfWeakBaseType {
@@ -292,7 +371,7 @@ public extension Overlay._TfWeakPtrProtocol {
   }
 }
 
-public extension Overlay._TfConstRefPtrProtocol {
+extension Overlay._TfConstRefPtrProtocol {
   @_documentation(visibility: internal)
   @available(*, unavailable, message: "`.pointee` is unsafe; use Overlay.Dereference(_:) instead")
   var pointee: _TfRefBaseType {
@@ -300,7 +379,7 @@ public extension Overlay._TfConstRefPtrProtocol {
   }
 }
 
-public extension Overlay._TfConstWeakPtrProtocol {
+extension Overlay._TfConstWeakPtrProtocol {
   @_documentation(visibility: internal)
   @available(*, unavailable, message: "`.pointee` is unsafe; use Overlay.Dereference(_:) instead")
   var pointee: _TfWeakBaseType {

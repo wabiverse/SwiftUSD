@@ -57,7 +57,38 @@ Pixar::TfRefBase * _Nullable _fromRawPointer__ZN3Pixar9TfRefBaseE(void* _Nullabl
   SWIFT_RETURNS_RETAINED
   SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._fromRawPointer(_:));
 
-typedef Pixar::UsdStage __SwiftUSDImportAsMemberTypedef___ZN3pxr8UsdStageE;
+
+typedef Pixar::TfSimpleRefBase __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE;
+typedef Pixar::TfRefPtr<Pixar::TfSimpleRefBase> __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr;
+typedef Pixar::TfRefPtr<const Pixar::TfSimpleRefBase> __SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_ConstRefPtr;
+void* _Nonnull _address(Pixar::TfSimpleRefBase* _Nonnull)
+    SWIFT_NAME(getter:__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE._address(self:));
+inline void __retain__ZN3Pixar15TfSimpleRefBaseE(Pixar::TfSimpleRefBase* _Nonnull x) {
+    Pixar::Tf_RetainReleaseHelper::retain(x);
+}
+inline void __release__ZN3Pixar15TfSimpleRefBaseE(Pixar::TfSimpleRefBase* _Nonnull x) {
+    Pixar::Tf_RetainReleaseHelper::release(x);
+}
+Pixar::TfRefPtr<Pixar::TfSimpleRefBase> _asRefPtrType(Pixar::TfSimpleRefBase* _Nonnull)
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE._asRefPtrType(self:));
+Pixar::TfSimpleRefBase * _Nullable _fromRefPtrType(const Pixar::TfRefPtr<Pixar::TfSimpleRefBase>&)
+    SWIFT_RETURNS_RETAINED
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE._fromRefPtrType(_:));
+Pixar::TfSimpleRefBase * _Nullable _fromConstRefPtrType(const Pixar::TfRefPtr<const Pixar::TfSimpleRefBase>&)
+    SWIFT_RETURNS_RETAINED
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE._fromConstRefPtrType(_:));
+Pixar::TfSimpleRefBase * _Nullable _fromRawPointer__ZN3Pixar15TfSimpleRefBaseE(void* _Nullable)
+    SWIFT_RETURNS_RETAINED
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE._fromRawPointer(_:));
+Pixar::TfRefPtr<Pixar::TfSimpleRefBase>_nullRefPtr__ZN3Pixar15TfSimpleRefBaseE()
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr._nullPtr());
+bool _isNonnull(const Pixar::TfRefPtr<Pixar::TfSimpleRefBase> &)
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_RefPtr._isNonnull(self:));
+bool _isNonnull(const Pixar::TfRefPtr<const Pixar::TfSimpleRefBase> &)
+    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar15TfSimpleRefBaseE_ConstRefPtr._isNonnull(self:));
+
+
+typedef Pixar::UsdStage __SwiftUSDImportAsMemberTypedef___ZN3Pixar8UsdStageE;
 
 typedef Pixar::UsdStage __SwiftUSD_Typedef___ZN3Pixar8UsdStageE;
 typedef Pixar::TfRefPtr<Pixar::UsdStage> __SwiftUSD_Typedef___ZN3Pixar8UsdStageE_RefPtr;

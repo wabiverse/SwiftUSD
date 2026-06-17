@@ -17,7 +17,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //===----------------------------------------------------------------------===//
 
-#include "ReferenceTypeConformances.h"
+#include "USDOverlays/ReferenceTypeConformances.h"
 
 void* _Nonnull _address(Pixar::TfRefBase* _Nonnull x)
 {
