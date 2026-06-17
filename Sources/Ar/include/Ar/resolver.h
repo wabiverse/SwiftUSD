@@ -10,6 +10,7 @@
 /// \file ar/resolver.h
 
 #include "pxr/pxrns.h"
+#include "Arch/swiftInterop.h"
 #include "Ar/api.h"
 #include "Ar/arImpl.h"
 #include "Ar/resolvedPath.h"
@@ -39,7 +40,7 @@ class VtValue;
 /// asset resolution behavior by implementing a subclass of ArResolver.
 /// Clients may use #ArGetResolver to access the configured asset resolver.
 ///
-class ArResolver 
+class SWIFT_IMMORTAL_REFERENCE ArResolver 
 {
 public:
     AR_API

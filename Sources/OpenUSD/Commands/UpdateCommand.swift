@@ -795,6 +795,7 @@ public enum Pxr: String, CaseIterable
       Patch.tfIteratorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.tfRefBaseHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.hgi(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.arResolver(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
@@ -1168,6 +1169,22 @@ public enum Pxr: String, CaseIterable
         default:
           return
       }
+    }
+
+    public static func arResolver(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "resolver.h" else { return }
+      // ArGetResolver() returns ArResolver& - the plugin registry owns the
+      // resolver for process lifetime, so SWIFT_IMMORTAL_REFERENCE is correct.
+      // ArDefaultResolver inherits the annotation through Swift C++ interop.
+      source = source.replacingOccurrences(
+        of: "#include \"pxr/usd/ar/api.h\"",
+        with: "#include \"Arch/swiftInterop.h\"\n#include \"Ar/api.h\""
+      )
+      source = source.replacingOccurrences(
+        of: "class ArResolver \n{",
+        with: "class SWIFT_IMMORTAL_REFERENCE ArResolver \n{"
+      )
     }
 
     public static func tfRefBaseHeader(to source: inout String, fileBaseName: String)
