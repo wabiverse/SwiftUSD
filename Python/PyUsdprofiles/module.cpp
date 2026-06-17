@@ -15,5 +15,5 @@ TF_WRAP_MODULE
     TF_WRAP(UsdProfileRegistry);
 
     // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+    #include <UsdProfiles/generatedSchema.module.h>
 }
