@@ -23,8 +23,6 @@ PXR_NAMESPACE_OPEN_SCOPE
 template <class T> class TfRefPtr;
 template <class T> class TfWeakPtr;
 
-class TfRefBase;
-
 /// \class TfRefBase
 /// \ingroup group_tf_Memory
 ///
