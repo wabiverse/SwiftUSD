@@ -796,6 +796,7 @@ public enum Pxr: String, CaseIterable
       Patch.tfRefBaseHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.hgi(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arResolver(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.usdStageCacheContext(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
@@ -1185,6 +1186,87 @@ public enum Pxr: String, CaseIterable
         of: "class ArResolver \n{",
         with: "class SWIFT_IMMORTAL_REFERENCE ArResolver \n{"
       )
+    }
+
+    public static func usdStageCacheContext(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "stageCacheContext.h" || fileBaseName == "stageCacheContext.cpp"
+      else { return }
+
+      switch fileBaseName
+      {
+        case "stageCacheContext.h":
+          // Inject includes needed for SWIFT_SHARED_REFERENCE and retain/release helper.
+          source = source.replacingOccurrences(
+            of: "#include \"pxr/usd/usd/api.h\"\n#include \"pxr/base/tf/stacked.h\"",
+            with: "#include \"Arch/swiftInterop.h\"\n#include \"Tf/sharedPtrRetainReleaseHelper.h\"\n#include \"Usd/api.h\"\n#include \"Tf/stacked.h\""
+          )
+          // Manually expand TF_DEFINE_STACKED to insert SWIFT_SHARED_REFERENCE on the
+          // class declaration - the macro itself cannot carry the annotation.
+          source = source.replacingOccurrences(
+            of: "TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)",
+            with: """
+            class UsdStageCacheContext;
+            template <>
+            struct Tf_ExportedStackedStorage<UsdStageCacheContext, true> {
+                typedef typename Tf_StackedStorageType<UsdStageCacheContext, true>::Stack Stack;
+                typedef typename Tf_StackedStorageType<UsdStageCacheContext, true>::Type Type;
+                static USD_API std::atomic<Type*> value;
+            };
+            class SWIFT_SHARED_REFERENCE(UsdStageCacheContextRetain, UsdStageCacheContextRelease)
+            UsdStageCacheContext :
+                public TfStacked<UsdStageCacheContext, true,
+                                 Tf_ExportedStackedStorage<UsdStageCacheContext, true>>
+            """
+          )
+          // Add a heap-allocating factory that registers with the retain/release helper.
+          source = source.replacingOccurrences(
+            of: "    friend class UsdStage;",
+            with: """
+                /// Heap-allocates a context registered with Tf_SharedPtrRetainReleaseHelper
+                /// so Swift ARC can manage it - destruction pops the thread-local cache stack.
+                USD_API
+                static UsdStageCacheContext* _Nonnull Create(UsdStageCache& cache);
+
+                friend class UsdStage;
+            """
+          )
+          source = source.replacingOccurrences(
+            of: "        UsdStageCache *_rwCache;\n        const UsdStageCache *_roCache;",
+            with: "        UsdStageCache * _Nullable _rwCache;\n        const UsdStageCache * _Nullable _roCache;"
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            PXR_NAMESPACE_CLOSE_SCOPE
+
+            inline void UsdStageCacheContextRetain(Pixar::UsdStageCacheContext* _Nonnull x) {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdStageCacheContext>::Retain(x);
+            }
+            inline void UsdStageCacheContextRelease(Pixar::UsdStageCacheContext* _Nonnull x) {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdStageCacheContext>::Release(x);
+            }
+            """
+          )
+        case "stageCacheContext.cpp":
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            /* static */
+            UsdStageCacheContext*
+            UsdStageCacheContext::Create(UsdStageCache& cache)
+            {
+                std::shared_ptr<UsdStageCacheContext> ptr =
+                    std::make_shared<UsdStageCacheContext>(cache);
+                return Tf_SharedPtrRetainReleaseHelper<UsdStageCacheContext>::Register(ptr);
+            }
+
+            PXR_NAMESPACE_CLOSE_SCOPE
+            """
+          )
+        default:
+          return
+      }
     }
 
     public static func tfRefBaseHeader(to source: inout String, fileBaseName: String)

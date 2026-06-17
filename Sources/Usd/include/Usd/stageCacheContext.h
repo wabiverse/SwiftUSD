@@ -8,6 +8,8 @@
 #define PXR_USD_USD_STAGE_CACHE_CONTEXT_H
 
 #include "pxr/pxrns.h"
+#include "Arch/swiftInterop.h"
+#include "Tf/sharedPtrRetainReleaseHelper.h"
 #include "Usd/api.h"
 #include "Tf/stacked.h"
 
@@ -101,7 +103,17 @@ enum UsdStageCacheContextBlockType
 /// UsdStageCacheContext objects that exist in one thread's stack do not
 /// influence calls to UsdStage::Open() from a different thread.
 ///
-TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)
+class UsdStageCacheContext;
+template <>
+struct Tf_ExportedStackedStorage<UsdStageCacheContext, true> {
+    typedef typename Tf_StackedStorageType<UsdStageCacheContext, true>::Stack Stack;
+    typedef typename Tf_StackedStorageType<UsdStageCacheContext, true>::Type Type;
+    static USD_API std::atomic<Type*> value;
+};
+class SWIFT_SHARED_REFERENCE(UsdStageCacheContextRetain, UsdStageCacheContextRelease)
+UsdStageCacheContext :
+    public TfStacked<UsdStageCacheContext, true,
+                     Tf_ExportedStackedStorage<UsdStageCacheContext, true>>
 {
 public:
     /// Bind a cache for calls to UsdStage::Open() to read from and write to.
@@ -123,6 +135,11 @@ public:
         : _blockType(blockType) {}
 
 private:
+    /// Heap-allocates a context registered with Tf_SharedPtrRetainReleaseHelper
+    /// so Swift ARC can manage it - destruction pops the thread-local cache stack.
+    USD_API
+    static UsdStageCacheContext* _Nonnull Create(UsdStageCache& cache);
+
     friend class UsdStage;
 
     static std::vector<const UsdStageCache *> _GetReadOnlyCaches();
@@ -131,8 +148,8 @@ private:
 
     // A blocking context is encoded with both members variables null.
     union {
-        UsdStageCache *_rwCache;
-        const UsdStageCache *_roCache;
+        UsdStageCache * _Nullable _rwCache;
+        const UsdStageCache * _Nullable _roCache;
     };
     bool _isReadOnlyCache;
     UsdStageCacheContextBlockType _blockType;
@@ -140,5 +157,12 @@ private:
 
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+inline void UsdStageCacheContextRetain(Pixar::UsdStageCacheContext* _Nonnull x) {
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdStageCacheContext>::Retain(x);
+}
+inline void UsdStageCacheContextRelease(Pixar::UsdStageCacheContext* _Nonnull x) {
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdStageCacheContext>::Release(x);
+}
 
 #endif // PXR_USD_USD_STAGE_CACHE_CONTEXT_H
