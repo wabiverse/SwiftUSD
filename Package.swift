@@ -3,6 +3,11 @@ import CompilerPluginSupport
 import Foundation
 import PackageDescription
 
+// swiftc's embedded clang (swift 6+) defines _LIBCPP_ABI_NO_COMPRESSED_PAIR_PADDING;
+// c++ module builds don't, causing a layout mismatch in __compressed_pair and a hard
+// odr violation on any stdlib include. this flag aligns both compilation contexts.
+let _abiFlag: CXXSetting = .define("_LIBCPP_ABI_NO_COMPRESSED_PAIR_PADDING")
+
 let package = Package(
   name: "SwiftUSD",
   platforms: [
@@ -374,6 +379,7 @@ let package = Package(
       dependencies: [],
       publicHeadersPath: "include",
       cxxSettings: [
+        _abiFlag,
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -403,6 +409,7 @@ let package = Package(
       ],
       publicHeadersPath: "include",
       cxxSettings: [
+        _abiFlag,
         /* ---------- Turn everything on. ---------- */
         .define("PXR_USE_NAMESPACES", to: "1"),
         .define("PXR_PYTHON_SUPPORT_ENABLED", to: "0"),
@@ -438,6 +445,7 @@ let package = Package(
         .target(name: "Arch"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Tf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
         .define("MFB_PACKAGE_MODULE", to: "Tf"),
@@ -458,6 +466,7 @@ let package = Package(
         .target(name: "Tf"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Js"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Js"),
         .define("MFB_PACKAGE_MODULE", to: "Js"),
@@ -476,6 +485,7 @@ let package = Package(
         .target(name: "Tf"),
       ],
       cxxSettings: [
+        _abiFlag,
         .headerSearchPath("include/Gf/nc"),
         .define("MFB_PACKAGE_NAME", to: "Gf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
@@ -495,6 +505,7 @@ let package = Package(
         .target(name: "Js"),
       ],
       cxxSettings: [
+        _abiFlag,
         /* --------- Fix missing TBB allocator funcs. --------- */
         .define("TBB_ALLOCATOR_TRAITS_BROKEN", to: "1", .when(platforms: Arch.OS.linux.platform)),
         /* --------- Standard USD source definitions. --------- */
@@ -517,6 +528,7 @@ let package = Package(
         .target(name: "Trace"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Vt"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Vt"),
         .define("MFB_PACKAGE_MODULE", to: "Vt"),
@@ -535,6 +547,7 @@ let package = Package(
         .target(name: "Trace"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Work"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Work"),
         .define("MFB_PACKAGE_MODULE", to: "Work"),
@@ -551,6 +564,7 @@ let package = Package(
         .target(name: "Arch")
       ],
       cxxSettings: [
+        _abiFlag,
         .headerSearchPath("include/Pegtl"),
         .define("MFB_PACKAGE_NAME", to: "Pegtl"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Pegtl"),
@@ -572,6 +586,7 @@ let package = Package(
         .target(name: "Work"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Plug"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Plug"),
         .define("MFB_PACKAGE_MODULE", to: "Plug"),
@@ -593,6 +608,7 @@ let package = Package(
         .target(name: "Vt"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Ts"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Ts"),
         .define("MFB_PACKAGE_MODULE", to: "Ts"),
@@ -616,6 +632,7 @@ let package = Package(
         .process("Resources"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Ar"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
         .define("MFB_PACKAGE_MODULE", to: "Ar"),
@@ -634,6 +651,7 @@ let package = Package(
         .target(name: "Plug"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Kind"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Kind"),
         .define("MFB_PACKAGE_MODULE", to: "Kind"),
@@ -662,6 +680,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Sdf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
         .define("MFB_PACKAGE_MODULE", to: "Sdf"),
@@ -687,6 +706,7 @@ let package = Package(
         .target(name: "Sdf"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Pcp"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Pcp"),
         .define("MFB_PACKAGE_MODULE", to: "Pcp"),
@@ -718,6 +738,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Usd"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Usd"),
         .define("MFB_PACKAGE_MODULE", to: "Usd"),
@@ -738,6 +759,7 @@ let package = Package(
         .target(name: "Sdf"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_PACKAGE_MODULE", to: "Sdr"),
@@ -768,6 +790,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
         .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
@@ -793,6 +816,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdShade"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdShade"),
         .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
@@ -817,6 +841,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
         .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
@@ -845,6 +870,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdLux"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdLux"),
         .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
@@ -870,6 +896,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
         .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
@@ -892,6 +919,7 @@ let package = Package(
         .target(name: "Vt"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "SdrGlslfx"),
         .define("MFB_ALT_PACKAGE_NAME", to: "SdrGlslfx"),
         .define("MFB_PACKAGE_MODULE", to: "SdrGlslfx"),
@@ -900,31 +928,6 @@ let package = Package(
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
-    
-    // .target(
-    //   name: "SdrOsl",
-    //   dependencies: [
-    //     .target(name: "Arch"),
-    //     .target(name: "Tf"),
-    //     .target(name: "Gf"),
-    //     .target(name: "Ar"),
-    //     .target(name: "Sdr"),
-    //     .target(name: "Vt"),
-    //   ],
-    //   resources: [
-    //     .process("Resources")
-    //   ],
-    //   cxxSettings: [
-    //     .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
-    //     .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
-    //     .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
-    //     .define("SDROSL_EXPORTS", to: "1"),
-    //     .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
-    //     .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-    //     .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
-    //     .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-    //   ]
-    // ),
 
     .target(
       name: "UsdAbc",
@@ -942,6 +945,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdAbc"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdAbc"),
         .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
@@ -968,6 +972,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .headerSearchPath("include/UsdDraco"),
         .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
@@ -993,6 +998,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdMedia"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdMedia"),
         .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
@@ -1024,6 +1030,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdMtlx"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdMtlx"),
         .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
@@ -1052,6 +1059,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdPhysics"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysics"),
         .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
@@ -1074,6 +1082,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdProc"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdProc"),
         .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
@@ -1099,6 +1108,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdRender"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdRender"),
         .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
@@ -1124,6 +1134,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdRi"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
         .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
@@ -1153,6 +1164,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdSkel"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkel"),
         .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
@@ -1175,6 +1187,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdUI"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdUI"),
         .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
@@ -1204,6 +1217,7 @@ let package = Package(
         .target(name: "UsdShade"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdUtils"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtils"),
         .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
@@ -1231,6 +1245,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdVol"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdVol"),
         .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
@@ -1255,6 +1270,7 @@ let package = Package(
         .target(name: "UsdGeom"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdProfiles"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdProfiles"),
         .define("MFB_PACKAGE_MODULE", to: "UsdProfiles"),
@@ -1273,6 +1289,7 @@ let package = Package(
         .target(name: "Gf"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "CameraUtil"),
         .define("MFB_ALT_PACKAGE_NAME", to: "CameraUtil"),
         .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
@@ -1291,6 +1308,7 @@ let package = Package(
         .target(name: "Trace"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Hf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Hf"),
         .define("MFB_PACKAGE_MODULE", to: "Hf"),
@@ -1309,6 +1327,7 @@ let package = Package(
         .target(name: "Vt"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "PxOsd"),
         .define("MFB_ALT_PACKAGE_NAME", to: "PxOsd"),
         .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
@@ -1338,6 +1357,7 @@ let package = Package(
         .process("Resources"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Hd"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Hd"),
         .define("MFB_PACKAGE_MODULE", to: "Hd"),
@@ -1355,6 +1375,7 @@ let package = Package(
         .target(name: "Tf"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("PXR_GL_SUPPORT_ENABLED", .when(platforms: Arch.OS.noembeddedapple.platform)),
         .define("MFB_PACKAGE_NAME", to: "Garch"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
@@ -1392,6 +1413,7 @@ let package = Package(
         .target(name: "Trace"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Hgi"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Hgi"),
         .define("MFB_PACKAGE_MODULE", to: "Hgi"),
@@ -1422,6 +1444,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HgiMetal"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HgiMetal"),
         .define("MFB_PACKAGE_MODULE", to: "HgiMetal"),
@@ -1441,28 +1464,6 @@ let package = Package(
       ]
     ),
 
-    // .target(
-    //   name: "HgiVulkan",
-    //   dependencies: [
-    //     .target(name: "Arch"),
-    //     .target(name: "Tf"),
-    //     .target(name: "Trace"),
-    //     .target(name: "Hgi"),
-    //   ],
-    //   resources: [
-    //     .process("Resources")
-    //   ],
-    //   cxxSettings: [
-    //     .define("MFB_PACKAGE_NAME", to: "HgiVulkan"),
-    //     .define("MFB_ALT_PACKAGE_NAME", to: "HgiVulkan"),
-    //     .define("MFB_PACKAGE_MODULE", to: "HgiVulkan"),
-    //     .define("HGIVULKAN_EXPORTS", to: "1"),
-    //     .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
-    //     .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
-    //     .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
-    //   ]
-    // ),
-
     .target(
       name: "HgiGL",
       dependencies: [
@@ -1478,6 +1479,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HgiGL"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HgiGL"),
         .define("MFB_PACKAGE_MODULE", to: "HgiGL"),
@@ -1502,6 +1504,7 @@ let package = Package(
         .target(name: "HgiGL"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HgiInterop"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HgiInterop"),
         .define("MFB_PACKAGE_MODULE", to: "HgiInterop"),
@@ -1536,6 +1539,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Hio"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Hio"),
         .define("MFB_PACKAGE_MODULE", to: "Hio"),
@@ -1565,6 +1569,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Glf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Glf"),
         .define("MFB_PACKAGE_MODULE", to: "Glf"),
@@ -1588,6 +1593,7 @@ let package = Package(
         .target(name: "PxOsd"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "GeomUtil"),
         .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
         .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
@@ -1617,6 +1623,7 @@ let package = Package(
         .target(name: "UsdVol"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HdSi"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HdSi"),
         .define("MFB_PACKAGE_MODULE", to: "HdSi"),
@@ -1641,6 +1648,7 @@ let package = Package(
         .target(name: "UsdMtlx")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HdMtlx"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HdMtlx"),
         .define("MFB_PACKAGE_MODULE", to: "HdMtlx"),
@@ -1673,6 +1681,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HdSt"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HdSt"),
         .define("MFB_PACKAGE_MODULE", to: "HdSt"),
@@ -1700,6 +1709,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HdStorm"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HdStorm"),
         .define("MFB_PACKAGE_MODULE", to: "HdStorm"),
@@ -1735,6 +1745,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Hdx"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Hdx"),
         .define("MFB_PACKAGE_MODULE", to: "Hdx"),
@@ -1754,6 +1765,7 @@ let package = Package(
         .target(name: "Ar"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HdAr"),
         .define("MFB_ALT_PACKAGE_NAME", to: "HdAr"),
         .define("MFB_PACKAGE_MODULE", to: "HdAr"),
@@ -1794,6 +1806,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdImaging"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdImaging"),
         .define("MFB_PACKAGE_MODULE", to: "UsdImaging"),
@@ -1835,6 +1848,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdImagingGL"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdImagingGL"),
         .define("MFB_PACKAGE_MODULE", to: "UsdImagingGL"),
@@ -1856,6 +1870,7 @@ let package = Package(
         .target(name: "Work"),
       ],
       cxxSettings: [
+        _abiFlag,
         .headerSearchPath("include/Vdf"),
         .define("MFB_PACKAGE_NAME", to: "Vdf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Vdf"),
@@ -1877,6 +1892,7 @@ let package = Package(
         .target(name: "Usd"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Esf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Esf"),
         .define("MFB_PACKAGE_MODULE", to: "Esf"),
@@ -1898,6 +1914,7 @@ let package = Package(
         .target(name: "Work"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Ef"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Ef"),
         .define("MFB_PACKAGE_MODULE", to: "Ef"),
@@ -1918,6 +1935,7 @@ let package = Package(
         .target(name: "Usd"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "EsfUsd"),
         .define("MFB_ALT_PACKAGE_NAME", to: "EsfUsd"),
         .define("MFB_PACKAGE_MODULE", to: "EsfUsd"),
@@ -1942,6 +1960,7 @@ let package = Package(
         .target(name: "Vt"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "Exec"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Exec"),
         .define("MFB_PACKAGE_MODULE", to: "Exec"),
@@ -1964,6 +1983,7 @@ let package = Package(
         .target(name: "Usd"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "ExecUsd"),
         .define("MFB_ALT_PACKAGE_NAME", to: "ExecUsd"),
         .define("MFB_PACKAGE_MODULE", to: "ExecUsd"),
@@ -1983,6 +2003,7 @@ let package = Package(
         .target(name: "UsdGeom"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "ExecGeom"),
         .define("MFB_ALT_PACKAGE_NAME", to: "ExecGeom"),
         .define("MFB_PACKAGE_MODULE", to: "ExecGeom"),
@@ -2001,6 +2022,7 @@ let package = Package(
         .target(name: "ExecUsd"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "ExecIr"),
         .define("MFB_ALT_PACKAGE_NAME", to: "ExecIr"),
         .define("MFB_PACKAGE_MODULE", to: "ExecIr"),
@@ -2022,6 +2044,7 @@ let package = Package(
         .target(name: "Work"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdValidation"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdValidation"),
         .define("MFB_PACKAGE_MODULE", to: "UsdValidation"),
@@ -2043,6 +2066,7 @@ let package = Package(
         .target(name: "UsdValidation"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdGeomValidators"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeomValidators"),
         .define("MFB_PACKAGE_MODULE", to: "UsdGeomValidators"),
@@ -2064,6 +2088,7 @@ let package = Package(
         .target(name: "UsdValidation"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdPhysicsValidators"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysicsValidators"),
         .define("MFB_PACKAGE_MODULE", to: "UsdPhysicsValidators"),
@@ -2086,6 +2111,7 @@ let package = Package(
         .target(name: "UsdValidation"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdShadeValidators"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdShadeValidators"),
         .define("MFB_PACKAGE_MODULE", to: "UsdShadeValidators"),
@@ -2106,6 +2132,7 @@ let package = Package(
         .target(name: "UsdValidation"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdSkelValidators"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkelValidators"),
         .define("MFB_PACKAGE_MODULE", to: "UsdSkelValidators"),
@@ -2126,6 +2153,7 @@ let package = Package(
         .target(name: "UsdValidation"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdUtilsValidators"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtilsValidators"),
         .define("MFB_PACKAGE_MODULE", to: "UsdUtilsValidators"),
@@ -2146,6 +2174,7 @@ let package = Package(
         .target(name: "UsdValidation"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdLuxValidators"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdLuxValidators"),
         .define("MFB_PACKAGE_MODULE", to: "UsdLuxValidators"),
@@ -2193,6 +2222,7 @@ let package = Package(
         .target(name: "UsdImaging"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdExecImaging"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdExecImaging"),
         .define("MFB_PACKAGE_MODULE", to: "UsdExecImaging"),
@@ -2232,6 +2262,7 @@ let package = Package(
         .target(name: "ExecIr"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "UsdIRImaging"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdIRImaging"),
         .define("MFB_PACKAGE_MODULE", to: "UsdIRImaging"),
@@ -2255,6 +2286,7 @@ let package = Package(
         .process("Resources")
       ],
       cxxSettings: [
+        _abiFlag,
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -2282,6 +2314,7 @@ let package = Package(
          .copy("Resources")
        ],
        cxxSettings: [
+        _abiFlag,
          .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
          .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
          .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -2385,6 +2418,7 @@ let package = Package(
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform))
       ],
       cxxSettings: [
+        _abiFlag,
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -2480,6 +2514,7 @@ let package = Package(
         .target(name: "USDOverlays"),
       ],
       cxxSettings: [
+        _abiFlag,
         // enable to debug swift retain/release calls.
         .define("DEBUG_MEMORY_MANAGEMENT", to: "0"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
@@ -2499,6 +2534,7 @@ let package = Package(
         .target(name: "PixarUSD"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
@@ -2514,6 +2550,7 @@ let package = Package(
         .target(name: "PixarUSD"),
       ],
       cxxSettings: [
+        _abiFlag,
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
