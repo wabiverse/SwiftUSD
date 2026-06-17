@@ -1104,6 +1104,10 @@ public enum Pxr: String, CaseIterable
     {
       guard fileBaseName == "refBase.h" else { return }
       source = source.replacingOccurrences(
+        of: "#include \"pxr/base/tf/api.h\"",
+        with: "#include \"Arch/swiftInterop.h\"\n#include \"Tf/api.h\""
+      )
+      source = source.replacingOccurrences(
         of: "class TfRefBase {",
         with: "class SWIFT_SHARED_REFERENCE(__retain__ZN3Pixar9TfRefBaseE, __release__ZN3Pixar9TfRefBaseE) TfRefBase {"
       )
