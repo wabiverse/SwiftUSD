@@ -84,5 +84,14 @@ UsdStageCacheContext::_GetWritableCaches()
     return caches;
 }
 
+/* static */
+UsdStageCacheContext*
+UsdStageCacheContext::Create(UsdStageCache& cache)
+{
+    std::shared_ptr<UsdStageCacheContext> ptr =
+        std::make_shared<UsdStageCacheContext>(cache);
+    return Tf_SharedPtrRetainReleaseHelper<UsdStageCacheContext>::Register(ptr);
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE
 
