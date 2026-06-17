@@ -1380,12 +1380,19 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "virtual ~SdfLayer();", with: "virtual ~SdfLayer() noexcept;")
       source = source.replacingOccurrences(of: "virtual ~UsdStage();", with: "virtual ~UsdStage() noexcept;")
 
-      // TF_FATAL_ERROR / TF_RUNTIME_ERROR: printf-style macros - pass c_str() for std::string args.
+      // TF_WARN / TF_FATAL_ERROR / TF_RUNTIME_ERROR: printf-style macros - pass c_str() for std::string args.
+      source = source.replacingOccurrences(
+        of: "TF_WARN(s.str());",
+        with: "TF_WARN(\"%s\", s.str().c_str());"
+      )
       source = source.replacingOccurrences(
         of: "TF_FATAL_ERROR(\"Attempted to get value for key '\" + key +\n                       \"', which is not in the dictionary.\");",
         with: "TF_FATAL_ERROR(\"Attempted to get value for key '%s', \"\n                       \"which is not in the dictionary.\", key.c_str());"
       )
-      source = source.replacingOccurrences(of: "TF_RUNTIME_ERROR(errs);", with: "TF_RUNTIME_ERROR(\"%s\", errs.c_str());")
+      source = source.replacingOccurrences(
+        of: "TF_RUNTIME_ERROR(errs);",
+        with: "TF_RUNTIME_ERROR(\"%s\", errs.c_str());"
+      )
 
       // TBB: MetaverseKit places tbb under OneTBB/; deprecated atomic/mutex/task_scheduler_init -> std.
       source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
