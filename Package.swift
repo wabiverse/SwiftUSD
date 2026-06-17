@@ -320,6 +320,10 @@ let package = Package(
       name: "UsdUtilsValidators",
       targets: ["UsdUtilsValidators"]
     ),
+    .library(
+      name: "UsdLuxValidators",
+      targets: ["UsdLuxValidators"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -2131,6 +2135,26 @@ let package = Package(
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
+    
+    .target(
+      name: "UsdLuxValidators",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdLux"),
+        .target(name: "UsdValidation"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdLuxValidators"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdLuxValidators"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdLuxValidators"),
+        .define("USDLUXVALIDATORS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
 
     .target(
       name: "UsdExecImaging",
@@ -2449,6 +2473,7 @@ let package = Package(
         .target(name: "UsdShadeValidators"),
         .target(name: "UsdSkelValidators"),
         .target(name: "UsdUtilsValidators"),
+        .target(name: "UsdLuxValidators"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
