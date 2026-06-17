@@ -1,3 +1,5 @@
+#if defined(__APPLE__)
+
 //
 // Copyright 2025 Apple
 //
@@ -16,3 +18,4 @@ const char* Arch_DarwinGetTemporaryDirectory() {
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // defined(__APPLE__)

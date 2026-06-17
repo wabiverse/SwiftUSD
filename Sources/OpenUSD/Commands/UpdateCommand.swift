@@ -796,6 +796,7 @@ public enum Pxr: String, CaseIterable
       Patch.tfRefBaseHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
       Patch.pythonIncludes(to: &pxrSrc)
       Patch.pythonGuards(to: &pxrSrc, fileBaseName: fileURL.deletingPathExtension().lastPathComponent, pythonOnlyBasenames: exclusions.pythonOnly)
@@ -1253,6 +1254,8 @@ public enum Pxr: String, CaseIterable
       var prefix = ""
       switch fileBaseName
       {
+      case "darwin.mm":
+        guardMacro = "defined(__APPLE__)"
       case "glPlatformContextDarwin.mm", "glPlatformDebugWindowDarwin.mm":
         guardMacro = "defined(__APPLE__)"
       case "glPlatformContextWindows.cpp", "glPlatformDebugWindowWindows.cpp":
@@ -1274,6 +1277,22 @@ public enum Pxr: String, CaseIterable
       guard !source.contains("#if \(guardMacro)") else { return }
 
       source = prefix + "#if \(guardMacro)\n\n" + source + "\n#endif // \(guardMacro)\n"
+    }
+
+    /** Guards Arch/darwin.h content and its unconditional include in Arch.h umbrella. */
+    public static func archDarwinHeaders(to source: inout String, fileBaseName: String)
+    {
+      switch fileBaseName
+      {
+      case "darwin.h":
+        guard !source.contains("#if defined(__APPLE__)") else { return }
+        source = source.replacingOccurrences(
+          of: "PXR_NAMESPACE_OPEN_SCOPE\n\nconst char* Arch_DarwinGetTemporaryDirectory();\n\nPXR_NAMESPACE_CLOSE_SCOPE",
+          with: "#if defined(__APPLE__)\nPXR_NAMESPACE_OPEN_SCOPE\n\nconst char* Arch_DarwinGetTemporaryDirectory();\n\nPXR_NAMESPACE_CLOSE_SCOPE\n#endif // defined(__APPLE__)"
+        )
+      default:
+        return
+      }
     }
 
     /** Guards boost/python includes and rewrites #ifdef->#if checks for PXR_PYTHON_SUPPORT_ENABLED. */

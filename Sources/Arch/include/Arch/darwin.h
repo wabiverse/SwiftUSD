@@ -8,9 +8,11 @@
 #define PXR_ARCH_DARWIN_H
 #include "pxr/pxrns.h"
 
+#if defined(__APPLE__)
 PXR_NAMESPACE_OPEN_SCOPE
 
 const char* Arch_DarwinGetTemporaryDirectory();
 
 PXR_NAMESPACE_CLOSE_SCOPE
+#endif // defined(__APPLE__)
 #endif // PXR_ARCH_DARWIN_H
