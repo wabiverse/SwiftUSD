@@ -8,6 +8,8 @@
 #define PXR_IMAGING_HGI_HGI_H
 
 #include "pxr/pxrns.h"
+#include "Arch/swiftInterop.h"
+#include "Tf/sharedPtrRetainReleaseHelper.h"
 #include "Tf/token.h"
 #include "Tf/type.h"
 
@@ -91,7 +93,7 @@ using HgiUniquePtr = std::unique_ptr<class Hgi>;
 ///     for i to num_threads
 ///         hgi->SubmitCmds( cmds[i] )
 ///
-class Hgi
+class SWIFT_SHARED_REFERENCE(HgiRetain, HgiRelease) Hgi
 {
 public:
     HGI_API
@@ -124,6 +126,10 @@ public:
     /// Thread safety: Not thread safe.
     HGI_API
     static HgiUniquePtr CreatePlatformDefaultHgi();
+
+    /// Returns a raw Hgi* registered with Tf_SharedPtrRetainReleaseHelper for Swift ARC.
+    HGI_API
+    static Hgi* CreatePlatformDefaultPtr();
 
     /// Helper function to return a Hgi object of choice supported by current 
     /// platform and build configuration.
@@ -386,5 +392,12 @@ public:
 
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+inline void HgiRetain(Pixar::Hgi * _Nonnull x) {
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Retain(x);
+}
+inline void HgiRelease(Pixar::Hgi * _Nonnull x) {
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Release(x);
+}
 
 #endif
