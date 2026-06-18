@@ -8,10 +8,10 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/volume.glslfx
+--- #import $TOOLS/HdSt/shaders/volume.glslfx
 
-#import $TOOLS/hdSt/shaders/instancing.glslfx
-#import $TOOLS/hdSt/shaders/pointId.glslfx
+#import $TOOLS/HdSt/shaders/instancing.glslfx
+#import $TOOLS/HdSt/shaders/pointId.glslfx
 
 --- --------------------------------------------------------------------------
 -- layout Volume.Vertex

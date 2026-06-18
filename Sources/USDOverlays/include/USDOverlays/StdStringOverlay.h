@@ -71,6 +71,13 @@ namespace Overlay
   std::vector<std::string> MakeStringVector();
   std::vector<std::string> PushBackPath(std::vector<std::string> paths, const char *path);
 
+  // (TODO:@furbytm) move these into own overlay header at some point...
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, double value);
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, int value);
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, float value);
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, Pixar::TfToken value);
+  Pixar::SdfValueTypeName SdfGetValueTypeNameValue(Pixar::SdfValueTypeNameType type);
+
   /// The reverse direction (`std::string` -> Swift `String`) is just as broken
   /// as the forward direction: `String.init(_ cxxString: std.string)` triggers
   /// the same deserialization failure. So every `std::string` returning getter

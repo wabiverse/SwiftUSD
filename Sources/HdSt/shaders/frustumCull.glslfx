@@ -8,9 +8,9 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/compute.glslfx
+--- #import $TOOLS/HdSt/shaders/compute.glslfx
 
-#import $TOOLS/hdSt/shaders/instancing.glslfx
+#import $TOOLS/HdSt/shaders/instancing.glslfx
 
 --- --------------------------------------------------------------------------
 -- layout ViewFrustumCull.Counting

@@ -593,6 +593,60 @@ private:
 extern SDF_API TfStaticData<const Sdf_ValueTypeNamesType,
     Sdf_ValueTypeNamesType::_Init> SdfValueTypeNames;
 
+/// Swift-importable enum of all SdfValueTypeName cases.
+/// Enumerators carry the SdfValueTypeNameType prefix so Swift's C++ interop
+/// strips it and imports them as .bool, .uChar, .float3Array, etc.
+/// Pass a value to SdfGetValueTypeName() to retrieve the corresponding
+/// SdfValueTypeName for use with USD APIs.
+enum class SdfValueTypeNameType {
+    SdfValueTypeNameTypeBool = 0,
+    SdfValueTypeNameTypeUChar, SdfValueTypeNameTypeInt, SdfValueTypeNameTypeUInt,
+    SdfValueTypeNameTypeInt64, SdfValueTypeNameTypeUInt64,
+    SdfValueTypeNameTypeHalf, SdfValueTypeNameTypeFloat, SdfValueTypeNameTypeDouble,
+    SdfValueTypeNameTypeTimeCode,
+    SdfValueTypeNameTypeString, SdfValueTypeNameTypeToken, SdfValueTypeNameTypeAsset,
+    SdfValueTypeNameTypeInt2, SdfValueTypeNameTypeInt3, SdfValueTypeNameTypeInt4,
+    SdfValueTypeNameTypeHalf2, SdfValueTypeNameTypeHalf3, SdfValueTypeNameTypeHalf4,
+    SdfValueTypeNameTypeFloat2, SdfValueTypeNameTypeFloat3, SdfValueTypeNameTypeFloat4,
+    SdfValueTypeNameTypeDouble2, SdfValueTypeNameTypeDouble3, SdfValueTypeNameTypeDouble4,
+    SdfValueTypeNameTypePoint3h, SdfValueTypeNameTypePoint3f, SdfValueTypeNameTypePoint3d,
+    SdfValueTypeNameTypeVector3h, SdfValueTypeNameTypeVector3f, SdfValueTypeNameTypeVector3d,
+    SdfValueTypeNameTypeNormal3h, SdfValueTypeNameTypeNormal3f, SdfValueTypeNameTypeNormal3d,
+    SdfValueTypeNameTypeColor3h, SdfValueTypeNameTypeColor3f, SdfValueTypeNameTypeColor3d,
+    SdfValueTypeNameTypeColor4h, SdfValueTypeNameTypeColor4f, SdfValueTypeNameTypeColor4d,
+    SdfValueTypeNameTypeQuath, SdfValueTypeNameTypeQuatf, SdfValueTypeNameTypeQuatd,
+    SdfValueTypeNameTypeMatrix2d, SdfValueTypeNameTypeMatrix3d, SdfValueTypeNameTypeMatrix4d,
+    SdfValueTypeNameTypeFrame4d,
+    SdfValueTypeNameTypeTexCoord2h, SdfValueTypeNameTypeTexCoord2f, SdfValueTypeNameTypeTexCoord2d,
+    SdfValueTypeNameTypeTexCoord3h, SdfValueTypeNameTypeTexCoord3f, SdfValueTypeNameTypeTexCoord3d,
+    SdfValueTypeNameTypeOpaque,
+    SdfValueTypeNameTypeGroup,
+    SdfValueTypeNameTypePathExpression,
+    SdfValueTypeNameTypeBoolArray,
+    SdfValueTypeNameTypeUCharArray, SdfValueTypeNameTypeIntArray, SdfValueTypeNameTypeUIntArray,
+    SdfValueTypeNameTypeInt64Array, SdfValueTypeNameTypeUInt64Array,
+    SdfValueTypeNameTypeHalfArray, SdfValueTypeNameTypeFloatArray, SdfValueTypeNameTypeDoubleArray,
+    SdfValueTypeNameTypeTimeCodeArray,
+    SdfValueTypeNameTypeStringArray, SdfValueTypeNameTypeTokenArray, SdfValueTypeNameTypeAssetArray,
+    SdfValueTypeNameTypeInt2Array, SdfValueTypeNameTypeInt3Array, SdfValueTypeNameTypeInt4Array,
+    SdfValueTypeNameTypeHalf2Array, SdfValueTypeNameTypeHalf3Array, SdfValueTypeNameTypeHalf4Array,
+    SdfValueTypeNameTypeFloat2Array, SdfValueTypeNameTypeFloat3Array, SdfValueTypeNameTypeFloat4Array,
+    SdfValueTypeNameTypeDouble2Array, SdfValueTypeNameTypeDouble3Array, SdfValueTypeNameTypeDouble4Array,
+    SdfValueTypeNameTypePoint3hArray, SdfValueTypeNameTypePoint3fArray, SdfValueTypeNameTypePoint3dArray,
+    SdfValueTypeNameTypeVector3hArray, SdfValueTypeNameTypeVector3fArray, SdfValueTypeNameTypeVector3dArray,
+    SdfValueTypeNameTypeNormal3hArray, SdfValueTypeNameTypeNormal3fArray, SdfValueTypeNameTypeNormal3dArray,
+    SdfValueTypeNameTypeColor3hArray, SdfValueTypeNameTypeColor3fArray, SdfValueTypeNameTypeColor3dArray,
+    SdfValueTypeNameTypeColor4hArray, SdfValueTypeNameTypeColor4fArray, SdfValueTypeNameTypeColor4dArray,
+    SdfValueTypeNameTypeQuathArray, SdfValueTypeNameTypeQuatfArray, SdfValueTypeNameTypeQuatdArray,
+    SdfValueTypeNameTypeMatrix2dArray, SdfValueTypeNameTypeMatrix3dArray, SdfValueTypeNameTypeMatrix4dArray,
+    SdfValueTypeNameTypeFrame4dArray,
+    SdfValueTypeNameTypeTexCoord2hArray, SdfValueTypeNameTypeTexCoord2fArray, SdfValueTypeNameTypeTexCoord2dArray,
+    SdfValueTypeNameTypeTexCoord3hArray, SdfValueTypeNameTypeTexCoord3fArray, SdfValueTypeNameTypeTexCoord3dArray,
+    SdfValueTypeNameTypePathExpressionArray,
+};
+
+SDF_API const SdfValueTypeName& SdfGetValueTypeName(SdfValueTypeNameType type);
+
 /// \class SdfValueBlock
 /// A special value type that can be used to explicitly author an
 /// opinion for an attribute's default value or time sample value

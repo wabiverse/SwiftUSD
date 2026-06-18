@@ -553,4 +553,14 @@ HgiMetal::_SubmitCmds(HgiCmds* cmds, HgiSubmitWaitType wait)
     return _workToFlush;
 }
 
+/* static */
+HgiMetal*
+HgiMetal::Create()
+{
+    std::shared_ptr<HgiMetal> ptr = std::make_shared<HgiMetal>();
+    std::shared_ptr<Hgi> hgiPtr = ptr;
+    return static_cast<HgiMetal*>(
+        Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(hgiPtr));
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE

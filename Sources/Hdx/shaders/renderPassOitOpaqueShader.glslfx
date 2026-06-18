@@ -8,11 +8,11 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdx/shaders/renderPassOitOpaqueShader.glslfx
+--- #import $TOOLS/Hdx/shaders/renderPassOitOpaqueShader.glslfx
 
-#import $TOOLS/hdSt/shaders/renderPass.glslfx
-#import $TOOLS/hdx/shaders/renderPass.glslfx
-#import $TOOLS/hdx/shaders/selection.glslfx
+#import $TOOLS/HdSt/shaders/renderPass.glslfx
+#import $TOOLS/Hdx/shaders/renderPass.glslfx
+#import $TOOLS/Hdx/shaders/selection.glslfx
 
 -- configuration
 {

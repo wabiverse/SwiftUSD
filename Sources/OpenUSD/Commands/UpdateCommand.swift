@@ -493,6 +493,7 @@ public enum Pxr: String, CaseIterable
           }
 
           Patch.apply(to: &resourceSrc, fileURL: dest, target: target, relativePath: resourceRelPath)
+          Patch.glslfxToolsPaths(to: &resourceSrc)
 
           if libRelative == "plugInfo.json"
           {
@@ -793,10 +794,24 @@ public enum Pxr: String, CaseIterable
       Patch.xmacroFragmentHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.fileSystemHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.tfIteratorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.tfSmallVectorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      
+      // exposes openusd c++ types to swift, complete with proper refcounting with ARC.
       Patch.tfRefBaseHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.hgi(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.hgiMetal(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
+      Patch.hgiGL(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
       Patch.arResolver(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.usdStageCacheContext(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.usdImagingGL(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
+      Patch.plugRegistry(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      
+      // cleans up openusd c++ enums for clean swifty apis.
+      Patch.sdfTypes(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
+      Patch.usdCommon(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.xformOp(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.xformCommonAPI(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
@@ -858,7 +873,9 @@ public enum Pxr: String, CaseIterable
       // C++ clang module, which is problematic.
       Patch.nanocolorHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.openexrCSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      
       Patch.materialXShaderGen(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.glslfxToolsPaths(to: &pxrSrc)
 
       let changed = priorContent.map { $0 != pxrSrc } ?? true
       try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -1104,12 +1121,24 @@ public enum Pxr: String, CaseIterable
       )
     }
 
+    /** Splits TfSmallVector::resize into two overloads to avoid the default-constructed
+        value_type() argument that breaks non-default-constructible element types. */
+    public static func tfSmallVectorHeader(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "smallVector.h" else { return }
+      source = source.replacingOccurrences(
+        of: "    void resize(size_type newSize, const value_type &v = value_type()) {\n        // If the new size is smaller than the current size, let go of some\n        // entries at the tail.\n        if (newSize < size()) {\n            erase(const_iterator(data() + newSize), \n                  const_iterator(data() + size())); \n        }\n\n        // Otherwise, lets grow and fill: Reserve some storage, fill the tail\n        // end with copies of v, and update the new size.\n        else if (newSize > size()) {\n            reserve(newSize);\n            std::uninitialized_fill(data() + size(), data() + newSize, v);\n            _size = newSize;\n        }\n    }",
+        with: "    void resize(size_type newSize) {\n        if (newSize < size()) {\n            erase(const_iterator(data() + newSize),\n                  const_iterator(data() + size()));\n        } else if (newSize > size()) {\n            reserve(newSize);\n            std::uninitialized_value_construct(data() + size(), data() + newSize);\n            _size = newSize;\n        }\n    }\n\n    void resize(size_type newSize, const value_type &v) {\n        if (newSize < size()) {\n            erase(const_iterator(data() + newSize),\n                  const_iterator(data() + size()));\n        } else if (newSize > size()) {\n            reserve(newSize);\n            std::uninitialized_fill(data() + size(), data() + newSize, v);\n            _size = newSize;\n        }\n    }"
+      )
+    }
+
     /** Annotates Hgi with SWIFT_SHARED_REFERENCE so Swift ARC can manage it via
         Tf_SharedPtrRetainReleaseHelper. Derived classes (HgiGL, HgiMetal, HgiVulkan) inherit
         the annotation automatically. */
     public static func hgi(to source: inout String, fileBaseName: String)
     {
       guard fileBaseName == "hgiImpl.h" || fileBaseName == "hgi.cpp" || fileBaseName == "device.h"
+              || fileBaseName == "texture.h"
       else { return }
       
       switch fileBaseName
@@ -1125,7 +1154,7 @@ public enum Pxr: String, CaseIterable
           )
           source = source.replacingOccurrences(
             of: "    static HgiUniquePtr CreatePlatformDefaultHgi();",
-            with: "    static HgiUniquePtr CreatePlatformDefaultHgi();\n\n    /// Returns a raw Hgi* registered with Tf_SharedPtrRetainReleaseHelper for Swift ARC.\n    HGI_API\n    static Hgi* CreatePlatformDefaultPtr();"
+            with: "    static HgiUniquePtr CreatePlatformDefaultHgi();\n\n    /// Returns a raw Hgi* registered with Tf_SharedPtrRetainReleaseHelper for Swift ARC.\n    HGI_API SWIFT_RETURNS_RETAINED\n    static Hgi* CreatePlatformDefaultPtr();"
           )
           source = source.replacingOccurrences(
             of: "PXR_NAMESPACE_CLOSE_SCOPE",
@@ -1167,6 +1196,153 @@ public enum Pxr: String, CaseIterable
             of: "class HgiGLDevice final {",
             with: "class SWIFT_UNSAFE_REFERENCE HgiGLDevice final {"
           )
+        case "texture.h":
+          // HgiTexture is owned by Hgi's resource management; Swift holds it
+          // only as a non-owning reference via HgiTextureHandle.Get().
+          // HgiTextureHandle (= HgiHandle<HgiTexture>) imports as a Swift
+          // value type (trivially-copyable pointer+id pair) automatically.
+          source = source.replacingOccurrences(
+            of: "#include \"pxr/imaging/hgi/types.h\"",
+            with: "#include \"Hgi/types.h\"\n#include \"Arch/swiftInterop.h\""
+          )
+          source = source.replacingOccurrences(
+            of: "class HgiTexture\n{",
+            with: "class SWIFT_UNSAFE_REFERENCE HgiTexture\n{"
+          )
+        default:
+          return
+      }
+    }
+    
+    public static func hgiMetal(to source: inout String, fileBaseName: String, target: String)
+    {
+      guard target == "HgiMetal" else { return }
+
+      switch fileBaseName
+      {
+        case "texture.h":
+          source = source.replacingOccurrences(
+            of: "#include \"pxr/pxrns.h\"\n#include \"pxr/imaging/hgiMetal/api.h\"\n#include \"pxr/imaging/hgi/texture.h\"",
+            with: "#include \"pxr/pxrns.h\"\n#include \"HgiMetal/api.h\"\n#include \"Hgi/texture.h\"\n#include \"Arch/swiftInterop.h\""
+          )
+          source = source.replacingOccurrences(
+            of: "class HgiMetalTexture final : public HgiTexture {",
+            with: "class SWIFT_UNSAFE_REFERENCE HgiMetalTexture final : public HgiTexture {"
+          )
+
+        case "hgi.h":
+          source = source.replacingOccurrences(
+            of: "class HgiMetal final : public Hgi\n{",
+            with: "class SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease) HgiMetal final : public Hgi\n{"
+          )
+          source = source.replacingOccurrences(
+            of: "class SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease) HgiMetal final : public Hgi\n{\npublic:",
+            with: """
+            class SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease) HgiMetal final : public Hgi
+            {
+            public:
+                HGIMETAL_API SWIFT_RETURNS_RETAINED
+                static HgiMetal* _Nonnull Create();
+            """
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE\n\n#endif",
+            with: """
+            PXR_NAMESPACE_CLOSE_SCOPE
+
+            inline void HgiMetalRetain(Pixar::HgiMetal* _Nonnull x)
+            {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Retain(x);
+            }
+
+            inline void HgiMetalRelease(Pixar::HgiMetal* _Nonnull x)
+            {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Release(x);
+            }
+
+            #endif
+            """
+          )
+
+        case "hgi.mm":
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            /* static */
+            HgiMetal*
+            HgiMetal::Create()
+            {
+                std::shared_ptr<HgiMetal> ptr = std::make_shared<HgiMetal>();
+                std::shared_ptr<Hgi> hgiPtr = ptr;
+                return static_cast<HgiMetal*>(
+                    Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(hgiPtr));
+            }
+
+            PXR_NAMESPACE_CLOSE_SCOPE
+            """
+          )
+
+        default:
+          return
+      }
+    }
+
+    public static func hgiGL(to source: inout String, fileBaseName: String, target: String)
+    {
+      guard target == "HgiGL" else { return }
+
+      switch fileBaseName
+      {
+        case "hgi.h":
+          source = source.replacingOccurrences(
+            of: "class HgiGL final : public Hgi\n{",
+            with: "class SWIFT_SHARED_REFERENCE(HgiGLRetain, HgiGLRelease) HgiGL final : public Hgi\n{"
+          )
+          source = source.replacingOccurrences(
+            of: "class SWIFT_SHARED_REFERENCE(HgiGLRetain, HgiGLRelease) HgiGL final : public Hgi\n{\npublic:",
+            with: """
+            class SWIFT_SHARED_REFERENCE(HgiGLRetain, HgiGLRelease) HgiGL final : public Hgi
+            {
+            public:
+                HGIGL_API SWIFT_RETURNS_RETAINED
+                static HgiGL* _Nonnull Create();
+            """
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            PXR_NAMESPACE_CLOSE_SCOPE
+
+            inline void HgiGLRetain(Pixar::HgiGL* _Nonnull x)
+            {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Retain(x);
+            }
+
+            inline void HgiGLRelease(Pixar::HgiGL* _Nonnull x)
+            {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Release(x);
+            }
+            """
+          )
+
+        case "hgi.cpp":
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            /* static */
+            HgiGL*
+            HgiGL::Create()
+            {
+                std::shared_ptr<HgiGL> ptr = std::make_shared<HgiGL>();
+                std::shared_ptr<Hgi> hgiPtr = ptr;
+                return static_cast<HgiGL*>(
+                    Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(hgiPtr));
+            }
+
+            PXR_NAMESPACE_CLOSE_SCOPE
+            """
+          )
+
         default:
           return
       }
@@ -1223,11 +1399,13 @@ public enum Pxr: String, CaseIterable
           source = source.replacingOccurrences(
             of: "    friend class UsdStage;",
             with: """
+                public:
                 /// Heap-allocates a context registered with Tf_SharedPtrRetainReleaseHelper
                 /// so Swift ARC can manage it - destruction pops the thread-local cache stack.
-                USD_API
+                USD_API SWIFT_RETURNS_RETAINED
                 static UsdStageCacheContext* _Nonnull Create(UsdStageCache& cache);
 
+                private:
                 friend class UsdStage;
             """
           )
@@ -1267,6 +1445,546 @@ public enum Pxr: String, CaseIterable
         default:
           return
       }
+    }
+
+    public static func usdImagingGL(to source: inout String, fileBaseName: String, target: String)
+    {
+      guard fileBaseName == "engine.h" || fileBaseName == "engine.cpp",
+            target == "UsdImagingGL"
+      else { return }
+
+      switch fileBaseName
+      {
+        case "engine.h":
+          // engine.h already gets swiftInterop.h + sharedPtrRetainReleaseHelper.h
+          // transitively through Hgi/hgiImpl.h - no extra includes needed.
+          source = source.replacingOccurrences(
+            of: "class UsdImagingGLEngine\n{",
+            with: "class SWIFT_SHARED_REFERENCE(UsdImagingGLEngineRetain, UsdImagingGLEngineRelease) UsdImagingGLEngine\n{"
+          )
+          // HgiHandle<T> templates are not importable by Swift when T is
+          // SWIFT_UNSAFE_REFERENCE; add a concrete overlay returning T* directly.
+          source = source.replacingOccurrences(
+            of: "    HgiTextureHandle GetAovTexture(TfToken const& name) const;",
+            with: """
+                HgiTextureHandle GetAovTexture(TfToken const& name) const;
+
+                /// Swift-importable variant - returns the raw non-owning HgiTexture pointer.
+                /// HgiHandle<T> templates are not importable by Swift; use this instead.
+                HgiTexture* _Nullable GetAovTexturePtr(TfToken const& name) const {
+                    return GetAovTexture(name).Get();
+                }
+            """
+          )
+          source = source.replacingOccurrences(
+            of: "    USDIMAGINGGL_API\n    UsdImagingGLEngine(const Parameters &params);",
+            with: """
+                /// Creates a heap-allocated engine registered with Tf_SharedPtrRetainReleaseHelper
+                /// for Swift ARC lifetime management.
+                USDIMAGINGGL_API SWIFT_RETURNS_RETAINED
+                static UsdImagingGLEngine* _Nonnull Create(const SdfPath& rootPath,
+                                                           const SdfPathVector& excludedPaths,
+                                                           const SdfPathVector& invisedPaths,
+                                                           const SdfPath& sceneDelegateID,
+                                                           const HdDriver& driver,
+                                                           const TfToken& rendererPluginId,
+                                                           const bool gpuEnabled,
+                                                           const bool displayUnloadedPrimsWithBounds,
+                                                           const bool allowAsynchronousSceneProcessing,
+                                                           const bool enableUsdDrawModes);
+
+                USDIMAGINGGL_API
+                UsdImagingGLEngine(const Parameters &params);
+            """
+          )
+          source = source.replacingOccurrences(
+            of: "    bool _enableUsdDrawModes = true;\n};\n\nPXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+                bool _enableUsdDrawModes = true;
+            };
+
+            PXR_NAMESPACE_CLOSE_SCOPE
+
+            inline void UsdImagingGLEngineRetain(Pixar::UsdImagingGLEngine* _Nonnull x) {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdImagingGLEngine>::Retain(x);
+            }
+            inline void UsdImagingGLEngineRelease(Pixar::UsdImagingGLEngine* _Nonnull x) {
+                Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdImagingGLEngine>::Release(x);
+            }
+            """
+          )
+        case "engine.cpp":
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            /* static */
+            UsdImagingGLEngine*
+            UsdImagingGLEngine::Create(const SdfPath& rootPath,
+                                       const SdfPathVector& excludedPaths,
+                                       const SdfPathVector& invisedPaths,
+                                       const SdfPath& sceneDelegateID,
+                                       const HdDriver& driver,
+                                       const TfToken& rendererPluginId,
+                                       const bool gpuEnabled,
+                                       const bool displayUnloadedPrimsWithBounds,
+                                       const bool allowAsynchronousSceneProcessing,
+                                       const bool enableUsdDrawModes)
+            {
+              std::shared_ptr<UsdImagingGLEngine> engine = std::make_shared<UsdImagingGLEngine>();
+
+              engine.reset(new UsdImagingGLEngine(
+                rootPath,
+                excludedPaths,
+                invisedPaths,
+                sceneDelegateID,
+                driver,
+                rendererPluginId,
+                gpuEnabled,
+                displayUnloadedPrimsWithBounds,
+                allowAsynchronousSceneProcessing,
+                enableUsdDrawModes
+              ));
+
+              return Tf_SharedPtrRetainReleaseHelper<UsdImagingGLEngine>::Register(engine);
+            }
+
+            PXR_NAMESPACE_CLOSE_SCOPE
+            """
+          )
+        default:
+          return
+      }
+    }
+
+    public static func sdfTypes(to source: inout String, fileBaseName: String, target: String)
+    {
+      guard (fileBaseName == "types.h" || fileBaseName == "valueTypeName.cpp"),
+            target == "Sdf"
+      else { return }
+
+      switch fileBaseName
+      {
+        case "types.h":
+          source = source.replacingOccurrences(
+            of: "extern SDF_API TfStaticData<const Sdf_ValueTypeNamesType,\n    Sdf_ValueTypeNamesType::_Init> SdfValueTypeNames;",
+            with: """
+            extern SDF_API TfStaticData<const Sdf_ValueTypeNamesType,
+                Sdf_ValueTypeNamesType::_Init> SdfValueTypeNames;
+
+            /// Swift-importable enum of all SdfValueTypeName cases.
+            /// Enumerators carry the SdfValueTypeNameType prefix so Swift's C++ interop
+            /// strips it and imports them as .bool, .uChar, .float3Array, etc.
+            /// Pass a value to SdfGetValueTypeName() to retrieve the corresponding
+            /// SdfValueTypeName for use with USD APIs.
+            enum class SdfValueTypeNameType {
+                SdfValueTypeNameTypeBool = 0,
+                SdfValueTypeNameTypeUChar, SdfValueTypeNameTypeInt, SdfValueTypeNameTypeUInt,
+                SdfValueTypeNameTypeInt64, SdfValueTypeNameTypeUInt64,
+                SdfValueTypeNameTypeHalf, SdfValueTypeNameTypeFloat, SdfValueTypeNameTypeDouble,
+                SdfValueTypeNameTypeTimeCode,
+                SdfValueTypeNameTypeString, SdfValueTypeNameTypeToken, SdfValueTypeNameTypeAsset,
+                SdfValueTypeNameTypeInt2, SdfValueTypeNameTypeInt3, SdfValueTypeNameTypeInt4,
+                SdfValueTypeNameTypeHalf2, SdfValueTypeNameTypeHalf3, SdfValueTypeNameTypeHalf4,
+                SdfValueTypeNameTypeFloat2, SdfValueTypeNameTypeFloat3, SdfValueTypeNameTypeFloat4,
+                SdfValueTypeNameTypeDouble2, SdfValueTypeNameTypeDouble3, SdfValueTypeNameTypeDouble4,
+                SdfValueTypeNameTypePoint3h, SdfValueTypeNameTypePoint3f, SdfValueTypeNameTypePoint3d,
+                SdfValueTypeNameTypeVector3h, SdfValueTypeNameTypeVector3f, SdfValueTypeNameTypeVector3d,
+                SdfValueTypeNameTypeNormal3h, SdfValueTypeNameTypeNormal3f, SdfValueTypeNameTypeNormal3d,
+                SdfValueTypeNameTypeColor3h, SdfValueTypeNameTypeColor3f, SdfValueTypeNameTypeColor3d,
+                SdfValueTypeNameTypeColor4h, SdfValueTypeNameTypeColor4f, SdfValueTypeNameTypeColor4d,
+                SdfValueTypeNameTypeQuath, SdfValueTypeNameTypeQuatf, SdfValueTypeNameTypeQuatd,
+                SdfValueTypeNameTypeMatrix2d, SdfValueTypeNameTypeMatrix3d, SdfValueTypeNameTypeMatrix4d,
+                SdfValueTypeNameTypeFrame4d,
+                SdfValueTypeNameTypeTexCoord2h, SdfValueTypeNameTypeTexCoord2f, SdfValueTypeNameTypeTexCoord2d,
+                SdfValueTypeNameTypeTexCoord3h, SdfValueTypeNameTypeTexCoord3f, SdfValueTypeNameTypeTexCoord3d,
+                SdfValueTypeNameTypeOpaque,
+                SdfValueTypeNameTypeGroup,
+                SdfValueTypeNameTypePathExpression,
+                SdfValueTypeNameTypeBoolArray,
+                SdfValueTypeNameTypeUCharArray, SdfValueTypeNameTypeIntArray, SdfValueTypeNameTypeUIntArray,
+                SdfValueTypeNameTypeInt64Array, SdfValueTypeNameTypeUInt64Array,
+                SdfValueTypeNameTypeHalfArray, SdfValueTypeNameTypeFloatArray, SdfValueTypeNameTypeDoubleArray,
+                SdfValueTypeNameTypeTimeCodeArray,
+                SdfValueTypeNameTypeStringArray, SdfValueTypeNameTypeTokenArray, SdfValueTypeNameTypeAssetArray,
+                SdfValueTypeNameTypeInt2Array, SdfValueTypeNameTypeInt3Array, SdfValueTypeNameTypeInt4Array,
+                SdfValueTypeNameTypeHalf2Array, SdfValueTypeNameTypeHalf3Array, SdfValueTypeNameTypeHalf4Array,
+                SdfValueTypeNameTypeFloat2Array, SdfValueTypeNameTypeFloat3Array, SdfValueTypeNameTypeFloat4Array,
+                SdfValueTypeNameTypeDouble2Array, SdfValueTypeNameTypeDouble3Array, SdfValueTypeNameTypeDouble4Array,
+                SdfValueTypeNameTypePoint3hArray, SdfValueTypeNameTypePoint3fArray, SdfValueTypeNameTypePoint3dArray,
+                SdfValueTypeNameTypeVector3hArray, SdfValueTypeNameTypeVector3fArray, SdfValueTypeNameTypeVector3dArray,
+                SdfValueTypeNameTypeNormal3hArray, SdfValueTypeNameTypeNormal3fArray, SdfValueTypeNameTypeNormal3dArray,
+                SdfValueTypeNameTypeColor3hArray, SdfValueTypeNameTypeColor3fArray, SdfValueTypeNameTypeColor3dArray,
+                SdfValueTypeNameTypeColor4hArray, SdfValueTypeNameTypeColor4fArray, SdfValueTypeNameTypeColor4dArray,
+                SdfValueTypeNameTypeQuathArray, SdfValueTypeNameTypeQuatfArray, SdfValueTypeNameTypeQuatdArray,
+                SdfValueTypeNameTypeMatrix2dArray, SdfValueTypeNameTypeMatrix3dArray, SdfValueTypeNameTypeMatrix4dArray,
+                SdfValueTypeNameTypeFrame4dArray,
+                SdfValueTypeNameTypeTexCoord2hArray, SdfValueTypeNameTypeTexCoord2fArray, SdfValueTypeNameTypeTexCoord2dArray,
+                SdfValueTypeNameTypeTexCoord3hArray, SdfValueTypeNameTypeTexCoord3fArray, SdfValueTypeNameTypeTexCoord3dArray,
+                SdfValueTypeNameTypePathExpressionArray,
+            };
+
+            SDF_API const SdfValueTypeName& SdfGetValueTypeName(SdfValueTypeNameType type);
+            """
+          )
+        case "valueTypeName.cpp":
+          source = source.replacingOccurrences(
+            of: "#include \"Sdf/valueTypeName.h\"",
+            with: "#include \"Sdf/valueTypeName.h\"\n#include \"Sdf/types.h\""
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE",
+            with: """
+            const SdfValueTypeName&
+            SdfGetValueTypeName(SdfValueTypeNameType type)
+            {
+                switch (type) {
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeBool:             return SdfValueTypeNames->Bool;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeUChar:            return SdfValueTypeNames->UChar;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt:              return SdfValueTypeNames->Int;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeUInt:             return SdfValueTypeNames->UInt;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt64:            return SdfValueTypeNames->Int64;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeUInt64:           return SdfValueTypeNames->UInt64;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf:             return SdfValueTypeNames->Half;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat:            return SdfValueTypeNames->Float;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble:           return SdfValueTypeNames->Double;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTimeCode:         return SdfValueTypeNames->TimeCode;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeString:           return SdfValueTypeNames->String;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeToken:            return SdfValueTypeNames->Token;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeAsset:            return SdfValueTypeNames->Asset;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt2:             return SdfValueTypeNames->Int2;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt3:             return SdfValueTypeNames->Int3;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt4:             return SdfValueTypeNames->Int4;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf2:            return SdfValueTypeNames->Half2;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf3:            return SdfValueTypeNames->Half3;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf4:            return SdfValueTypeNames->Half4;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat2:           return SdfValueTypeNames->Float2;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat3:           return SdfValueTypeNames->Float3;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat4:           return SdfValueTypeNames->Float4;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble2:          return SdfValueTypeNames->Double2;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble3:          return SdfValueTypeNames->Double3;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble4:          return SdfValueTypeNames->Double4;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3h:          return SdfValueTypeNames->Point3h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3f:          return SdfValueTypeNames->Point3f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3d:          return SdfValueTypeNames->Point3d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3h:         return SdfValueTypeNames->Vector3h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3f:         return SdfValueTypeNames->Vector3f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3d:         return SdfValueTypeNames->Vector3d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3h:         return SdfValueTypeNames->Normal3h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3f:         return SdfValueTypeNames->Normal3f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3d:         return SdfValueTypeNames->Normal3d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3h:          return SdfValueTypeNames->Color3h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3f:          return SdfValueTypeNames->Color3f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3d:          return SdfValueTypeNames->Color3d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4h:          return SdfValueTypeNames->Color4h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4f:          return SdfValueTypeNames->Color4f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4d:          return SdfValueTypeNames->Color4d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeQuath:            return SdfValueTypeNames->Quath;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatf:            return SdfValueTypeNames->Quatf;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatd:            return SdfValueTypeNames->Quatd;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix2d:         return SdfValueTypeNames->Matrix2d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix3d:         return SdfValueTypeNames->Matrix3d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix4d:         return SdfValueTypeNames->Matrix4d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFrame4d:          return SdfValueTypeNames->Frame4d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2h:       return SdfValueTypeNames->TexCoord2h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2f:       return SdfValueTypeNames->TexCoord2f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2d:       return SdfValueTypeNames->TexCoord2d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3h:       return SdfValueTypeNames->TexCoord3h;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3f:       return SdfValueTypeNames->TexCoord3f;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3d:       return SdfValueTypeNames->TexCoord3d;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeOpaque:           return SdfValueTypeNames->Opaque;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeGroup:            return SdfValueTypeNames->Group;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePathExpression:   return SdfValueTypeNames->PathExpression;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeBoolArray:        return SdfValueTypeNames->BoolArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeUCharArray:       return SdfValueTypeNames->UCharArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeIntArray:         return SdfValueTypeNames->IntArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeUIntArray:        return SdfValueTypeNames->UIntArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt64Array:       return SdfValueTypeNames->Int64Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeUInt64Array:      return SdfValueTypeNames->UInt64Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalfArray:        return SdfValueTypeNames->HalfArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloatArray:       return SdfValueTypeNames->FloatArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDoubleArray:      return SdfValueTypeNames->DoubleArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTimeCodeArray:    return SdfValueTypeNames->TimeCodeArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeStringArray:      return SdfValueTypeNames->StringArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTokenArray:       return SdfValueTypeNames->TokenArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeAssetArray:       return SdfValueTypeNames->AssetArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt2Array:        return SdfValueTypeNames->Int2Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt3Array:        return SdfValueTypeNames->Int3Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeInt4Array:        return SdfValueTypeNames->Int4Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf2Array:       return SdfValueTypeNames->Half2Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf3Array:       return SdfValueTypeNames->Half3Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf4Array:       return SdfValueTypeNames->Half4Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat2Array:      return SdfValueTypeNames->Float2Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat3Array:      return SdfValueTypeNames->Float3Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat4Array:      return SdfValueTypeNames->Float4Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble2Array:     return SdfValueTypeNames->Double2Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble3Array:     return SdfValueTypeNames->Double3Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble4Array:     return SdfValueTypeNames->Double4Array;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3hArray:     return SdfValueTypeNames->Point3hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3fArray:     return SdfValueTypeNames->Point3fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3dArray:     return SdfValueTypeNames->Point3dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3hArray:    return SdfValueTypeNames->Vector3hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3fArray:    return SdfValueTypeNames->Vector3fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3dArray:    return SdfValueTypeNames->Vector3dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3hArray:    return SdfValueTypeNames->Normal3hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3fArray:    return SdfValueTypeNames->Normal3fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3dArray:    return SdfValueTypeNames->Normal3dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3hArray:     return SdfValueTypeNames->Color3hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3fArray:     return SdfValueTypeNames->Color3fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3dArray:     return SdfValueTypeNames->Color3dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4hArray:     return SdfValueTypeNames->Color4hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4fArray:     return SdfValueTypeNames->Color4fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4dArray:     return SdfValueTypeNames->Color4dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeQuathArray:       return SdfValueTypeNames->QuathArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatfArray:       return SdfValueTypeNames->QuatfArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatdArray:       return SdfValueTypeNames->QuatdArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix2dArray:    return SdfValueTypeNames->Matrix2dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix3dArray:    return SdfValueTypeNames->Matrix3dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix4dArray:    return SdfValueTypeNames->Matrix4dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeFrame4dArray:     return SdfValueTypeNames->Frame4dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2hArray:  return SdfValueTypeNames->TexCoord2hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2fArray:  return SdfValueTypeNames->TexCoord2fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2dArray:  return SdfValueTypeNames->TexCoord2dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3hArray:  return SdfValueTypeNames->TexCoord3hArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3fArray:  return SdfValueTypeNames->TexCoord3fArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3dArray:  return SdfValueTypeNames->TexCoord3dArray;
+                    case SdfValueTypeNameType::SdfValueTypeNameTypePathExpressionArray: return SdfValueTypeNames->PathExpressionArray;
+                }
+            }
+
+            PXR_NAMESPACE_CLOSE_SCOPE
+            """
+          )
+        default:
+          return
+      }
+    }
+
+    public static func usdCommon(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "common.h" else { return }
+
+      // Convert plain C enum to scoped enum class. Enumerators keep the full
+      // UsdListPosition prefix so Swift's C++ interop strips it and imports them
+      // as .frontOfPrependList, .backOfPrependList, etc.
+      // Backward-compat constexpr aliases keep all existing C++ callers compiling unchanged.
+      source = source.replacingOccurrences(
+        of: #"enum\s+UsdListPosition\s*\{[\s\S]*?\};"#,
+        with: """
+        enum class UsdListPosition {
+            /// The position at the front of the prepend list.
+            /// An item added at this position will, after composition is applied,
+            /// be stronger than other items prepended in this layer, and stronger
+            /// than items added by weaker layers.
+            UsdListPositionFrontOfPrependList,
+            /// The position at the back of the prepend list.
+            /// An item added at this position will, after composition is applied,
+            /// be weaker than other items prepended in this layer, but stronger
+            /// than items added by weaker layers.
+            UsdListPositionBackOfPrependList,
+            /// The position at the front of the append list.
+            /// An item added at this position will, after composition is applied,
+            /// be stronger than other items appended in this layer, and stronger
+            /// than items added by weaker layers.
+            UsdListPositionFrontOfAppendList,
+            /// The position at the back of the append list.
+            /// An item added at this position will, after composition is applied,
+            /// be weaker than other items appended in this layer, but stronger
+            /// than items added by weaker layers.
+            UsdListPositionBackOfAppendList,
+        };
+
+        // Backward-compat aliases - all existing C++ callers compile unchanged.
+        constexpr UsdListPosition UsdListPositionFrontOfPrependList = UsdListPosition::UsdListPositionFrontOfPrependList;
+        constexpr UsdListPosition UsdListPositionBackOfPrependList  = UsdListPosition::UsdListPositionBackOfPrependList;
+        constexpr UsdListPosition UsdListPositionFrontOfAppendList  = UsdListPosition::UsdListPositionFrontOfAppendList;
+        constexpr UsdListPosition UsdListPositionBackOfAppendList   = UsdListPosition::UsdListPositionBackOfAppendList;
+        """,
+        options: .regularExpression
+      )
+
+      source = source.replacingOccurrences(
+        of: #"enum\s+UsdLoadPolicy\s*\{[\s\S]*?\};"#,
+        with: """
+        enum class UsdLoadPolicy {
+            /// Load a prim plus all its descendants.
+            UsdLoadPolicyWithDescendants,
+            /// Load a prim by itself with no descendants.
+            UsdLoadPolicyWithoutDescendants
+        };
+
+        // Backward-compat aliases - all existing C++ callers compile unchanged.
+        constexpr UsdLoadPolicy UsdLoadWithDescendants    = UsdLoadPolicy::UsdLoadPolicyWithDescendants;
+        constexpr UsdLoadPolicy UsdLoadWithoutDescendants = UsdLoadPolicy::UsdLoadPolicyWithoutDescendants;
+        """,
+        options: .regularExpression
+      )
+
+      // UsdSchemaKind is already enum class - add prefixed members for Swift interop
+      // alongside duplicate same-value aliases that keep UsdSchemaKind::Invalid etc. working.
+      source = source.replacingOccurrences(
+        of: #"enum(?:\s+class)?\s+UsdSchemaKind\s*\{[^}]*\};"#,
+        with: """
+        enum class UsdSchemaKind {
+            /// Invalid or unknown schema kind.
+            UsdSchemaKindInvalid,
+            /// Represents abstract or base schema types that are interface-only
+            /// and cannot be instantiated. These are reserved for core base classes
+            /// known to the usdGenSchema system, so this should never be assigned to
+            /// generated schema classes.
+            UsdSchemaKindAbstractBase,
+            /// Represents a non-concrete typed schema
+            UsdSchemaKindAbstractTyped,
+            /// Represents a concrete typed schema
+            UsdSchemaKindConcreteTyped,
+            /// Non-applied API schema
+            UsdSchemaKindNonAppliedAPI,
+            /// Single Apply API schema
+            UsdSchemaKindSingleApplyAPI,
+            /// Multiple Apply API Schema
+            UsdSchemaKindMultipleApplyAPI,
+            // Backward-compat aliases - all existing UsdSchemaKind::Xxx callers compile unchanged.
+            Invalid          = UsdSchemaKindInvalid,
+            AbstractBase     = UsdSchemaKindAbstractBase,
+            AbstractTyped    = UsdSchemaKindAbstractTyped,
+            ConcreteTyped    = UsdSchemaKindConcreteTyped,
+            NonAppliedAPI    = UsdSchemaKindNonAppliedAPI,
+            SingleApplyAPI   = UsdSchemaKindSingleApplyAPI,
+            MultipleApplyAPI = UsdSchemaKindMultipleApplyAPI,
+        };
+        """,
+        options: .regularExpression
+      )
+    }
+    
+    public static func xformOp(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "xformOp.h" else { return }
+
+      source = source.replacingOccurrences(
+        of: #"enum\s+Type\s*\{[\s\S]*?\};"#,
+        with: #"""
+        enum class Type {
+                TypeInvalid,   ///< Represents an invalid xformOp.
+                TypeTranslateX,///< Translation along the X-axis.
+                TypeTranslateY,///< Translation along the Y-axis.
+                TypeTranslateZ,///< Translation along the Z-axis.
+                TypeTranslate, ///< XYZ translation.
+                TypeScaleX,    ///< Scale along the X-axis.
+                TypeScaleY,    ///< Scale along the Y-axis.
+                TypeScaleZ,    ///< Scale along the Z-axis.
+                TypeScale,     ///< XYZ scale.
+                TypeRotateX,   ///< Rotation about the X-axis, <b>in degrees</b>.
+                TypeRotateY,   ///< Rotation about the Y-axis, <b>in degrees</b>.
+                TypeRotateZ,   ///< Rotation about the Z-axis, <b>in degrees</b>.
+                TypeRotateXYZ, ///< Set of 3 canonical Euler rotations
+                               ///  \ref usdGeom_rotationPackingOrder "in XYZ order"
+                TypeRotateXZY, ///< Set of 3 canonical Euler rotations 
+                               /// \ref usdGeom_rotationPackingOrder "in XZY order"
+                TypeRotateYXZ, ///< Set of 3 canonical Euler rotations 
+                               /// \ref usdGeom_rotationPackingOrder "in YXZ order"
+                TypeRotateYZX, ///< Set of 3 canonical Euler rotations 
+                               /// \ref usdGeom_rotationPackingOrder "in YZX order"
+                TypeRotateZXY, ///< Set of 3 canonical Euler rotations 
+                               /// \ref usdGeom_rotationPackingOrder "in ZXY order"
+                TypeRotateZYX, ///< Set of 3 canonical Euler rotations 
+                               /// \ref usdGeom_rotationPackingOrder "in ZYX order"
+                TypeOrient,    ///< Arbitrary axis/angle rotation, expressed as a quaternion.
+                TypeTransform  ///< A 4x4 matrix transformation.
+            };
+        
+            static constexpr Type TypeInvalid = Type::TypeInvalid;
+            static constexpr Type TypeTranslateX = Type::TypeTranslateX;
+            static constexpr Type TypeTranslateY = Type::TypeTranslateY;
+            static constexpr Type TypeTranslateZ = Type::TypeTranslateZ;
+            static constexpr Type TypeTranslate = Type::TypeTranslate;
+            static constexpr Type TypeScaleX = Type::TypeScaleX;
+            static constexpr Type TypeScaleY = Type::TypeScaleY;
+            static constexpr Type TypeScaleZ = Type::TypeScaleZ;
+            static constexpr Type TypeScale = Type::TypeScale;
+            static constexpr Type TypeRotateX = Type::TypeRotateX;
+            static constexpr Type TypeRotateY = Type::TypeRotateY;
+            static constexpr Type TypeRotateZ = Type::TypeRotateZ;
+            static constexpr Type TypeRotateXYZ = Type::TypeRotateXYZ;
+            static constexpr Type TypeRotateXZY = Type::TypeRotateXZY; 
+            static constexpr Type TypeRotateYXZ = Type::TypeRotateYXZ; 
+            static constexpr Type TypeRotateYZX = Type::TypeRotateYZX; 
+            static constexpr Type TypeRotateZXY = Type::TypeRotateZXY; 
+            static constexpr Type TypeRotateZYX = Type::TypeRotateZYX;
+            static constexpr Type TypeOrient = Type::TypeOrient;
+            static constexpr Type TypeTransform = Type::TypeTransform;
+        """#,
+        options: .regularExpression
+      )
+      source = source.replacingOccurrences(
+        of: #"enum\s+Precision\s*\{[\s\S]*?\};"#,
+        with: #"""
+        enum class Precision {
+                PrecisionDouble, ///< Double precision
+                PrecisionFloat,  ///< Floating-point precision 
+                PrecisionHalf    ///< Half-float precision
+            };
+        
+            static constexpr Precision PrecisionDouble = Precision::PrecisionDouble;
+            static constexpr Precision PrecisionFloat = Precision::PrecisionFloat;
+            static constexpr Precision PrecisionHalf = Precision::PrecisionHalf;
+        """#,
+        options: .regularExpression
+      )
+    }
+
+    public static func xformCommonAPI(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "xformCommonAPI.cpp" else { return }
+
+      // enum class Type doesn't support arithmetic or relational operators -
+      // cast to int for the static_assert subtractions and range comparisons.
+      source = source.replacingOccurrences(
+        of: """
+            static_assert(
+                UsdGeomXformOp::TypeRotateZYX - UsdGeomXformOp::TypeRotateXYZ == 5,
+                "Exactly six three-axis rotate op types");
+            return opType >= UsdGeomXformOp::TypeRotateXYZ &&
+                   opType <= UsdGeomXformOp::TypeRotateZYX;
+        """,
+        with: """
+            static_assert(
+                static_cast<int>(UsdGeomXformOp::TypeRotateZYX) - static_cast<int>(UsdGeomXformOp::TypeRotateXYZ) == 5,
+                "Exactly six three-axis rotate op types");
+            return static_cast<int>(opType) >= static_cast<int>(UsdGeomXformOp::TypeRotateXYZ) &&
+                   static_cast<int>(opType) <= static_cast<int>(UsdGeomXformOp::TypeRotateZYX);
+        """
+      )
+
+      source = source.replacingOccurrences(
+        of: """
+            static_assert(
+                UsdGeomXformOp::TypeRotateZYX - UsdGeomXformOp::TypeRotateX == 8,
+                "Exactly nine rotate op types");
+            return opType >= UsdGeomXformOp::TypeRotateX &&
+                   opType <= UsdGeomXformOp::TypeRotateZYX;
+        """,
+        with: """
+            static_assert(
+                static_cast<int>(UsdGeomXformOp::TypeRotateZYX) - static_cast<int>(UsdGeomXformOp::TypeRotateX) == 8,
+                "Exactly nine rotate op types");
+            return static_cast<int>(opType) >= static_cast<int>(UsdGeomXformOp::TypeRotateX) &&
+                   static_cast<int>(opType) <= static_cast<int>(UsdGeomXformOp::TypeRotateZYX);
+        """
+      )
+    }
+
+    public static func plugRegistry(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "registry.h" else { return }
+
+      source = source.replacingOccurrences(
+        of: "#include \"pxr/pxrns.h\"\n#include \"pxr/base/plug/api.h\"",
+        with: "#include \"pxr/pxrns.h\"\n#include \"Plug/api.h\"\n#include \"Arch/swiftInterop.h\""
+      )
+      source = source.replacingOccurrences(
+        of: "class PlugRegistry : public TfWeakBase {",
+        with: "class SWIFT_IMMORTAL_REFERENCE PlugRegistry : public TfWeakBase {"
+      )
     }
 
     public static func tfRefBaseHeader(to source: inout String, fileBaseName: String)
@@ -1348,6 +2066,15 @@ public enum Pxr: String, CaseIterable
         ("return typeDesc == *mx::Type::NONE;",          "return typeDesc.getName() == mx::Type::NONE->getName();"),
         ("return typeDesc == *mx::Type::SURFACESHADER;", "return typeDesc.getName() == mx::Type::SURFACESHADER->getName();"),
         ("return typeDesc == *mx::Type::FILENAME;",      "return typeDesc.getName() == mx::Type::FILENAME->getName();"),
+      ] { source = source.replacingOccurrences(of: old, with: new) }
+    }
+
+    public static func glslfxToolsPaths(to source: inout String)
+    {
+      for (old, new) in [
+        ("$TOOLS/hdSt/", "$TOOLS/HdSt/"),
+        ("$TOOLS/hdx/",  "$TOOLS/Hdx/"),
+        ("$TOOLS/glf/",  "$TOOLS/Glf/"),
       ] { source = source.replacingOccurrences(of: old, with: new) }
     }
 

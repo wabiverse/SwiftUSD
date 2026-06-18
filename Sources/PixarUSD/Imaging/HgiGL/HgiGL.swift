@@ -16,7 +16,7 @@ public enum HgiGL
 {
   public static func createHgi() -> Pixar.HgiGL
   {
-    Pixar.HgiGL.CreateHgi()
+    Pixar.HgiGL.Create()
   }
 }
 

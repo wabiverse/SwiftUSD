@@ -8,9 +8,9 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/renderPassShader.glslfx
+--- #import $TOOLS/HdSt/shaders/renderPassShader.glslfx
 
-#import $TOOLS/hdSt/shaders/renderPass.glslfx
+#import $TOOLS/HdSt/shaders/renderPass.glslfx
 
 -- configuration
 {

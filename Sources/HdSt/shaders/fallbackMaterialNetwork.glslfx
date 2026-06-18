@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/fallbackMaterialNetwork.glslfx
+--- #import $TOOLS/HdSt/shaders/fallbackMaterialNetwork.glslfx
 
 ---
 --- The fallback shader is used as a replacement shader if no material binding

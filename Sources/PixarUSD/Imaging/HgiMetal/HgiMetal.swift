@@ -18,7 +18,7 @@
   {
     public static func createHgi() -> Pixar.HgiMetal
     {
-      Pixar.HgiMetal.CreateHgi()
+      Pixar.HgiMetal.Create()
     }
   }
 

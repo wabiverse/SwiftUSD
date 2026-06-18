@@ -145,4 +145,29 @@ namespace Overlay
     buf = Pixar::ArchGetExecutablePath();
     return buf.c_str();
   }
+
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, double value)
+  {
+    return stage.SetMetadata(key, Pixar::VtValue(value));
+  }
+
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, int value)
+  {
+    return stage.SetMetadata(key, Pixar::VtValue(value));
+  }
+
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, float value)
+  {
+    return stage.SetMetadata(key, Pixar::VtValue(value));
+  }
+
+  bool StageSetMetadata(const Pixar::UsdStage &stage, const Pixar::TfToken &key, Pixar::TfToken value)
+  {
+    return stage.SetMetadata(key, Pixar::VtValue(value));
+  }
+
+  Pixar::SdfValueTypeName SdfGetValueTypeNameValue(Pixar::SdfValueTypeNameType type)
+  {
+    return Pixar::SdfGetValueTypeName(type);
+  }
 } // namespace Overlay

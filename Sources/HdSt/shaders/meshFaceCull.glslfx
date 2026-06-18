@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/meshFaceCull.glslfx
+--- #import $TOOLS/HdSt/shaders/meshFaceCull.glslfx
 
 
 --- --------------------------------------------------------------------------

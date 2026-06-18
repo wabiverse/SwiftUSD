@@ -81,7 +81,7 @@ namespace UsdImagingGLEngine_Impl
 ///
 /// The UsdImagingGLEngine is the main entry point API for rendering USD scenes.
 ///
-class UsdImagingGLEngine
+class SWIFT_SHARED_REFERENCE(UsdImagingGLEngineRetain, UsdImagingGLEngineRelease) UsdImagingGLEngine
 {
 public:
     /// Parameters to construct UsdImagingGLEngine.
@@ -118,6 +118,20 @@ public:
     /// \name Construction
     /// @{
     // ---------------------------------------------------------------------
+
+    /// Creates a heap-allocated engine registered with Tf_SharedPtrRetainReleaseHelper
+    /// for Swift ARC lifetime management.
+    USDIMAGINGGL_API SWIFT_RETURNS_RETAINED
+    static UsdImagingGLEngine* _Nonnull Create(const SdfPath& rootPath,
+                                               const SdfPathVector& excludedPaths,
+                                               const SdfPathVector& invisedPaths,
+                                               const SdfPath& sceneDelegateID,
+                                               const HdDriver& driver,
+                                               const TfToken& rendererPluginId,
+                                               const bool gpuEnabled,
+                                               const bool displayUnloadedPrimsWithBounds,
+                                               const bool allowAsynchronousSceneProcessing,
+                                               const bool enableUsdDrawModes);
 
     USDIMAGINGGL_API
     UsdImagingGLEngine(const Parameters &params);
@@ -466,6 +480,12 @@ public:
     /// Returns an AOV texture handle for the given token.
     USDIMAGINGGL_API
     HgiTextureHandle GetAovTexture(TfToken const& name) const;
+
+    /// Swift-importable variant - returns the raw non-owning HgiTexture pointer.
+    /// HgiHandle<T> templates are not importable by Swift; use this instead.
+    HgiTexture* _Nullable GetAovTexturePtr(TfToken const& name) const {
+        return GetAovTexture(name).Get();
+    }
 
     /// Returns the AOV render buffer for the given token.
     USDIMAGINGGL_API
@@ -877,5 +897,12 @@ private:
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+inline void UsdImagingGLEngineRetain(Pixar::UsdImagingGLEngine* _Nonnull x) {
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdImagingGLEngine>::Retain(x);
+}
+inline void UsdImagingGLEngineRelease(Pixar::UsdImagingGLEngine* _Nonnull x) {
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdImagingGLEngine>::Release(x);
+}
 
 #endif // PXR_USD_IMAGING_USD_IMAGING_GL_ENGINE_H

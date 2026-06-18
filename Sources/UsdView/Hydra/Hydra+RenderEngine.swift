@@ -78,7 +78,7 @@ public enum Hydra
       setupMaterial()
     }
 
-    public func render(at timeCode: Double, viewSize: CGSize) -> Pixar.HgiTextureHandle
+    public func render(at timeCode: Double, viewSize: CGSize) -> Pixar.HgiTexture?
     {
       // draws the scene using hydra.
       let cameraTransform = viewCamera.getTransform()
@@ -101,7 +101,6 @@ public enum Hydra
       params.frame = Usd.TimeCode(timeCode)
       params.clearColor = .init(0.0, 0.0, 0.0, 1.0)
       params.colorCorrectionMode = .sRGB
-      params.enableIdRender = false
       params.showGuides = true
       params.showRender = true
       params.showProxy = true

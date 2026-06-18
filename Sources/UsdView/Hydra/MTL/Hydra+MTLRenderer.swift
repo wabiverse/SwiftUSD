@@ -175,20 +175,15 @@ public extension Hydra
       #endif // os(macOS)
     }
 
-    public func getMetalTexture(from hgiTexture: Pixar.HgiTextureHandle) -> MTLTexture?
+    public func getMetalTexture(from hgiTexture: Pixar.HgiTexture) -> MTLTexture?
     {
-      // get the hgi texture handle.
-      guard let hgiTex = hgiTexture.Get()
-      else { Msg.logger.error("HYDRA: Failed to retrieve the hgi texture."); return nil }
+      let rawResource = hgiTexture.GetRawResource()
+      guard
+        rawResource != 0,
+        let ptr = UnsafeRawPointer(bitPattern: UInt(rawResource))
+      else { return nil }
 
-      // get the raw pointer from the hgi handle.
-      let rawPtr = UnsafeRawPointer(hgiTex)
-
-      // get the hgi texture from the raw pointer.
-      let texPtr: Pixar.HgiMetalTexture = Unmanaged.fromOpaque(rawPtr).takeUnretainedValue()
-
-      // get the metal texture from the hgi texture.
-      return texPtr.GetTextureId()
+      return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? any MTLTexture
     }
   }
 }

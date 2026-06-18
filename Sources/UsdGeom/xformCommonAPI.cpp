@@ -240,10 +240,10 @@ bool
 _IsThreeAxisRotateOpType(UsdGeomXformOp::Type opType)
 {
     static_assert(
-        UsdGeomXformOp::TypeRotateZYX - UsdGeomXformOp::TypeRotateXYZ == 5,
+        static_cast<int>(UsdGeomXformOp::TypeRotateZYX) - static_cast<int>(UsdGeomXformOp::TypeRotateXYZ) == 5,
         "Exactly six three-axis rotate op types");
-    return opType >= UsdGeomXformOp::TypeRotateXYZ &&
-           opType <= UsdGeomXformOp::TypeRotateZYX;
+    return static_cast<int>(opType) >= static_cast<int>(UsdGeomXformOp::TypeRotateXYZ) &&
+           static_cast<int>(opType) <= static_cast<int>(UsdGeomXformOp::TypeRotateZYX);
 }
 
 static constexpr
@@ -251,10 +251,10 @@ bool
 _IsRotateOpType(UsdGeomXformOp::Type opType)
 {
     static_assert(
-        UsdGeomXformOp::TypeRotateZYX - UsdGeomXformOp::TypeRotateX == 8,
+        static_cast<int>(UsdGeomXformOp::TypeRotateZYX) - static_cast<int>(UsdGeomXformOp::TypeRotateX) == 8,
         "Exactly nine rotate op types");
-    return opType >= UsdGeomXformOp::TypeRotateX &&
-           opType <= UsdGeomXformOp::TypeRotateZYX;
+    return static_cast<int>(opType) >= static_cast<int>(UsdGeomXformOp::TypeRotateX) &&
+           static_cast<int>(opType) <= static_cast<int>(UsdGeomXformOp::TypeRotateZYX);
 }
 
 static_assert(_IsRotateOpType(UsdGeomXformOp::TypeRotateX) &&

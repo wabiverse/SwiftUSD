@@ -128,7 +128,7 @@ public:
     static HgiUniquePtr CreatePlatformDefaultHgi();
 
     /// Returns a raw Hgi* registered with Tf_SharedPtrRetainReleaseHelper for Swift ARC.
-    HGI_API
+    HGI_API SWIFT_RETURNS_RETAINED
     static Hgi* CreatePlatformDefaultPtr();
 
     /// Helper function to return a Hgi object of choice supported by current 

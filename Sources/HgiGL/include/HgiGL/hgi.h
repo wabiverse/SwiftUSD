@@ -51,9 +51,11 @@ using HgiGLContextArenaHandle = HgiHandle<class HgiGLContextArena>;
 /// is used with the implied expectation that the same GL context is valid
 /// and current for the lifetime of the HgiGL instance.
 ///
-class HgiGL final : public Hgi
+class SWIFT_SHARED_REFERENCE(HgiGLRetain, HgiGLRelease) HgiGL final : public Hgi
 {
 public:
+    HGIGL_API SWIFT_RETURNS_RETAINED
+    static HgiGL* _Nonnull Create();
     HGIGL_API
     HgiGL();
 
@@ -219,5 +221,15 @@ private:
 #define HGIGL_API_VERSION 2
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+inline void HgiGLRetain(Pixar::HgiGL* _Nonnull x)
+{
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Retain(x);
+}
+
+inline void HgiGLRelease(Pixar::HgiGL* _Nonnull x)
+{
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Release(x);
+}
 
 #endif

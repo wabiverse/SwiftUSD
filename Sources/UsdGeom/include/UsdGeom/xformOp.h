@@ -107,7 +107,7 @@ class UsdGeomXformOp
 public:
   
     /// Enumerates the set of all transformation operation types.
-    enum Type {
+    enum class Type {
         TypeInvalid,   ///< Represents an invalid xformOp.
         TypeTranslateX,///< Translation along the X-axis.
         TypeTranslateY,///< Translation along the Y-axis.
@@ -121,27 +121,52 @@ public:
         TypeRotateY,   ///< Rotation about the Y-axis, <b>in degrees</b>.
         TypeRotateZ,   ///< Rotation about the Z-axis, <b>in degrees</b>.
         TypeRotateXYZ, ///< Set of 3 canonical Euler rotations
-                       ///  \ref usdGeom_rotationPackingOrder "in XYZ order"
+                       ///  ref usdGeom_rotationPackingOrder "in XYZ order"
         TypeRotateXZY, ///< Set of 3 canonical Euler rotations 
-                       /// \ref usdGeom_rotationPackingOrder "in XZY order"
+                       /// ref usdGeom_rotationPackingOrder "in XZY order"
         TypeRotateYXZ, ///< Set of 3 canonical Euler rotations 
-                       /// \ref usdGeom_rotationPackingOrder "in YXZ order"
+                       /// ref usdGeom_rotationPackingOrder "in YXZ order"
         TypeRotateYZX, ///< Set of 3 canonical Euler rotations 
-                       /// \ref usdGeom_rotationPackingOrder "in YZX order"
+                       /// ref usdGeom_rotationPackingOrder "in YZX order"
         TypeRotateZXY, ///< Set of 3 canonical Euler rotations 
-                       /// \ref usdGeom_rotationPackingOrder "in ZXY order"
+                       /// ref usdGeom_rotationPackingOrder "in ZXY order"
         TypeRotateZYX, ///< Set of 3 canonical Euler rotations 
-                       /// \ref usdGeom_rotationPackingOrder "in ZYX order"
+                       /// ref usdGeom_rotationPackingOrder "in ZYX order"
         TypeOrient,    ///< Arbitrary axis/angle rotation, expressed as a quaternion.
         TypeTransform  ///< A 4x4 matrix transformation.
     };
 
+    static constexpr Type TypeInvalid = Type::TypeInvalid;
+    static constexpr Type TypeTranslateX = Type::TypeTranslateX;
+    static constexpr Type TypeTranslateY = Type::TypeTranslateY;
+    static constexpr Type TypeTranslateZ = Type::TypeTranslateZ;
+    static constexpr Type TypeTranslate = Type::TypeTranslate;
+    static constexpr Type TypeScaleX = Type::TypeScaleX;
+    static constexpr Type TypeScaleY = Type::TypeScaleY;
+    static constexpr Type TypeScaleZ = Type::TypeScaleZ;
+    static constexpr Type TypeScale = Type::TypeScale;
+    static constexpr Type TypeRotateX = Type::TypeRotateX;
+    static constexpr Type TypeRotateY = Type::TypeRotateY;
+    static constexpr Type TypeRotateZ = Type::TypeRotateZ;
+    static constexpr Type TypeRotateXYZ = Type::TypeRotateXYZ;
+    static constexpr Type TypeRotateXZY = Type::TypeRotateXZY; 
+    static constexpr Type TypeRotateYXZ = Type::TypeRotateYXZ; 
+    static constexpr Type TypeRotateYZX = Type::TypeRotateYZX; 
+    static constexpr Type TypeRotateZXY = Type::TypeRotateZXY; 
+    static constexpr Type TypeRotateZYX = Type::TypeRotateZYX;
+    static constexpr Type TypeOrient = Type::TypeOrient;
+    static constexpr Type TypeTransform = Type::TypeTransform;
+
     /// Precision of the encoded transformation operation's value.
-    enum Precision {
+    enum class Precision {
         PrecisionDouble, ///< Double precision
         PrecisionFloat,  ///< Floating-point precision 
         PrecisionHalf    ///< Half-float precision
     };
+
+    static constexpr Precision PrecisionDouble = Precision::PrecisionDouble;
+    static constexpr Precision PrecisionFloat = Precision::PrecisionFloat;
+    static constexpr Precision PrecisionHalf = Precision::PrecisionHalf;
 
     // Default constructor returns an invalid XformOp.  Exists for 
     // container classes

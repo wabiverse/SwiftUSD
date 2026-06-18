@@ -30,9 +30,11 @@ enum {
 ///
 /// Metal implementation of the Hydra Graphics Interface.
 ///
-class HgiMetal final : public Hgi
+class SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease) HgiMetal final : public Hgi
 {
 public:
+    HGIMETAL_API SWIFT_RETURNS_RETAINED
+    static HgiMetal* _Nonnull Create();
     enum CommitCommandBufferWaitType {
         CommitCommandBuffer_NoWait = 0,
         CommitCommandBuffer_WaitUntilScheduled,
@@ -238,5 +240,15 @@ private:
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+inline void HgiMetalRetain(Pixar::HgiMetal* _Nonnull x)
+{
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Retain(x);
+}
+
+inline void HgiMetalRelease(Pixar::HgiMetal* _Nonnull x)
+{
+    Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::Hgi>::Release(x);
+}
 
 #endif
