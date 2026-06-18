@@ -898,6 +898,24 @@ public enum Pxr: String, CaseIterable
 
       let changed = priorContent.map { $0 != pxrSrc } ?? true
       try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
+
+      // hgiInterop.mm is guarded defined(__APPLE__); mirror it as hgiInterop.cpp
+      // with the inverse guard so non-Apple platforms get plain C++, this is
+      // required because linux debug builds otherwise have linker errors with:
+      //
+      // error: undefined reference to '__gnu_objc_personality_v0'
+      //
+      // because the .mm extension makes clang compile it as objc++ on linux,
+      // which emits DWARF unwind info referencing __gnu_objc_personality_v0
+      // from libobjc.
+      if fileURL.lastPathComponent == "hgiInterop.mm" {
+        let cppURL = fileURL.deletingLastPathComponent().appendingPathComponent("hgiInterop.cpp")
+        let cppSrc = pxrSrc
+          .replacingOccurrences(of: "#if defined(__APPLE__)\n\n", with: "#if !defined(__APPLE__)\n\n")
+          .replacingOccurrences(of: "\n#endif // defined(__APPLE__)\n", with: "\n#endif // !defined(__APPLE__)\n")
+        try cppSrc.write(to: cppURL, atomically: true, encoding: .utf8)
+      }
+
       return changed
     }
     catch
@@ -2171,6 +2189,8 @@ public enum Pxr: String, CaseIterable
       case "darwin.mm":
         guardMacro = "defined(__APPLE__)"
       case "glPlatformContextDarwin.mm", "glPlatformDebugWindowDarwin.mm":
+        guardMacro = "defined(__APPLE__)"
+      case "hgiInterop.mm":
         guardMacro = "defined(__APPLE__)"
       case "glPlatformContextWindows.cpp", "glPlatformDebugWindowWindows.cpp":
         guardMacro = "defined(_WIN32)"

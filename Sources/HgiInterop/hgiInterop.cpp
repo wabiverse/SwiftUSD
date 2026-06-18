@@ -1,4 +1,4 @@
-#if defined(__APPLE__)
+#if !defined(__APPLE__)
 
 //
 // Copyright 2020 Pixar
@@ -111,4 +111,4 @@ void HgiInterop::TransferToApp(
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__APPLE__)
+#endif // !defined(__APPLE__)
