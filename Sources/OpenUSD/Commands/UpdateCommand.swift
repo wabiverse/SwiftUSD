@@ -2262,9 +2262,11 @@ public enum Pxr: String, CaseIterable
 
         case "glPlatformDebugWindowGLX.h":
           // Guard X11/GLX headers and class body against Android - debug window is desktop-only.
+          // Anchor on the system header (never rewritten) rather than Tf/declarePtrs.h
+          // which is still in pxr/base/tf/ form when this patch runs.
           source = source.replacingOccurrences(
-            of: "#include \"pxr/pxrns.h\"\n#include \"Tf/declarePtrs.h\"\n#include <X11/Xlib.h>\n#include <GL/glx.h>",
-            with: "#include \"pxr/pxrns.h\"\n\n#if !defined(__ANDROID__)\n\n#include \"Tf/declarePtrs.h\"\n#include <X11/Xlib.h>\n#include <GL/glx.h>"
+            of: "#include <X11/Xlib.h>\n#include <GL/glx.h>",
+            with: "#if !defined(__ANDROID__)\n#include <X11/Xlib.h>\n#include <GL/glx.h>"
           )
           source = source.replacingOccurrences(
             of: "PXR_NAMESPACE_CLOSE_SCOPE\n\n#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H",
