@@ -2223,6 +2223,17 @@ public enum Pxr: String, CaseIterable
             with: "#elif defined(__linux__)\n#define ARCH_OS_LINUX\n#if defined(__ANDROID__)\n#define ARCH_OS_ANDROID\n#endif"
           )
 
+        case "glPlatformDebugContext.cpp":
+          // Exclude Android from the GLX/X11 debug context; add a no-op stub like Darwin/Windows.
+          source = source.replacingOccurrences(
+            of: "#if defined(ARCH_OS_LINUX)\n\n#include <GL/glx.h>",
+            with: "#if defined(ARCH_OS_LINUX) && !defined(ARCH_OS_ANDROID)\n\n#include <GL/glx.h>"
+          )
+          source = source.replacingOccurrences(
+            of: "#endif // ARCH_OS_LINUX\n\n////////////////////////////////////////////////////////////\n\n#if defined(ARCH_OS_DARWIN)",
+            with: "#endif // ARCH_OS_LINUX && !ARCH_OS_ANDROID\n\n////////////////////////////////////////////////////////////\n\n#if defined(ARCH_OS_ANDROID)\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nclass GarchGLPlatformDebugContextPrivate {\npublic:\n    GarchGLPlatformDebugContextPrivate(\n        int majorVersion, int minorVersion,\n        bool coreProfile, bool directRendering) {}\n    ~GarchGLPlatformDebugContextPrivate() {}\n\n    void MakeCurrent() {}\n};\n\nvoid *GarchSelectCoreProfileMacVisual()\n{\n    return nullptr;\n}\n\nPXR_NAMESPACE_CLOSE_SCOPE\n\n#endif // ARCH_OS_ANDROID\n\n////////////////////////////////////////////////////////////\n\n#if defined(ARCH_OS_DARWIN)"
+          )
+
         case "glPlatformContextGLX.h":
           source = source.replacingOccurrences(
             of: "#include \"pxr/pxrns.h\"\n#include <GL/glx.h>",
