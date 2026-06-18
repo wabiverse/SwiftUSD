@@ -455,6 +455,24 @@ public enum Pxr: String, CaseIterable
           let umbrellaPath = "\(packagePath)/Sources/\(target)/include/\(target)/\(target).h"
           let umbrellaURL = URL(fileURLWithPath: umbrellaPath)
           generateUmbrellaHeader(fileURL: umbrellaURL, for: target, appending: sourceFile)
+          
+          // various umbrella header modifications
+          switch target {
+            case "HgiInterop":
+              var umbrellaSrc = try String(contentsOf: umbrellaURL, encoding: .utf8)
+              // HgiInterop/metal.h is only for macOS.
+              umbrellaSrc = umbrellaSrc.replacingOccurrences(
+                of: "#include <HgiInterop/metal.h>",
+                with: "#if defined(__APPLE__) && defined(__has_include) && __has_include(<AppKit/AppKit.h>)\n#include <HgiInterop/metal.h>\n#endif"
+              )
+              umbrellaSrc = umbrellaSrc.replacingOccurrences(
+                of: "#include <HgiInterop/hgiinteropImpl.h>",
+                with: "#include <HgiInterop/hgiInteropImpl.h>"
+              )
+              try umbrellaSrc.write(to: umbrellaURL, atomically: true, encoding: .utf8)
+            default:
+              break
+          }
         }
 
         return dest
