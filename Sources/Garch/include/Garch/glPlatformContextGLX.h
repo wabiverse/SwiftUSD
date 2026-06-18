@@ -8,10 +8,39 @@
 #define PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H
 
 #include "pxr/pxrns.h"
-#include <GL/glx.h>
+
+#if defined(__ANDROID__)
+
+#include <EGL/egl.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+class GarchEGLContextState {
+public:
+    GarchEGLContextState();
+    GarchEGLContextState(EGLDisplay, EGLSurface, EGLContext);
+    bool operator==(const GarchEGLContextState& rhs) const;
+    size_t GetHash() const;
+    bool IsValid() const;
+    void MakeCurrent();
+    static void DoneCurrent();
+public:
+    EGLDisplay display;
+    EGLSurface drawable;
+    EGLContext context;
+private:
+    bool _defaultCtor;
+};
+
+typedef GarchEGLContextState GarchGLPlatformContextState;
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#else // !defined(__ANDROID__)
+
+#include <GL/glx.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
 
 class GarchGLXContextState {
 public:
@@ -45,10 +74,10 @@ private:
     bool _defaultCtor;
 };
 
-// Hide the platform specific type name behind a common name.
 typedef GarchGLXContextState GarchGLPlatformContextState;
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(__ANDROID__)
 
 #endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H

@@ -833,6 +833,7 @@ public enum Pxr: String, CaseIterable
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.garchAndroid(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
       Patch.pythonIncludes(to: &pxrSrc)
       Patch.pythonGuards(to: &pxrSrc, fileBaseName: fileURL.deletingPathExtension().lastPathComponent, pythonOnlyBasenames: exclusions.pythonOnly)
@@ -2173,8 +2174,10 @@ public enum Pxr: String, CaseIterable
         guardMacro = "defined(__APPLE__)"
       case "glPlatformContextWindows.cpp", "glPlatformDebugWindowWindows.cpp":
         guardMacro = "defined(_WIN32)"
-      case "glPlatformContextGLX.cpp", "glPlatformDebugWindowGLX.cpp":
+      case "glPlatformContextGLX.cpp":
         guardMacro = "defined(__ANDROID__) || defined(__linux__)"
+      case "glPlatformDebugWindowGLX.cpp":
+        guardMacro = "defined(__linux__) && !defined(__ANDROID__)"
       case "vulkan.cpp":
         guardMacro = "0"
       case "metal.mm":
@@ -2205,6 +2208,71 @@ public enum Pxr: String, CaseIterable
         )
       default:
         return
+      }
+    }
+
+    /** Adds ARCH_OS_ANDROID alongside ARCH_OS_LINUX in Arch/defines.h, and fixes
+     *  Garch to use EGL instead of GLX on Android (glPlatformContextGLX.h/.cpp + glApi.cpp). */
+    public static func garchAndroid(to source: inout String, fileBaseName: String)
+    {
+      switch fileBaseName
+      {
+        case "defines.h":
+          source = source.replacingOccurrences(
+            of: "#elif defined(__linux__)\n#define ARCH_OS_LINUX",
+            with: "#elif defined(__linux__)\n#define ARCH_OS_LINUX\n#if defined(__ANDROID__)\n#define ARCH_OS_ANDROID\n#endif"
+          )
+
+        case "glPlatformContextGLX.h":
+          source = source.replacingOccurrences(
+            of: "#include \"pxr/pxrns.h\"\n#include <GL/glx.h>",
+            with: "#include \"pxr/pxrns.h\"\n\n#if defined(__ANDROID__)\n\n#include <EGL/egl.h>"
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_OPEN_SCOPE\n\n\nclass GarchGLXContextState {",
+            with: "PXR_NAMESPACE_OPEN_SCOPE\n\nclass GarchEGLContextState {\npublic:\n    GarchEGLContextState();\n    GarchEGLContextState(EGLDisplay, EGLSurface, EGLContext);\n    bool operator==(const GarchEGLContextState& rhs) const;\n    size_t GetHash() const;\n    bool IsValid() const;\n    void MakeCurrent();\n    static void DoneCurrent();\npublic:\n    EGLDisplay display;\n    EGLSurface drawable;\n    EGLContext context;\nprivate:\n    bool _defaultCtor;\n};\n\ntypedef GarchEGLContextState GarchGLPlatformContextState;\n\nPXR_NAMESPACE_CLOSE_SCOPE\n\n#else // !defined(__ANDROID__)\n\n#include <GL/glx.h>\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nclass GarchGLXContextState {"
+          )
+          source = source.replacingOccurrences(
+            of: "// Hide the platform specific type name behind a common name.\ntypedef GarchGLXContextState GarchGLPlatformContextState;\n\n\nPXR_NAMESPACE_CLOSE_SCOPE",
+            with: "typedef GarchGLXContextState GarchGLPlatformContextState;\n\nPXR_NAMESPACE_CLOSE_SCOPE\n\n#endif // defined(__ANDROID__)"
+          )
+
+        case "glPlatformContextGLX.cpp":
+          // Replace GLX-only implementation with EGL (Android) / GLX (Linux) split.
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_OPEN_SCOPE\n\n\n//\n// GarchGLXContextState\n//\n\nGarchGLXContextState::GarchGLXContextState() :",
+            with: "PXR_NAMESPACE_OPEN_SCOPE\n\n#if defined(__ANDROID__)\n\n//\n// GarchEGLContextState\n//\n\nGarchEGLContextState::GarchEGLContextState() :\n    display(eglGetCurrentDisplay()),\n    drawable(eglGetCurrentSurface(EGL_DRAW)),\n    context(eglGetCurrentContext()),\n    _defaultCtor(true)\n{\n}\n\nGarchEGLContextState::GarchEGLContextState(\n    EGLDisplay display_, EGLSurface drawable_, EGLContext context_) :\n    display(display_), drawable(drawable_), context(context_),\n    _defaultCtor(false)\n{\n}\n\nbool\nGarchEGLContextState::operator==(const GarchEGLContextState& rhs) const\n{\n    return display  == rhs.display  &&\n           drawable == rhs.drawable &&\n           context  == rhs.context;\n}\n\nsize_t\nGarchEGLContextState::GetHash() const\n{\n    return TfHash::Combine(\n        display,\n        drawable,\n        context\n    );\n}\n\nbool\nGarchEGLContextState::IsValid() const\n{\n    return display != EGL_NO_DISPLAY &&\n           drawable != EGL_NO_SURFACE &&\n           context  != EGL_NO_CONTEXT;\n}\n\nvoid\nGarchEGLContextState::MakeCurrent()\n{\n    if (IsValid()) {\n        eglMakeCurrent(display, drawable, drawable, context);\n    }\n    else if (_defaultCtor) {\n        DoneCurrent();\n    }\n}\n\nvoid\nGarchEGLContextState::DoneCurrent()\n{\n    if (EGLDisplay dpy = eglGetCurrentDisplay()) {\n        eglMakeCurrent(dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);\n    }\n}\n\nGarchGLPlatformContextState\nGarchGetNullGLPlatformContextState()\n{\n    return GarchEGLContextState(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);\n}\n\n#else // !defined(__ANDROID__)\n\n//\n// GarchGLXContextState\n//\n\nGarchGLXContextState::GarchGLXContextState() :"
+          )
+          source = source.replacingOccurrences(
+            of: "GarchGLPlatformContextState\nGarchGetNullGLPlatformContextState()\n{\n    return GarchGLXContextState(NULL, None, NULL);\n}\n\nPXR_NAMESPACE_CLOSE_SCOPE",
+            with: "GarchGLPlatformContextState\nGarchGetNullGLPlatformContextState()\n{\n    return GarchGLXContextState(NULL, None, NULL);\n}\n\n#endif // defined(__ANDROID__)\n\nPXR_NAMESPACE_CLOSE_SCOPE"
+          )
+
+        case "glApi.cpp":
+          // Add EGL include for Android.
+          source = source.replacingOccurrences(
+            of: "#include \"Garch/glApi.h\"\n\n#include \"Arch/defines.h\"\n#include \"Arch/library.h\"\n#include \"Tf/diagnostic.h\"",
+            with: "#include \"Garch/glApi.h\"\n\n#include \"Arch/defines.h\"\n#include \"Arch/library.h\"\n#include \"Tf/diagnostic.h\"\n\n#if defined(__ANDROID__)\n#include <EGL/egl.h>\n#endif"
+          )
+          // Use libGLESv2 + eglGetProcAddress on Android instead of libGL + glXGetProcAddressARB.
+          source = source.replacingOccurrences(
+            of: "#elif defined(ARCH_OS_LINUX)\n    libHandle = ArchLibraryOpen(\"libGL.so.1\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) ArchLibraryGetSymbolAddress(libHandle, \"glXGetProcAddressARB\");",
+            with: "#elif defined(ARCH_OS_LINUX)\n#if defined(ARCH_OS_ANDROID)\n    libHandle = ArchLibraryOpen(\"libGLESv2.so\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) eglGetProcAddress;\n#else\n    libHandle = ArchLibraryOpen(\"libGL.so.1\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) ArchLibraryGetSymbolAddress(libHandle, \"glXGetProcAddressARB\");\n#endif"
+          )
+
+        case "glPlatformDebugWindowGLX.h":
+          // Guard X11/GLX headers and class body against Android - debug window is desktop-only.
+          source = source.replacingOccurrences(
+            of: "#include \"pxr/pxrns.h\"\n#include \"Tf/declarePtrs.h\"\n#include <X11/Xlib.h>\n#include <GL/glx.h>",
+            with: "#include \"pxr/pxrns.h\"\n\n#if !defined(__ANDROID__)\n\n#include \"Tf/declarePtrs.h\"\n#include <X11/Xlib.h>\n#include <GL/glx.h>"
+          )
+          source = source.replacingOccurrences(
+            of: "PXR_NAMESPACE_CLOSE_SCOPE\n\n#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H",
+            with: "PXR_NAMESPACE_CLOSE_SCOPE\n\n#endif  // !defined(__ANDROID__)\n\n#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H"
+          )
+
+        default:
+          return
       }
     }
 
