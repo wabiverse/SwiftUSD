@@ -418,17 +418,22 @@ public:
 
     /// Resize the vector to \p newSize and insert copies of \v.
     ///
-    void resize(size_type newSize, const value_type &v = value_type()) {
-        // If the new size is smaller than the current size, let go of some
-        // entries at the tail.
+    void resize(size_type newSize) {
         if (newSize < size()) {
-            erase(const_iterator(data() + newSize), 
-                  const_iterator(data() + size())); 
+            erase(const_iterator(data() + newSize),
+                  const_iterator(data() + size()));
+        } else if (newSize > size()) {
+            reserve(newSize);
+            std::uninitialized_value_construct(data() + size(), data() + newSize);
+            _size = newSize;
         }
+    }
 
-        // Otherwise, lets grow and fill: Reserve some storage, fill the tail
-        // end with copies of v, and update the new size.
-        else if (newSize > size()) {
+    void resize(size_type newSize, const value_type &v) {
+        if (newSize < size()) {
+            erase(const_iterator(data() + newSize),
+                  const_iterator(data() + size()));
+        } else if (newSize > size()) {
             reserve(newSize);
             std::uninitialized_fill(data() + size(), data() + newSize, v);
             _size = newSize;

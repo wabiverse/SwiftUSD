@@ -359,4 +359,14 @@ HgiGL::_SubmitCmds(HgiCmds* cmds, HgiSubmitWaitType wait)
     return result;
 }
 
+/* static */
+HgiGL*
+HgiGL::Create()
+{
+    std::shared_ptr<HgiGL> ptr = std::make_shared<HgiGL>();
+    std::shared_ptr<Hgi> hgiPtr = ptr;
+    return static_cast<HgiGL*>(
+        Tf_SharedPtrRetainReleaseHelper<Hgi>::Register(hgiPtr));
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -135,11 +135,11 @@ HdSt_RenderPassShaderKey::GetGlslfxString() const
     ss << "-- glslfx version 0.1\n";
 
     if (!GetGlslfxFilename().IsEmpty()) {
-        ss << "#import $TOOLS/hdSt/shaders/" 
+        ss << "#import $TOOLS/HdSt/shaders/" 
            << GetGlslfxFilename().GetText() << "\n";
     }
     // Additionally need one more import.
-    ss << "#import $TOOLS/hdx/shaders/" << _tokens->selectionGlslfx << "\n";
+    ss << "#import $TOOLS/Hdx/shaders/" << _tokens->selectionGlslfx << "\n";
 
     ss << "-- configuration\n"
        << "{\"techniques\": {\"default\": {\n";

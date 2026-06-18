@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/overlayShader.glslfx
+--- #import $TOOLS/HdSt/shaders/overlayShader.glslfx
 
 ---
 --- The fallback overlay shader is used as a replacement shader if the

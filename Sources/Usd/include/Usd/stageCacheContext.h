@@ -135,11 +135,13 @@ public:
         : _blockType(blockType) {}
 
 private:
+    public:
     /// Heap-allocates a context registered with Tf_SharedPtrRetainReleaseHelper
     /// so Swift ARC can manage it - destruction pops the thread-local cache stack.
-    USD_API
+    USD_API SWIFT_RETURNS_RETAINED
     static UsdStageCacheContext* _Nonnull Create(UsdStageCache& cache);
 
+    private:
     friend class UsdStage;
 
     static std::vector<const UsdStageCache *> _GetReadOnlyCaches();

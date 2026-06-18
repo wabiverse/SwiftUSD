@@ -9,6 +9,7 @@
 
 #include "pxr/pxrns.h"
 #include "Plug/api.h"
+#include "Arch/swiftInterop.h"
 
 #include "Js/value.h"
 #include "Tf/declarePtrs.h"
@@ -316,7 +317,7 @@ class Plug_RegistrationMetadata;
 /// \endcode
 ///
 
-class PlugRegistry : public TfWeakBase {
+class SWIFT_IMMORTAL_REFERENCE PlugRegistry : public TfWeakBase {
     PlugRegistry(PlugRegistry const &) = delete;
     PlugRegistry &operator=(PlugRegistry const &) = delete;
 public:

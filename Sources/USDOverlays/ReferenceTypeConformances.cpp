@@ -44,6 +44,38 @@ bool __Overlay::operatorEqualsEquals(const Pixar::UsdStage& l,
   return &l == &r;
 }
 
+
+void* _Nonnull _address(Pixar::TfSimpleRefBase* _Nonnull x) {
+    return reinterpret_cast<void*>(x);
+}
+Pixar::TfRefPtr<Pixar::TfSimpleRefBase> _asRefPtrType(Pixar::TfSimpleRefBase* _Nonnull x) {
+    return Pixar::TfRefPtr<Pixar::TfSimpleRefBase>(x);
+}
+Pixar::TfSimpleRefBase * _Nullable _fromRefPtrType(const Pixar::TfRefPtr<Pixar::TfSimpleRefBase>& x) {
+    if (!x) { return nullptr; }
+    Pixar::Tf_RetainReleaseHelper::retain(x.operator->());
+    return x.operator->();
+}
+Pixar::TfSimpleRefBase * _Nullable _fromConstRefPtrType(const Pixar::TfRefPtr<const Pixar::TfSimpleRefBase>& x) {
+    if (!x) { return nullptr; }
+    Pixar::TfSimpleRefBase* result = const_cast<Pixar::TfSimpleRefBase *>(x.operator->());
+    Pixar::Tf_RetainReleaseHelper::retain(result);
+    return result;
+}
+Pixar::TfSimpleRefBase * _Nullable _fromRawPointer__ZN3Pixar15TfSimpleRefBaseE(void* _Nullable p) {
+    return __Overlay::dynamic_cast_raw_to_frt<Pixar::TfSimpleRefBase>(p);
+}
+Pixar::TfRefPtr<Pixar::TfSimpleRefBase>_nullRefPtr__ZN3Pixar15TfSimpleRefBaseE() {
+    return Pixar::TfRefPtr<Pixar::TfSimpleRefBase>(nullptr);
+}
+bool _isNonnull(const Pixar::TfRefPtr<Pixar::TfSimpleRefBase> & p) {
+    return (bool)p;
+}
+bool _isNonnull(const Pixar::TfRefPtr<const Pixar::TfSimpleRefBase> & p) {
+    return (bool)p;
+}
+
+
 void* _Nonnull _address(Pixar::UsdStage* _Nonnull x) {
   return reinterpret_cast<void*>(x);
 }

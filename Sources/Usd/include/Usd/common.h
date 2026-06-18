@@ -68,7 +68,7 @@ typedef std::map<class TfToken, VtValue,
 /// Specifies a position to add items to lists.  Used by some Add()
 /// methods in the USD API that manipulate lists, such as AddReference().
 ///
-enum UsdListPosition {
+enum class UsdListPosition {
     /// The position at the front of the prepend list.
     /// An item added at this position will, after composition is applied,
     /// be stronger than other items prepended in this layer, and stronger
@@ -91,17 +91,27 @@ enum UsdListPosition {
     UsdListPositionBackOfAppendList,
 };
 
+// Backward-compat aliases - all existing C++ callers compile unchanged.
+constexpr UsdListPosition UsdListPositionFrontOfPrependList = UsdListPosition::UsdListPositionFrontOfPrependList;
+constexpr UsdListPosition UsdListPositionBackOfPrependList  = UsdListPosition::UsdListPositionBackOfPrependList;
+constexpr UsdListPosition UsdListPositionFrontOfAppendList  = UsdListPosition::UsdListPositionFrontOfAppendList;
+constexpr UsdListPosition UsdListPositionBackOfAppendList   = UsdListPosition::UsdListPositionBackOfAppendList;
+
 /// \enum UsdLoadPolicy
 ///
 /// Controls UsdStage::Load() and UsdPrim::Load() behavior regarding whether or
 /// not descendant prims are loaded.
 ///
-enum UsdLoadPolicy {
+enum class UsdLoadPolicy {
     /// Load a prim plus all its descendants.
-    UsdLoadWithDescendants,
+    UsdLoadPolicyWithDescendants,
     /// Load a prim by itself with no descendants.
-    UsdLoadWithoutDescendants
+    UsdLoadPolicyWithoutDescendants
 };
+
+// Backward-compat aliases - all existing C++ callers compile unchanged.
+constexpr UsdLoadPolicy UsdLoadWithDescendants    = UsdLoadPolicy::UsdLoadPolicyWithDescendants;
+constexpr UsdLoadPolicy UsdLoadWithoutDescendants = UsdLoadPolicy::UsdLoadPolicyWithoutDescendants;
 
 /// \enum UsdSchemaKind
 ///
@@ -111,22 +121,30 @@ enum UsdLoadPolicy {
 ///
 enum class UsdSchemaKind {
     /// Invalid or unknown schema kind.
-    Invalid,
+    UsdSchemaKindInvalid,
     /// Represents abstract or base schema types that are interface-only
     /// and cannot be instantiated. These are reserved for core base classes
     /// known to the usdGenSchema system, so this should never be assigned to
     /// generated schema classes.
-    AbstractBase,
+    UsdSchemaKindAbstractBase,
     /// Represents a non-concrete typed schema
-    AbstractTyped,
+    UsdSchemaKindAbstractTyped,
     /// Represents a concrete typed schema
-    ConcreteTyped,
+    UsdSchemaKindConcreteTyped,
     /// Non-applied API schema
-    NonAppliedAPI,
+    UsdSchemaKindNonAppliedAPI,
     /// Single Apply API schema
-    SingleApplyAPI,
+    UsdSchemaKindSingleApplyAPI,
     /// Multiple Apply API Schema
-    MultipleApplyAPI
+    UsdSchemaKindMultipleApplyAPI,
+    // Backward-compat aliases - all existing UsdSchemaKind::Xxx callers compile unchanged.
+    Invalid          = UsdSchemaKindInvalid,
+    AbstractBase     = UsdSchemaKindAbstractBase,
+    AbstractTyped    = UsdSchemaKindAbstractTyped,
+    ConcreteTyped    = UsdSchemaKindConcreteTyped,
+    NonAppliedAPI    = UsdSchemaKindNonAppliedAPI,
+    SingleApplyAPI   = UsdSchemaKindSingleApplyAPI,
+    MultipleApplyAPI = UsdSchemaKindMultipleApplyAPI,
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

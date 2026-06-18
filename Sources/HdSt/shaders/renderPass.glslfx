@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/renderPass.glslfx
+--- #import $TOOLS/HdSt/shaders/renderPass.glslfx
 
 -- glsl RenderPass.Camera
 

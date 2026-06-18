@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/instancing.glslfx
+--- #import $TOOLS/HdSt/shaders/instancing.glslfx
 
 --- --------------------------------------------------------------------------
 -- glsl Instancing.Transform

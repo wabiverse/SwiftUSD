@@ -13,6 +13,7 @@
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/types.h"
+#include "Arch/swiftInterop.h"
 
 #include <string>
 #include <vector>
@@ -140,7 +141,7 @@ bool operator!=(
 /// To the client (HdSt) texture resources are referred to via
 /// opaque, stateless handles (HgTextureHandle).
 ///
-class HgiTexture
+class SWIFT_UNSAFE_REFERENCE HgiTexture
 {
 public:
     HGI_API

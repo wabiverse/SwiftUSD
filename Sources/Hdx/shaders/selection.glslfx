@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdx/shaders/selection.glslfx
+--- #import $TOOLS/Hdx/shaders/selection.glslfx
 
 --- --------------------------------------------------------------------------
 -- glsl Selection.DecodeUtils

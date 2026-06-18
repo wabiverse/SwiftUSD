@@ -21,23 +21,6 @@ public enum UsdImagingGL
 
 public extension UsdImagingGL.Engine
 {
-  static func createEngine() -> UsdImagingGL.Engine
-  {
-    UsdImagingGL.Engine.CreateEngine()
-  }
-
-  static func createEngine(params: Parameters) -> UsdImagingGL.Engine
-  {
-    UsdImagingGL.Engine.CreateEngine(params)
-  }
-
-  static func createEngine(driver: HdDriver = HdDriver(name: Tf.Token(), driver: VtValue()),
-                           rendererPluginId: Tf.Token = Tf.Token(),
-                           gpuEnabled: Bool = true) -> UsdImagingGL.Engine
-  {
-    UsdImagingGL.Engine.CreateEngine(driver, rendererPluginId, gpuEnabled)
-  }
-
   static func createEngine(rootPath: Sdf.Path,
                            excludedPaths: Sdf.PathVector,
                            invisedPaths: Sdf.PathVector = Sdf.PathVector(),
@@ -46,9 +29,10 @@ public extension UsdImagingGL.Engine
                            rendererPluginId: Tf.Token = Tf.Token(),
                            gpuEnabled: Bool = true,
                            displayUnloadedPrimsWithBounds: Bool = false,
-                           allowAsynchronousSceneProcessing: Bool = false) -> UsdImagingGL.Engine
+                           allowAsynchronousSceneProcessing: Bool = false,
+                           enableUsdDrawModes: Bool = true) -> UsdImagingGL.Engine
   {
-    UsdImagingGL.Engine.CreateEngine(
+    return UsdImagingGL.Engine.Create(
       rootPath,
       excludedPaths,
       invisedPaths,
@@ -57,7 +41,8 @@ public extension UsdImagingGL.Engine
       rendererPluginId,
       gpuEnabled,
       displayUnloadedPrimsWithBounds,
-      allowAsynchronousSceneProcessing
+      allowAsynchronousSceneProcessing,
+      enableUsdDrawModes
     )
   }
 
@@ -112,8 +97,8 @@ public extension UsdImagingGL.Engine
     SetLightingState(lights, material, sceneAmbient)
   }
 
-  func getAovTexture(_ aovName: Hd.AovTokens) -> Pixar.HgiTextureHandle
+  func getAovTexture(_ aovName: Hd.AovTokens) -> Pixar.HgiTexture?
   {
-    GetAovTexture(aovName.token)
+    GetAovTexturePtr(aovName.token)
   }
 }

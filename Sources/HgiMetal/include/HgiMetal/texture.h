@@ -12,6 +12,7 @@
 #include "pxr/pxrns.h"
 #include "HgiMetal/api.h"
 #include "Hgi/texture.h"
+#include "Arch/swiftInterop.h"
 
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -22,7 +23,7 @@ class HgiMetal;
 ///
 /// Represents a Metal GPU texture resource.
 ///
-class HgiMetalTexture final : public HgiTexture {
+class SWIFT_UNSAFE_REFERENCE HgiMetalTexture final : public HgiTexture {
 public:
     HGIMETAL_API
     ~HgiMetalTexture() override;

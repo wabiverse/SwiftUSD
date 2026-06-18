@@ -25,6 +25,6 @@ public extension Sdf
 {
   static func getValueType(for type: SdfValueTypeNameType) -> Sdf.ValueTypeName
   {
-    Pixar.SdfGetValueType(type)
+    Overlay.SdfGetValueTypeNameValue(type)
   }
 }

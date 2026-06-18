@@ -36,6 +36,6 @@ public extension UsdStageCacheContext
   @discardableResult
   static func bind(cache: inout UsdStageCache) -> UsdStageCacheContext
   {
-    UsdStageCacheContext.CreateCache(&cache)
+    Pixar.UsdStageCacheContext.Create(&cache)
   }
 }

@@ -16,6 +16,6 @@ namespace Overlay
 {
   Pixar::VtValue GetValue(Pixar::HgiGL *hgi)
   {
-    return Pixar::VtValue(hgi);
+    return Pixar::VtValue(static_cast<Pixar::Hgi*>(hgi));
   }
 }

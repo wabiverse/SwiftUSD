@@ -105,8 +105,8 @@ public extension Usd.Stage
     {
       switch self
       {
-        case .all: InitialLoadSet.LoadAll
-        case .none: InitialLoadSet.LoadNone
+        case .all: InitialLoadSet(0)
+        case .none: InitialLoadSet(1)
       }
     }
   }
@@ -449,7 +449,7 @@ public extension Usd.Stage
    * This is equivalent to ``Usd.PrimRange.stage()``. */
   func traverse() -> [Usd.Prim]
   {
-    let it = Usd.PrimRange.Stage(getPtr(), .init())
+    let it = Usd.PrimRange.Stage(Overlay.TfWeakPtr(self), .init())
 
     return IteratorSequence(it).map { $0 }
   }
@@ -534,25 +534,25 @@ public extension Usd.Stage
   @discardableResult
   func setMetadata(_ key: String, _ value: Double) -> Bool
   {
-    SetMetadata(Tf.Token(key), value)
+    Overlay.StageSetMetadata(self, Tf.Token(key), value)
   }
 
   @discardableResult
-  func setMetadata(_ key: String, _ value: Int) -> Bool
+  func setMetadata(_ key: String, _ value: Int32) -> Bool
   {
-    SetMetadata(Tf.Token(key), value)
+    Overlay.StageSetMetadata(self, Tf.Token(key), value)
   }
 
   @discardableResult
   func setMetadata(_ key: String, _ value: Float) -> Bool
   {
-    SetMetadata(Tf.Token(key), value)
+    Overlay.StageSetMetadata(self, Tf.Token(key), value)
   }
 
   @discardableResult
   func setMetadata(_ key: String, _ value: Tf.Token) -> Bool
   {
-    SetMetadata(Tf.Token(key), value)
+    Overlay.StageSetMetadata(self, Tf.Token(key), value)
   }
 
   func exportToString(_ result: inout String, addSourceFileComment: Bool = true)

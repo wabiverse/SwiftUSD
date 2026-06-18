@@ -3029,4 +3029,35 @@ UsdImagingGLEngine::UseUsdImagingSceneIndex()
     return result;
 }
 
+/* static */
+UsdImagingGLEngine*
+UsdImagingGLEngine::Create(const SdfPath& rootPath,
+                           const SdfPathVector& excludedPaths,
+                           const SdfPathVector& invisedPaths,
+                           const SdfPath& sceneDelegateID,
+                           const HdDriver& driver,
+                           const TfToken& rendererPluginId,
+                           const bool gpuEnabled,
+                           const bool displayUnloadedPrimsWithBounds,
+                           const bool allowAsynchronousSceneProcessing,
+                           const bool enableUsdDrawModes)
+{
+  std::shared_ptr<UsdImagingGLEngine> engine = std::make_shared<UsdImagingGLEngine>();
+
+  engine.reset(new UsdImagingGLEngine(
+    rootPath,
+    excludedPaths,
+    invisedPaths,
+    sceneDelegateID,
+    driver,
+    rendererPluginId,
+    gpuEnabled,
+    displayUnloadedPrimsWithBounds,
+    allowAsynchronousSceneProcessing,
+    enableUsdDrawModes
+  ));
+
+  return Tf_SharedPtrRetainReleaseHelper<UsdImagingGLEngine>::Register(engine);
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE
