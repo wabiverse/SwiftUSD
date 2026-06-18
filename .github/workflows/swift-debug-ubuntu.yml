@@ -11,9 +11,10 @@ jobs:
         swift: ["6.3.2"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: swift-actions/setup-swift@v2
+      - uses: swift-actions/setup-swift@v3
         with:
           swift-version: ${{ matrix.swift }}
+          skip-verify-signature: true
       - uses: actions/checkout@v4
       - name: 🔥 Refresh Index
         run: sudo apt update && sudo apt install -y liblzma-dev
