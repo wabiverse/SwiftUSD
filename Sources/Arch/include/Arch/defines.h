@@ -14,6 +14,9 @@
 #define ARCH_OS_WASM_VM
 #elif defined(__linux__)
 #define ARCH_OS_LINUX
+#if defined(__ANDROID__)
+#define ARCH_OS_ANDROID
+#endif
 #elif defined(__APPLE__)
 #include <TargetConditionals.h>
 #define ARCH_OS_DARWIN

@@ -1,4 +1,4 @@
-#if defined(__ANDROID__) || defined(__linux__)
+#if defined(__linux__) && !defined(__ANDROID__)
 
 //
 // Copyright 2016 Pixar
@@ -208,4 +208,4 @@ Garch_GLPlatformDebugWindow::ExitApp()
 PXR_NAMESPACE_CLOSE_SCOPE
 
 
-#endif // defined(__ANDROID__) || defined(__linux__)
+#endif // defined(__linux__) && !defined(__ANDROID__)

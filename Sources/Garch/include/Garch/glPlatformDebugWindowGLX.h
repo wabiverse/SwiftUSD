@@ -41,4 +41,6 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
+#endif  // !defined(__ANDROID__)
+
 #endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H
