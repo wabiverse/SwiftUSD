@@ -383,6 +383,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -456,6 +457,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -475,6 +477,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -494,6 +497,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -516,6 +520,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -536,6 +541,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -555,6 +561,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -573,6 +580,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -594,6 +602,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
     
@@ -616,6 +625,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -640,6 +650,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -659,6 +670,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -689,7 +701,8 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-        .define("YY_NO_UNISTD_H", .when(platforms: [.windows]))
+        .define("YY_NO_UNISTD_H", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -714,6 +727,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -746,6 +760,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -767,6 +782,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -798,6 +814,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -824,6 +841,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -849,6 +867,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -878,6 +897,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -904,6 +924,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -926,6 +947,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1006,6 +1028,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1038,6 +1061,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1067,6 +1091,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1090,6 +1115,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1116,6 +1142,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1143,6 +1170,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1172,6 +1200,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1195,6 +1224,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1225,6 +1255,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1253,6 +1284,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
     
@@ -1278,6 +1310,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1297,6 +1330,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1316,6 +1350,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1335,6 +1370,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1365,6 +1401,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1384,6 +1421,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
@@ -1427,6 +1465,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1455,6 +1494,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("Foundation", .when(platforms: Arch.OS.apple.platform)),
@@ -1487,6 +1527,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1516,6 +1557,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("Foundation", .when(platforms: Arch.OS.apple.platform)),
@@ -1547,6 +1589,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1577,6 +1620,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
@@ -1601,6 +1645,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1631,6 +1676,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1656,6 +1702,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1690,6 +1737,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1717,6 +1765,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1753,6 +1802,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1773,6 +1823,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1814,6 +1865,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1856,6 +1908,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1879,6 +1932,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1900,6 +1954,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1922,6 +1977,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1943,6 +1999,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1968,6 +2025,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1991,6 +2049,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2011,6 +2070,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2030,6 +2090,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2052,6 +2113,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2074,6 +2136,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2096,6 +2159,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2119,6 +2183,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2140,6 +2205,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2161,6 +2227,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
     
@@ -2182,6 +2249,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -2230,6 +2298,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
     
@@ -2270,6 +2339,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
     
@@ -2318,6 +2388,7 @@ let package = Package(
          .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
          .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
          .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+         .define("NOMINMAX", .when(platforms: [.windows])),
        ],
        swiftSettings: [
          // already enabled in Swift 6+.
@@ -2422,6 +2493,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
     
@@ -2538,6 +2610,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
@@ -2554,6 +2627,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
