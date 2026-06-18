@@ -9,6 +9,7 @@
 
 #include "pxr/pxrns.h"
 #include "Tf/declarePtrs.h"
+#if !defined(__ANDROID__)
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 
