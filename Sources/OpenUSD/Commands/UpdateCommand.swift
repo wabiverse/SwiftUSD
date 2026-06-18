@@ -2249,15 +2249,15 @@ public enum Pxr: String, CaseIterable
           )
 
         case "glApi.cpp":
-          // Add EGL include for Android.
+          // Add libEGLHandle static for Android alongside the existing libHandle.
           source = source.replacingOccurrences(
-            of: "#include \"Garch/glApi.h\"\n\n#include \"Arch/defines.h\"\n#include \"Arch/library.h\"\n#include \"Tf/diagnostic.h\"",
-            with: "#include \"Garch/glApi.h\"\n\n#include \"Arch/defines.h\"\n#include \"Arch/library.h\"\n#include \"Tf/diagnostic.h\"\n\n#if defined(__ANDROID__)\n#include <EGL/egl.h>\n#endif"
+            of: "static void* libHandle = NULL;\n#if !defined(ARCH_OS_DARWIN)",
+            with: "static void* libHandle = NULL;\n#if defined(ARCH_OS_ANDROID)\nstatic void* libEGLHandle = NULL;\n#endif\n#if !defined(ARCH_OS_DARWIN)"
           )
-          // Use libGLESv2 + eglGetProcAddress on Android instead of libGL + glXGetProcAddressARB.
+          // Open libGLESv2 (dlsym fallback) + libEGL (eglGetProcAddress) on Android.
           source = source.replacingOccurrences(
             of: "#elif defined(ARCH_OS_LINUX)\n    libHandle = ArchLibraryOpen(\"libGL.so.1\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) ArchLibraryGetSymbolAddress(libHandle, \"glXGetProcAddressARB\");",
-            with: "#elif defined(ARCH_OS_LINUX)\n#if defined(ARCH_OS_ANDROID)\n    libHandle = ArchLibraryOpen(\"libGLESv2.so\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) eglGetProcAddress;\n#else\n    libHandle = ArchLibraryOpen(\"libGL.so.1\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) ArchLibraryGetSymbolAddress(libHandle, \"glXGetProcAddressARB\");\n#endif"
+            with: "#elif defined(ARCH_OS_LINUX)\n#if defined(ARCH_OS_ANDROID)\n    libHandle    = ArchLibraryOpen(\"libGLESv2.so\", RTLD_LAZY | RTLD_LOCAL);\n    libEGLHandle = ArchLibraryOpen(\"libEGL.so\",    RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) ArchLibraryGetSymbolAddress(libEGLHandle, \"eglGetProcAddress\");\n#else\n    libHandle = ArchLibraryOpen(\"libGL.so.1\", RTLD_LAZY | RTLD_LOCAL);\n    libGetProcAddress = (PFNGETPROCADDRESS) ArchLibraryGetSymbolAddress(libHandle, \"glXGetProcAddressARB\");\n#endif"
           )
 
         case "glPlatformDebugWindowGLX.h":
