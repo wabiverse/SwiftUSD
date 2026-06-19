@@ -106,4 +106,4 @@ jobs:
     - name: Build UsdView for Android
       shell: bash
       run: |
-        ./swift-bundler bundle UsdView --platform Android
+        set -o pipefail && ./swift-bundler bundle UsdView --platform Android | xcbeautify --preserve-unbeautified --renderer github-actions

@@ -36,5 +36,9 @@ jobs:
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 💻 Install GTK
         run: sudo apt install libgtk-4-dev clang
+      - name: ✨ Install xcbeautify
+        run: |
+          git clone https://github.com/cpisciotta/xcbeautify.git
+          cd xcbeautify && make install && cd .. && rm -rf xcbeautify
       - name: 📦 Build
-        run: swift build -c release --target UsdView
+        run: set -o pipefail && swift build -c release --target UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
