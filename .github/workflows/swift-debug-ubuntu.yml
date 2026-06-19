@@ -42,7 +42,7 @@ jobs:
         run: swift build --target UsdView
       - name: 🎬 Run
         run: |
-          xvfb-run --auto-servernum .build/x86_64-unknown-linux-gnu/debug/UsdView &
+          xvfb-run --auto-servernum ./.build/debug/UsdView &
           PID=$!
           sleep 10
           if ! kill -0 $PID 2>/dev/null; then
