@@ -9,12 +9,22 @@
 #include "Garch/glPlatformDebugContext.h"
 #include "Arch/defines.h"
 
-#if defined(ARCH_OS_LINUX)
+#if defined(ARCH_OS_LINUX) && !defined(ARCH_OS_ANDROID)
 #include "Garch/glPlatformDebugWindowGLX.h"
 #elif defined(ARCH_OS_DARWIN)
 #include "Garch/glPlatformDebugWindowDarwin.h"
 #elif defined(ARCH_OS_WINDOWS)
 #include "Garch/glPlatformDebugWindowWindows.h"
+#elif defined(ARCH_OS_ANDROID)
+PXR_NAMESPACE_OPEN_SCOPE
+class Garch_GLPlatformDebugWindow {
+public:
+    Garch_GLPlatformDebugWindow(GarchGLDebugWindow*) {}
+    void Init(const char*, int, int) {}
+    void Run() {}
+    void ExitApp() {}
+};
+PXR_NAMESPACE_CLOSE_SCOPE
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
