@@ -32,14 +32,26 @@ jobs:
         run: sudo apt install freeglut3-dev
       - name: 🚀 Install Boost
         run: sudo apt install libboost-all-dev
+      - name: Install OpenGL
+        run: sudo apt install libgl1-mesa-dev libgl1-mesa-dri xvfb
       - name: 🖥️ Install X11
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 💻 Install GTK
         run: sudo apt install libgtk-4-dev clang
-      - name: 🧪 Test
-        run: |
-          echo "### Disabled Tests" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Pre Swift 5.10 toolchains do not support Cxx Interop enabled testing targets on Linux." >> $GITHUB_STEP_SUMMARY
+      - name: 🔨 Build
+        run: swift build --target UsdView
       - name: 🎬 Run
-        run: swift run UsdView
+        run: |
+          xvfb-run --auto-servernum .build/debug/UsdView &
+          PID=$!
+          sleep 10
+          if ! kill -0 $PID 2>/dev/null; then
+            echo "UsdView crashed during startup"
+            exit 1
+          fi
+          kill $PID
+          wait $PID 2>/dev/null
+          exit 0
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          GDK_BACKEND: "x11"
