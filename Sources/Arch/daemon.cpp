@@ -40,7 +40,12 @@ ArchCloseAllFiles(int nExcept, const int* exceptFds)
 
     if (limits.rlim_cur == RLIM_INFINITY)
     {
+#  if defined(NOFILE)
         maxfd = NOFILE;
+#  else
+        maxfd = (int)sysconf(_SC_OPEN_MAX);
+        if (maxfd < 0) maxfd = 256;
+#  endif
     }
     else
     {

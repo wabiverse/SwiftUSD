@@ -833,6 +833,7 @@ public enum Pxr: String, CaseIterable
       Patch.predicateExpressionParserHeader(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.platformGuardedSource(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.archAndroid(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.garchAndroid(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
       Patch.pythonIncludes(to: &pxrSrc)
@@ -2226,6 +2227,35 @@ public enum Pxr: String, CaseIterable
           of: "PXR_NAMESPACE_OPEN_SCOPE\n\nconst char* Arch_DarwinGetTemporaryDirectory();\n\nPXR_NAMESPACE_CLOSE_SCOPE",
           with: "#if defined(__APPLE__)\nPXR_NAMESPACE_OPEN_SCOPE\n\nconst char* Arch_DarwinGetTemporaryDirectory();\n\nPXR_NAMESPACE_CLOSE_SCOPE\n#endif // defined(__APPLE__)"
         )
+      default:
+        return
+      }
+    }
+
+    /** Excludes Android from Linux-only Arch code that uses glibc/GCC-specific APIs. */
+    public static func archAndroid(to source: inout String, fileBaseName: String)
+    {
+      switch fileBaseName
+      {
+      case "stackTrace.cpp":
+        // nonLockingLinux__execve uses GCC register-label asm (unsupported on Clang/Android)
+        // and __environ (glibc-only; Bionic uses environ). Route Android through plain execv.
+        source = source.replacingOccurrences(
+          of: "#if defined(ARCH_OS_LINUX)\nstatic int\nnonLockingLinux__execve",
+          with: "#if defined(ARCH_OS_LINUX) && !defined(ARCH_OS_ANDROID)\nstatic int\nnonLockingLinux__execve"
+        )
+        source = source.replacingOccurrences(
+          of: "#if defined(ARCH_OS_LINUX)\n     return nonLockingLinux__execve (path, argv, __environ);",
+          with: "#if defined(ARCH_OS_LINUX) && !defined(ARCH_OS_ANDROID)\n     return nonLockingLinux__execve (path, argv, __environ);"
+        )
+
+      case "daemon.cpp":
+        // Android Bionic doesn't define NOFILE; use sysconf(_SC_OPEN_MAX) as fallback.
+        source = source.replacingOccurrences(
+          of: "    if (limits.rlim_cur == RLIM_INFINITY)\n    {\n        maxfd = NOFILE;\n    }",
+          with: "    if (limits.rlim_cur == RLIM_INFINITY)\n    {\n#  if defined(NOFILE)\n        maxfd = NOFILE;\n#  else\n        maxfd = (int)sysconf(_SC_OPEN_MAX);\n        if (maxfd < 0) maxfd = 256;\n#  endif\n    }"
+        )
+
       default:
         return
       }
