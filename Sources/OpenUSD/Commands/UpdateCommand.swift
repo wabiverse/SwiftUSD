@@ -2237,6 +2237,19 @@ public enum Pxr: String, CaseIterable
     {
       switch fileBaseName
       {
+        case "glDebugWindow.cpp":
+          // Android has no debug window, exclude it
+          // from the Linux branch and insert a no-op
+          // stub so the type is always complete.
+          source = source.replacingOccurrences(
+            of: "#if defined(ARCH_OS_LINUX)\n",
+            with: "#if defined(ARCH_OS_LINUX) && !defined(ARCH_OS_ANDROID)\n"
+          )
+          source = source.replacingOccurrences(
+            of: "#endif\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nGarchGLDebugWindow",
+            with: "#elif defined(ARCH_OS_ANDROID)\nPXR_NAMESPACE_OPEN_SCOPE\nclass Garch_GLPlatformDebugWindow {\npublic:\n    Garch_GLPlatformDebugWindow(GarchGLDebugWindow*) {}\n    void Init(const char*, int, int) {}\n    void Run() {}\n    void ExitApp() {}\n};\nPXR_NAMESPACE_CLOSE_SCOPE\n#endif\n\nPXR_NAMESPACE_OPEN_SCOPE\n\nGarchGLDebugWindow"
+          )
+
         case "defines.h":
           source = source.replacingOccurrences(
             of: "#elif defined(__linux__)\n#define ARCH_OS_LINUX",
