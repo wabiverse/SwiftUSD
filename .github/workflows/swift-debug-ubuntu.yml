@@ -32,14 +32,18 @@ jobs:
         run: sudo apt install freeglut3-dev
       - name: 🚀 Install Boost
         run: sudo apt install libboost-all-dev
-      - name: Install OpenGL
+      - name: 📐 Install OpenGL
         run: sudo apt install libgl1-mesa-dev libgl1-mesa-dri xvfb
       - name: 🖥️ Install X11
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 💻 Install GTK
         run: sudo apt install libgtk-4-dev clang
+      - name: ✨ Install xcbeautify
+        run: |
+          git clone https://github.com/cpisciotta/xcbeautify.git
+          cd xcbeautify && make install && cd .. && rm -rf xcbeautify
       - name: 🔨 Build
-        run: swift build --target UsdView
+        run: set -o pipefail && swift build --target UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
           xvfb-run --auto-servernum ./.build/debug/UsdView &
