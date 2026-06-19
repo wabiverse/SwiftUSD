@@ -15,8 +15,8 @@
 /* **                                                                      ** */
 /* ************************************************************************** */
 
-#ifndef PXR_IMAGING_HD_SCENE_INDEX_INPUT_ARGS_SCHEMA_H
-#define PXR_IMAGING_HD_SCENE_INDEX_INPUT_ARGS_SCHEMA_H
+#ifndef PXR_IMAGING_HD_SCENE_INDEX_CREATE_ARGS_SCHEMA_H
+#define PXR_IMAGING_HD_SCENE_INDEX_CREATE_ARGS_SCHEMA_H
 
 /// \file
 
@@ -36,24 +36,24 @@ using HdRenderDelegateInfoDataSource = HdTypedSampledDataSource<HdRenderDelegate
 using HdRenderDelegateInfoDataSourceHandle = HdRenderDelegateInfoDataSource::Handle;
 // --(END CUSTOM CODE: Declares)--
 
-#define HD_SCENE_INDEX_INPUT_ARGS_SCHEMA_TOKENS \
+#define HD_SCENE_INDEX_CREATE_ARGS_SCHEMA_TOKENS \
     (motionBlurSupport) \
     (cameraMotionBlurSupport) \
     (legacyRenderDelegateInfo) \
 
-TF_DECLARE_PUBLIC_TOKENS(HdSceneIndexInputArgsSchemaTokens, HD_API,
-    HD_SCENE_INDEX_INPUT_ARGS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSceneIndexCreateArgsSchemaTokens, HD_API,
+    HD_SCENE_INDEX_CREATE_ARGS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
 
-/// \class HdSceneIndexInputArgsSchema
+/// \class HdSceneIndexCreateArgsSchema
 ///
 /// Schema for the container data source returned by
-/// HdRendererPlugin::GetSceneIndexInputArgs. The application forwards it
+/// HdRendererPlugin::GetSceneIndexCreateArgs. The application forwards it
 /// (possibly overlayed with its own container data source) to the scene index
 /// constructors or scene index plugins. In other words,
-/// HdRendererPlugin::GetSceneIndexInputArgs gives a renderer the opportunity
+/// HdRendererPlugin::GetSceneIndexCreateArgs gives a renderer the opportunity
 /// to configure scene indices.
 ///
 /// Examples are: A scene index might use execution which is non-lazy and needs
@@ -63,13 +63,13 @@ TF_DECLARE_PUBLIC_TOKENS(HdSceneIndexInputArgsSchemaTokens, HD_API,
 /// different render contexts such as glslflx which is understood by Storm but
 /// not Prman, for example.
 ///
-class HdSceneIndexInputArgsSchema : public HdSchema
+class HdSceneIndexCreateArgsSchema : public HdSchema
 {
 public:
     /// \name Schema retrieval
     /// @{
 
-    HdSceneIndexInputArgsSchema(HdContainerDataSourceHandle container)
+    HdSceneIndexCreateArgsSchema(HdContainerDataSourceHandle container)
       : HdSchema(container) {}
 
     /// @}
@@ -122,7 +122,7 @@ public:
         const HdRenderDelegateInfoDataSourceHandle &legacyRenderDelegateInfo
     );
 
-    /// \class HdSceneIndexInputArgsSchema::Builder
+    /// \class HdSceneIndexCreateArgsSchema::Builder
     /// 
     /// Utility class for setting sparse sets of child data source fields to be
     /// filled as arguments into BuildRetained. Because all setter methods

@@ -49,6 +49,7 @@
 #include "Hd/cubeSchema.h"
 #include "Hd/cylinderSchema.h"
 #include "Hd/displayFilterSchema.h"
+#include "Hd/energyFilterSchema.h"
 #include "Hd/extComputationInputComputationSchema.h"
 #include "Hd/extComputationOutputSchema.h"
 #include "Hd/extComputationPrimvarSchema.h"
@@ -154,11 +155,10 @@ HdSceneIndexAdapterSceneDelegate::HdSceneIndexAdapterSceneDelegate(
 , _cachedDirtyBits(0)
 , _cachedPrimType()
 {
-
+    // The registered name is typically used in UI tools like the HSD.
+    // Make it simple to read.
     std::string registeredName = ArchStringPrintf(
-        "delegate adapter: %s @ %s",
-            delegateID.GetString().c_str(),
-            parentIndex->GetInstanceName().c_str());
+        "[Terminal SI] %s", parentIndex->GetInstanceName().c_str());
 
     HdSceneIndexNameRegistry::GetInstance().RegisterNamedSceneIndex(
         registeredName, inputSceneIndex);
@@ -2136,6 +2136,21 @@ HdSceneIndexAdapterSceneDelegate::Get(SdfPath const &id, TfToken const &key)
     if (prim.primType == HdPrimTypeTokens->displayFilter) {
         if (key == HdDisplayFilterSchemaTokens->resource) {
             return _GetRenderTerminalResource<HdDisplayFilterSchema>(prim);
+        }
+        return VtValue();
+    }
+
+    // energyFilter use of Get().
+    if (prim.primType == HdPrimTypeTokens->energyFilter) {
+        if (key == HdEnergyFilterSchemaTokens->resource) {
+            return _GetRenderTerminalResource<HdEnergyFilterSchema>(prim);
+        }
+        // enabled, lpe, order are stored as flat attributes in the container.
+        if (prim.dataSource) {
+            if (const HdSampledDataSourceHandle ds =
+                    HdSampledDataSource::Cast(prim.dataSource->Get(key))) {
+                return ds->GetValue(0.0f);
+            }
         }
         return VtValue();
     }

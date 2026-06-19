@@ -23,6 +23,20 @@ void wrapUsdGeomTokens()
     _ADD_TOKEN(cls, all);
     _ADD_TOKEN(cls, angularVelocities);
     _ADD_TOKEN(cls, axis);
+    _ADD_TOKEN(cls, backPlate);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_AlphaImage);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_DepthCameraSpaceOffset);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_DepthImage);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_DepthMinOffset);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_DepthNormalizingFactor);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_Image);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_LumaGain);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_LumaGamma);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_LumaLift);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_PlateVisibility);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_RotateXYZTweak);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_ScaleTweak);
+    _ADD_TOKEN(cls, backPlate_MultipleApplyTemplate_TranslateTweak);
     _ADD_TOKEN(cls, basis);
     _ADD_TOKEN(cls, bezier);
     _ADD_TOKEN(cls, bilinear);
@@ -108,6 +122,7 @@ void wrapUsdGeomTokens()
     _ADD_TOKEN(cls, motionBlurScale);
     _ADD_TOKEN(cls, motionNonlinearSampleCount);
     _ADD_TOKEN(cls, motionVelocityScale);
+    _ADD_TOKEN(cls, mute);
     _ADD_TOKEN(cls, none);
     _ADD_TOKEN(cls, nonOverlapping);
     _ADD_TOKEN(cls, nonperiodic);
@@ -152,6 +167,7 @@ void wrapUsdGeomTokens()
     _ADD_TOKEN(cls, shutterOpen);
     _ADD_TOKEN(cls, size);
     _ADD_TOKEN(cls, smooth);
+    _ADD_TOKEN(cls, solo);
     _ADD_TOKEN(cls, stereoRole);
     _ADD_TOKEN(cls, subdivisionScheme);
     _ADD_TOKEN(cls, surfaceFaceVertexIndices);
@@ -194,6 +210,7 @@ void wrapUsdGeomTokens()
     _ADD_TOKEN(cls, xformOpOrder);
     _ADD_TOKEN(cls, y);
     _ADD_TOKEN(cls, z);
+    _ADD_TOKEN(cls, BackPlateAPI);
     _ADD_TOKEN(cls, BasisCurves);
     _ADD_TOKEN(cls, Boundable);
     _ADD_TOKEN(cls, Camera);

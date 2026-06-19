@@ -6,8 +6,8 @@
 //
 
 #include "pxr/pxrns.h"
+#include "Ts/spline.h"
 #include "Ts/tsTest_SampleTimes.h"
-#include "Ts/tsTest_SplineData.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/stringUtils.h"
@@ -142,7 +142,7 @@ void wrapTsTest_SampleTimes()
             static_cast<void (This::*)(const std::vector<This::SampleTime>&)>(
                 &This::AddTimes))
 
-        .def(init<const TsTest_SplineData&>())
+        .def(init<const TsSpline&>())
 
         .def("AddKnotTimes", &This::AddKnotTimes)
 

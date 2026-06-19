@@ -69,6 +69,7 @@
 #include <Hd/field.h>
 #include <Hd/displayFilterSchema.h>
 #include <Hd/coordSysBindingSchema.h>
+#include <Hd/sceneIndexCreateArgsSchema.h>
 #include <Hd/materialInterfaceParameterSchema.h>
 #include <Hd/materialNetworkInterface.h>
 #include <Hd/legacyTaskSchema.h>
@@ -99,6 +100,7 @@
 #include <Hd/schema.h>
 #include <Hd/sceneIndexAdapterSceneDelegate.h>
 #include <Hd/mesh.h>
+#include <Hd/instanceProxySchema.h>
 #include <Hd/visibilitySchema.h>
 #include <Hd/extComputationPrimvarSchema.h>
 #include <Hd/materialBindingsSchema.h>
@@ -176,6 +178,7 @@
 #include <Hd/renderDelegate.h>
 #include <Hd/vectorSchemaTypeDefs.h>
 #include <Hd/renderPassState.h>
+#include <Hd/instanceProxyViewSceneIndex.h>
 #include <Hd/geomSubsetSchema.h>
 #include <Hd/sprim.h>
 #include <Hd/legacyGeomSubsetSceneIndex.h>
@@ -204,7 +207,7 @@
 #include <Hd/sceneDelegate.h>
 #include <Hd/selectionsSchema.h>
 #include <Hd/bufferSpec.h>
-#include <Hd/sceneIndexInputArgsSchema.h>
+#include <Hd/energyFilterSchema.h>
 #include <Hd/flattenedDataSourceProvider.h>
 #include <Hd/materialBindingSchema.h>
 #include <Hd/perfLog.h>

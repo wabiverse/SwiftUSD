@@ -26,6 +26,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+namespace {
+
+// Constants for constructing GfInterval objects
+constexpr bool OPEN = false;
+constexpr bool CLOSED = true;
+
+} // annonymous namespace
 
 TF_REGISTRY_FUNCTION(TfType)
 {
@@ -59,6 +66,12 @@ TsSpline::TsSpline(const TsSpline &other)
     : _data(other._data)
 {
 }
+
+TsSpline::TsSpline(Ts_SplineData* data)
+    : _data(data)
+{
+}
+
 
 TsSpline& TsSpline::operator=(const TsSpline &other)
 {
@@ -136,6 +149,14 @@ void TsSpline::SetPreExtrapolation(
     const TsExtrapolation &extrap)
 {
     _PrepareForWrite();
+    if (extrap.IsLooping() && extrap.loopBoundaryTime.has_value() &&
+        _data->loopParams != TsLoopParams())
+    {
+        TF_CODING_ERROR("Cannot set extrapolation looping with a non-null "
+                        "loopBoundaryTime when inner loops are possibly "
+                        "present.");
+        return;
+    }
     _data->preExtrapolation = extrap;
 }
 
@@ -148,12 +169,48 @@ void TsSpline::SetPostExtrapolation(
     const TsExtrapolation &extrap)
 {
     _PrepareForWrite();
+    if (extrap.IsLooping() && extrap.loopBoundaryTime.has_value() &&
+        _data->loopParams != TsLoopParams())
+    {
+        TF_CODING_ERROR("Cannot set extrapolation looping with a non-null "
+                        "loopBoundaryTime when inner loops are possibly "
+                        "present.");
+        return;
+    }
     _data->postExtrapolation = extrap;
 }
 
 TsExtrapolation TsSpline::GetPostExtrapolation() const
 {
     return _GetData()->postExtrapolation;
+}
+
+bool
+TsSpline::IsPreExtrapolationValid() const
+{
+    const TsExtrapolation& extrap = _GetData()->preExtrapolation;
+    if (!extrap.IsLooping() || !extrap.loopBoundaryTime.has_value()) {
+        return true;
+    }
+
+    const std::vector<TsTime>& times = _GetData()->times;
+    return std::binary_search(times.begin(),
+                              times.end(),
+                              extrap.loopBoundaryTime.value());
+}
+
+bool
+TsSpline::IsPostExtrapolationValid() const
+{
+    const TsExtrapolation& extrap = _GetData()->postExtrapolation;
+    if (!extrap.IsLooping() || !extrap.loopBoundaryTime.has_value()) {
+        return true;
+    }
+
+    const std::vector<TsTime>& times = _GetData()->times;
+    return std::binary_search(times.begin(),
+                              times.end(),
+                              extrap.loopBoundaryTime.value());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,6 +220,21 @@ void TsSpline::SetInnerLoopParams(
     const TsLoopParams &params)
 {
     _PrepareForWrite();
+
+    // Don't set inner looping if it causes non-default inner looping and
+    // extrapolation looping with loopBoundaryTime to be active simultaneously.
+    if (params != TsLoopParams()) {
+        const TsExtrapolation& preExtrap = GetPreExtrapolation();
+        const TsExtrapolation& postExtrap = GetPostExtrapolation();
+        if ((preExtrap.IsLooping() && preExtrap.loopBoundaryTime.has_value()) ||
+            (postExtrap.IsLooping() && postExtrap.loopBoundaryTime.has_value()))
+        {
+            TF_CODING_ERROR("Cannot set non-default inner loop params when "
+                            "spline has extrapolation looping with non-null "
+                            "loopBoundaryTime.");
+            return;
+        }
+    }
 
     // Store a copy.
     _data->loopParams = params;
@@ -502,6 +574,29 @@ TF_PP_SEQ_FOR_EACH(_INSTANTIATE_SAMPLE_METHOD,
 
 #undef _INSTANTIATE_SAMPLE_METHOD
 
+////////////////////////////////////////////////////////////////////////////////
+// Transformation
+
+TsSpline
+TsSpline::GetTruncated(
+    const GfInterval& interval,
+    TsExtrapolation preFallback,
+    TsExtrapolation postFallback) const
+{
+    if (interval.IsEmpty() || _data == nullptr || _data->times.empty()) {
+        return TsSpline();
+    }
+
+    Ts_SplineData* truncatedData = Ts_Truncate(_GetData(), interval,
+                                               preFallback, postFallback);
+
+    if (truncatedData) {
+        return TsSpline(truncatedData);
+    }
+
+    // Ts_Truncate issued a coding error already if truncatedData is null.
+    return TsSpline();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Comparison

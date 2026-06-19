@@ -10,11 +10,12 @@
 #include "Tf/fileUtils.h"
 #include "Tf/pathUtils.h"
 
-#include "Sdf/layerUtils.h"
 #include "Ar/packageUtils.h"
 #include "Ar/resolver.h"
+#include "Sdf/layerUtils.h"
 #include "Sdf/usdFileFormat.h"
 #include "Usd/stage.h"
+#include "UsdShade/udimUtils.h"
 #include "UsdUtils/assetLocalization.h"
 #include "UsdUtils/assetLocalizationDelegate.h"
 #include "UsdUtils/assetLocalizationPackage.h"
@@ -49,7 +50,32 @@ UsdUtils_DirectoryRemapper::Remap(
             TfStringPrintf("%zu", _nextDirectoryNum++);
     }
     
-    return TfStringCatPaths(insertStatus.first->second, baseName);
+    const std::string remappedPath = 
+         TfStringCatPaths(insertStatus.first->second, baseName);
+    
+    if (insertStatus.second) {
+        _remappedDirectories.insert(remappedPath);
+    }
+
+    return remappedPath;
+}
+
+bool 
+UsdUtils_AssetLocalizationPackage::PathShouldResolve(const std::string &path) {
+    // Remapped paths are not expected to resolve due to the fact that they
+    // are synthesized for use within the package that is currently being
+    // built.
+    if (_directoryRemapper.PathIsRemapped(path)) {
+        return false;
+    }
+
+    // Raw Udim paths are not expected to resolve because they are only a
+    // template for a number of potential concrete paths.
+    if (UsdShadeUdimUtils::IsUdimIdentifier(path)) {
+        return false;
+    }
+
+    return true;
 }
 
 bool 
@@ -77,7 +103,7 @@ UsdUtils_AssetLocalizationPackage::Build(
         ? TfGetBaseName(_rootLayer->GetRealPath()) 
         : firstLayerName;
 
-    UsdUtils_LocalizationContext context(&_delegate);
+    UsdUtils_LocalizationContext context(this);
     context.SetMetadataFilteringEnabled(true);
     context.SetDependenciesToSkip(_dependenciesToSkip);
 
@@ -431,8 +457,7 @@ UsdUtils_AssetLocalizationPackage::_AddLayerToPackage(
     SdfLayerRefPtr sourceLayer,
     const std::string &destPath)
 {
-    SdfLayerConstHandle layer = 
-        _delegate.GetLayerUsedForWriting(sourceLayer);
+    SdfLayerConstHandle layer = GetLayerUsedForWriting(sourceLayer);
     TF_DEBUG(USDUTILS_CREATE_PACKAGE).Msg(
         ".. adding layer @%s@ to package at path '%s'.\n", 
         layer->GetIdentifier().c_str(), destPath.c_str());
@@ -507,7 +532,7 @@ UsdUtils_AssetLocalizationPackage::_AddLayerToPackage(
             // layers used for layer modifications need to be cleared to
             // prevent a mapped file descriptor from being held after
             // export to temporary file.
-            _delegate.ClearLayerUsedForWriting(sourceLayer);
+            ClearLayerUsedForWriting(sourceLayer);
             TfDeleteFile(tmpLayerExportPath);
         }
     }

@@ -441,7 +441,7 @@ _AddStandardTypesToRegistry(Sdf_ValueTypeRegistry* r)
     r->AddType(T("half",   GfHalf(0.0)).CPPTypeName("GfHalf"));
     r->AddType(T("float",  float()));
     r->AddType(T("double", double()));
-    r->AddType(T("timecode", SdfTimeCode()));
+    r->AddType(T("timecode", GfTimeCode()));
     // TfType reports "string" as the typename for "std::string", but we want
     // the fully-qualified name for documentation purposes.
     r->AddType(T("string", std::string()).CPPTypeName("std::string"));

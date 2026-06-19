@@ -33,6 +33,7 @@
 #endif
 #else
 #include <dlfcn.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <sys/param.h>
@@ -130,6 +131,8 @@ static char * _progNameForErrors = NULL;
 static volatile std::sig_atomic_t _isCrashing = 0;
 
 namespace {
+void aswrite(int fd, const char* msg);
+
 // Key-value map for program info. Stores additional
 // program info to be used when displaying error information.
 class Arch_ProgInfo
@@ -203,12 +206,15 @@ Arch_ProgInfo::GetProgramInfoForErrors(const std::string& key) const
     return result;
 } 
 
-void 
+void
 Arch_ProgInfo::PrintInfoForErrors() const
 {
-    std::lock_guard<std::mutex> lock(_progInfoForErrorsMutex);
+    if (!_progInfoForErrorsMutex.try_lock()) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(_progInfoForErrorsMutex, std::adopt_lock);
     if (_progInfoForErrors) {
-        fprintf(stderr, "%s", _progInfoForErrors);
+        aswrite(2, _progInfoForErrors);
     }
 }
 
@@ -1108,23 +1114,32 @@ _ArchLogProcessStateHelper(bool isFatal,
     }
 
     // Write reason for stack trace to logfile.
-    if (FILE* stackFd = ArchOpenFile(logfile, "a")) {
-        if (reason) {
-            fputs("This stack trace was requested because: ", stackFd);
-            fputs(reason, stackFd);
-            fputs("\n", stackFd);
+    // Use fd-based I/O: stdio lazily mallocs its write buffer on first use,
+    // which deadlocks if we were called from a signal handler that interrupted
+    // malloc.
+    {
+        const int stackFd =
+            open(logfile, O_WRONLY | O_APPEND | O_CREAT, 0666);
+        if (stackFd >= 0) {
+            if (reason) {
+                aswrite(stackFd, "This stack trace was requested because: ");
+                aswrite(stackFd, reason);
+                aswrite(stackFd, "\n");
+            }
+            if (message) {
+                aswrite(stackFd, message);
+                aswrite(stackFd, "\n");
+            }
+            ArchStackTrace_GetLogInfo().TryToFillLogInfoBuffer(
+                _extraLogInfoBuffer, ExtraLogInfoBufSize);
+            aswrite(stackFd, _extraLogInfoBuffer);
+            if (extraLogMsg) {
+                aswrite(stackFd, extraLogMsg);
+                aswrite(stackFd, "\n");
+            }
+            aswrite(stackFd, "\nPostmortem Stack Trace\n");
+            close(stackFd);
         }
-        if (message) {
-            fputs(message, stackFd);
-            fputs("\n", stackFd);
-        }
-        ArchStackTrace_GetLogInfo().EmitAnyExtraLogInfo(stackFd);
-        if (extraLogMsg) {
-            fputs(extraLogMsg, stackFd);
-            fputs("\n", stackFd);
-        }
-        fputs("\nPostmortem Stack Trace\n", stackFd);
-        fclose(stackFd);
     }
 
     /* get hostname for printing out in the error message only */

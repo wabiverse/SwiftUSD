@@ -151,6 +151,9 @@ public:
     HDST_API
     static
     const HdRenderDelegateInfo &GetRenderDelegateInfo();
+
+    HDST_API
+    static bool IsEnabledNativeSphereRenderingSupport();
     
 private:
     void _ApplyTextureSettings();

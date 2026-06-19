@@ -12,6 +12,7 @@
 #include "pxr/pxrns.h"
 #include "Tf/api.h"
 #include "Tf/diagnosticContainer.h"
+#include "Tf/diagnosticMgr.h"
 #include "Tf/error.h"
 #include "Tf/status.h"
 #include "Tf/warning.h"
@@ -24,7 +25,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class TfDiagnosticMgr;
 class TfDiagnosticTrap;
 
 /// \class TfDiagnosticTransport
@@ -79,17 +79,22 @@ public:
     /// were originally issued, leaving this transport empty.
     void Post() {
         _container.Post();
+        _pin = {};
     }
 
 private:
+    friend class Tf_DiagnosticMgrTestAccess;
     friend class TfDiagnosticTrap;
-    
+
     // TfDiagnosticTrap calls this to implement Transport().
-    explicit TfDiagnosticTransport(Tf_DiagnosticContainer &&container)
+    TfDiagnosticTransport(Tf_DiagnosticContainer &&container,
+                          TfDiagnosticMgr::_LogTextPin &&pin)
         : _container(std::move(container))
+        , _pin(std::move(pin))
     {}
 
-    Tf_DiagnosticContainer _container;
+    Tf_DiagnosticContainer       _container;
+    TfDiagnosticMgr::_LogTextPin _pin;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

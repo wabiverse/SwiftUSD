@@ -9,7 +9,6 @@
 #include "UsdImaging/drawModeSceneIndex.h"
 #include "UsdImaging/extentResolvingSceneIndex.h"
 #include "UsdImaging/instanceProxyPathTranslationSceneIndex.h"
-// #include "UsdImaging/instanceProxyPathTranslationSceneIndex.h"
 #include "UsdImaging/materialBindingsResolvingSceneIndex.h"
 #include "UsdImaging/niPrototypePropagatingSceneIndex.h"
 #include "UsdImaging/piPrototypePropagatingSceneIndex.h"
@@ -18,7 +17,7 @@
 #include "UsdImaging/selectionSceneIndex.h"
 #include "UsdImaging/stageSceneIndex.h"
 #include "UsdImaging/unloadedDrawModeSceneIndex.h"
-#include "UsdImaging/usdSceneIndexInputArgsSchema.h"
+#include "UsdImaging/sceneIndexCreateArgsSchema.h"
 
 #include "UsdImaging/geomModelSchema.h"
 #include "UsdImaging/modelSchema.h"
@@ -79,7 +78,7 @@ _AddPluginSceneIndices(HdSceneIndexBaseRefPtr sceneIndex)
 
 static
 HdContainerDataSourceHandle
-_AdditionalStageSceneIndexInputArgs(
+_AdditionalStageSceneIndexCreateArgs(
     const bool displayUnloadedPrimsWithBounds)
 {
     if (!displayUnloadedPrimsWithBounds) {
@@ -87,8 +86,11 @@ _AdditionalStageSceneIndexInputArgs(
     }
     static HdContainerDataSourceHandle const ds =
         HdRetainedContainerDataSource::New(
-            UsdImagingStageSceneIndexTokens->includeUnloadedPrims,
-            HdRetainedTypedSampledDataSource<bool>::New(true));
+            UsdImagingSceneIndexCreateArgsSchema::GetSchemaToken(),
+            UsdImagingSceneIndexCreateArgsSchema::Builder()
+                .SetIncludeUnloadedPrims(
+                    HdRetainedTypedSampledDataSource<bool>::New(true))
+                .Build());
     return ds;
 }
 
@@ -98,7 +100,7 @@ _AdditionalStageSceneIndexInputArgs(
 // UsdImaging 1.0.
 static
 HdContainerDataSourceHandle
-_ExtentResolvingSceneIndexInputArgs()
+_ExtentResolvingSceneIndexCreateArgs()
 {
     HdDataSourceBaseHandle const purposeDataSources[] = {
         HdRetainedTypedSampledDataSource<TfToken>::New(
@@ -197,7 +199,7 @@ UsdImagingCreateSceneIndices(
     sceneIndex = result.stageSceneIndex =
         UsdImagingStageSceneIndex::New(
             HdOverlayContainerDataSource::OverlayedContainerDataSources(
-                _AdditionalStageSceneIndexInputArgs(
+                _AdditionalStageSceneIndexCreateArgs(
                     createInfo.displayUnloadedPrimsWithBounds),
                 createInfo.stageSceneIndexInputArgs));
 
@@ -227,7 +229,7 @@ UsdImagingCreateSceneIndices(
     
     sceneIndex =
         UsdImagingExtentResolvingSceneIndex::New(
-            sceneIndex, _ExtentResolvingSceneIndexInputArgs());
+            sceneIndex, _ExtentResolvingSceneIndexCreateArgs());
 
     {
         TRACE_FUNCTION_SCOPE("UsdImagingPiPrototypePropagatingSceneIndex");
@@ -322,11 +324,11 @@ UsdImagingCreateSceneIndices(
 
 UsdImagingSceneIndices
 UsdImagingCreateSceneIndices(
-    HdContainerDataSourceHandle const &inputArgs,
+    HdContainerDataSourceHandle const &createArgs,
     const UsdImagingSceneIndexAppendCallback &overridesSceneIndexCallback)
 {
-    const UsdImagingUsdSceneIndexInputArgsSchema schema =
-        UsdImagingUsdSceneIndexInputArgsSchema::GetFromParent(inputArgs);
+    const UsdImagingSceneIndexCreateArgsSchema schema =
+        UsdImagingSceneIndexCreateArgsSchema::GetFromParent(createArgs);
     
     UsdImagingCreateSceneIndicesInfo info;
 

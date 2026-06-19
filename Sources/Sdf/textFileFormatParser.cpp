@@ -2383,7 +2383,7 @@ struct TextParserAction<KeywordSpline>
         const TfType valueType =
             SdfGetTypeForValueTypeName(
                 TfToken(context.values.valueTypeName));
-        if (valueType == TfType::Find<SdfTimeCode>()) {
+        if (valueType == TfType::Find<GfTimeCode>()) {
           // Special case for timecode-valued attributes: physically use double,
           // but set the flag that causes layer offsets to be applied to values
           // as well as times.
@@ -2683,6 +2683,74 @@ struct TextParserAction<SplineLoopItem>
 };
 
 template <>
+struct TextParserAction<SplineExtrapLoopWithoutBoundary>
+{
+    template <class Input>
+    static void apply(const Input& in, Sdf_TextParserContext& context)
+    {
+        if (context.parsingContext.back() == 
+            Sdf_TextParserCurrentParsingContext::SplineKeywordRepeat)
+        {
+            context.splineExtrap = TsExtrapolation(TsExtrapLoopRepeat);
+            // Pop SplineKeywordRepeat context
+            _PopContext(context);
+
+        } else if (context.parsingContext.back() == 
+            Sdf_TextParserCurrentParsingContext::SplineKeywordReset)
+        {
+            context.splineExtrap = TsExtrapolation(TsExtrapLoopReset);
+            // Pop SplineKeywordReset context
+            _PopContext(context);
+
+        } else if (context.parsingContext.back() == 
+            Sdf_TextParserCurrentParsingContext::SplineKeywordOscillate)
+        {
+            context.splineExtrap = TsExtrapolation(TsExtrapLoopOscillate);
+            // Pop SplineKeywordReset context
+            _PopContext(context); // Pop context SplineKeywordOscillate
+        }
+    }
+};
+
+template <>
+struct TextParserAction<LoopBoundaryTime>
+{
+    template <class Input>
+    static void apply(const Input& in, Sdf_TextParserContext& context)
+    {
+        // Set the extrap looping mode
+        bool loopingExtrap = false;
+        if (context.parsingContext.back() ==
+            Sdf_TextParserCurrentParsingContext::SplineKeywordRepeat)
+        {
+            context.splineExtrap.mode = TsExtrapLoopRepeat;
+            loopingExtrap = true;
+        } else if (context.parsingContext.back() ==
+            Sdf_TextParserCurrentParsingContext::SplineKeywordReset)
+        {
+            context.splineExtrap.mode = TsExtrapLoopReset;
+            loopingExtrap = true;
+        } else if (context.parsingContext.back() ==
+            Sdf_TextParserCurrentParsingContext::SplineKeywordOscillate)
+        {
+            context.splineExtrap.mode = TsExtrapLoopOscillate;
+            loopingExtrap = true;
+        }
+
+        // Process and set the loopBoundaryTime
+        if (loopingExtrap) {
+            const std::pair<bool, Sdf_ParserHelpers::Value> result =
+                _HelperGetNumericValueFromString(in, context);
+            context.splineExtrap.loopBoundaryTime =
+                result.second.Get<double>();
+            
+            _PopContext(context);
+        }
+    }
+};
+
+
+template <>
 struct TextParserAction<KeywordRepeat>
 {
     template <class Input>
@@ -2691,9 +2759,12 @@ struct TextParserAction<KeywordRepeat>
         if (context.parsingContext.back() == 
             Sdf_TextParserCurrentParsingContext::SplineKeywordLoop)
         {
-            context.splineExtrap = TsExtrapolation(TsExtrapLoopRepeat);
             // Pop the SplineKeywordLoop context
             _PopContext(context);
+
+            // Push the SplineKeywordRepeat context
+            _PushContext(context,
+                Sdf_TextParserCurrentParsingContext::SplineKeywordRepeat);
         }
     }
 };
@@ -2707,9 +2778,12 @@ struct TextParserAction<KeywordReset>
         if (context.parsingContext.back() == 
             Sdf_TextParserCurrentParsingContext::SplineKeywordLoop)
         {
-            context.splineExtrap = TsExtrapolation(TsExtrapLoopReset);
             // Pop the SplineKeywordLoop context
             _PopContext(context);
+
+            // Push the SplineKeywordReset context
+            _PushContext(context,
+                Sdf_TextParserCurrentParsingContext::SplineKeywordReset);
         }
     }
 };
@@ -2723,9 +2797,12 @@ struct TextParserAction<KeywordOscillate>
         if (context.parsingContext.back() == 
             Sdf_TextParserCurrentParsingContext::SplineKeywordLoop)
         {
-            context.splineExtrap = TsExtrapolation(TsExtrapLoopOscillate);
             // Pop the SplineKeywordLoop context
             _PopContext(context);
+
+            // Push the SplineKeywordOscillate context
+            _PushContext(context,
+                Sdf_TextParserCurrentParsingContext::SplineKeywordOscillate);
         }
     }
 };

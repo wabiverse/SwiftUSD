@@ -558,7 +558,7 @@ Usd_Clip::IsBlocked(const SdfPath& path, ExternalTime time) const
 {
     SdfAbstractDataTypedValue<SdfValueBlock> blockValue(nullptr);
     if (_GetLayerForClip()->QueryTimeSample(
-            path, _TranslateTimeToInternal(time), 
+            _TranslatePathToClip(path), _TranslateTimeToInternal(time), 
             (SdfAbstractDataValue*)&blockValue)
         && blockValue.isValueBlock) {
         return true;
@@ -787,44 +787,44 @@ Usd_Clip::GetLayerIfOpen() const
 
 namespace { // Anonymous namespace
 
-// SdfTimeCode values from clips need to be converted from internal time to
+// GfTimeCode values from clips need to be converted from internal time to
 // external time. We treat time code values as relative to the internal time
 // to convert to external.
 inline
 void 
 _ConvertValueForTime(const Usd_Clip::ExternalTime &extTime, 
                      const Usd_Clip::InternalTime &intTime,
-                     SdfTimeCode *value)
+                     GfTimeCode *value)
 {
     *value = *value + (extTime - intTime);
 }
 
-// Similarly we convert arrays of SdfTimeCodes.
+// Similarly we convert arrays of GfTimeCodes.
 inline
 void 
 _ConvertValueForTime(const Usd_Clip::ExternalTime &extTime, 
                      const Usd_Clip::InternalTime &intTime,
-                     VtArray<SdfTimeCode> *value)
+                     VtArray<GfTimeCode> *value)
 {
     for (size_t i = 0; i < value->size(); ++i) {
         _ConvertValueForTime(extTime, intTime, &(*value)[i]);
     }
 }
 
-// Similarly we convert arrayEdits of SdfTimeCodes.
+// Similarly we convert arrayEdits of GfTimeCodes.
 inline
 void
 _ConvertValueForTime(const Usd_Clip::ExternalTime &extTime, 
                      const Usd_Clip::InternalTime &intTime,
-                     VtArrayEdit<SdfTimeCode> *value)
+                     VtArrayEdit<GfTimeCode> *value)
 {
-    for (SdfTimeCode &tc: value->GetMutableLiterals()) {
+    for (GfTimeCode &tc: value->GetMutableLiterals()) {
         _ConvertValueForTime(extTime, intTime, &tc);
     }
 }
 
 // Helpers for accessing the typed value from type erased values, needed for
-// converting SdfTimeCodes.
+// converting GfTimeCodes.
 template <class T>
 inline
 void _UncheckedSwap(SdfAbstractDataValue *value, T& val) {
@@ -849,7 +849,7 @@ bool _IsHolding(const VtValue &value) {
     return value.IsHolding<T>();
 }
 
-// For type erased values, we need to convert them if they hold SdfTimeCode 
+// For type erased values, we need to convert them if they hold GfTimeCode 
 // based types.
 template <class Storage>
 inline
@@ -858,18 +858,18 @@ _ConvertTypeErasedValueForTime(const Usd_Clip::ExternalTime &extTime,
                                const Usd_Clip::InternalTime &intTime,
                                Storage *value)
 {
-    if (_IsHolding<SdfTimeCode>(*value)) {
-        SdfTimeCode rawVal;
+    if (_IsHolding<GfTimeCode>(*value)) {
+        GfTimeCode rawVal;
         _UncheckedSwap(value, rawVal);
         _ConvertValueForTime(extTime, intTime, &rawVal);
         _UncheckedSwap(value, rawVal);
-    } else if (_IsHolding<VtArray<SdfTimeCode>>(*value)) {
-        VtArray<SdfTimeCode> rawVal;
+    } else if (_IsHolding<VtArray<GfTimeCode>>(*value)) {
+        VtArray<GfTimeCode> rawVal;
         _UncheckedSwap(value, rawVal);
         _ConvertValueForTime(extTime, intTime, &rawVal);
         _UncheckedSwap(value, rawVal);
-    } else if (_IsHolding<VtArrayEdit<SdfTimeCode>>(*value)) {
-        VtArrayEdit<SdfTimeCode> rawVal;
+    } else if (_IsHolding<VtArrayEdit<GfTimeCode>>(*value)) {
+        VtArrayEdit<GfTimeCode> rawVal;
         _UncheckedSwap(value, rawVal);
         _ConvertValueForTime(extTime, intTime, &rawVal);
         _UncheckedSwap(value, rawVal);
@@ -956,7 +956,7 @@ Usd_Clip::QueryTimeSample(
         }
     }
 
-    // Convert values containing SdfTimeCodes if necessary.
+    // Convert values containing GfTimeCodes if necessary.
     _ConvertValueForTime(time.GetValue(), clipTime, value);
     return true;
 }

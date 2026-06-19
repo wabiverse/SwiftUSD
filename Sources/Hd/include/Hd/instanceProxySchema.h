@@ -15,12 +15,12 @@
 /* **                                                                      ** */
 /* ************************************************************************** */
 
-#ifndef PXR_USD_IMAGING_USD_IMAGING_USD_SCENE_INDEX_INPUT_ARGS_SCHEMA_H
-#define PXR_USD_IMAGING_USD_IMAGING_USD_SCENE_INDEX_INPUT_ARGS_SCHEMA_H
+#ifndef PXR_IMAGING_HD_INSTANCE_PROXY_SCHEMA_H
+#define PXR_IMAGING_HD_INSTANCE_PROXY_SCHEMA_H
 
 /// \file
 
-#include "UsdImaging/api.h"
+#include "Hd/api.h"
 
 #include "Hd/schema.h"
 
@@ -30,42 +30,44 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // --(BEGIN CUSTOM CODE: Declares)--
-TF_DECLARE_REF_PTRS(UsdStage);
-using UsdStageRefPtrDataSource = HdTypedSampledDataSource<UsdStageRefPtr>;
-using UsdStageRefPtrDataSourceHandle = UsdStageRefPtrDataSource::Handle;
 // --(END CUSTOM CODE: Declares)--
 
-#define USD_IMAGING_USD_SCENE_INDEX_INPUT_ARGS_SCHEMA_TOKENS \
-    (usdSceneIndex) \
-    (stage) \
-    (includeUnloadedPrims) \
-    (displayUnloadedPrimsWithBounds) \
-    (addDrawModeSceneIndex) \
+#define HD_INSTANCE_PROXY_SCHEMA_TOKENS \
+    (instanceProxy) \
+    (prototypePath) \
 
-TF_DECLARE_PUBLIC_TOKENS(UsdImagingUsdSceneIndexInputArgsSchemaTokens, USDIMAGING_API,
-    USD_IMAGING_USD_SCENE_INDEX_INPUT_ARGS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdInstanceProxySchemaTokens, HD_API,
+    HD_INSTANCE_PROXY_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
 
-/// \class UsdImagingUsdSceneIndexInputArgsSchema
+/// \class HdInstanceProxySchema
 ///
-class UsdImagingUsdSceneIndexInputArgsSchema : public HdSchema
+/// A schema for marking a prim as an instance proxy. An instance proxy prim
+/// represents a descendant prim beneath an instance prim, even though no such
+/// prim actually exists in the scene. This schema is in service of
+/// HdInstanceProxyViewSceneIndex that provides a topological view of the scene
+/// as though instancing were not being used. This is useful for path
+/// expression-based collection membership evaluation, and for UI tools like
+/// the Hydra Scene Debugger.
+///
+class HdInstanceProxySchema : public HdSchema
 {
 public:
     /// \name Schema retrieval
     /// @{
 
-    UsdImagingUsdSceneIndexInputArgsSchema(HdContainerDataSourceHandle container)
+    HdInstanceProxySchema(HdContainerDataSourceHandle container)
       : HdSchema(container) {}
 
     /// Retrieves a container data source with the schema's default name token
-    /// "usdSceneIndex" from the parent container and constructs a
-    /// UsdImagingUsdSceneIndexInputArgsSchema instance.
+    /// "instanceProxy" from the parent container and constructs a
+    /// HdInstanceProxySchema instance.
     /// Because the requested container data source may not exist, the result
     /// should be checked with IsDefined() or a bool comparison before use.
-    USDIMAGING_API
-    static UsdImagingUsdSceneIndexInputArgsSchema GetFromParent(
+    HD_API
+    static HdInstanceProxySchema GetFromParent(
         const HdContainerDataSourceHandle &fromParentContainer);
 
     /// @}
@@ -76,17 +78,10 @@ public:
     /// \name Member accessor
     /// @{
 
-    USDIMAGING_API
-    UsdStageRefPtrDataSourceHandle GetStage() const;
-
-    USDIMAGING_API
-    HdBoolDataSourceHandle GetIncludeUnloadedPrims() const;
-
-    USDIMAGING_API
-    HdBoolDataSourceHandle GetDisplayUnloadedPrimsWithBounds() const;
-
-    USDIMAGING_API
-    HdBoolDataSourceHandle GetAddDrawModeSceneIndex() const; 
+    /// The path to the propagated prototype prim that this instance proxy
+    /// prim represents.
+    HD_API
+    HdPathDataSourceHandle GetPrototypePath() const; 
 
     /// @}
 
@@ -95,12 +90,12 @@ public:
 
     /// Returns a token where the container representing this schema is found in
     /// a container by default.
-    USDIMAGING_API
+    HD_API
     static const TfToken &GetSchemaToken();
 
     /// Returns an HdDataSourceLocator (relative to the prim-level data source)
     /// where the container representing this schema is found by default.
-    USDIMAGING_API
+    HD_API
     static const HdDataSourceLocator &GetDefaultLocator();
 
     /// @} 
@@ -115,16 +110,13 @@ public:
     /// low-level interface. For cases in which it's desired to define
     /// the container with a sparse set of child fields, the Builder class
     /// is often more convenient and readable.
-    USDIMAGING_API
+    HD_API
     static HdContainerDataSourceHandle
     BuildRetained(
-        const UsdStageRefPtrDataSourceHandle &stage,
-        const HdBoolDataSourceHandle &includeUnloadedPrims,
-        const HdBoolDataSourceHandle &displayUnloadedPrimsWithBounds,
-        const HdBoolDataSourceHandle &addDrawModeSceneIndex
+        const HdPathDataSourceHandle &prototypePath
     );
 
-    /// \class UsdImagingUsdSceneIndexInputArgsSchema::Builder
+    /// \class HdInstanceProxySchema::Builder
     /// 
     /// Utility class for setting sparse sets of child data source fields to be
     /// filled as arguments into BuildRetained. Because all setter methods
@@ -133,28 +125,16 @@ public:
     class Builder
     {
     public:
-        USDIMAGING_API
-        Builder &SetStage(
-            const UsdStageRefPtrDataSourceHandle &stage);
-        USDIMAGING_API
-        Builder &SetIncludeUnloadedPrims(
-            const HdBoolDataSourceHandle &includeUnloadedPrims);
-        USDIMAGING_API
-        Builder &SetDisplayUnloadedPrimsWithBounds(
-            const HdBoolDataSourceHandle &displayUnloadedPrimsWithBounds);
-        USDIMAGING_API
-        Builder &SetAddDrawModeSceneIndex(
-            const HdBoolDataSourceHandle &addDrawModeSceneIndex);
+        HD_API
+        Builder &SetPrototypePath(
+            const HdPathDataSourceHandle &prototypePath);
 
         /// Returns a container data source containing the members set thus far.
-        USDIMAGING_API
+        HD_API
         HdContainerDataSourceHandle Build();
 
     private:
-        UsdStageRefPtrDataSourceHandle _stage;
-        HdBoolDataSourceHandle _includeUnloadedPrims;
-        HdBoolDataSourceHandle _displayUnloadedPrimsWithBounds;
-        HdBoolDataSourceHandle _addDrawModeSceneIndex;
+        HdPathDataSourceHandle _prototypePath;
 
     };
 

@@ -15,7 +15,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
+class HdRendererCreateArgsSchema;
 class HdRendererPlugin;
 class HdRendererPluginHandle;
 class HdPluginRenderDelegateUniqueHandle;
@@ -36,8 +36,30 @@ public:
     static void Define();
 
     ///
-    /// \deprecated Use GetDefaultPluginId overload below.
-    /// 
+    /// Returns the id of plugin to use as the default.  To ensure an
+    /// appropriate default is found, the \p rendererCreateArgs (following the
+    /// HdCreateRendererArgsSchema) parameter will be used to indicate the
+    /// resources available when making the determination.
+    ///
+    HD_API
+    TfToken GetDefaultPluginId(
+        const HdRendererCreateArgsSchema &rendererCreateArgs);
+
+    ///
+    /// Returns the renderer plugin for the given id or a null handle
+    /// if not found. The plugin is wrapped in a handle that automatically
+    /// increments and decrements the reference count and also stores the
+    /// plugin id.
+    ///
+    HD_API
+    HdRendererPluginHandle GetOrCreateRendererPlugin(const TfToken &pluginId);
+
+    /// \name Hydra 1.0 and other deprecated API
+    /// @{
+
+    ///
+    /// \deprecated Use overload taking HdRendererCreateArgsSchema.
+    ///
     /// Returns the id of plugin to use as the default.  To ensure an
     /// appropriate default is found, the \p gpuEnabled parameter will be used
     /// to indicate if the GPU will be available when making the determination.
@@ -45,6 +67,8 @@ public:
     TfToken GetDefaultPluginId(bool gpuEnabled = true);
 
     ///
+    /// \deprecated Use overload taking HdRendererCreateArgsSchema.
+    /// 
     /// Returns the id of plugin to use as the default.  To ensure an
     /// appropriate default is found, the \p rendererCreateArgs parameter will
     /// be used to indicate the resources available when making the 
@@ -65,15 +89,6 @@ public:
     HdRendererPlugin *GetRendererPlugin(const TfToken &pluginId);
 
     ///
-    /// Returns the renderer plugin for the given id or a null handle
-    /// if not found. The plugin is wrapped in a handle that automatically
-    /// increments and decrements the reference count and also stores the
-    /// plugin id.
-    ///
-    HD_API
-    HdRendererPluginHandle GetOrCreateRendererPlugin(const TfToken &pluginId);
-
-    ///
     /// Returns a render delegate created by the plugin with the given name
     /// if the plugin is supported using given initial settings.
     /// The render delegate is wrapped in a movable handle that
@@ -84,6 +99,8 @@ public:
     HdPluginRenderDelegateUniqueHandle CreateRenderDelegate(
         const TfToken &pluginId,
         const HdRenderSettingsMap &settingsMap = {});
+
+    /// @}
 
 private:
     // Friend required by TfSingleton to access constructor (as it is private).

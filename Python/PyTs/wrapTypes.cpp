@@ -117,6 +117,7 @@ void wrapTypes()
 
         .def_readwrite("mode", &TsExtrapolation::mode)
         .def_readwrite("slope", &TsExtrapolation::slope)
+        .def_readwrite("loopBoundaryTime", &TsExtrapolation::loopBoundaryTime)
 
         .def("IsLooping", &TsExtrapolation::IsLooping)
 

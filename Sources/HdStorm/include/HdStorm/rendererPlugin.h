@@ -29,7 +29,7 @@ public:
         HdRendererCreateArgs const &rendererCreateArgs,
         std::string *reasonWhyNot = nullptr) const override;
 
-    HdContainerDataSourceHandle GetSceneIndexInputArgs() const override;
+    HdContainerDataSourceHandle GetSceneIndexCreateArgs() const override;
     
 private:
     HdStormRendererPlugin(const HdStormRendererPlugin &)             = delete;

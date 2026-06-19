@@ -15,7 +15,7 @@
 /* **                                                                      ** */
 /* ************************************************************************** */
 
-#include "Hd/sceneIndexInputArgsSchema.h"
+#include "Hd/sceneIndexCreateArgsSchema.h"
 
 #include "Hd/retainedDataSource.h"
 
@@ -26,36 +26,36 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSceneIndexInputArgsSchemaTokens,
-    HD_SCENE_INDEX_INPUT_ARGS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSceneIndexCreateArgsSchemaTokens,
+    HD_SCENE_INDEX_CREATE_ARGS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
 HdBoolDataSourceHandle
-HdSceneIndexInputArgsSchema::GetMotionBlurSupport() const
+HdSceneIndexCreateArgsSchema::GetMotionBlurSupport() const
 {
     return _GetTypedDataSource<HdBoolDataSource>(
-        HdSceneIndexInputArgsSchemaTokens->motionBlurSupport);
+        HdSceneIndexCreateArgsSchemaTokens->motionBlurSupport);
 }
 
 HdBoolDataSourceHandle
-HdSceneIndexInputArgsSchema::GetCameraMotionBlurSupport() const
+HdSceneIndexCreateArgsSchema::GetCameraMotionBlurSupport() const
 {
     return _GetTypedDataSource<HdBoolDataSource>(
-        HdSceneIndexInputArgsSchemaTokens->cameraMotionBlurSupport);
+        HdSceneIndexCreateArgsSchemaTokens->cameraMotionBlurSupport);
 }
 
 HdRenderDelegateInfoDataSourceHandle
-HdSceneIndexInputArgsSchema::GetLegacyRenderDelegateInfo() const
+HdSceneIndexCreateArgsSchema::GetLegacyRenderDelegateInfo() const
 {
     return _GetTypedDataSource<HdRenderDelegateInfoDataSource>(
-        HdSceneIndexInputArgsSchemaTokens->legacyRenderDelegateInfo);
+        HdSceneIndexCreateArgsSchemaTokens->legacyRenderDelegateInfo);
 }
 
 /*static*/
 HdContainerDataSourceHandle
-HdSceneIndexInputArgsSchema::BuildRetained(
+HdSceneIndexCreateArgsSchema::BuildRetained(
         const HdBoolDataSourceHandle &motionBlurSupport,
         const HdBoolDataSourceHandle &cameraMotionBlurSupport,
         const HdRenderDelegateInfoDataSourceHandle &legacyRenderDelegateInfo
@@ -67,40 +67,40 @@ HdSceneIndexInputArgsSchema::BuildRetained(
     size_t _count = 0;
 
     if (motionBlurSupport) {
-        _names[_count] = HdSceneIndexInputArgsSchemaTokens->motionBlurSupport;
+        _names[_count] = HdSceneIndexCreateArgsSchemaTokens->motionBlurSupport;
         _values[_count++] = motionBlurSupport;
     }
 
     if (cameraMotionBlurSupport) {
-        _names[_count] = HdSceneIndexInputArgsSchemaTokens->cameraMotionBlurSupport;
+        _names[_count] = HdSceneIndexCreateArgsSchemaTokens->cameraMotionBlurSupport;
         _values[_count++] = cameraMotionBlurSupport;
     }
 
     if (legacyRenderDelegateInfo) {
-        _names[_count] = HdSceneIndexInputArgsSchemaTokens->legacyRenderDelegateInfo;
+        _names[_count] = HdSceneIndexCreateArgsSchemaTokens->legacyRenderDelegateInfo;
         _values[_count++] = legacyRenderDelegateInfo;
     }
     return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-HdSceneIndexInputArgsSchema::Builder &
-HdSceneIndexInputArgsSchema::Builder::SetMotionBlurSupport(
+HdSceneIndexCreateArgsSchema::Builder &
+HdSceneIndexCreateArgsSchema::Builder::SetMotionBlurSupport(
     const HdBoolDataSourceHandle &motionBlurSupport)
 {
     _motionBlurSupport = motionBlurSupport;
     return *this;
 }
 
-HdSceneIndexInputArgsSchema::Builder &
-HdSceneIndexInputArgsSchema::Builder::SetCameraMotionBlurSupport(
+HdSceneIndexCreateArgsSchema::Builder &
+HdSceneIndexCreateArgsSchema::Builder::SetCameraMotionBlurSupport(
     const HdBoolDataSourceHandle &cameraMotionBlurSupport)
 {
     _cameraMotionBlurSupport = cameraMotionBlurSupport;
     return *this;
 }
 
-HdSceneIndexInputArgsSchema::Builder &
-HdSceneIndexInputArgsSchema::Builder::SetLegacyRenderDelegateInfo(
+HdSceneIndexCreateArgsSchema::Builder &
+HdSceneIndexCreateArgsSchema::Builder::SetLegacyRenderDelegateInfo(
     const HdRenderDelegateInfoDataSourceHandle &legacyRenderDelegateInfo)
 {
     _legacyRenderDelegateInfo = legacyRenderDelegateInfo;
@@ -108,9 +108,9 @@ HdSceneIndexInputArgsSchema::Builder::SetLegacyRenderDelegateInfo(
 }
 
 HdContainerDataSourceHandle
-HdSceneIndexInputArgsSchema::Builder::Build()
+HdSceneIndexCreateArgsSchema::Builder::Build()
 {
-    return HdSceneIndexInputArgsSchema::BuildRetained(
+    return HdSceneIndexCreateArgsSchema::BuildRetained(
         _motionBlurSupport,
         _cameraMotionBlurSupport,
         _legacyRenderDelegateInfo

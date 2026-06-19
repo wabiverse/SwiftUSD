@@ -90,7 +90,7 @@ HdRendererPlugin::CreateDelegate(HdRenderSettingsMap const& settingsMap)
 HdPluginRendererUniqueHandle
 HdRendererPlugin::CreateRenderer(
     HdSceneIndexBaseRefPtr const &sceneIndex,
-    HdContainerDataSourceHandle const &rendererCreateArgs)
+    const HdRendererCreateArgsSchema &rendererCreateArgs)
 {
     if (!IsSupported(rendererCreateArgs)) {
         return nullptr;
@@ -130,47 +130,17 @@ HdRendererPlugin::GetDisplayName() const
 }
 
 bool
-HdRendererPlugin::IsSupported(bool gpuEnabled) const
-{
-    HdRendererCreateArgs rendererCreateArgs;
-    rendererCreateArgs.gpuEnabled = gpuEnabled;
-    return IsSupported(rendererCreateArgs);
-}
-
-static
-HdRendererCreateArgs
-_ToRendererCreateArgs(
-    const HdRendererCreateArgsSchema &schema)
-{
-    HdRendererCreateArgs rendererCreateArgs;
-
-    if (HdBoolDataSourceHandle const ds = schema.GetGpuEnabled()) {
-        rendererCreateArgs.gpuEnabled = ds->GetTypedValue(0.0f);
-    }
-
-    if (auto const ds =
-            HdTypedSampledDataSource<Hgi*>::Cast(
-                schema
-                    .GetDrivers()
-                    .Get(HdRendererCreateArgsSchemaTokens->hgi))) {
-        rendererCreateArgs.hgi = ds->GetTypedValue(0.0f);
-    }
-
-    return rendererCreateArgs;
-}
-
-bool
 HdRendererPlugin::IsSupported(
-    HdContainerDataSourceHandle const &rendererCreateArgs,
+    const HdRendererCreateArgsSchema &rendererCreateArgs,
     std::string * const reasonWhyNot) const
 {
     return IsSupported(
-        _ToRendererCreateArgs(HdRendererCreateArgsSchema(rendererCreateArgs)),
+        HdRendererCreateArgs(rendererCreateArgs),
         reasonWhyNot);
 }
 
 HdContainerDataSourceHandle
-HdRendererPlugin::GetSceneIndexInputArgs() const
+HdRendererPlugin::GetSceneIndexCreateArgs() const
 {
     return {};
 }
@@ -178,9 +148,11 @@ HdRendererPlugin::GetSceneIndexInputArgs() const
 std::unique_ptr<HdRenderer>
 HdRendererPlugin::_CreateRenderer(
     HdSceneIndexBaseRefPtr const &sceneIndex,
-    HdContainerDataSourceHandle const &rendererCreateArgs)
+    const HdRendererCreateArgsSchema &rendererCreateArgs)
 {
-    return _CreateRendererFromRenderDelegate(sceneIndex, rendererCreateArgs);
+    return _CreateRendererFromRenderDelegate(
+        sceneIndex,
+        rendererCreateArgs);
 }
 
 static
@@ -190,19 +162,18 @@ _ToRenderSettings(
 {
     HdRenderSettingsMap result;
     result[HdRenderSettingsTokens->rendererCreateArgs] =
-        _ToRendererCreateArgs(schema);
+        HdRendererCreateArgs(schema);
     return result;
 }
 
 std::unique_ptr<HdRenderer>
 HdRendererPlugin::_CreateRendererFromRenderDelegate(
     HdSceneIndexBaseRefPtr const &sceneIndex,
-    HdContainerDataSourceHandle const &rendererCreateArgs)
+    const HdRendererCreateArgsSchema &rendererCreateArgs)
 {
     HdPluginRenderDelegateUniqueHandle renderDelegate =
         CreateDelegate(
-            _ToRenderSettings(
-                HdRendererCreateArgsSchema(rendererCreateArgs)));
+            _ToRenderSettings(rendererCreateArgs));
     if (!renderDelegate) {
         return nullptr;
     }

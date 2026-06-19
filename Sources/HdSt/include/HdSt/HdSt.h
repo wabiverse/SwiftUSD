@@ -38,7 +38,9 @@
 #include <HdSt/textureHandleRegistry.h>
 #include <HdSt/light.h>
 #include <HdSt/basisCurvesComputations.h>
+#include <HdSt/sphereShaderKey.h>
 #include <HdSt/field.h>
+#include <HdSt/sphere.h>
 #include <HdSt/textureIdentifier.h>
 #include <HdSt/materialXFilter.h>
 #include <HdSt/textureCpuData.h>

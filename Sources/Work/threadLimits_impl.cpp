@@ -6,11 +6,9 @@
 //
 #include "pxr/pxrns.h"
 
+#include "Work/tbb_version.h"
 #include "Work/threadLimits_impl.h"
 
-// Blocked range is not used in this file, but this header happens to pull in
-// the TBB version header in a way that works in all TBB versions.
-#include <OneTBB/tbb/blocked_range.h>
 #include <OneTBB/tbb/task_arena.h>
 
 #if TBB_INTERFACE_VERSION_MAJOR >= 12

@@ -42,6 +42,7 @@
 #include <UsdGeom/constraintTarget.h>
 #include <UsdGeom/imageable.h>
 #include <UsdGeom/hermiteCurves.h>
+#include <UsdGeom/backPlateAPI.h>
 #include <UsdGeom/primvar.h>
 #include <UsdGeom/boundable.h>
 #endif  // __PXR_USD_USDGEOM_H__

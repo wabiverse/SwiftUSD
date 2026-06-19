@@ -141,9 +141,24 @@
 // 94 -> 95: Add HdRenderDelegate::GetShadingSystems to replace deprecated
 //           HdRenderDelegate::GetShaderSourceTypes
 // 95 -> 96: Added HdVisitSampledDataSourceType and HdCopySampledDataSourceType.
-// 96 -> 97: Added HdsiParticleFieldConversionSceneIndex
+// 96 -> 97: Added HdsiParticleFieldConversionSceneIndex.
+// 97 -> 98: Consistently use HdRendererCreateArgsSchema for
+//           HdRendererPluginRegistry::GetDefaultPluginId,
+//           HdRendererPlugin::IsSupported and CreateRenderer and
+//           HdRenderDelegateAdapterRenderer c'tor.
+// 98 -> 99: Removing HdRenderIndex::IsSceneIndexEmulationEnabled() and
+//           UsdImagingGLEngine::_GetTaskController().
+//           Emulation is now always enabled.
+// 99 -> 100: HdRenderIndex::New renamed to
+//            HdRenderIndexNewForBack/FrontendEmulation.
+// 100 -> 101: HdRendererPlugin::GetSceneIndexInputArgs renamed to
+//             GetSceneIndexCreateArgs. HdSceneIndexInputArgsSchema renamed
+//             to HdSceneIndexCreateArgsSchema accordingly.
+// 101 -> 102: Contiguous data source handle allocation via allocate_shared in
+//             ::New(), added by HD_DECLARE_DATASOURCE. Change is forward- and
+//             backward-compatible with existing data source implementations.
 
-#define HD_API_VERSION 97
+#define HD_API_VERSION 102
 
 // 1  ->  2: SimpleLighting -> FallbackLighting
 // 2  ->  3: Use GetLightCount() instead of NUM_LIGHTS to get light count.

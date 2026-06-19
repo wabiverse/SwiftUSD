@@ -6,4 +6,5 @@
 #include <UsdHydra/generativeProceduralAPI.h>
 #include <UsdHydra/tokens.h>
 #include <UsdHydra/api.h>
+#include <UsdHydra/renderPassAPI.h>
 #endif  // __PXR_USD_USDHYDRA_H__

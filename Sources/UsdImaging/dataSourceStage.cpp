@@ -61,6 +61,9 @@ UsdImagingDataSourceStage::Get(const TfToken& name)
                .SetEndTimeCode(
                    HdRetainedTypedSampledDataSource<double>::New(
                        _stage->GetEndTimeCode()))
+               .SetTimeCodesPerSecond(
+                   HdRetainedTypedSampledDataSource<double>::New(
+                       _stage->GetTimeCodesPerSecond()))
                .Build();
     }
     return nullptr;

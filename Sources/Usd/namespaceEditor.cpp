@@ -32,68 +32,179 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 
-// Stores info about a property spec that has authored attribute connections or 
-// relationship targets.
-struct _PropertySpecWithAuthoredTargetsInfo {
+// Stores info about a property spec with authored path-bearing fields that will 
+// need to be updated as part of a namespace edit (e.g. attribute connections or 
+// relationship targets).
+struct _PropertySpecWithPathBearingFieldsInfo {
     // Layer and path of the site of the spec.
     SdfLayerHandle layer;
     SdfPath path;
 
-    // The name of the field in property spec that holds the target list op.
-    // This will be ConnectionPaths for attributes and TargetPaths for 
-    // relationships.
+    // The name of the field in the property spec.
     TfToken fieldName;
 
     // The node in the composed prim index that introduces this spec. Necessary 
-    // for mapping the target paths to the stage namespace paths as well as 
-    // determining if these target paths can be edited with or without relocates.
+    // for mapping paths to the stage namespace as well as determining if these 
+    // paths can be edited with or without relocates.
     PcpNodeRef originatingNode;
 
-    // Gets the targets list op value from this spec.
-    SdfPathListOp GetTargetListOp() const
+    // Gets the field's value from this spec.
+    VtValue GetFieldValue() const
     {
-        SdfPathListOp listOp;
-        
-        if (!layer->HasField(path, fieldName, &listOp)) {
-            TF_CODING_ERROR("Spec at site @%s@<%s> is expected to have a "
-                "path list op for field %s",
+        VtValue val;
+        TF_VERIFY(layer->HasField(path, fieldName, &val));
+        if (val.IsEmpty()) {
+            TF_CODING_ERROR("Field %s at site @%s@<%s> is expected to exist.",
+                fieldName.GetText(),
                 layer->GetIdentifier().c_str(),
-                path.GetText(),
-                fieldName.GetText());
+                path.GetText());
+            return VtValue();
         }
-        return listOp;
+        return val;
     }
 };
 
-using _PropertySpecWithAuthoredTargetsVector = 
-    std::vector<_PropertySpecWithAuthoredTargetsInfo>;
+using _PropertySpecWithPathBearingFieldsVector = 
+    std::vector<_PropertySpecWithPathBearingFieldsInfo>;
 
 // Structure for storing the dependencies between stage object paths and the
-// property specs that cause the object to be targeted for attribute connections
-// or relationship targets.
-struct _TargetingPropertyDependencies {
+// property specs that have fields with paths that include that object.
+struct _Dependencies {
     // The map of each stage property path to the property specs (ordered 
-    // strongest to weakest) that provide opinions for the property's targets 
-    // (relationship) or connections (attribute)
-    std::unordered_map<SdfPath, _PropertySpecWithAuthoredTargetsVector, TfHash> 
-        composedPropertyToSpecsWithAuthoredTargetsMap;
+    // strongest to weakest) that provide opinions for the property's path-
+    // bearing fields.
+    std::unordered_map<SdfPath, _PropertySpecWithPathBearingFieldsVector, TfHash> 
+        composedPropertyToSpecsWithPathBearingFieldsMap;
 
     // A table of stage object path to the list of property paths that have
-    // specs with list ops that contain a path that maps to this object path.
-    SdfPathTable<SdfPathVector> targetedPathToTargetingPropertiesPathTable;
+    // specs with path-bearing fields that map to this object path.
+    SdfPathTable<SdfPathVector> targetedPathToTargetingSpecPathsTable;
+};
+// ------------------------------------------------------------------------- //
+// Transforms for fields
+// ------------------------------------------------------------------------- //
+
+// This struct encapsulates the state required to perform a namespace edit.
+struct _NamespaceEditXf
+{
+    SdfPath oldPath;
+    SdfPath newPath;
 };
 
-// Helper for collecting all targeting property dependencies on a stage.
-class _TargetingPropertyDependencyCollector
+// This struct is used to collect the paths that a certain field refers to.
+// For example, when used to transform a targetPaths field, it collects all the 
+// paths stored in the targetPath list op's explicit, append, prepend, and delete
+// item vectors. This transformation collects these paths and saves them in this 
+// struct for use after the transform is applied. The transform itself does not 
+// change the returned field value.
+struct _CollectPathsXf
+{
+    PcpNodeRef node;
+    mutable SdfPathSet paths;
+};
+
+// Append an SdfPath to its transform.
+SdfPath
+_CollectPath(
+    SdfPath const &path, _CollectPathsXf const &xf)
+{
+    xf.paths.insert(path);
+    return path;
+}
+
+// Namespace edit SdfPath by replacing its prefix.
+SdfPath
+_PathReplacePrefix(
+    SdfPath const &path, _NamespaceEditXf const &xf)
+{
+    return path.ReplacePrefix(xf.oldPath, xf.newPath);
+}
+
+SdfPathListOp
+_PathListOpNamespaceEdit(SdfPathListOp const &listOp, _NamespaceEditXf const& xf)
+{
+    // Try to modify any paths that need to change because of the
+    // edited namespace path.
+    SdfPathListOp modifiedListOp(listOp);
+    modifiedListOp.ModifyOperations(
+        [&](const SdfPath &path) {
+            // All paths are always absolute within the layer 
+            // data even though they can be specified as relative in
+            // the text of a usda file. We verify this absolute path
+            // assumption just to make sure.
+            if (!path.IsAbsolutePath()) {
+                return std::optional<SdfPath>(path);
+            }
+            // If the path doesn't start with the old path, it is not 
+            // affected and returned unmodified.
+            if (!path.HasPrefix(xf.oldPath)) {
+                return std::optional<SdfPath>(path);
+            }
+            // Otherwise we found an affected path. If we've deleted
+            // the old path, delete this item.
+            if (xf.newPath.IsEmpty()) {
+                return std::optional<SdfPath>();
+            }
+            // Otherwise update the path of this item for the 
+            // new path.
+            return std::optional<SdfPath>(
+                path.ReplacePrefix(xf.oldPath, xf.newPath));
+    });
+    return modifiedListOp;
+}
+
+SdfPathListOp
+_PathListOpCollectPathsXf(
+    SdfPathListOp const &listOp, _CollectPathsXf const &xf)
+{
+    // Helper for collecting the paths from a listOp item vector and adding 
+    // them to the work entry's paths list, mapping the path to the root node 
+    // (stage namespace) if necessary.
+    auto ApplyXfFn = [&](const SdfPathListOp::ItemVector &items) {
+        for (const SdfPath &item : items) {
+            VtValueTryTransform(VtValue(item), xf);
+        }
+    };
+
+    // Apply the transform to all paths found anywhere in the listOp
+    // as all these paths count as a dependency that may need to 
+    // fixed after a namespace edit. 
+    if (listOp.IsExplicit()) {
+        ApplyXfFn(listOp.GetExplicitItems());
+    } else {
+        ApplyXfFn(listOp.GetAddedItems());
+        ApplyXfFn(listOp.GetAppendedItems());
+        ApplyXfFn(listOp.GetDeletedItems());
+        ApplyXfFn(listOp.GetOrderedItems());
+        ApplyXfFn(listOp.GetPrependedItems());
+    }
+
+    return listOp;
+}
+
+TF_REGISTRY_FUNCTION(VtValue)
+{
+    // Transforms for SdfPath
+    VtRegisterTransform(_CollectPath);
+    VtRegisterTransform(_PathReplacePrefix);
+
+    // Transforms for SdfPathListOp
+    VtRegisterTransform(_PathListOpCollectPathsXf);
+    VtRegisterTransform(_PathListOpNamespaceEdit);
+
+}
+
+// Helper for collecting all dependencies on a stage.
+class _DependencyCollector
 {
 public:
-    // Gets all the targeting property dependencies for all object paths on 
+    // Gets all dependencies (fields containing paths) for all objects on 
     // the given stage
-    static _TargetingPropertyDependencies GetDependencies(
+    static _Dependencies GetDependencies(
         const UsdStageRefPtr &stage) 
     {
         TRACE_FUNCTION();
-        _TargetingPropertyDependencyCollector impl;
+        _DependencyCollector impl;
         impl._Run(stage);
         return std::move(impl._result);
     }
@@ -104,15 +215,15 @@ private:
 
     struct _WorkQueueEntry {
         SdfPath composedPropertyPath;
-        _PropertySpecWithAuthoredTargetsVector propSpecsWithAuthoredTargets;
-        SdfPathSet targetedPaths;
+        _PropertySpecWithPathBearingFieldsVector propSpecsWithPathBearingFields;
+        SdfPathSet paths;
     };
 
     tbb::concurrent_queue<_WorkQueueEntry> _workQueue;
 
-    _TargetingPropertyDependencies _result;
+    _Dependencies _result;
 
-    explicit _TargetingPropertyDependencyCollector()
+    explicit _DependencyCollector()
         : _consumerTask(_dispatcher, [this]() { _ConsumerTask(); }) {}
 
     void _Run(const UsdStageRefPtr &stage) {
@@ -129,9 +240,9 @@ private:
         std::unordered_map<SdfPath, _WorkQueueEntry, TfHash> 
             workEntriesPerProperty;
 
-        // Use a resolver to get all of the prim's property opinions that 
-        // provide attribute connections or relationship targets in strength
-        // order.
+        // Use a resolver to get all of the prim's field opinions in strength
+        // order. We collect information on fields that need to be updated as
+        // part of the namespace edit.
         for(Usd_Resolver res(&(prim.GetPrimIndex())); 
                 res.IsValid(); res.NextLayer()) {
 
@@ -148,92 +259,56 @@ private:
                 continue;
             }
 
-            // Now we look through property specs looking for ones with 
-            // connections or relationship targets
-            for (const TfToken &propName : primSpecPropertyNames) {
+            const PcpNodeRef node = res.GetNode();
 
+            // Now we look through property specs looking for any with 
+            // fields to update.
+            for (const TfToken &propName : primSpecPropertyNames) {
                 // Get the property spec path in this layer.
                 SdfPath localPropPath = primSpecPath.AppendProperty(propName);
 
-                // Get the target path field name for the property based on 
-                // whether it's an attribute or relationship.
-                const SdfSpecType specType = layer->GetSpecType(localPropPath);
-                TfToken targetPathListOpField;
-                if (specType == SdfSpecTypeAttribute) {
-                    targetPathListOpField = SdfFieldKeys->ConnectionPaths;
-                } else if (specType == SdfSpecTypeRelationship) {
-                    targetPathListOpField = SdfFieldKeys->TargetPaths;
-                } else {
-                    TF_CODING_ERROR("Spec type for property child of at site "
-                        "@%s@<%s> is not an attribute or relationship",
-                        layer->GetIdentifier().c_str(),
-                        localPropPath.GetText());
-                    continue;
-                }
+                // Iterate through the property's fields.
+                for (const TfToken &fieldName : layer->ListFields(localPropPath)) {
+                    // Get the field's value.
+                    VtValue val;
+                    TF_VERIFY(layer->HasField(localPropPath, fieldName, &val));
 
-                // Get the target path list op for the property spec skipping
-                // specs that don't have opinions on this field.
-                SdfPathListOp targetPathsListOp;
-                if (!layer->HasField<SdfPathListOp>(
-                        localPropPath, targetPathListOpField, &targetPathsListOp)) {
-                    continue;
-                }
+                    // Collect any paths that might be present in this field.
+                    // If the returned value is empty, it means the field type
+                    // is not path-bearing and does not need updating.
+                    _CollectPathsXf xf = {node, SdfPathSet()};
+                    if (VtValueTryTransform(val, xf).IsEmpty()) {
+                        continue;
+                    }
 
-                // Add or get the work entry for the composed property path so
-                // we can add this spec's info to it.
-                _WorkQueueEntry &workEntry = workEntriesPerProperty.emplace(
-                    prim.GetPrimPath().AppendProperty(propName), 
-                    _WorkQueueEntry()).first->second;
+                    // Add or get the work entry for the composed property path so
+                    // we can add this spec's info to it.
+                    _WorkQueueEntry &workEntry = workEntriesPerProperty.try_emplace(
+                        prim.GetPrimPath().AppendProperty(propName), 
+                        _WorkQueueEntry()).first->second;
 
-                const PcpNodeRef node = res.GetNode();
-
-                // Helper for collecting the target paths from a listOp item 
-                // vector and adding them to the work entry's target paths list,
-                // mapping the path to the root node (stage namespace) if
-                // necessary.
-                auto collectMappedPathsFn = 
-                    [&](const SdfPathListOp::ItemVector &items) {
-                        if (node.IsRootNode() || 
-                                node.GetMapToRoot().IsIdentity()) {
-                            workEntry.targetedPaths.insert(
-                                items.begin(), items.end());
-                        } else {
-                            for (const auto &item : items) {
-                                SdfPath mappedItem = 
-                                    node.GetMapToRoot().MapSourceToTarget(item);
-                                if (!mappedItem.IsEmpty()) {
-                                    workEntry.targetedPaths.insert(
-                                        std::move(mappedItem));
-                                }
-                            }
+                    for (const auto& path : xf.paths) {
+                        // Map the path into stage namespace
+                        SdfPath mappedPath = 
+                            node.GetMapToRoot().MapSourceToTarget(path);
+                        if (!mappedPath.IsEmpty()) {
+                            workEntry.paths.insert(std::move(mappedPath));
                         }
-                    };
+                    }
 
-                // Collect all the target paths found anywhere in the listOp
-                // as all these paths count as a dependency that may need to 
-                // fixed after a namespace edit. 
-                if (targetPathsListOp.IsExplicit()) {
-                    collectMappedPathsFn(targetPathsListOp.GetExplicitItems());
-                } else {
-                    collectMappedPathsFn(targetPathsListOp.GetAddedItems());
-                    collectMappedPathsFn(targetPathsListOp.GetAppendedItems());
-                    collectMappedPathsFn(targetPathsListOp.GetDeletedItems());
-                    collectMappedPathsFn(targetPathsListOp.GetOrderedItems());
-                    collectMappedPathsFn(targetPathsListOp.GetPrependedItems());
+                    // Add the prop spec info to the contributing prop specs for 
+                    // this composed entry.
+                    workEntry.propSpecsWithPathBearingFields.push_back({
+                        layer, 
+                        localPropPath, 
+                        std::move(fieldName),
+                        node
+                    });
                 }
-
-                // Add the prop spec info to the contributing prop specs for 
-                // this composed entry.
-                workEntry.propSpecsWithAuthoredTargets.push_back({
-                    layer, 
-                    std::move(localPropPath), 
-                    std::move(targetPathListOpField),
-                    node
-                });
             }
         }
 
-        // With all the target dependency work done for every property of this
+        // With all the dependency work done for every property of this
         // prim, we can queue each property up to be added to the result.
         if (!workEntriesPerProperty.empty()) {
             for (auto &[propPath, workEntry] : workEntriesPerProperty) {
@@ -249,16 +324,15 @@ private:
     void _ConsumerTask() {
         _WorkQueueEntry queueEntry;
         while (_workQueue.try_pop(queueEntry)) {
-            // Store the prop specs (with targets) for the composed property in
-            // result.
-            _result.composedPropertyToSpecsWithAuthoredTargetsMap.emplace(
+            // Store the prop specs for the composed property in _result.
+            _result.composedPropertyToSpecsWithPathBearingFieldsMap.emplace(
                 queueEntry.composedPropertyPath, 
-                std::move(queueEntry.propSpecsWithAuthoredTargets));
+                std::move(queueEntry.propSpecsWithPathBearingFields));
 
-            // Add the mapping of each targeted path to the composed property
-            // which we now know targets it.
-            for (const auto &targetedPath : queueEntry.targetedPaths) {
-                _result.targetedPathToTargetingPropertiesPathTable[targetedPath]
+            // Add the mapping of each path to the composed property
+            // which we now know has a path-bearing field that maps to it.
+            for (const auto &targetedPath : queueEntry.paths) {
+                _result.targetedPathToTargetingSpecPathsTable[targetedPath]
                     .push_back(queueEntry.composedPropertyPath);
             }
         }
@@ -695,7 +769,7 @@ private:
 
     void _GatherLayersToEdit();
 
-    void _GatherTargetListOpEdits();
+    void _GatherPathBearingFieldEdits();
 
     void _GatherDependentStageEdits();
 
@@ -938,10 +1012,9 @@ UsdNamespaceEditor::_EditProcessor::_EditProcessor(
     // indexes that would be affected by the initial layer edits.
     _GatherDependentStageEdits();
 
-    // Gather all the edits that need to be made to target path listOps in 
-    // property specs in order to "fix up" properties that have connections or 
-    // relationship targets targeting the namespace edited object.
-    _GatherTargetListOpEdits();
+    // Gather all the edits that need to be made to path-bearing fields in 
+    // order to "fix up" paths that refer to the namespace edited object.
+    _GatherPathBearingFieldEdits();
 }
 
 bool
@@ -1188,38 +1261,36 @@ UsdNamespaceEditor::_EditProcessor::_GatherLayersToEdit()
 }
 
 void 
-UsdNamespaceEditor::_EditProcessor::_GatherTargetListOpEdits()
+UsdNamespaceEditor::_EditProcessor::_GatherPathBearingFieldEdits()
 {
     TRACE_FUNCTION();
 
     // Gather all the dependencies from stage namespace path to properties with 
-    // relationship targets or attributes connections that depend on that 
-    // namespace path.
-    _TargetingPropertyDependencies deps =
-         _TargetingPropertyDependencyCollector::GetDependencies(_stage);
+    // path-bearing fields that include that namespace path.
+    _Dependencies deps = _DependencyCollector::GetDependencies(_stage);
 
-    // With all the target path dependencies we need to determine which 
-    // targeting properties are affected by this particular edit. If the edit 
-    // was to a prim, the affected target paths will be any descendants of the
-    // original prim path, thus we have to get all properties targeting any 
-    // descendant of the changed path.
-    SdfPathSet propPathsWithAffectedTargets;
+    // With all the dependencies we need to determine which fields are 
+    // affected by this particular edit. If the edit was to a prim, the 
+    // affected paths will be any descendants of the original prim path, 
+    // thus we have to get all fields targeting any descendant of the 
+    // changed path.
+    SdfPathSet propPathsWithAffectedFields;
     const auto range = 
-        deps.targetedPathToTargetingPropertiesPathTable.FindSubtreeRange(
+        deps.targetedPathToTargetingSpecPathsTable.FindSubtreeRange(
             _editDesc.oldPath);
     for (auto it = range.first; it != range.second; ++it) {
         const SdfPathVector &propPaths = it->second;
-        propPathsWithAffectedTargets.insert(propPaths.begin(), propPaths.end());
+        propPathsWithAffectedFields.insert(propPaths.begin(), propPaths.end());
     }
 
-    // Now for each targeting property gather the edits that need to be made to
-    // the layer specs in order to update the affected targets.
-    for (const SdfPath &propertyPath : propPathsWithAffectedTargets) {
+    // Now for each property gather the edits that need to be made to
+    // the layer specs in order to update the affected path-bearing fields.
+    for (const SdfPath &propertyPath : propPathsWithAffectedFields) {
 
         // Every property path listed as dependency must have a list of property
-        // specs that provide target opinions.
-        const _PropertySpecWithAuthoredTargetsVector *propertySpecs = 
-            TfMapLookupPtr(deps.composedPropertyToSpecsWithAuthoredTargetsMap, 
+        // specs that have path-bearing fields.
+        const _PropertySpecWithPathBearingFieldsVector *propertySpecs = 
+            TfMapLookupPtr(deps.composedPropertyToSpecsWithPathBearingFieldsMap, 
                 propertyPath);
         if (!TF_VERIFY(propertySpecs)) {
             continue;
@@ -1227,7 +1298,7 @@ UsdNamespaceEditor::_EditProcessor::_GatherTargetListOpEdits()
 
         // First we're only going to look at property specs that originated from
         // the root node of the prim index (local opinions). These specs can 
-        // be edited to update the target paths.
+        // be edited to update the relevant path-bearing fields.
         for (const auto &specInfo : *propertySpecs) {
             // Stop when we hit a non-root node as the property specs are in
             // strength order.
@@ -1235,64 +1306,43 @@ UsdNamespaceEditor::_EditProcessor::_GatherTargetListOpEdits()
                 break;
             }
 
-            // Get the current value of the target field list op for the spec
-            // and try to modify any paths that need to change because of the
-            // edited namespace path.
-            SdfPathListOp targetListOp = specInfo.GetTargetListOp();
-            if (targetListOp.ModifyOperations(
-                [&](const SdfPath &path) {
-                    // All target paths are always absolute within the layer 
-                    // data even though they can be specified as relative in
-                    // the text of a usda file. We verify this absolute path
-                    // assumption just to make sure.
-                    if (!TF_VERIFY(path.IsAbsolutePath())) {
-                        return std::optional<SdfPath>(path);
-                    }
-                    // If the path doesn't start with the old path, it is not 
-                    // affected and returned unmodified.
-                    if (!path.HasPrefix(_editDesc.oldPath)) {
-                        return std::optional<SdfPath>(path);
-                    }
-                    // Otherwise we found an affected path. If we've deleted
-                    // the old path, delete this target item.
-                    if (_editDesc.newPath.IsEmpty()) {
-                        return std::optional<SdfPath>();
-                    }
-                    // Otherwise update the path of this target item for the 
-                    // new path.
-                    return std::optional<SdfPath>(
-                        path.ReplacePrefix(_editDesc.oldPath, _editDesc.newPath));
-                }))
-            {
-                // If the target list op was modified, add the edit we need
-                // to perform for this spec in the processed edit.
-                _processedEdit->targetPathListOpEdits.push_back(
+            // Get the current value of the property and try to modify any 
+            // paths that need to change because of the edited namespace path.
+            VtValue fieldValue = specInfo.GetFieldValue();
+            VtValue modifiedValue = VtValueTryTransform(
+                fieldValue, _NamespaceEditXf {
+                    _editDesc.oldPath, _editDesc.newPath });
+
+            // If the path expression was modified, add the edit we need
+            // to perform for this spec in the processed edit.
+            if (fieldValue != modifiedValue) {
+                _processedEdit->pathBearingFieldEdits.push_back(
                     {specInfo.layer->GetPropertyAtPath(specInfo.path),
-                     specInfo.fieldName, 
-                     std::move(targetListOp)});
+                    specInfo.fieldName, 
+                    std::move(modifiedValue)});
             }
         }
 
-        // If the edit will author relocates for the primary edit, then the target
-        // paths authored across composition arcs will also be mapped by the
+        // If the edit will author relocates for the primary edit, then the 
+        // fields authored across composition arcs will also be mapped by the
         // relocation. 
         if (_processedEdit->willAuthorRelocates) {
             continue;
         }
 
-        // For target paths that are contributed by specs that originate across
+        // For fields that are contributed by specs that originate across
         // arcs below the root node, we can't edit these specs directly. 
         // Instead we'd need relocates to map these paths. In this case we 
-        // compose the target list, excluding the root node opinions, to see if 
+        // compose the field value, excluding the root node opinions, to see if 
         // any of them would be affected by the namespace edit and therefore 
-        // require a relocates
-        SdfPathVector targetsRequireRelocates;
+        // require a relocates.
+        std::map<TfToken, SdfPathVector> fieldsRequireRelocates;
 
         // Iterate in weakest to strongest applying each list op to get the 
         // composed targets below the root node.
         for (auto rIt = propertySpecs->rbegin(); rIt != propertySpecs->rend(); 
                 ++rIt) {
-            const _PropertySpecWithAuthoredTargetsInfo &specInfo = *rIt;
+            const _PropertySpecWithPathBearingFieldsInfo &specInfo = *rIt;
 
             // Stop when we hit a spec originating from the root node
             if (specInfo.originatingNode.IsRootNode()) {
@@ -1304,7 +1354,7 @@ UsdNamespaceEditor::_EditProcessor::_GatherTargetListOpEdits()
                 rIt->originatingNode.GetMapToRoot().MapSourceToTarget(
                 pathAtIntroduction);
 
-            // Before we check whether the target requires relocates, first check
+            // Before we check whether the field requires relocates, first check
             // whether the edit could possibly affect anything across this 
             // composition arc. If the edit is strictly to the source prim of 
             // the composition arc or its ancestors, that edit will not 
@@ -1314,35 +1364,40 @@ UsdNamespaceEditor::_EditProcessor::_GatherTargetListOpEdits()
                 continue;
             } 
 
-            // Apply each list op, translating the paths into stage namespace.
-            rIt->GetTargetListOp().ApplyOperations(&targetsRequireRelocates,
-                [&](SdfListOpType opType, const SdfPath& inPath) {
+            // Get the current value of the field.
+            VtValue fieldValue = specInfo.GetFieldValue();
 
-                    const SdfPath translatedPath = 
-                        rIt->originatingNode.GetMapToRoot().MapSourceToTarget(inPath);
-                    // Skip paths that don't map. Also skip paths that aren't 
-                    // affected by the namespace edit; we don't care about these 
-                    // either.
-                    if (translatedPath.IsEmpty() ||
-                        !translatedPath.HasPrefix(_editDesc.oldPath)) {
-                        return std::optional<SdfPath>();
-                    }
-                    return std::optional<SdfPath>(translatedPath);
-                });
+            // Get the list of paths associated with the field.
+            _CollectPathsXf xf;
+            if (!fieldValue.IsEmpty()) {
+                VtValueTryTransform(fieldValue, xf);
+            }
+
+            // Translate the paths into stage namespace.
+            for (const SdfPath& path : xf.paths) {
+                const SdfPath translatedPath = 
+                    rIt->originatingNode.GetMapToRoot().MapSourceToTarget(path);
+                
+                // Skip paths that don't map. Also skip paths that aren't 
+                // affected by the namespace edit; we don't care about these 
+                // either.
+                if (translatedPath.IsEmpty() ||
+                    !translatedPath.HasPrefix(_editDesc.oldPath)) {
+                    continue;
+                }
+                fieldsRequireRelocates[specInfo.fieldName].push_back(translatedPath);
+            }
         }
 
-        // If any of the targets require relocates, we can't fix them up.
-        // Errors in fixing up targets do not prevent us from applying namespace
+        // If any of the fields require relocates, we can't fix them up.
+        // Errors in fixing up fields do not prevent us from applying namespace
         // edits, but we report them as warnings.
-        if (!targetsRequireRelocates.empty()) {
-            const bool isAttribute = 
-                _stage->GetObjectAtPath(propertyPath).Is<UsdAttribute>();
+        for (const auto& it : fieldsRequireRelocates) {
             _processedEdit->warnings.push_back(TfStringPrintf(
-                "Fixing the %s paths %s for the %s at '%s' would require "
+                "Fixing the paths %s in the field %s for the property at '%s' would require "
                 "'%s'to be relocated but we do not introduce relocates for %s.",
-                isAttribute ? "connection" : "relationship",
-                TfStringify(targetsRequireRelocates).c_str(),
-                isAttribute ? "attribute" : "relationship",
+                TfStringify(it.second).c_str(),
+                it.first.GetText(),
                 propertyPath.GetText(),
                 _editDesc.oldPath.GetText(),
                 _editDesc.IsPropertyEdit() ? 
@@ -1492,12 +1547,11 @@ UsdNamespaceEditor::_ProcessedEdit::Apply()
         }
     }
 
-    // Perform any target path listOp fixups necessary now that the namespace 
+    // Perform any path-bearing field fixups necessary now that the namespace 
     // edits have been successfully performed.
-    for (const TargetPathListOpEdit &edit : targetPathListOpEdits) {
+    for (const PathBearingFieldEdit &edit : pathBearingFieldEdits) {
         // It's possible the spec no longer exists if the property holding
-        // the target field was deleted by the namespace edit operation 
-        // itself.
+        // the field was deleted by the namespace edit operation itself.
         if (edit.propertySpec) {
             edit.propertySpec->SetField(edit.fieldName, edit.newFieldValue);
         }

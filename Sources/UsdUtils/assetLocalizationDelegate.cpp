@@ -31,7 +31,7 @@ _AllDependenciesForInfo(
 }
 
 UsdUtilsDependencyInfo 
-UsdUtils_ProcessedPathCache::GetProcessedInfo(
+UsdUtils_CachedPathLocalizationClient::GetProcessedInfo(
     const SdfLayerRefPtr &layer, 
     const UsdUtilsDependencyInfo &dependencyInfo,
     UsdUtils_DependencyType dependencyType)
@@ -40,7 +40,7 @@ UsdUtils_ProcessedPathCache::GetProcessedInfo(
         std::make_tuple(layer->GetRealPath(), dependencyInfo.GetAssetPath());
     auto result = _cachedPaths.find(depKey);
     if (result == _cachedPaths.end()) {
-        UsdUtilsDependencyInfo depInfo = _processingFunc(
+        UsdUtilsDependencyInfo depInfo = _ProcessDependency(
             layer, dependencyInfo, dependencyType);
 
         _cachedPaths.insert(std::make_pair(depKey, depInfo.GetAssetPath()));
@@ -55,7 +55,7 @@ UsdUtils_ProcessedPathCache::GetProcessedInfo(
 // Processes sublayer paths, removing duplicates and only updates the paths in
 // the writable layer if the processed list differs from the source list.
 std::vector<std::string> 
-UsdUtils_WritableLocalizationDelegate::ProcessSublayers(
+UsdUtils_WritableLocalizationClient::ProcessSublayers(
     const SdfLayerRefPtr &layer)
 {
     SdfSubLayerProxy sublayerPaths = layer->GetSubLayerPaths();
@@ -63,7 +63,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessSublayers(
 
     for (const std::string& sublayerPath : sublayerPaths) {
         UsdUtilsDependencyInfo depInfo(sublayerPath);
-        UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo( 
+        UsdUtilsDependencyInfo info = GetProcessedInfo( 
             layer, depInfo, UsdUtils_DependencyType::Sublayer);
 
         if (info.GetAssetPath().empty()) {
@@ -95,7 +95,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessSublayers(
 }
 
 std::vector<std::string> 
-UsdUtils_WritableLocalizationDelegate::ProcessPayloads(
+UsdUtils_WritableLocalizationClient::ProcessPayloads(
     const SdfLayerRefPtr &layer,
     const SdfPrimSpecHandle &primSpec)
 {
@@ -105,7 +105,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessPayloads(
 }
 
 std::vector<std::string> 
-UsdUtils_WritableLocalizationDelegate::ProcessReferences(
+UsdUtils_WritableLocalizationClient::ProcessReferences(
     const SdfLayerRefPtr &layer,
     const SdfPrimSpecHandle &primSpec)
 {
@@ -120,7 +120,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessReferences(
 // existing list ops.
 template <class ListOpType, UsdUtils_DependencyType DEP_TYPE>
 std::vector<std::string> 
-UsdUtils_WritableLocalizationDelegate::_ProcessReferencesOrPayloads(
+UsdUtils_WritableLocalizationClient::_ProcessReferencesOrPayloads(
     const SdfLayerRefPtr &layer,
     const SdfPrimSpecHandle &primSpec,
     const TfToken &listOpToken)
@@ -163,7 +163,7 @@ UsdUtils_WritableLocalizationDelegate::_ProcessReferencesOrPayloads(
 
 template <class RefOrPayloadType, UsdUtils_DependencyType DEP_TYPE>
 std::optional<RefOrPayloadType>
-UsdUtils_WritableLocalizationDelegate::_ProcessRefOrPayload(
+UsdUtils_WritableLocalizationClient::_ProcessRefOrPayload(
     const SdfLayerRefPtr &layer,
     const RefOrPayloadType& refOrPayload,
     std::vector<std::string>* dependencies)
@@ -176,7 +176,7 @@ UsdUtils_WritableLocalizationDelegate::_ProcessRefOrPayload(
     }
 
     UsdUtilsDependencyInfo depInfo(refOrPayload.GetAssetPath());
-    const UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo( 
+    const UsdUtilsDependencyInfo info = GetProcessedInfo( 
         layer, depInfo, DEP_TYPE);
 
     if (info.GetAssetPath().empty()) {
@@ -200,7 +200,7 @@ UsdUtils_WritableLocalizationDelegate::_ProcessRefOrPayload(
 // updated in this copied dictionary.  We will only get callbacks for asset 
 // related keys, so other properties will be left unaffected.
 void
-UsdUtils_WritableLocalizationDelegate::BeginProcessValue(
+UsdUtils_WritableLocalizationClient::BeginProcessValue(
     const SdfLayerRefPtr &layer,
     const VtValue &val)
 {
@@ -210,7 +210,7 @@ UsdUtils_WritableLocalizationDelegate::BeginProcessValue(
 }
 
 std::vector<std::string> 
-UsdUtils_WritableLocalizationDelegate::ProcessValuePath(
+UsdUtils_WritableLocalizationClient::ProcessValuePath(
     const SdfLayerRefPtr &layer,
     const std::string &keyPath,
     const std::string &authoredPath,
@@ -223,7 +223,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessValuePath(
     }
 
     UsdUtilsDependencyInfo depInfo = {authoredPath, dependencies};
-    UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo(
+    UsdUtilsDependencyInfo info = GetProcessedInfo(
         layer, depInfo, UsdUtils_DependencyType::Reference);
 
     const std::string relativeKeyPath = _GetRelativeKeyPath(keyPath);
@@ -246,14 +246,14 @@ UsdUtils_WritableLocalizationDelegate::ProcessValuePath(
 }
 
 std::vector<std::string> 
-UsdUtils_WritableLocalizationDelegate::ProcessValuePathArrayElement(
+UsdUtils_WritableLocalizationClient::ProcessValuePathArrayElement(
     const SdfLayerRefPtr &layer,
     const std::string &keyPath,
     const std::string &authoredPath,
     const std::vector<std::string> &dependencies)
 {
     UsdUtilsDependencyInfo depInfo = {authoredPath, dependencies};
-    const UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo(
+    const UsdUtilsDependencyInfo info = GetProcessedInfo(
         layer, depInfo, UsdUtils_DependencyType::Reference);
     
     if (!info.GetAssetPath().empty()) {
@@ -273,7 +273,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessValuePathArrayElement(
 }
 
 void 
-UsdUtils_WritableLocalizationDelegate::EndProcessingValuePathArray(
+UsdUtils_WritableLocalizationClient::EndProcessingValuePathArray(
     const SdfLayerRefPtr &layer,
     const std::string &keyPath)
 {
@@ -295,7 +295,7 @@ UsdUtils_WritableLocalizationDelegate::EndProcessingValuePathArray(
 }
 
 VtValue 
-UsdUtils_WritableLocalizationDelegate::_GetUpdatedValue(
+UsdUtils_WritableLocalizationClient::_GetUpdatedValue(
     const VtValue &val)
 {
     VtValue updatedValue;
@@ -330,7 +330,7 @@ UsdUtils_WritableLocalizationDelegate::_GetUpdatedValue(
 }
  
 void 
-UsdUtils_WritableLocalizationDelegate::EndProcessValue(
+UsdUtils_WritableLocalizationClient::EndProcessValue(
     const SdfLayerRefPtr &layer,
     const SdfPath &path,
     const TfToken &key,
@@ -355,7 +355,7 @@ UsdUtils_WritableLocalizationDelegate::EndProcessValue(
 }
 
 void 
-UsdUtils_WritableLocalizationDelegate::EndProcessTimeSampleValue(
+UsdUtils_WritableLocalizationClient::EndProcessTimeSampleValue(
         const SdfLayerRefPtr &layer,
         const SdfPath &path,
         double t,
@@ -379,7 +379,7 @@ UsdUtils_WritableLocalizationDelegate::EndProcessTimeSampleValue(
 }
 
 std::vector<std::string>
-UsdUtils_WritableLocalizationDelegate::ProcessClipTemplateAssetPath(
+UsdUtils_WritableLocalizationClient::ProcessClipTemplateAssetPath(
     const SdfLayerRefPtr &layer,
     const SdfPrimSpecHandle &primSpec,
     const std::string &clipSetName,
@@ -387,7 +387,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessClipTemplateAssetPath(
     std::vector<std::string> dependencies)
 {
     UsdUtilsDependencyInfo depInfo = {templateAssetPath, dependencies};
-    const UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo(layer,
+    const UsdUtilsDependencyInfo info = GetProcessedInfo(layer,
         depInfo, UsdUtils_DependencyType::Reference);
 
     if (info.GetAssetPath() == templateAssetPath) {
@@ -415,7 +415,7 @@ UsdUtils_WritableLocalizationDelegate::ProcessClipTemplateAssetPath(
 }
 
 std::string 
-UsdUtils_WritableLocalizationDelegate::_GetRelativeKeyPath(
+UsdUtils_WritableLocalizationClient::_GetRelativeKeyPath(
     const std::string& fullPath) 
 {
     std::string::size_type pos = fullPath.find_first_of(':');
@@ -428,7 +428,7 @@ UsdUtils_WritableLocalizationDelegate::_GetRelativeKeyPath(
 }
 
 SdfLayerRefPtr 
-UsdUtils_WritableLocalizationDelegate::_GetOrCreateWritableLayer(
+UsdUtils_WritableLocalizationClient::_GetOrCreateWritableLayer(
     const SdfLayerRefPtr& layer)
 {
     if (!layer ) {
@@ -468,7 +468,7 @@ UsdUtils_WritableLocalizationDelegate::_GetOrCreateWritableLayer(
 }
 
 SdfLayerConstHandle
-UsdUtils_WritableLocalizationDelegate::GetLayerUsedForWriting(
+UsdUtils_WritableLocalizationClient::GetLayerUsedForWriting(
     const SdfLayerRefPtr& layer) 
 {
     if (_editLayersInPlace || !layer) {
@@ -485,20 +485,20 @@ UsdUtils_WritableLocalizationDelegate::GetLayerUsedForWriting(
 }
 
 void
-UsdUtils_WritableLocalizationDelegate::ClearLayerUsedForWriting(
+UsdUtils_WritableLocalizationClient::ClearLayerUsedForWriting(
     const SdfLayerRefPtr& layer)
 {
     _writableLayerMap.erase(layer);
 }
 
 std::vector<std::string> 
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessSublayers(
+UsdUtils_ReadOnlyLocalizationClient::ProcessSublayers(
     const SdfLayerRefPtr &layer)
 {
     std::vector<std::string> dependencies;
 
     for (const auto &path : layer->GetSubLayerPaths()) {
-        UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo(
+        UsdUtilsDependencyInfo info = GetProcessedInfo(
             layer, {path, {}}, UsdUtils_DependencyType::Sublayer);
 
         if (info.GetAssetPath().empty()) {
@@ -514,7 +514,7 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessSublayers(
 }
 
 std::vector<std::string>
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessPayloads(
+UsdUtils_ReadOnlyLocalizationClient::ProcessPayloads(
     const SdfLayerRefPtr &layer,
     const SdfPrimSpecHandle &primSpec)
 {
@@ -524,7 +524,7 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessPayloads(
 }
 
 std::vector<std::string> 
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessReferences(
+UsdUtils_ReadOnlyLocalizationClient::ProcessReferences(
         const SdfLayerRefPtr &layer,
         const SdfPrimSpecHandle &primSpec)
 {
@@ -536,7 +536,7 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessReferences(
 
 template <typename RefOrPayloadType, UsdUtils_DependencyType dependencyType>
 std::vector<std::string> 
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessReferencesOrPayloads(
+UsdUtils_ReadOnlyLocalizationClient::ProcessReferencesOrPayloads(
     const SdfLayerRefPtr &layer,
     const std::vector<RefOrPayloadType>& appliedItems)
 {
@@ -550,7 +550,7 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessReferencesOrPayloads(
             continue;
         }
 
-        UsdUtilsDependencyInfo info = _pathCache.GetProcessedInfo(layer, 
+        UsdUtilsDependencyInfo info = GetProcessedInfo(layer, 
             {refOrPayload.GetAssetPath(), {}}, dependencyType);
 
         if (info.GetAssetPath().empty()) {
@@ -566,7 +566,7 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessReferencesOrPayloads(
 }
 
 std::vector<std::string>
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessValuePath(
+UsdUtils_ReadOnlyLocalizationClient::ProcessValuePath(
     const SdfLayerRefPtr &layer,
     const std::string &keyPath,
     const std::string &authoredPath,
@@ -578,12 +578,12 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessValuePath(
         return {};
     }
 
-    return _AllDependenciesForInfo(_pathCache.GetProcessedInfo(layer, 
+    return _AllDependenciesForInfo(GetProcessedInfo(layer, 
         {authoredPath, dependencies}, UsdUtils_DependencyType::Reference));
 }
 
 std::vector<std::string>
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessValuePathArrayElement(
+UsdUtils_ReadOnlyLocalizationClient::ProcessValuePathArrayElement(
     const SdfLayerRefPtr &layer,
     const std::string &keyPath,
     const std::string &authoredPath,
@@ -595,19 +595,19 @@ UsdUtils_ReadOnlyLocalizationDelegate::ProcessValuePathArrayElement(
         return {};
     }
 
-    return _AllDependenciesForInfo(_pathCache.GetProcessedInfo(layer, 
+    return _AllDependenciesForInfo(GetProcessedInfo(layer, 
         {authoredPath, dependencies}, UsdUtils_DependencyType::Reference));
 }
 
 std::vector<std::string>
-UsdUtils_ReadOnlyLocalizationDelegate::ProcessClipTemplateAssetPath(
+UsdUtils_ReadOnlyLocalizationClient::ProcessClipTemplateAssetPath(
     const SdfLayerRefPtr &layer,
     const SdfPrimSpecHandle &primSpec,
     const std::string &clipSetName,
     const std::string &templateAssetPath,
     std::vector<std::string> dependencies)
 {
-    return _AllDependenciesForInfo(_pathCache.GetProcessedInfo(
+    return _AllDependenciesForInfo(GetProcessedInfo(
         layer, {templateAssetPath, dependencies}, 
         UsdUtils_DependencyType::ClipTemplateAssetPath));
 }

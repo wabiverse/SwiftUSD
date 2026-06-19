@@ -15,7 +15,7 @@
 /* **                                                                      ** */
 /* ************************************************************************** */
 
-#include "UsdImaging/usdSceneIndexInputArgsSchema.h"
+#include "UsdImaging/sceneIndexCreateArgsSchema.h"
 
 #include "Hd/retainedDataSource.h"
 
@@ -26,43 +26,43 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(UsdImagingUsdSceneIndexInputArgsSchemaTokens,
-    USD_IMAGING_USD_SCENE_INDEX_INPUT_ARGS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(UsdImagingSceneIndexCreateArgsSchemaTokens,
+    USD_IMAGING_SCENE_INDEX_CREATE_ARGS_SCHEMA_TOKENS);
 
 // --(BEGIN CUSTOM CODE: Schema Methods)--
 // --(END CUSTOM CODE: Schema Methods)--
 
 UsdStageRefPtrDataSourceHandle
-UsdImagingUsdSceneIndexInputArgsSchema::GetStage() const
+UsdImagingSceneIndexCreateArgsSchema::GetStage() const
 {
     return _GetTypedDataSource<UsdStageRefPtrDataSource>(
-        UsdImagingUsdSceneIndexInputArgsSchemaTokens->stage);
+        UsdImagingSceneIndexCreateArgsSchemaTokens->stage);
 }
 
 HdBoolDataSourceHandle
-UsdImagingUsdSceneIndexInputArgsSchema::GetIncludeUnloadedPrims() const
+UsdImagingSceneIndexCreateArgsSchema::GetIncludeUnloadedPrims() const
 {
     return _GetTypedDataSource<HdBoolDataSource>(
-        UsdImagingUsdSceneIndexInputArgsSchemaTokens->includeUnloadedPrims);
+        UsdImagingSceneIndexCreateArgsSchemaTokens->includeUnloadedPrims);
 }
 
 HdBoolDataSourceHandle
-UsdImagingUsdSceneIndexInputArgsSchema::GetDisplayUnloadedPrimsWithBounds() const
+UsdImagingSceneIndexCreateArgsSchema::GetDisplayUnloadedPrimsWithBounds() const
 {
     return _GetTypedDataSource<HdBoolDataSource>(
-        UsdImagingUsdSceneIndexInputArgsSchemaTokens->displayUnloadedPrimsWithBounds);
+        UsdImagingSceneIndexCreateArgsSchemaTokens->displayUnloadedPrimsWithBounds);
 }
 
 HdBoolDataSourceHandle
-UsdImagingUsdSceneIndexInputArgsSchema::GetAddDrawModeSceneIndex() const
+UsdImagingSceneIndexCreateArgsSchema::GetAddDrawModeSceneIndex() const
 {
     return _GetTypedDataSource<HdBoolDataSource>(
-        UsdImagingUsdSceneIndexInputArgsSchemaTokens->addDrawModeSceneIndex);
+        UsdImagingSceneIndexCreateArgsSchemaTokens->addDrawModeSceneIndex);
 }
 
 /*static*/
 HdContainerDataSourceHandle
-UsdImagingUsdSceneIndexInputArgsSchema::BuildRetained(
+UsdImagingSceneIndexCreateArgsSchema::BuildRetained(
         const UsdStageRefPtrDataSourceHandle &stage,
         const HdBoolDataSourceHandle &includeUnloadedPrims,
         const HdBoolDataSourceHandle &displayUnloadedPrimsWithBounds,
@@ -75,53 +75,53 @@ UsdImagingUsdSceneIndexInputArgsSchema::BuildRetained(
     size_t _count = 0;
 
     if (stage) {
-        _names[_count] = UsdImagingUsdSceneIndexInputArgsSchemaTokens->stage;
+        _names[_count] = UsdImagingSceneIndexCreateArgsSchemaTokens->stage;
         _values[_count++] = stage;
     }
 
     if (includeUnloadedPrims) {
-        _names[_count] = UsdImagingUsdSceneIndexInputArgsSchemaTokens->includeUnloadedPrims;
+        _names[_count] = UsdImagingSceneIndexCreateArgsSchemaTokens->includeUnloadedPrims;
         _values[_count++] = includeUnloadedPrims;
     }
 
     if (displayUnloadedPrimsWithBounds) {
-        _names[_count] = UsdImagingUsdSceneIndexInputArgsSchemaTokens->displayUnloadedPrimsWithBounds;
+        _names[_count] = UsdImagingSceneIndexCreateArgsSchemaTokens->displayUnloadedPrimsWithBounds;
         _values[_count++] = displayUnloadedPrimsWithBounds;
     }
 
     if (addDrawModeSceneIndex) {
-        _names[_count] = UsdImagingUsdSceneIndexInputArgsSchemaTokens->addDrawModeSceneIndex;
+        _names[_count] = UsdImagingSceneIndexCreateArgsSchemaTokens->addDrawModeSceneIndex;
         _values[_count++] = addDrawModeSceneIndex;
     }
     return HdRetainedContainerDataSource::New(_count, _names, _values);
 }
 
-UsdImagingUsdSceneIndexInputArgsSchema::Builder &
-UsdImagingUsdSceneIndexInputArgsSchema::Builder::SetStage(
+UsdImagingSceneIndexCreateArgsSchema::Builder &
+UsdImagingSceneIndexCreateArgsSchema::Builder::SetStage(
     const UsdStageRefPtrDataSourceHandle &stage)
 {
     _stage = stage;
     return *this;
 }
 
-UsdImagingUsdSceneIndexInputArgsSchema::Builder &
-UsdImagingUsdSceneIndexInputArgsSchema::Builder::SetIncludeUnloadedPrims(
+UsdImagingSceneIndexCreateArgsSchema::Builder &
+UsdImagingSceneIndexCreateArgsSchema::Builder::SetIncludeUnloadedPrims(
     const HdBoolDataSourceHandle &includeUnloadedPrims)
 {
     _includeUnloadedPrims = includeUnloadedPrims;
     return *this;
 }
 
-UsdImagingUsdSceneIndexInputArgsSchema::Builder &
-UsdImagingUsdSceneIndexInputArgsSchema::Builder::SetDisplayUnloadedPrimsWithBounds(
+UsdImagingSceneIndexCreateArgsSchema::Builder &
+UsdImagingSceneIndexCreateArgsSchema::Builder::SetDisplayUnloadedPrimsWithBounds(
     const HdBoolDataSourceHandle &displayUnloadedPrimsWithBounds)
 {
     _displayUnloadedPrimsWithBounds = displayUnloadedPrimsWithBounds;
     return *this;
 }
 
-UsdImagingUsdSceneIndexInputArgsSchema::Builder &
-UsdImagingUsdSceneIndexInputArgsSchema::Builder::SetAddDrawModeSceneIndex(
+UsdImagingSceneIndexCreateArgsSchema::Builder &
+UsdImagingSceneIndexCreateArgsSchema::Builder::SetAddDrawModeSceneIndex(
     const HdBoolDataSourceHandle &addDrawModeSceneIndex)
 {
     _addDrawModeSceneIndex = addDrawModeSceneIndex;
@@ -129,9 +129,9 @@ UsdImagingUsdSceneIndexInputArgsSchema::Builder::SetAddDrawModeSceneIndex(
 }
 
 HdContainerDataSourceHandle
-UsdImagingUsdSceneIndexInputArgsSchema::Builder::Build()
+UsdImagingSceneIndexCreateArgsSchema::Builder::Build()
 {
-    return UsdImagingUsdSceneIndexInputArgsSchema::BuildRetained(
+    return UsdImagingSceneIndexCreateArgsSchema::BuildRetained(
         _stage,
         _includeUnloadedPrims,
         _displayUnloadedPrimsWithBounds,
@@ -140,27 +140,27 @@ UsdImagingUsdSceneIndexInputArgsSchema::Builder::Build()
 }
 
 /*static*/
-UsdImagingUsdSceneIndexInputArgsSchema
-UsdImagingUsdSceneIndexInputArgsSchema::GetFromParent(
+UsdImagingSceneIndexCreateArgsSchema
+UsdImagingSceneIndexCreateArgsSchema::GetFromParent(
         const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return UsdImagingUsdSceneIndexInputArgsSchema(
+    return UsdImagingSceneIndexCreateArgsSchema(
         fromParentContainer
         ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                UsdImagingUsdSceneIndexInputArgsSchemaTokens->usdSceneIndex))
+                UsdImagingSceneIndexCreateArgsSchemaTokens->usdImagingSceneIndexCreateArgs))
         : nullptr);
 }
 
 /*static*/
 const TfToken &
-UsdImagingUsdSceneIndexInputArgsSchema::GetSchemaToken()
+UsdImagingSceneIndexCreateArgsSchema::GetSchemaToken()
 {
-    return UsdImagingUsdSceneIndexInputArgsSchemaTokens->usdSceneIndex;
+    return UsdImagingSceneIndexCreateArgsSchemaTokens->usdImagingSceneIndexCreateArgs;
 }
 
 /*static*/
 const HdDataSourceLocator &
-UsdImagingUsdSceneIndexInputArgsSchema::GetDefaultLocator()
+UsdImagingSceneIndexCreateArgsSchema::GetDefaultLocator()
 {
     static const HdDataSourceLocator locator(GetSchemaToken());
     return locator;

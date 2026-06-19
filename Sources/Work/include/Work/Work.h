@@ -15,6 +15,7 @@
 #include <Work/withScopedParallelism_impl.h>
 #include <Work/threadLimits_impl.h>
 #include <Work/reduce_impl.h>
+#include <Work/tbb_version.h>
 #include <Work/taskGraph_impl.h>
 #include <Work/loops_impl.h>
 #include <Work/sort_impl.h>

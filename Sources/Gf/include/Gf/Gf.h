@@ -30,6 +30,7 @@
 #include <Gf/vec3d.h>
 #include <Gf/plane.h>
 #include <Gf/size2.h>
+#include <Gf/timeCode.h>
 #include <Gf/line2d.h>
 #include <Gf/matrix3f.h>
 #include <Gf/range2d.h>

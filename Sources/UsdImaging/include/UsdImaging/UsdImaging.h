@@ -7,6 +7,7 @@
 #include <UsdImaging/dataSourceStageGlobals.h>
 #include <UsdImaging/capsuleAdapter.h>
 #include <UsdImaging/legacyRenderSettingsSceneIndex.h>
+#include <UsdImaging/sceneIndex.h>
 #include <UsdImaging/delegate.h>
 #include <UsdImaging/fieldAdapter.h>
 #include <UsdImaging/geometryLightAdapter.h>
@@ -20,7 +21,6 @@
 #include <UsdImaging/dataSourceVolume.h>
 #include <UsdImaging/pluginLightAdapter.h>
 #include <UsdImaging/flattenedDataSourceProviders.h>
-#include <UsdImaging/usdSceneIndexInputArgsSchema.h>
 #include <UsdImaging/directMaterialBindingSchema.h>
 #include <UsdImaging/dataSourcePrim.h>
 #include <UsdImaging/primvarUtils.h>
@@ -37,10 +37,12 @@
 #include <UsdImaging/materialBindingAPIAdapter.h>
 #include <UsdImaging/niPrototypePruningSceneIndex.h>
 #include <UsdImaging/coordSysAPIAdapter.h>
+#include <UsdImaging/motionAPIAdapter.h>
 #include <UsdImaging/dataSourceAttributeTypeName.h>
 #include <UsdImaging/adapterRegistry.h>
 #include <UsdImaging/collectionMaterialBindingSchema.h>
 #include <UsdImaging/collectionCache.h>
+#include <UsdImaging/sceneIndexCreateArgsSchema.h>
 #include <UsdImaging/domeLight_1Adapter.h>
 #include <UsdImaging/materialParamUtils.h>
 #include <UsdImaging/debugCodes.h>

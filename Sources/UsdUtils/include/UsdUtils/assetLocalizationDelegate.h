@@ -31,18 +31,16 @@ enum class UsdUtils_DependencyType {
     ClipTemplateAssetPath
 };
 
-// This class defines the interface between the UsdUtils_LocalizationContext and
-// localization clients.
+// This is the base class for localization clients and defines the interface
+// used by UsdUtils_LocalizationContext to facilitate the processing of
+// scene description.
 // Methods which directly process asset paths return a vector of std::string.
 // The return value for these functions indicates additional asset paths
 // that should be enqueued for traversal and processing by the localization
 // context.
-struct UsdUtils_LocalizationDelegate
-{
-    using ProcessingFunc = std::function<UsdUtilsDependencyInfo(
-        const SdfLayerRefPtr &layer, 
-        const UsdUtilsDependencyInfo &dependencyInfo,
-        UsdUtils_DependencyType dependencyType)>;
+class UsdUtils_LocalizationClient {
+public:
+    virtual ~UsdUtils_LocalizationClient() = default;
 
     virtual std::vector<std::string> ProcessSublayers(
         const SdfLayerRefPtr &layer) { return {}; }
@@ -100,14 +98,27 @@ struct UsdUtils_LocalizationDelegate
         const std::string &clipSetName,
         const std::string &templateAssetPath,
         std::vector<std::string> dependencies) { return {}; }
+
+    // Returns true if the supplied path is expected to resolve.
+    // An example case where a path would not be expected is if it represents
+    // a remapped path (such as in a USDZ archive)
+    virtual bool PathShouldResolve(const std::string &path) {
+        return true;
+    }
+
+protected:
+    virtual UsdUtilsDependencyInfo _ProcessDependency( 
+        const SdfLayerRefPtr &layer, 
+        const UsdUtilsDependencyInfo &dependencyInfo,
+        UsdUtils_DependencyType dependencyType) = 0;
 };
 
-class UsdUtils_ProcessedPathCache {
+// Base class for clients which would like to cache the results of the
+// pure virtual _ProcessDependency method.
+class UsdUtils_CachedPathLocalizationClient : 
+    public UsdUtils_LocalizationClient
+{
 public:
-    UsdUtils_ProcessedPathCache(
-        const UsdUtils_LocalizationDelegate::ProcessingFunc &processingFun)
-        : _processingFunc(processingFun) {}
-
     UsdUtilsDependencyInfo GetProcessedInfo(
         const SdfLayerRefPtr &layer, 
         const UsdUtilsDependencyInfo &dependencyInfo,
@@ -124,22 +135,16 @@ private:
     };
 
     std::unordered_map<PathKey, std::string, ProcessedPathHash> _cachedPaths;
-    UsdUtils_LocalizationDelegate::ProcessingFunc _processingFunc;
 };
 
 // A Delegate which allows for modification and optional removal of
 // asset path values.  This delegate invokes a user supplied processing function
 // on every asset path it encounters.  It will update the path with the returned
 // value.  If this value is empty, it will remove the asset path from the layer.
-class UsdUtils_WritableLocalizationDelegate
-    : public UsdUtils_LocalizationDelegate
+class UsdUtils_WritableLocalizationClient
+    : public UsdUtils_CachedPathLocalizationClient
 {
 public:
-    UsdUtils_WritableLocalizationDelegate(
-        ProcessingFunc processingFunc)
-        : _pathCache(processingFunc)
-    {}
-
     virtual std::vector<std::string> ProcessSublayers(
         const SdfLayerRefPtr &layer) override;
 
@@ -242,8 +247,6 @@ private:
 
     static std::string _GetRelativeKeyPath(const std::string& fullPath);
 
-    UsdUtils_ProcessedPathCache _pathCache;
-
     SdfAssetPath _currentValuePath;
     VtArray<SdfAssetPath> _currentValuePathArray;
 
@@ -269,13 +272,10 @@ private:
 
 // This delegate provides clients with ReadOnly access to processed
 // asset references. This delegate does not maintain any state.
-class UsdUtils_ReadOnlyLocalizationDelegate
-: public UsdUtils_LocalizationDelegate
+class UsdUtils_ReadOnlyLocalizationClient
+: public UsdUtils_CachedPathLocalizationClient
 {
 public:
-    UsdUtils_ReadOnlyLocalizationDelegate(ProcessingFunc processingFunc)
-        : _pathCache(processingFunc){}
-
     virtual std::vector<std::string> ProcessSublayers(
         const SdfLayerRefPtr &layer) override;
 
@@ -313,8 +313,6 @@ private:
     std::vector<std::string> ProcessReferencesOrPayloads(
         const SdfLayerRefPtr &layer,
         const std::vector<RefOrPayloadType>& appliedItems);
-
-    UsdUtils_ProcessedPathCache _pathCache;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

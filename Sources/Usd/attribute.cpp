@@ -290,10 +290,10 @@ UsdAttribute::GetSpline() const
 }
 
 bool
-UsdAttribute::SetSpline(const TsSpline &spline)
+UsdAttribute::SetSpline(const TsSpline &spline) const
 {
     static const TfType doubleType = TfType::Find<double>();
-    static const TfType timecodeType = TfType::Find<SdfTimeCode>();
+    static const TfType timecodeType = TfType::Find<GfTimeCode>();
 
     // Find the attribute's value type.
     const TfType attrType = _GetStage()->_GetAttributeValueType(*this);

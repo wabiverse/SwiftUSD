@@ -8,6 +8,7 @@
 #include <UsdValidation/context.h>
 #include <UsdValidation/validatorTokens.h>
 #include <UsdValidation/timeRange.h>
+#include <UsdValidation/notice.h>
 #include <UsdValidation/registry.h>
 #include <UsdValidation/api.h>
 #endif  // __PXR_USDVALIDATION_USDVALIDATION_H__

@@ -44,8 +44,8 @@ public:
     };
 
 public:
-    UsdUtils_LocalizationContext(UsdUtils_LocalizationDelegate* delegate)
-        :_delegate(delegate)
+    UsdUtils_LocalizationContext(UsdUtils_LocalizationClient* client)
+        :_delegate(client)
         {}
 
     // Begins recursive dependency analysis on the supplied layer
@@ -144,7 +144,7 @@ private:
     static bool _ValueTypeIsRelevant(const VtValue &val);
 
 private:
-    UsdUtils_LocalizationDelegate* _delegate;
+    UsdUtils_LocalizationClient* _delegate;
 
     SdfLayerRefPtr _rootLayer;
 

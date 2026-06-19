@@ -22,6 +22,8 @@
 #include "UsdGeom/cone.h"
 #include "UsdGeom/plane.h"
 #include "UsdGeom/points.h"
+#include "UsdGeom/primvar.h"
+#include "UsdGeom/primvarsAPI.h"
 
 #include "UsdGeom/metrics.h"
 
@@ -809,34 +811,40 @@ bool _ParseSpherePointsShapeDesc(const UsdPhysicsCollisionAPI& collisionAPI,
 
             VtArray<float> widths;
             VtArray<GfVec3f> positions;
-            shape.GetWidthsAttr().Get(&widths);
-            if (widths.size())
+            shape.GetPointsAttr().Get(&positions);
+
+            const UsdGeomPrimvarsAPI primvarsAPI(usdPrim);
+            const UsdGeomPrimvar widthsPrimvar =
+                primvarsAPI.GetPrimvar(UsdGeomTokens->widths);
+
+            if (widthsPrimvar && widthsPrimvar.HasAuthoredValue())
             {
-                shape.GetPointsAttr().Get(&positions);
-                if (positions.size() == widths.size())
+                widthsPrimvar.ComputeFlattened(&widths);
+            }
+            else
+            {
+                shape.GetWidthsAttr().Get(&widths);
+            }
+
+            if (widths.size() && positions.size() == widths.size())
+            {
+                float sphereScale = 1.0f;
                 {
-                    float sphereScale = 1.0f;
-                    {
-                        const GfVec3d sc = tr.GetScale();
+                    const GfVec3d sc = tr.GetScale();
 
-                        sphereScale = fmaxf(fmaxf(fabsf(float(sc[1])), 
-                                                  fabsf(float(sc[0]))),
-                                            fabsf(float(sc[2])));
-                    }
-
-                    const size_t scount = positions.size();
-                    outSpherePointsShapeDesc->spherePoints.resize(scount);
-                    for (size_t i = 0; i < scount; i++)
-                    {
-                        outSpherePointsShapeDesc->spherePoints[i].radius =
-                            sphereScale * widths[i] * 0.5f;
-                        outSpherePointsShapeDesc->spherePoints[i].center =
-                            positions[i];
-                    }
+                    sphereScale = fmaxf(fmaxf(fabsf(float(sc[1])),
+                                              fabsf(float(sc[0]))),
+                                        fabsf(float(sc[2])));
                 }
-                else
+
+                const size_t scount = positions.size();
+                outSpherePointsShapeDesc->spherePoints.resize(scount);
+                for (size_t i = 0; i < scount; i++)
                 {
-                    outSpherePointsShapeDesc->isValid = false;
+                    outSpherePointsShapeDesc->spherePoints[i].radius =
+                        sphereScale * widths[i] * 0.5f;
+                    outSpherePointsShapeDesc->spherePoints[i].center =
+                        positions[i];
                 }
             }
             else

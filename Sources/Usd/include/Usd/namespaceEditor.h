@@ -325,24 +325,23 @@ private:
         // Whether performing the edit will author new relocates.
         bool willAuthorRelocates = false;
 
-        // Layer edits that need to be performed to update connection and 
-        // relationship targets of other properties in order to keep them 
-        // targeting the same object after applying this processed edit.
-        struct TargetPathListOpEdit {
-            // Property spec to author the new targets value to. Note that we
+        // Layer edits that need to be performed to update path-bearing fields 
+        // (like connection and relationship targets) in order to keep them 
+        // referring to the same object after applying this processed edit.
+        struct PathBearingFieldEdit {
+            // Property spec to author the new value to. Note that we
             // store the spec handle for the property as the property spec's
             // path could change if the property is moved or deleted by the 
             // primary namespace edit.
             SdfPropertySpecHandle propertySpec;
 
-            // Name of the field that holds the path targets for the property
-            // which differs for attributes vs relationships.  
+            // Name of the path-bearing field.  
             TfToken fieldName;
 
-            // Updated list op value to set for the property spec.
-            SdfPathListOp newFieldValue;
+            // Updated field value to set for the property spec.
+            VtValue newFieldValue;
         };
-        std::vector<TargetPathListOpEdit> targetPathListOpEdits;
+        std::vector<PathBearingFieldEdit> pathBearingFieldEdits;
 
         // Full set of namespace edits that need to be performed for all the
         // dependent stages of this editor as a result of dependencies on the

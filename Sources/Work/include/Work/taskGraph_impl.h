@@ -9,18 +9,7 @@
 
 #include "pxr/pxrns.h"
 #include "Work/api.h"
-
-// The TBB version macro is located in different headers in legacy TBB
-// (tbb/tbb_stddef.h) and oneTBB (tbb/version.h)
-#if __has_include(<OneTBB/tbb/tbb_stddef.h>)
-#include <OneTBB/tbb/tbb_stddef.h>
-#elif __has_include(<OneTBB/tbb/version.h>)
-#include <OneTBB/tbb/version.h>
-#endif
-
-#ifndef TBB_INTERFACE_VERSION_MAJOR
-#error "TBB version macro TBB_INTERFACE_VERSION_MAJOR not found"
-#endif
+#include "Work/tbb_version.h"
 
 #if TBB_INTERFACE_VERSION_MAJOR < 12
 

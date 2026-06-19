@@ -121,6 +121,11 @@ public:
     /// \name Extrapolation
     /// @{
 
+    /// Sets pre extrapolation.
+    ///
+    /// Issues a coding error if the spline has non-default inner loop
+    /// params and `extrap` is looping extrapolation with a specified
+    /// loopBoundaryTime.
     TS_API
     void SetPreExtrapolation(
         const TsExtrapolation &extrap);
@@ -128,12 +133,37 @@ public:
     TS_API
     TsExtrapolation GetPreExtrapolation() const;
 
+    /// Sets post extrapolation.
+    ///
+    /// Issues a coding error if the spline has non-default inner loop
+    /// params and `extrap` is looping extrapolation with a specified
+    /// loopBoundaryTime.
     TS_API
     void SetPostExtrapolation(
         const TsExtrapolation &extrap);
 
     TS_API
     TsExtrapolation GetPostExtrapolation() const;
+
+    // Returns whether pre extrapolation is valid.
+    //
+    // Pre extrapolation is invalid if it is looping and loopBoundaryTime
+    // is set to a value for which the spline does not have an associated
+    // knot time.
+    //
+    // Invalid extrapolation regions evaluate to value-block.
+    TS_API
+    bool IsPreExtrapolationValid() const;
+
+    // Returns whether post extrapolation is valid.
+    //
+    // Post extrapolation is invalid if it is looping and loopBoundaryTime
+    // is set to a value for which the spline does not have an associated
+    // knot time.
+    //
+    // Invalid extrapolation regions evaluate to value-block.
+    TS_API
+    bool IsPostExtrapolationValid() const;
 
     /// @}
     /// \name Inner loops
@@ -263,6 +293,8 @@ public:
     /// knots. Attempts to bake an infinite number of knots will emit a coding
     /// error and return an empty \c TsKnotMap.
     ///
+    /// Empty \p interval causes this function to return an empty \c TsKnotMap.
+    ///
     /// \note Knots baked from extrapolation loops may include knots that are
     /// generated from multiple input knots. Knots at loop boundaries get their
     /// "pre" values from the end of the loop and their "post" values from the
@@ -290,6 +322,11 @@ public:
     /// requested insertion time is in a region of the spline that is looped
     /// from either extrapolation or inner looping. Use \c CanBreakdown to see
     /// if a breakdown would succeed.
+    ///
+    /// \note If the time requested lies in a regressed segment, the
+    /// breakdown may cause the resulting spline's evaluation to differ
+    /// slightly from that of the original spline due to accumulated numeric
+    /// rounding.
     ///
     /// \return true if a knot was successfully inserted or false if not.
     TS_API
@@ -395,6 +432,9 @@ public:
     /// \c tolerance must all be greater than 0.0. If any of these conditions
     /// are not met, \c Sample returns false and \c *splineSamples is unchanged.
     /// Otherwise, true is returned and \c splineSamples is populated.
+    ///
+    /// If \c timeInterval covers an infinite region, a coding error is issued
+    /// and \c splineSamples is unchanged.
     template <typename Vertex>
     bool
     Sample(
@@ -428,6 +468,54 @@ public:
     }
 
     /// @}
+
+    /// \name Spline transformation
+    ///
+    /// These functions return a new transformed spline; they don't modify the
+    /// current one.
+    /// @{
+
+    /// Returns a new spline resulting from truncation of the given spline to
+    /// the given interval.
+    ///
+    /// Each bound of the interval has either a finite or infinite value.
+    /// - If the bound is finite, the resulting corresponding extrapolation
+    ///   is value-block by default. This can be changed by providing arguments
+    ///   `preExtrap` and `postExtrap`.
+    /// - If the bound is infinite, the resulting logical extrapolation
+    ///   mode from the original spline is set on the result. Input invalid
+    ///   looping extrapolation degenerates to value-block and empty looping
+    ///   extrapolation degenerates to held
+    ///   (\ref TsExtrapolation::loopBoundaryTime). Note that if the extrap
+    ///   is looping, this function may set `loopBoundaryTime` to
+    ///   preserve the shape of the spline.
+    ///
+    /// Any inner loop is baked out during this process.
+    ///
+    /// \note No values outside the interval will be retained in the
+    /// resulting spline. For example, the pre-values of a knot will not be
+    /// kept if the interval's min is finite and its time is exactly the knot's
+    /// time. For another example -- an open finite max boundary time, if it
+    /// falls exactly on a knot, will cause the knot's interpolation and post-
+    /// tangent values to be discarded. The knot's pre-value will be written
+    /// to the knot's value to preserve continuity.
+    ///
+    /// \note If the given interval has a finite min or max in a regressed
+    /// spline region, the truncated spline's evaluation may differ slightly
+    /// from that of the original spline due to accumulated error.
+    ///
+    /// If given an empty interval or a spline with no knots, returns empty
+    /// spline.
+    TS_API
+    TsSpline GetTruncated(
+        const GfInterval& interval,
+        TsExtrapolation preFallback = TsExtrapolation(TsExtrapValueBlock),
+        TsExtrapolation postFallback = TsExtrapolation(TsExtrapValueBlock)
+    ) const;
+
+    /// @}
+
+
     /// \name Spline comparison
     /// @{
 
@@ -589,6 +677,11 @@ private:
     friend struct Ts_SplineOffsetAccess;
 
 private:
+    // TsSpline takes ownership of `data`. The caller should not retain or
+    // delete `data` after this constructor is called.
+    TS_API
+    TsSpline(Ts_SplineData* data);
+
     // Get data to read from.  Will be either actual data or default data.
     TS_API
     const Ts_SplineData* _GetData() const;

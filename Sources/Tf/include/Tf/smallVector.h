@@ -938,6 +938,27 @@ void swap(TfSmallVector<T, N> &a, TfSmallVector<T, N> &b)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Return the largest local capacity N so that sizeof(TfSmallVector<T, N>) <=
+// SizeOf.
+template <class T, size_t SizeOf>
+constexpr uint32_t
+TfComputeSmallVectorLocalCapacityForTotalSize()
+{
+    // If T is over-aligned, sizeof(TfSmallVector<T, 1>) can be greater than
+    // sizeof(TfSmallVector<T, 0>) + sizeof(T).  If sizeof(TfSmallVector<T, 1>)
+    // is not already too large, we take the total desired size minus
+    // sizeof(TfSmallVector<T, 1>), divide the difference by sizeof(T) and add
+    // one.
+    constexpr size_t SizeOfOne = sizeof(TfSmallVector<T, 1>);
+    constexpr size_t LocalCap = SizeOfOne > SizeOf ? 0
+        : ((SizeOf - SizeOfOne) / sizeof(T)) + 1;
+    constexpr size_t LocalCapMax = std::numeric_limits<uint32_t>::max();
+    constexpr uint32_t LocalCap32 = static_cast<uint32_t>(
+        LocalCap > LocalCapMax ? LocalCapMax : LocalCap);
+    static_assert(sizeof(TfSmallVector<T, LocalCap32>) <= SizeOf);
+    return LocalCap32;
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif

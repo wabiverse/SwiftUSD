@@ -17,6 +17,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdRenderer;
 class HdPluginRenderDelegateUniqueHandle;
 class HdPluginRendererUniqueHandle;
+class HdRendererCreateArgsSchema;
 struct HdRendererCreateArgs;
 TF_DECLARE_REF_PTRS(HdSceneIndexBase);
 
@@ -43,26 +44,24 @@ public:
     /// process and \c false if not.
     /// 
     /// This gives the plugin a chance to perform some runtime checks to make
-    /// sure that the system meets minimum requirements.  The 
-    /// \p rendererCreateArgs parameter should conform to
-    /// HdRendererCreateArgsSchema to indicate the resources available when 
-    /// making this determination.
+    /// sure that the system meets minimum requirements (given the requested
+    /// configuration/resources provided by rendererCreateArgs).
     /// 
     /// The \p reasonWhyNot param, when provided, can be filled with the reason
     /// why the renderer plugin is not supported.
+    ///
     HD_API
-    virtual bool IsSupported(
-        HdContainerDataSourceHandle const &rendererCreateArgs,
+    virtual
+    bool IsSupported(
+        const HdRendererCreateArgsSchema &rendererCreateArgs,
         std::string *reasonWhyNot = nullptr) const;
 
-    /// 
-
     ///
-    /// Arguments that an application should pass as input arguments to
+    /// Arguments that an application should pass as create arguments to
     /// scene indices so that they can be configured for the needs of the
     /// renderer.
     ///
-    /// Follows the HdSceneIndexInputArgsSchema but can have data sources
+    /// Follows the HdSceneIndexCreateArgsSchema but can have data sources
     /// at additional data sources.
     ///
     /// Example: Some scene indices are computing samples for motion blur
@@ -77,7 +76,7 @@ public:
     ///
     HD_API
     virtual
-    HdContainerDataSourceHandle GetSceneIndexInputArgs() const;
+    HdContainerDataSourceHandle GetSceneIndexCreateArgs() const;
 
     ///
     /// Create renderer through the plugin and wrap it in a handle that
@@ -95,7 +94,7 @@ public:
     HD_API
     HdPluginRendererUniqueHandle CreateRenderer(
         HdSceneIndexBaseRefPtr const &sceneIndex,
-        HdContainerDataSourceHandle const &rendererCreateArgs);
+        const HdRendererCreateArgsSchema &rendererCreateArgs);
 
     /// @}
 
@@ -111,9 +110,11 @@ public:
     HD_API
     std::string GetDisplayName() const;
 
-    /// \name Hydra 1.0 API
+    /// \name Hydra 1.0 and other deprecated API
     /// @{
 
+    ///
+    /// \deprecated Also implement overload taking HdRendererCreateArgsSchema
     ///
     /// Returns \c true if this renderer plugin is supported in the running 
     /// process and \c false if not.
@@ -169,20 +170,6 @@ public:
 
     /// @}
 
-    ///
-    /// \deprecated Use IsSupported overload below.
-    ///
-    /// Returns \c true if this renderer plugin is supported in the running 
-    /// process and \c false if not.
-    /// 
-    /// This gives the plugin a chance to perform some runtime checks to make
-    /// sure that the system meets minimum requirements.  The \p gpuEnabled
-    /// parameter indicates if the GPU is available for use by the plugin in
-    /// case this information is necessary to make this determination.
-    ///
-    HD_API
-    virtual bool IsSupported(bool gpuEnabled = true) const;
-
 protected:
     HdRendererPlugin() = default;
     HD_API
@@ -191,13 +178,13 @@ protected:
     HD_API
     virtual std::unique_ptr<HdRenderer> _CreateRenderer(
         HdSceneIndexBaseRefPtr const &sceneIndex,
-        HdContainerDataSourceHandle const &rendererCreateArgs);
+        const HdRendererCreateArgsSchema &rendererCreateArgs);
 
     // Instantiates render delegate and uses "back-end" emulation.
     HD_API
     std::unique_ptr<HdRenderer> _CreateRendererFromRenderDelegate(
         HdSceneIndexBaseRefPtr const &sceneIndex,
-        HdContainerDataSourceHandle const &rendererCreateArgs);
+        const HdRendererCreateArgsSchema &rendererCreateArgs);
 
 private:
     // This class doesn't require copy support.

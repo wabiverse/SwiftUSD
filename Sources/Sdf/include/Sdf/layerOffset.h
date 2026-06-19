@@ -11,13 +11,12 @@
 
 #include "pxr/pxrns.h"
 #include "Sdf/api.h"
+#include "Gf/timeCode.h"
 
 #include <iosfwd>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
-class SdfTimeCode;
 
 /// \class SdfLayerOffset 
 ///
@@ -156,7 +155,7 @@ public:
 
     /// Applies the offset to the given value.
     SDF_API
-    SdfTimeCode operator*(const SdfTimeCode &rhs) const;
+    GfTimeCode operator*(const GfTimeCode &rhs) const;
 
     /// @}
 
