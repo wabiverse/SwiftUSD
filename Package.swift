@@ -2081,7 +2081,7 @@ let package = Package(
         .target(name: "Gf"),
         .target(name: "Tf"),
         .target(name: "ExecUsd"),
-        .target(name: "ExecGeom"),
+        .target(name: "ExecGeom")
       ],
       cxxSettings: [
         _abiFlag,

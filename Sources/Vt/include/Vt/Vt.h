@@ -8,7 +8,6 @@
 #include <Vt/streamOut.h>
 #include <Vt/types.h>
 #include <Vt/pyOperators.h>
-#include <Vt/addExtVisitValueType.h>
 #include <Vt/debugCodes.h>
 #include <Vt/arrayEdit.h>
 #include <Vt/value.h>

@@ -424,6 +424,10 @@ public enum Pxr: String, CaseIterable
           // Private nested struct definition for GfColorSpace::_Data; only valid
           // after GfColorSpace is declared (included mid-class in colorSpace.h).
           "colorSpace_data.h",
+          // This is a special header include that requires VT_ADD_EXT_VISIT_VALUE_TYPE
+          // to be defined prior to including, which is not an umbrella header compatible
+          // include.
+          "addExtVisitValueType.h"
         ]
         // Use exact filename match - substring match on dest.path would
         // accidentally catch files whose names end in a blacklisted name
