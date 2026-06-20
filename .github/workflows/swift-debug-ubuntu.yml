@@ -46,10 +46,7 @@ jobs:
         run: set -o pipefail && swift build --target UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
-          BINPATH=$(swift build --target UsdView --show-bin-path)
-          export PATH="$BINPATH:$PATH"
-          export LD_LIBRARY_PATH="$(dirname $(which swift))/../lib/swift/linux:$BINPATH:$LD_LIBRARY_PATH"
-          xvfb-run --auto-servernum UsdView &
+          xvfb-run --auto-servernum swift run --target UsdView --skip-build &
           PID=$!
           sleep 10
           if ! kill -0 $PID 2>/dev/null; then
