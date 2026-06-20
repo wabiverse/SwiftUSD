@@ -60,7 +60,7 @@ native UI, and real-time workflows. Unbound from any single vendor's GPU or plat
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "24.8.14"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "26.5.1"),
 ]
 ```
 
@@ -91,7 +91,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "24.8.14")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "26.5.1")
   ],
   targets: [
     /* 📕 For library products... */
