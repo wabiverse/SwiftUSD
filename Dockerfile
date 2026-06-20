@@ -37,4 +37,4 @@ RUN git clone https://github.com/wabiverse/SwiftUSD.git /SwiftUSD
 
 WORKDIR /SwiftUSD
 
-RUN swift build --product UsdView | xcbeautify --preserve-unbeautified
+RUN bash -c "set -o pipefail && swift build --product UsdView | xcbeautify --preserve-unbeautified"
