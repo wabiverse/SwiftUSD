@@ -43,7 +43,7 @@ jobs:
           git clone https://github.com/cpisciotta/xcbeautify.git
           cd xcbeautify && make install && cd .. && rm -rf xcbeautify
       - name: 🔨 Build
-        run: set -o pipefail && swift build --target UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
+        run: set -o pipefail && swift build --product UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
           xvfb-run --auto-servernum swift run --skip-build UsdView &
