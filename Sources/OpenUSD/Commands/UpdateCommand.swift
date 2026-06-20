@@ -835,6 +835,7 @@ public enum Pxr: String, CaseIterable
       Patch.archDarwinHeaders(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.archAndroid(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.garchAndroid(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
+      Patch.backPlateAPI(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.arcRetainReleaseGuards(to: &pxrSrc, fileExtension: fileURL.pathExtension)
       Patch.pythonIncludes(to: &pxrSrc)
       Patch.pythonGuards(to: &pxrSrc, fileBaseName: fileURL.deletingPathExtension().lastPathComponent, pythonOnlyBasenames: exclusions.pythonOnly)
@@ -1795,6 +1796,16 @@ public enum Pxr: String, CaseIterable
         default:
           return
       }
+    }
+
+    /** Moves #includes that appear after PXR_NAMESPACE_OPEN_SCOPE in backPlateAPI.cpp to before it. */
+    public static func backPlateAPI(to source: inout String, fileBaseName: String)
+    {
+      guard fileBaseName == "backPlateAPI.cpp" else { return }
+      source = source.replacingOccurrences(
+        of: "PXR_NAMESPACE_OPEN_SCOPE\n#include <cmath>\n#include \"pxr/base/gf/camera.h\"\n#include \"pxr/base/gf/vec3f.h\"\n#include \"pxr/base/gf/vec2f.h\"",
+        with: "#include <cmath>\n#include \"pxr/base/gf/camera.h\"\n#include \"pxr/base/gf/vec3f.h\"\n#include \"pxr/base/gf/vec2f.h\"\n\nPXR_NAMESPACE_OPEN_SCOPE"
+      )
     }
 
     public static func usdCommon(to source: inout String, fileBaseName: String)

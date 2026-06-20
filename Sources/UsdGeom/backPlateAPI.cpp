@@ -557,11 +557,12 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-PXR_NAMESPACE_OPEN_SCOPE
 #include <cmath>
 #include "Gf/camera.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec2f.h"
+
+PXR_NAMESPACE_OPEN_SCOPE
 
 
 float 
