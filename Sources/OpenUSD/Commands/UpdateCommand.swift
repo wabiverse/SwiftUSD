@@ -2052,6 +2052,14 @@ public enum Pxr: String, CaseIterable
         with: "class SWIFT_SHARED_REFERENCE(__retain__ZN3Pixar9TfRefBaseE, __release__ZN3Pixar9TfRefBaseE) TfRefBase {"
       )
       source = source.replacingOccurrences(
+        of: "typedef void (*UniqueChangedFuncPtr)(TfRefBase const *, bool);",
+        with: "typedef void (*UniqueChangedFuncPtr)(TfRefBase const * _Nonnull, bool);"
+      )
+      source = source.replacingOccurrences(
+        of: "        void (*lock)();\n        UniqueChangedFuncPtr func;\n        void (*unlock)();",
+        with: "        void (* _Nonnull lock)();\n        UniqueChangedFuncPtr _Nonnull func;\n        void (* _Nonnull unlock)();"
+      )
+      source = source.replacingOccurrences(
         of: "PXR_NAMESPACE_CLOSE_SCOPE",
         with: """
         PXR_NAMESPACE_CLOSE_SCOPE

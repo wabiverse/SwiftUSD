@@ -57,11 +57,11 @@ template <class T> class TfWeakPtr;
 class SWIFT_SHARED_REFERENCE(__retain__ZN3Pixar9TfRefBaseE, __release__ZN3Pixar9TfRefBaseE) TfRefBase {
 public:
 
-    typedef void (*UniqueChangedFuncPtr)(TfRefBase const *, bool);
+    typedef void (*UniqueChangedFuncPtr)(TfRefBase const * _Nonnull, bool);
     struct UniqueChangedListener {
-        void (*lock)();
-        UniqueChangedFuncPtr func;
-        void (*unlock)();
+        void (* _Nonnull lock)();
+        UniqueChangedFuncPtr _Nonnull func;
+        void (* _Nonnull unlock)();
     };
 
     // This mimics the old TfRefCount's default ctor behavior, which set
