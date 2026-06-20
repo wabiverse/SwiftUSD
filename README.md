@@ -27,6 +27,12 @@
   <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-macos.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-macos.yml?style=flat-square&label=macOS&labelColor=000000&logo=apple">
   </a>
+  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-ios.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ios.yml?style=flat-square&label=iOS&labelColor=000000&logo=apple">
+  </a>
+  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-visionos.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-visionos.yml?style=flat-square&label=visionOS&labelColor=000000&logo=apple">
+  </a>
   <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-debug-windows.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-debug-windows.yml?style=flat-square&label=windows&labelColor=357EC7&logo=gitforwindows">
   </a>
@@ -45,7 +51,9 @@
   </a>
 </h4>
 
-<image align=top src="https://github.com/user-attachments/assets/ad0a019c-17fd-422f-9145-b88aad3f9f06">
+<div align="center">
+  <image align=top width="50%" src="https://github.com/user-attachments/assets/ad0a019c-17fd-422f-9145-b88aad3f9f06">
+</div>
 
 <div align="center">
 
