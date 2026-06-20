@@ -1895,6 +1895,7 @@ let package = Package(
         .target(name: "UsdHydra"),
         .target(name: "UsdShade"),
         .target(name: "UsdImaging"),
+        .target(name: "UsdExecImaging"),
       ],
       resources: [
         .process("Resources")
