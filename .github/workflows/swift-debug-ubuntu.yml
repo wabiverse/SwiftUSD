@@ -46,15 +46,17 @@ jobs:
         run: set -o pipefail && swift build --product UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
-          xvfb-run --auto-servernum swift run --skip-build UsdView &
+          xvfb-run --auto-servernum swift run --skip-build UsdView > /tmp/usdview.log 2>&1 &
           PID=$!
-          sleep 10
+          sleep 30
           if ! kill -0 $PID 2>/dev/null; then
             echo "UsdView crashed during startup"
+            cat /tmp/usdview.log
             exit 1
           fi
           kill $PID
-          wait $PID 2>/dev/null
+          wait $PID 2>/dev/null || true
+          cat /tmp/usdview.log
           exit 0
         env:
           LIBGL_ALWAYS_SOFTWARE: "1"
