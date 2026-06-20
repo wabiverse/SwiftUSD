@@ -57,99 +57,7 @@ A Swift-native, cross-platform framework for building OpenUSD applications - bri
 Linux, Windows, and Apple platforms through syntactically pleasing Swift OpenUSD APIs, a composable Hydra viewport,
 native UI, and real-time workflows. Unbound from any single vendor's GPU or platform.
 
-##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
-```swift
-dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "26.5.1"),
-]
-```
-
-
-##### Then, for any target you'd like, add the monolithic USD **Pixar** product as a target dependency, a complete example.
-```swift
-// swift-tools-version: 5.10
-import PackageDescription
-
-let package = Package(
-  name: "MySwiftPackage",
-  platforms: [
-    .macOS(.v14),
-    .visionOS(.v1),
-    .iOS(.v17),
-    .tvOS(.v17),
-    .watchOS(.v10)
-  ],
-  // --- 📦 Package Products. ---
-  products: [
-    .library(
-      name: "MySwiftLibrary",
-      targets: ["MySwiftLibrary"]
-    ),
-    .executable(
-      name: "MySwiftApp",
-      targets: ["MySwiftApp"]
-    ),
-  ],
-  dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "26.5.1")
-  ],
-  targets: [
-    /* 📕 For library products... */
-    .target(
-      name: "MySwiftLibrary",
-      dependencies: [
-        /* add pixar usd as a library dependency. */
-        .product(name: "PixarUSD", package: "SwiftUSD"),
-      ],
-      cxxSettings: [
-        /* for windows support, add these three defines until swift's clang is updated. */
-        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
-        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-      ],
-      swiftSettings: [
-        /* enable swift/c++ interop. */
-        .interoperabilityMode(.Cxx)
-      ]
-    ),
-
-    /* 📗 Or executable products... */
-    .executableTarget(
-      name: "MySwiftApp",
-      dependencies: [
-        /* add pixar usd as an executable dependency. */
-        .product(name: "PixarUSD", package: "SwiftUSD"),
-      ],
-      cxxSettings: [
-        /* for windows support, add these three defines until swift's clang is updated. */
-        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
-        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-      ],
-      swiftSettings: [
-        /* enable swift/c++ interop. */
-        .interoperabilityMode(.Cxx)
-      ],
-      plugins: [
-        /* 📙 And, plugins are added like so. */
-        .plugin(name: "UsdGenSchemaPlugin", package: "SwiftUSD")
-      ]
-    ),
-  ],
-  /* use cxx17 language standard. */
-  cxxLanguageStandard: .cxx17
-)
-```
-
-```diff
-@@ Dependency Notes @@
-- Library Products allow clients that declare a dependency on this package to use the package’s functionality.
-+ Executable Products vend an executable target. Use this only if you want to make the executable available to clients.
-! Plugin Products vend plugin targets. This makes the plugin available to clients that integrate the Swift package.
-# Swift's package manager, SwiftPM, is capabable of building Swift, Objective-C/C++, and C/C++ code.
-```
-
-##### Finally, author scene description, this is a working example of creating a new USD stage with a transform and a sphere in swift.
+##### Example of creating a new USD stage with a transform and a sphere in Swift.
 ```swift
 import Foundation
 import PixarUSD
@@ -165,7 +73,7 @@ enum Creator
 
     /* Create a new USD stage with a transform and a sphere. */
 
-    let stage = Usd.Stage.createNew("HelloPixarUSD.usda")
+    let stage = Usd.Stage.createNew("HelloWorldExample.usd")
 
     UsdGeom.Xform.define(stage, path: "/Hello")
     UsdGeom.Sphere.define(stage, path: "/Hello/World")
@@ -177,33 +85,71 @@ enum Creator
 }
 ```
 
-##### Or, if you prefer those swifty declarative APIs...
+##### Example of creating the same USD stage above, declaratively.
 ```swift
-import Foundation
-import PixarUSD
-
-@main
-enum Creator
+USDStage("HelloWorldExample", ext: .usd)
 {
-  static func main()
+  USDPrim("Hello", type: .xform)
   {
-    /* Setup all usd resources (python, plugins, resources). */
-
-    Pixar.Bundler.shared.setup(.resources)
-
-    /* Create a new USD stage with a transform and a sphere. */
-
-    USDStage("HelloPixarUSD", ext: .usda)
-    {
-      USDPrim("Hello", type: .xform)
-      {
-        USDPrim("World", type: .sphere)
-      }
-    }
-    .set(doc: "Stay Swifty.")
-    .save()
+    USDPrim("World", type: .sphere)
   }
 }
+.set(doc: "Hello World Example (Swift)!")
+.save()
+```
+
+### **Getting Started**
+
+##### To use **OpenUSD** in Swift, run the following in your terminal:
+```swift
+mkdir MySwiftApp
+cd MySwiftApp
+
+swift package init --type executable --name MySwiftApp
+
+open Package.swift
+```
+
+
+##### Then, in your project's **`Package.swift`** file, add the monolithic **PixarUSD** product as a target dependency.
+```swift
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+  name: "MySwiftPackage",
+  platforms: [
+    .macOS(.v14),
+    .visionOS(.v1),
+    .iOS(.v17),
+    .tvOS(.v17),
+    .watchOS(.v10)
+  ],
+  products: [
+    .executable(
+      name: "MySwiftApp",
+      targets: ["MySwiftApp"]
+    ),
+  ],
+  dependencies: [
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "26.5.1")
+  ],
+  targets: [
+    .executableTarget(
+      name: "MySwiftApp",
+      dependencies: [
+        // add the monolithic PixarUSD product as a dependency.
+        .product(name: "PixarUSD", package: "SwiftUSD"),
+      ],
+      swiftSettings: [
+        // enable swift/c++ interop.
+        .interoperabilityMode(.Cxx)
+      ]
+    ),
+  ],
+  // use cxx17 language standard.
+  cxxLanguageStandard: .cxx17
+)
 ```
 
 <br/>
