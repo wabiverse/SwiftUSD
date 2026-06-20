@@ -47,6 +47,7 @@ jobs:
       - name: 🎬 Run
         run: |
           BINPATH=$(swift build --target UsdView --show-bin-path)
+          export LD_LIBRARY_PATH="$(dirname $(which swift))/../lib/swift/linux:$BINPATH:$LD_LIBRARY_PATH"
           xvfb-run --auto-servernum "$BINPATH/UsdView" &
           PID=$!
           sleep 10
