@@ -38,6 +38,8 @@ jobs:
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 💻 Install GTK
         run: sudo apt install libgtk-4-dev clang
+      - name: 🪄 Install ImageMagick
+        run: sudo apt install imagemagick
       - name: ✨ Install xcbeautify
         run: |
           git clone https://github.com/cpisciotta/xcbeautify.git
@@ -54,6 +56,7 @@ jobs:
             cat /tmp/usdview.log
             exit 1
           fi
+          import -window root /tmp/usdview.png || true
           kill $PID
           wait $PID 2>/dev/null || true
           cat /tmp/usdview.log
@@ -61,3 +64,87 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: "1"
           GDK_BACKEND: "x11"
+      - name: 📚 Create Monolithic Static Library
+        run: |
+          mkdir -p /tmp/artifacts
+          find .build/x86_64-unknown-linux-gnu/debug -name "*.o" \
+            -not -path "*tool.build*" \
+            -not -path "*checkouts*" \
+            -not -path "*plugin.build*" \
+            | xargs ar rcs /tmp/artifacts/libSwiftUSD.a
+
+      - name: 📂 Create Single Shared C++ Include Directory
+        run: |
+          find Sources .build/checkouts \( -path "*/include/*.h" -o -path "*/include/*.modulemap" \) | while read f; do
+            rel="${f#*/include/}"
+            dest="/tmp/artifacts/include/$rel"
+            mkdir -p "$(dirname "$dest")"
+            cp -f "$f" "$dest"
+          done
+      - name: 📋 Generate build metadata
+        run: |
+          USD_VER=$(grep 'define PXR_VERSION' Sources/pxr/include/pxr/pxrns.h | grep -o '[0-9]*')
+          USD_MAJOR=$((USD_VER / 100))
+          USD_MINOR=$(printf "%02d" $((USD_VER % 100)))
+          USD_VERSION="$USD_MAJOR.$USD_MINOR"
+          SWIFT_VERSION="$(swift --version 2>&1 | head -1)"
+          GIT_COMMIT="$(git rev-parse HEAD)"
+          GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          mkdir -p /tmp/artifacts/lib/pkgconfig /tmp/artifacts/lib/cmake/SwiftUSD
+
+          # build-info.json (OpenUSD standard)
+          cat > /tmp/artifacts/build-info.json << EOF
+          {
+            "usd_version": "$USD_VERSION",
+            "swift_version": "$SWIFT_VERSION",
+            "git_commit": "$GIT_COMMIT",
+            "git_branch": "$GIT_BRANCH",
+            "build_date": "$BUILD_DATE",
+            "platform": "linux",
+            "arch": "x86_64",
+            "configuration": "debug"
+          }
+          EOF
+
+          # pkg-config
+          cat > /tmp/artifacts/lib/pkgconfig/SwiftUSD.pc << EOF
+          prefix=/usr/local
+          libdir=\${prefix}/lib
+          includedir=\${prefix}/include
+
+          Name: SwiftUSD
+          Description: Pixar OpenUSD Swift bindings
+          Version: $USD_VERSION
+          Libs: -L\${libdir} -lPixarUSD
+          Cflags: -I\${includedir}
+          EOF
+
+          # CMake config
+          cat > /tmp/artifacts/lib/cmake/SwiftUSD/SwiftUSDConfig.cmake << EOF
+          set(SwiftUSD_VERSION $USD_VERSION)
+          set(SwiftUSD_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
+          set(SwiftUSD_LIBRARY_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../..")
+          set(SwiftUSD_LIBRARIES SwiftUSD)
+          set(SwiftUSD_LINK_FLAGS "-Wl,--whole-archive -lSwiftUSD -Wl,--no-whole-archive")
+          EOF
+      - name: 📦 Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: usdview-artifacts
+          path: |
+            /tmp/usdview.png
+            /tmp/usdview.log
+            /tmp/artifacts/include
+            /tmp/artifacts/lib
+            /tmp/artifacts/build-info.json
+            /tmp/artifacts/libSwiftUSD.a
+            .build/x86_64-unknown-linux-gnu/debug/UsdView
+            .build/x86_64-unknown-linux-gnu/debug/*.so
+            .build/x86_64-unknown-linux-gnu/debug/*.a
+            .build/x86_64-unknown-linux-gnu/debug/*.bundle
+            .build/x86_64-unknown-linux-gnu/debug/*.resources
+            .build/x86_64-unknown-linux-gnu/debug/*.dSYM
+            .build/x86_64-unknown-linux-gnu/debug/*.debug
+            .build/x86_64-unknown-linux-gnu/debug/Modules
