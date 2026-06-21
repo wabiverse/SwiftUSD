@@ -48,7 +48,7 @@ jobs:
         run: set -o pipefail && swift build --product UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
-          xvfb-run --auto-servernum swift run --skip-build UsdView > /tmp/usdview.log 2>&1 &
+          xvfb-run --server-num=99 swift run --skip-build UsdView > /tmp/usdview.log 2>&1 &
           PID=$!
           sleep 30
           if ! kill -0 $PID 2>/dev/null; then
@@ -56,7 +56,7 @@ jobs:
             cat /tmp/usdview.log
             exit 1
           fi
-          import -window root /tmp/usdview.png || true
+          DISPLAY=:99 import -window root /tmp/usdview.png || true
           kill $PID
           wait $PID 2>/dev/null || true
           cat /tmp/usdview.log
