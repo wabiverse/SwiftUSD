@@ -426,6 +426,7 @@ let package = Package(
         .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.noandroid.platform)),
       ],
+      exclude: Arch.OS.getExcludes(for: "Arch"),
       publicHeadersPath: "include",
       cxxSettings: [
         _abiFlag,
@@ -1562,6 +1563,7 @@ let package = Package(
         // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
         .target(name: "HgiGL"),
       ],
+      exclude: Arch.OS.getExcludes(for: "HgiInterop"),
       cxxSettings: [
         _abiFlag,
         .define("MFB_PACKAGE_NAME", to: "HgiInterop"),
@@ -2728,6 +2730,31 @@ enum Arch
       #else
         []
       #endif
+    }
+    
+    public static func getExcludes(for target: String) -> [String]
+    {
+      switch target {
+        case "Arch":
+          #if !os(macOS)
+            return [
+              "darwin.mm",
+            ]
+          #else
+            return []
+          #endif
+        case "HgiInterop":
+          #if !os(macOS)
+            return [
+              "metal.mm",
+              "hgiInterop.mm",
+            ]
+          #else
+            return []
+          #endif
+        default:
+          return []
+      }
     }
   }
 }
