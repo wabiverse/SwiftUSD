@@ -28,7 +28,7 @@ let package = Package(
         "UsdPhysics", "UsdProc", "UsdRender", "UsdRi", "UsdSkel", "UsdUI",
         "UsdUtils", "UsdVol", "UsdProfiles", "CameraUtil", "Hf", "PxOsd", "Hd",
         "HdAr", "HdMtlx", "HdSi", "HdSt", "HdStorm", "Hdx", "Garch", "Hgi",
-        "HgiMetal", "HgiGL", "HgiInterop", "Hio", "Glf", "GeomUtil", "UsdShaders",
+        "HgiGL", "HgiInterop", "Hio", "Glf", "GeomUtil", "UsdShaders",
         "UsdImaging", "UsdImagingGL", "UsdExecImaging", "UsdIRImaging", "Vdf",
         "Esf", "Ef", "EsfUsd", "Exec", "ExecUsd", "ExecGeom", "ExecIr",
         "UsdValidation", "UsdGeomValidators", "UsdPhysicsValidators",
