@@ -45,10 +45,10 @@ jobs:
           git clone https://github.com/cpisciotta/xcbeautify.git
           cd xcbeautify && make install && cd .. && rm -rf xcbeautify
       - name: 🔨 Build
-        run: set -o pipefail && swift build --product UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
+        run: set -o pipefail && swift build --build-system swiftbuild --product UsdView --product swiftusd_m | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
-          xvfb-run --server-num=99 swift run --skip-build UsdView > /tmp/usdview.log 2>&1 &
+          xvfb-run --auto-servernum --server-num=99 swift run --skip-build UsdView > /tmp/usdview.log 2>&1 &
           PID=$!
           sleep 30
           if ! kill -0 $PID 2>/dev/null; then
@@ -64,15 +64,10 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: "1"
           GDK_BACKEND: "x11"
-      - name: 📚 Create Monolithic Static Library
+      - name: 📚 Copy Monolithic Library
         run: |
           mkdir -p /tmp/artifacts
-          find .build/x86_64-unknown-linux-gnu/debug -name "*.o" \
-            -not -path "*tool.build*" \
-            -not -path "*checkouts*" \
-            -not -path "*plugin.build*" \
-            | xargs ar rcs /tmp/artifacts/libSwiftUSD.a
-
+          cp .build/out/Products/Debug-linux/libswiftusd_m.a /tmp/artifacts/libswiftusd_m.a
       - name: 📂 Create Single Shared C++ Include Directory
         run: |
           find Sources .build/checkouts \( -path "*/include/*.h" -o -path "*/include/*.modulemap" \) | while read f; do
@@ -115,9 +110,9 @@ jobs:
           includedir=\${prefix}/include
 
           Name: SwiftUSD
-          Description: Pixar OpenUSD Swift bindings
+          Description: OpenUSD monolithic static library for C++ and Swift consumers
           Version: $USD_VERSION
-          Libs: -L\${libdir} -lPixarUSD
+          Libs: -L\${libdir} -lswiftusd_m
           Cflags: -I\${includedir}
           EOF
 
@@ -126,8 +121,8 @@ jobs:
           set(SwiftUSD_VERSION $USD_VERSION)
           set(SwiftUSD_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
           set(SwiftUSD_LIBRARY_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../..")
-          set(SwiftUSD_LIBRARIES SwiftUSD)
-          set(SwiftUSD_LINK_FLAGS "-Wl,--whole-archive -lSwiftUSD -Wl,--no-whole-archive")
+          set(SwiftUSD_LIBRARIES swiftusd_m)
+          set(SwiftUSD_LINK_FLAGS "-Wl,--whole-archive -lswiftusd_m -Wl,--no-whole-archive")
           EOF
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v7
@@ -139,12 +134,12 @@ jobs:
             /tmp/artifacts/include
             /tmp/artifacts/lib
             /tmp/artifacts/build-info.json
-            /tmp/artifacts/libSwiftUSD.a
-            .build/x86_64-unknown-linux-gnu/debug/UsdView
-            .build/x86_64-unknown-linux-gnu/debug/*.so
-            .build/x86_64-unknown-linux-gnu/debug/*.a
-            .build/x86_64-unknown-linux-gnu/debug/*.bundle
-            .build/x86_64-unknown-linux-gnu/debug/*.resources
-            .build/x86_64-unknown-linux-gnu/debug/*.dSYM
-            .build/x86_64-unknown-linux-gnu/debug/*.debug
-            .build/x86_64-unknown-linux-gnu/debug/Modules
+            /tmp/artifacts/libswiftusd_m.a
+            .build/out/Products/Debug-linux/UsdView
+            .build/out/Products/Debug-linux/*.so
+            .build/out/Products/Debug-linux/*.a
+            .build/out/Products/Debug-linux/*.bundle
+            .build/out/Products/Debug-linux/*.resources
+            .build/out/Products/Debug-linux/*.dSYM
+            .build/out/Products/Debug-linux/*.debug
+            .build/out/Products/Debug-linux/*.swiftmodule

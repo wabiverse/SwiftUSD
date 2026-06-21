@@ -18,6 +18,24 @@ let package = Package(
     .watchOS(.v10)
   ],
   products: [
+    // --- Monolithic lib for Swift & C++ CMake consumers ---
+    .library(
+      name: "swiftusd_m",
+      targets: [
+        "Arch", "Tf", "Js", "Gf", "Trace", "Vt", "Work", "Pegtl", "Plug", "Ts",
+        "Ar", "Kind", "Sdf", "Pcp", "Usd", "Sdr", "UsdGeom", "UsdShade", "UsdLux",
+        "UsdHydra", "SdrGlslfx", "UsdAbc", "UsdDraco", "UsdMedia", "UsdMtlx",
+        "UsdPhysics", "UsdProc", "UsdRender", "UsdRi", "UsdSkel", "UsdUI",
+        "UsdUtils", "UsdVol", "UsdProfiles", "CameraUtil", "Hf", "PxOsd", "Hd",
+        "HdAr", "HdMtlx", "HdSi", "HdSt", "HdStorm", "Hdx", "Garch", "Hgi",
+        "HgiMetal", "HgiGL", "HgiInterop", "Hio", "Glf", "GeomUtil", "UsdShaders",
+        "UsdImaging", "UsdImagingGL", "UsdExecImaging", "UsdIRImaging", "Vdf",
+        "Esf", "Ef", "EsfUsd", "Exec", "ExecUsd", "ExecGeom", "ExecIr",
+        "UsdValidation", "UsdGeomValidators", "UsdPhysicsValidators",
+        "UsdShadeValidators", "UsdSkelValidators", "UsdUtilsValidators",
+        "UsdLuxValidators",
+      ]
+    ),
     // ---------------- Pixar -----
     .library(
       name: "pxr",
