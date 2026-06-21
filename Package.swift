@@ -1430,6 +1430,7 @@ let package = Package(
         .target(name: "Arch"),
         .target(name: "Tf"),
       ],
+      exclude: Arch.OS.getExcludes(for: "Garch"),
       cxxSettings: [
         _abiFlag,
         .define("PXR_GL_SUPPORT_ENABLED", .when(platforms: Arch.OS.noembeddedapple.platform)),
@@ -2510,6 +2511,7 @@ let package = Package(
         .target(name: "HgiGL"),
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform))
       ],
+      exclude: Arch.OS.getExcludes(for: "USDOverlays"),
       cxxSettings: [
         _abiFlag,
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
@@ -2743,11 +2745,28 @@ enum Arch
           #else
             return []
           #endif
+        case "Garch":
+          #if !os(macOS)
+            return [
+              "glPlatformContextDarwin.mm",
+              "glPlatformDebugWindowDarwin.mm",
+            ]
+          #else
+            return []
+          #endif
         case "HgiInterop":
           #if !os(macOS)
             return [
               "metal.mm",
               "hgiInterop.mm",
+            ]
+          #else
+            return []
+          #endif
+        case "USDOverlays":
+          #if !os(macOS)
+            return [
+              "HgiMetalOverlay.mm",
             ]
           #else
             return []
