@@ -45,7 +45,7 @@ jobs:
           git clone https://github.com/cpisciotta/xcbeautify.git
           cd xcbeautify && make install && cd .. && rm -rf xcbeautify
       - name: 🔨 Build
-        run: set -o pipefail && swift build --build-system swiftbuild --product UsdView --product swiftusd_m | xcbeautify --preserve-unbeautified --renderer github-actions
+        run: set -o pipefail && swift build --build-system swiftbuild --product UsdView | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 🎬 Run
         run: |
           export PATH="$PWD/.build/out/Products/Debug-linux:$PATH"
@@ -65,9 +65,10 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: "1"
           GDK_BACKEND: "x11"
-      - name: 📚 Copy Monolithic Library
+      - name: 📚 Create Monolithic Library
         run: |
           mkdir -p /tmp/artifacts
+          set -o pipefail && swift build --build-system swiftbuild --product swiftusd_m | xcbeautify --preserve-unbeautified --renderer github-actions
           cp .build/out/Products/Debug-linux/libswiftusd_m.a /tmp/artifacts/libswiftusd_m.a
       - name: 📂 Create Single Shared C++ Include Directory
         run: |

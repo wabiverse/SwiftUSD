@@ -17,4 +17,4 @@ jobs:
           tag: 6.3-RELEASE
       - uses: actions/checkout@v4
       - name: 🔨 Build
-        run: swift build --build-system swiftbuild --product UsdView --product swiftusd_m
+        run: swift build --build-system swiftbuild --product UsdView
