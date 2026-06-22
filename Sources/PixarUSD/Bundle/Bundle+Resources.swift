@@ -14,283 +14,289 @@ import Foundation
 
 public extension Bundle
 {
-  static let pxrRoot = Bundle.main.resourcePath ?? ""
+  /**
+   * Resolves plugin resource paths for both bundled and unbundled app contexts,
+   * handling both '.bundle' and '.resources' extensions, and the Contents/Resources
+   * nesting inside app bundles. */
+  static func pxrBundle(_ name: String) -> Bundle?
+  {
+    let pxrRoot = Bundle.main.resourcePath ?? ""
+    let base = ["\(pxrRoot)/\(name).bundle", "\(pxrRoot)/\(name).resources"]
+      .first { FileManager.default.fileExists(atPath: $0) }
+    guard let base else { return nil }
 
-  #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-    static let ext = ".bundle"
-  #else
-    static let ext = ".resources"
-  #endif
+    return Bundle(path: "\(base)/Contents/Resources") ?? Bundle(path: base)
+  }
 
   /**
    * Where ``Ar`` application bundle resources are located. */
-  static let ar = Bundle(path: "\(pxrRoot)/SwiftUSD_Ar\(ext)")
+  static let ar = pxrBundle("SwiftUSD_Ar")
 
   /**
    * Where ``Sdf`` application bundle resources are located. */
-  static let sdf = Bundle(path: "\(pxrRoot)/SwiftUSD_Sdf\(ext)")
+  static let sdf = pxrBundle("SwiftUSD_Sdf")
 
   /**
    * Where ``Usd`` application bundle resources are located. */
-  static let usd = Bundle(path: "\(pxrRoot)/SwiftUSD_Usd\(ext)")
+  static let usd = pxrBundle("SwiftUSD_Usd")
 
   /**
    * Where ``Ndr`` application bundle resources are located. */
-  static let ndr = Bundle(path: "\(pxrRoot)/SwiftUSD_Ndr\(ext)")
+  static let ndr = pxrBundle("SwiftUSD_Ndr")
 
   /**
    * Where ``UsdGeom`` application bundle resources are located. */
-  static let usdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdGeom\(ext)")
+  static let usdGeom = pxrBundle("SwiftUSD_UsdGeom")
 
   /**
    * Where ``UsdShade`` application bundle resources are located. */
-  static let usdShade = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdShade\(ext)")
+  static let usdShade = pxrBundle("SwiftUSD_UsdShade")
 
   /**
    * Where ``UsdShaders`` application bundle resources are located. */
-  static let usdShaders = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdShaders\(ext)")
+  static let usdShaders = pxrBundle("SwiftUSD_UsdShaders")
 
   /**
    * Where ``UsdLux`` application bundle resources are located. */
-  static let usdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdLux\(ext)")
+  static let usdLux = pxrBundle("SwiftUSD_UsdLux")
 
   /**
    * Where ``UsdHydra`` application bundle resources are located. */
-  static let usdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdHydra\(ext)")
+  static let usdHydra = pxrBundle("SwiftUSD_UsdHydra")
 
   /**
    * Where ``SdrOsl`` application bundle resources are located. */
-  static let sdrOsl = Bundle(path: "\(pxrRoot)/SwiftUSD_SdrOsl\(ext)")
+  static let sdrOsl = pxrBundle("SwiftUSD_SdrOsl")
 
   /**
    * Where ``UsdAbc`` application bundle resources are located. */
-  static let usdAbc = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdAbc\(ext)")
+  static let usdAbc = pxrBundle("SwiftUSD_UsdAbc")
 
   /**
    * Where ``UsdDraco`` application bundle resources are located. */
-  static let usdDraco = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdDraco\(ext)")
+  static let usdDraco = pxrBundle("SwiftUSD_UsdDraco")
 
   /**
    * Where ``UsdMedia`` application bundle resources are located. */
-  static let usdMedia = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdMedia\(ext)")
+  static let usdMedia = pxrBundle("SwiftUSD_UsdMedia")
 
   /**
    * Where ``UsdMtlx`` application bundle resources are located. */
-  static let usdMtlx = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdMtlx\(ext)")
+  static let usdMtlx = pxrBundle("SwiftUSD_UsdMtlx")
 
   /**
    * Where ``UsdPhysics`` application bundle resources are located. */
-  static let usdPhysics = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdPhysics\(ext)")
+  static let usdPhysics = pxrBundle("SwiftUSD_UsdPhysics")
 
   /**
    * Where ``UsdProc`` application bundle resources are located. */
-  static let usdProc = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdProc\(ext)")
+  static let usdProc = pxrBundle("SwiftUSD_UsdProc")
 
   /**
    * Where ``UsdRender`` application bundle resources are located. */
-  static let usdRender = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdRender\(ext)")
+  static let usdRender = pxrBundle("SwiftUSD_UsdRender")
 
   /**
    * Where ``UsdRi`` application bundle resources are located. */
-  static let usdRi = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdRi\(ext)")
+  static let usdRi = pxrBundle("SwiftUSD_UsdRi")
 
   /**
    * Where ``UsdSkel`` application bundle resources are located. */
-  static let usdSkel = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdSkel\(ext)")
+  static let usdSkel = pxrBundle("SwiftUSD_UsdSkel")
 
   /**
    * Where ``UsdUI`` application bundle resources are located. */
-  static let usdUI = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdUI\(ext)")
+  static let usdUI = pxrBundle("SwiftUSD_UsdUI")
 
   /**
    * Where ``UsdVol`` application bundle resources are located. */
-  static let usdVol = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdVol\(ext)")
+  static let usdVol = pxrBundle("SwiftUSD_UsdVol")
 
   /**
    * Where ``Hd`` application bundle resources are located. */
-  static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
+  static let hd = pxrBundle("SwiftUSD_Hd")
 
   /**
    * Where ``HgiMetal`` application bundle resources are located. */
-  static let hgiMetal = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiMetal\(ext)")
+  static let hgiMetal = pxrBundle("SwiftUSD_HgiMetal")
 
   /**
    * Where ``HgiVulkan`` application bundle resources are located. */
-  static let hgiVulkan = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiVulkan\(ext)")
+  static let hgiVulkan = pxrBundle("SwiftUSD_HgiVulkan")
 
   /**
    * Where ``HgiGL`` application bundle resources are located. */
-  static let hgiGL = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiGL\(ext)")
+  static let hgiGL = pxrBundle("SwiftUSD_HgiGL")
 
   /**
    * Where ``HdSt`` application bundle resources are located. */
-  static let hdSt = Bundle(path: "\(pxrRoot)/SwiftUSD_HdSt\(ext)")
+  static let hdSt = pxrBundle("SwiftUSD_HdSt")
 
   /**
    * Where ``HdStorm`` application bundle resources are located. */
-  static let hdStorm = Bundle(path: "\(pxrRoot)/SwiftUSD_HdStorm\(ext)")
+  static let hdStorm = pxrBundle("SwiftUSD_HdStorm")
 
   /**
    * Where ``Hdx`` application bundle resources are located. */
-  static let hdx = Bundle(path: "\(pxrRoot)/SwiftUSD_Hdx\(ext)")
+  static let hdx = pxrBundle("SwiftUSD_Hdx")
 
   /**
    * Where ``Hio`` application bundle resources are located. */
-  static let hio = Bundle(path: "\(pxrRoot)/SwiftUSD_Hio\(ext)")
+  static let hio = pxrBundle("SwiftUSD_Hio")
 
   /**
    * Where ``Glf`` application bundle resources are located. */
-  static let glf = Bundle(path: "\(pxrRoot)/SwiftUSD_Glf\(ext)")
+  static let glf = pxrBundle("SwiftUSD_Glf")
 
   /**
    * Where ``UsdImaging`` application bundle resources are located. */
-  static let usdImaging = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdImaging\(ext)")
+  static let usdImaging = pxrBundle("SwiftUSD_UsdImaging")
 
   /**
    * Where ``UsdImagingGL`` application bundle resources are located. */
-  static let usdImagingGL = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdImagingGL\(ext)")
+  static let usdImagingGL = pxrBundle("SwiftUSD_UsdImagingGL")
 
   /**
    * Where ``Tf`` python bundle resources are located. */
-  static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
+  static let pyTf = pxrBundle("SwiftUSD_PyTf")
 
   /**
    * Where ``Plug`` python bundle resources are located. */
-  static let pyPlug = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPlug\(ext)")
+  static let pyPlug = pxrBundle("SwiftUSD_PyPlug")
 
   /**
    * Where ``Trace`` python bundle resources are located. */
-  static let pyTrace = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTrace\(ext)")
+  static let pyTrace = pxrBundle("SwiftUSD_PyTrace")
 
   /**
    * Where ``Work`` python bundle resources are located. */
-  static let pyWork = Bundle(path: "\(pxrRoot)/SwiftUSD_PyWork\(ext)")
+  static let pyWork = pxrBundle("SwiftUSD_PyWork")
 
   /**
    * Where ``Gf`` python bundle resources are located. */
-  static let pyGf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGf\(ext)")
+  static let pyGf = pxrBundle("SwiftUSD_PyGf")
 
   /**
    * Where ``Vt`` python bundle resources are located. */
-  static let pyVt = Bundle(path: "\(pxrRoot)/SwiftUSD_PyVt\(ext)")
+  static let pyVt = pxrBundle("SwiftUSD_PyVt")
 
   /**
    * Where ``Ar`` python bundle resources are located. */
-  static let pyAr = Bundle(path: "\(pxrRoot)/SwiftUSD_PyAr\(ext)")
+  static let pyAr = pxrBundle("SwiftUSD_PyAr")
 
   /**
    * Where ``Kind`` python bundle resources are located. */
-  static let pyKind = Bundle(path: "\(pxrRoot)/SwiftUSD_PyKind\(ext)")
+  static let pyKind = pxrBundle("SwiftUSD_PyKind")
 
   /**
    * Where ``Sdf`` python bundle resources are located. */
-  static let pySdf = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdf\(ext)")
+  static let pySdf = pxrBundle("SwiftUSD_PySdf")
 
   /**
    * Where ``Pcp`` python bundle resources are located. */
-  static let pyPcp = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPcp\(ext)")
+  static let pyPcp = pxrBundle("SwiftUSD_PyPcp")
 
   /**
    * Where ``Usd`` python bundle resources are located. */
-  static let pyUsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsd\(ext)")
+  static let pyUsd = pxrBundle("SwiftUSD_PyUsd")
 
   /**
    * Where ``Ndr`` python bundle resources are located. */
-  static let pyNdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PyNdr\(ext)")
+  static let pyNdr = pxrBundle("SwiftUSD_PyNdr")
 
   /**
    * Where ``Sdr`` python bundle resources are located. */
-  static let pySdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdr\(ext)")
+  static let pySdr = pxrBundle("SwiftUSD_PySdr")
 
   /**
    * Where ``SdrOsl`` application bundle resources are located. */
-  static let pySdrOsl = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdrOsl\(ext)")
+  static let pySdrOsl = pxrBundle("SwiftUSD_PySdrOsl")
 
   /**
    * Where ``UsdGeom`` python bundle resources are located. */
-  static let pyUsdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdGeom\(ext)")
+  static let pyUsdGeom = pxrBundle("SwiftUSD_PyUsdGeom")
 
   /**
    * Where ``UsdShade`` python bundle resources are located. */
-  static let pyUsdShade = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdShade\(ext)")
+  static let pyUsdShade = pxrBundle("SwiftUSD_PyUsdShade")
 
   /**
    * Where ``UsdShaders`` application bundle resources are located. */
-  static let pyUsdShaders = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdShaders\(ext)")
+  static let pyUsdShaders = pxrBundle("SwiftUSD_PyUsdShaders")
 
   /**
    * Where ``UsdLux`` application bundle resources are located. */
-  static let pyUsdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdLux\(ext)")
+  static let pyUsdLux = pxrBundle("SwiftUSD_PyUsdLux")
 
   /**
    * Where ``UsdAbc`` application bundle resources are located. */
-  static let pyUsdAbc = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdAbc\(ext)")
+  static let pyUsdAbc = pxrBundle("SwiftUSD_PyUsdAbc")
 
   /**
    * Where ``UsdDraco`` application bundle resources are located. */
-  static let pyUsdDraco = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdDraco\(ext)")
+  static let pyUsdDraco = pxrBundle("SwiftUSD_PyUsdDraco")
 
   /**
    * Where ``UsdMedia`` application bundle resources are located. */
-  static let pyUsdMedia = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdMedia\(ext)")
+  static let pyUsdMedia = pxrBundle("SwiftUSD_PyUsdMedia")
 
   /**
    * Where ``UsdMtlx`` application bundle resources are located. */
-  static let pyUsdMtlx = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdMtlx\(ext)")
+  static let pyUsdMtlx = pxrBundle("SwiftUSD_PyUsdMtlx")
 
   /**
    * Where ``UsdPhysics`` application bundle resources are located. */
-  static let pyUsdPhysics = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdPhysics\(ext)")
+  static let pyUsdPhysics = pxrBundle("SwiftUSD_PyUsdPhysics")
 
   /**
    * Where ``UsdProc`` application bundle resources are located. */
-  static let pyUsdProc = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdProc\(ext)")
+  static let pyUsdProc = pxrBundle("SwiftUSD_PyUsdProc")
 
   /**
    * Where ``UsdRender`` application bundle resources are located. */
-  static let pyUsdRender = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdRender\(ext)")
+  static let pyUsdRender = pxrBundle("SwiftUSD_PyUsdRender")
 
   /**
    * Where ``UsdRi`` application bundle resources are located. */
-  static let pyUsdRi = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdRi\(ext)")
+  static let pyUsdRi = pxrBundle("SwiftUSD_PyUsdRi")
 
   /**
    * Where ``UsdSkel`` application bundle resources are located. */
-  static let pyUsdSkel = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdSkel\(ext)")
+  static let pyUsdSkel = pxrBundle("SwiftUSD_PyUsdSkel")
 
   /**
    * Where ``UsdUI`` application bundle resources are located. */
-  static let pyUsdUI = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdUI\(ext)")
+  static let pyUsdUI = pxrBundle("SwiftUSD_PyUsdUI")
 
   /**
    * Where ``UsdUtils`` application bundle resources are located. */
-  static let pyUsdUtils = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdUtils\(ext)")
+  static let pyUsdUtils = pxrBundle("SwiftUSD_PyUsdUtils")
 
   /**
    * Where ``UsdVol`` application bundle resources are located. */
-  static let pyUsdVol = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdVol\(ext)")
+  static let pyUsdVol = pxrBundle("SwiftUSD_PyUsdVol")
 
   /**
    * Where ``UsdHydra`` application bundle resources are located. */
-  static let pyUsdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdHydra\(ext)")
+  static let pyUsdHydra = pxrBundle("SwiftUSD_PyUsdHydra")
 
   /**
    * Where ``CameraUtil`` application bundle resources are located. */
-  static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
+  static let pyCameraUtil = pxrBundle("SwiftUSD_PyCameraUtil")
 
   /**
    * Where ``PxOsd`` application bundle resources are located. */
-  static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
+  static let pyPxOsd = pxrBundle("SwiftUSD_PyPxOsd")
 
   /**
    * Where ``Garch`` application bundle resources are located. */
-  static let pyGarch = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGarch\(ext)")
+  static let pyGarch = pxrBundle("SwiftUSD_PyGarch")
 
   /**
    * Where ``Glf`` application bundle resources are located. */
-  static let pyGlf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGlf\(ext)")
+  static let pyGlf = pxrBundle("SwiftUSD_PyGlf")
 
   /**
    * Where ``GeomUtil`` application bundle resources are located. */
-  static let pyGeomUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGeomUtil\(ext)")
+  static let pyGeomUtil = pxrBundle("SwiftUSD_PyGeomUtil")
 }

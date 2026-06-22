@@ -14,5 +14,13 @@ import Foundation
 
 public extension Bundle
 {
-  static let usdview = Bundle.module
+  static let usdview: Bundle = {
+    // in bundled app contexts, swift bundler nests compiled resources under
+    // Contents/Resources - check there before falling back to .module.
+    if let url = Bundle.main.resourceURL?.appendingPathComponent("Contents/Resources"),
+       FileManager.default.fileExists(atPath: url.appendingPathComponent("default.metallib").path),
+       let bundle = Bundle(url: url)
+    { return bundle }
+    return .module
+  }()
 }

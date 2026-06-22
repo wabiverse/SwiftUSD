@@ -35,13 +35,8 @@ import Foundation
 
     public init?(path: String)
     {
-      var correctedBundlePath = path
-      if !FileManager.default.fileExists(atPath: path, isDirectory: nil) {
-        correctedBundlePath = path.replacingOccurrences(of: ".resources", with: ".bundle")
-      }
-      
-      guard FileManager.default.fileExists(atPath: correctedBundlePath, isDirectory: nil) else { return nil }
-      resourcePath = correctedBundlePath
+      guard FileManager.default.fileExists(atPath: path, isDirectory: nil) else { return nil }
+      resourcePath = path
     }
   }
 #endif /* os(Linux) */
