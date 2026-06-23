@@ -21,7 +21,7 @@ jobs:
       - name: 📦 Build & Bundle
         run: swift bundler bundle -c release --xcodebuild
       - name: 📚 Build Monolithic Library
-        run: echo "skip building release builds of monolithic 'swiftusd_m' library for now"
+        run: set -o pipefail && swift build -c release --build-system swiftbuild --product swiftusd_m --arch arm64 | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 📂 Create Single Shared C++ Include Directory
         run: |
           find Sources .build/checkouts \( -path "*/include/*.h" -o -path "*/include/*.modulemap" \) | while read f; do
