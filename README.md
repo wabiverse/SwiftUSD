@@ -108,6 +108,9 @@ USDStage("HelloWorldExample", ext: .usd)
 
 ### **Getting Started**
 
+> [!IMPORTANT]
+> This repository was renamed to `https://github.com/wabiverse/swift-usd.git`. If you previously specified `https://github.com/wabiverse/SwiftUSD.git` in your own SwiftPM package dependency URLs, or used `SwiftUSD` to refer to this package in your own SwiftPM package, change it to `swift-usd`. This is because the [apple/SwiftUsd](https://github.com/apple/SwiftUsd) package conflicted with our own package name, and we are currently integrating [apple/SwiftUsd](https://github.com/apple/SwiftUsd) to bring in precompiled binaries by default across all Apple Darwin platforms.
+
 ##### To use **OpenUSD** in Swift, run the following in your terminal:
 ```swift
 mkdir MySwiftApp
