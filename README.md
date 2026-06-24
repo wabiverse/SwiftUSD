@@ -149,8 +149,10 @@ let package = Package(
     .executableTarget(
       name: "MySwiftApp",
       dependencies: [
-        // add the monolithic OpenUSDKit product as a dependency.
-        .product(name: "OpenUSDKit", package: "swift-usd"),
+        // add the monolithic OpenUSDKit product as a dependency, on 'dev'.
+        // .product(name: "OpenUSDKit", package: "swift-usd"),
+        // otherwise use the monolithic PixarUSD product as a dependency, with '26.5.1'.
+        .product(name: "PixarUSD", package: "swift-usd"),
       ],
       swiftSettings: [
         // enable swift/c++ interop.
