@@ -4,6 +4,5 @@
 .build
 .vscode
 .swiftpm
-generated
 target
 .index-build
