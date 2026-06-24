@@ -18,7 +18,7 @@ struct OpenUSDPlugin: CommandPlugin
 {
   func performCommand(context: PluginContext, arguments: [String]) throws
   {
-    let openusd = try context.tool(named: "OpenUSD")
+    let openusd = try context.tool(named: "ousd")
 
     try run(command: openusd.url, with: arguments)
   }
