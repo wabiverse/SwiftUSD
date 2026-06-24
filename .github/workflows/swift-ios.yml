@@ -19,7 +19,7 @@ jobs:
           sudo cp ./swift-bundler /usr/local/bin/
           rm ./swift-bundler
       - name: 📦 Build & Bundle
-        run: xcodebuild -scheme UsdView -destination 'platform=iOS Simulator,name=iPhone 17'
+        run: xcodebuild -scheme UsdView -skipMacroValidation -destination 'platform=iOS Simulator,name=iPhone 17'
       - name: 📦 Upload Artifacts
         uses: actions/upload-artifact@v7
         with:

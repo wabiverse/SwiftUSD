@@ -19,7 +19,7 @@ jobs:
           sudo cp ./swift-bundler /usr/local/bin/
           rm ./swift-bundler
       - name: 📦 Build & Bundle
-        run: xcodebuild -scheme UsdView -destination 'platform=visionOS Simulator,name=Apple Vision Pro'
+        run: xcodebuild -scheme UsdView -skipMacroValidation -destination 'platform=visionOS Simulator,name=Apple Vision Pro'
       - name: 📦 Upload Artifacts
         uses: actions/upload-artifact@v7
         with:
