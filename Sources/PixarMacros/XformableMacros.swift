@@ -29,42 +29,66 @@ public struct PixarXformableMacro: MemberMacro
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        Overlay.addXformOp(self, type, precision, suffix, invert)
+        #if canImport(UsdGeom)
+          Overlay.addXformOp(self, type, precision, suffix, invert)
+        #else
+          AddXformOp(type, precision, suffix, invert)
+        #endif
       }
 
       public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
                                  suffix: Tf.Token = Tf.Token(),
                                  invert: Bool = false) -> UsdGeomXformOp
       {
-        Overlay.addTranslateOp(self, precision, suffix, invert)
+        #if canImport(UsdGeom)
+          Overlay.addTranslateOp(self, precision, suffix, invert)
+        #else
+          AddTranslateOp(precision, suffix, invert)
+        #endif
       }
 
       public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        Overlay.addScaleOp(self, precision, suffix, invert)
+        #if canImport(UsdGeom)
+          Overlay.addScaleOp(self, precision, suffix, invert)
+        #else
+          AddScaleOp(precision, suffix, invert)
+        #endif
       }
 
       public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        Overlay.addRotateXOp(self, precision, suffix, invert)
+        #if canImport(UsdGeom)
+          Overlay.addRotateXOp(self, precision, suffix, invert)
+        #else
+          AddRotateXOp(precision, suffix, invert)
+        #endif
       }
 
       public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        Overlay.addRotateYOp(self, precision, suffix, invert)
+        #if canImport(UsdGeom)
+          Overlay.addRotateYOp(self, precision, suffix, invert)
+        #else
+          AddRotateYOp(precision, suffix, invert)
+        #endif
       }
 
       public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        Overlay.addRotateZOp(self, precision, suffix, invert)
+        #if canImport(UsdGeom)
+          Overlay.addRotateZOp(self, precision, suffix, invert)
+        #else
+          AddRotateZOp(precision, suffix, invert)
+        #endif
       }
       """
 

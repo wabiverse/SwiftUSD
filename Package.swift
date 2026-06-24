@@ -2655,7 +2655,7 @@ enum Arch
     public static func getOpenUSDTargets() -> [Target.Dependency]
     {
       #if os(macOS)
-        let usePrecompiledOpenUSD = false//ProcessInfo.processInfo.environment["SWIFTUSD_BUILD_FROM_SOURCE"] != "1"
+        let usePrecompiledOpenUSD = false// ProcessInfo.processInfo.environment["SWIFTUSD_BUILD_FROM_SOURCE"] != "1"
       #else
         // precompiled binaries aren't yet supported on
         // Linux, Android, Windows, or WebAssembly.
@@ -2752,6 +2752,9 @@ enum Arch
       } else {
         return [
           .product(name: "OpenUSD", package: "SwiftUsd", condition: .when(platforms: Arch.OS.apple.platform)),
+          .product(name: "Logging", package: "swift-log"),
+          .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.noandroid.platform)),
+          .target(name: "PixarMacros"),
         ]
       }
     }

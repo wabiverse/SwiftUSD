@@ -23,6 +23,15 @@ public extension UsdGeom
   typealias XformOp = UsdGeomXformOp
 }
 
+#if canImport(OpenUSD)
+extension UsdGeomXformOp.Precision
+{
+  public static let double = UsdGeomXformOp.Precision(rawValue: 0)
+  public static let float = UsdGeomXformOp.Precision(rawValue: 1)
+  public static let half = UsdGeomXformOp.Precision(rawValue: 2)
+}
+#endif
+
 public extension UsdGeom.XformOp
 {
   @discardableResult
