@@ -13,7 +13,11 @@
 import Foundation
 
 // import Tf
-import Plug
+#if canImport(Plug)
+  import Plug
+#else
+  import OpenUSD
+#endif
 
 /* note: the typealiases are documented the same way twice,
  * keep it like this so that sourcekit shows documentation

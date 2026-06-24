@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Garch
+#if canImport(Garch)
+  import Garch
+#else
+  import OpenUSD
+#endif
 
 public enum Garch
 {}

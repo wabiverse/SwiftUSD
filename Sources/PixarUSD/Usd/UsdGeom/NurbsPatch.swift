@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdGeom
+#if canImport(UsdGeom)
+  import UsdGeom
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdGeomNurbsPatch = Pixar.UsdGeomNurbsPatch
 

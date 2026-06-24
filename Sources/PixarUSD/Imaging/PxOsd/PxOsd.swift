@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import PxOsd
+#if canImport(PxOsd)
+  import PxOsd
+#else
+  import OpenUSD
+#endif
 
 public enum PxOsd
 {}

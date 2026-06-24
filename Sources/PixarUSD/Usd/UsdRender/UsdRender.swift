@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdRender
+#if canImport(UsdRender)
+  import UsdRender
+#else
+  import OpenUSD
+#endif
 
 public enum UsdRender
 {}

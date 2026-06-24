@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Sdr
+#if canImport(Sdr)
+  import Sdr
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Sdr``

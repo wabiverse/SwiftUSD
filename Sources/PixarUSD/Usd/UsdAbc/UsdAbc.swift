@@ -11,7 +11,11 @@
  * ---------------------------------------------------------------- */
 
 #if !os(Windows)
-  import UsdAbc
+  #if canImport(UsdAbc)
+    import UsdAbc
+  #else
+    import OpenUSD
+  #endif
 #endif
 
 public enum UsdAbc

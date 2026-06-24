@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdHydra
+#if canImport(UsdHydra)
+  import UsdHydra
+#else
+  import OpenUSD
+#endif
 
 public enum UsdHydra
 {}

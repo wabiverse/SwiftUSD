@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdVol
+#if canImport(UsdVol)
+  import UsdVol
+#else
+  import OpenUSD
+#endif
 
 public enum UsdVol
 {}

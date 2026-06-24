@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Hdx
+#if canImport(Hdx)
+  import Hdx
+#else
+  import OpenUSD
+#endif
 
 private extension Hdx
 {

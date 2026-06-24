@@ -11,7 +11,11 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import Usd
+#if canImport(Usd)
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 public protocol Prim
 {

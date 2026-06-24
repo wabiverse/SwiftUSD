@@ -11,7 +11,11 @@
  * ---------------------------------------------------------------- */
 
 import CxxStdlib
-import Usd
+#if canImport(Usd)
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdAttribute = Pixar.UsdAttribute
 

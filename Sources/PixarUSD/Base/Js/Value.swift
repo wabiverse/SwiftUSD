@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Js
+#if canImport(Js)
+  import Js
+#else
+  import OpenUSD
+#endif
 
 public typealias JsValue = Pixar.JsValue
 

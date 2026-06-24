@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Sdf
+#if canImport(Sdf)
+  import Sdf
+#else
+  import OpenUSD
+#endif
 
 public typealias SdfValueTypeNameType = Pixar.SdfValueTypeNameType
 public typealias SdfValueTypeName = Pixar.SdfValueTypeName

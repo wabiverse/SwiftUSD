@@ -19,6 +19,8 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+
+#if canImport(pxr)
 @_exported import pxr
 @_exported import USDOverlays
 
@@ -386,3 +388,5 @@ extension Overlay._TfConstWeakPtrProtocol {
     fatalError()
   }
 }
+
+#endif

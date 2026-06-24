@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdLux
+#if canImport(UsdLux)
+  import UsdLux
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdLuxGeometryLight = Pixar.UsdLuxGeometryLight
 

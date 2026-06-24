@@ -10,10 +10,15 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Arch
+#if canImport(Arch)
+  import Arch
+  import Plug
+#else
+  import OpenUSD
+#endif
 import CxxStdlib
 import Foundation
-import Plug
+
 #if !os(Android)
   import Rainbow
 #endif

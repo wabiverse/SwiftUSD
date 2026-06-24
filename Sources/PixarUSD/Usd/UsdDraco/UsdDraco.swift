@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdDraco
+#if canImport(UsdDraco)
+  import UsdDraco
+#else
+  import OpenUSD
+#endif
 
 public enum UsdDraco
 {}

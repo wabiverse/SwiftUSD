@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+#if canImport(Gf)
+  import Gf
+#else
+  import OpenUSD
+#endif
 
 public extension Gf
 {

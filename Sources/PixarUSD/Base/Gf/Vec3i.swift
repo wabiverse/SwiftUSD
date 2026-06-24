@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+#if canImport(Gf)
+  import Gf
+#else
+  import OpenUSD
+#endif
 
 /* note: the typealiases are documented the same way twice,
  * keep it like this so that sourcekit shows documentation

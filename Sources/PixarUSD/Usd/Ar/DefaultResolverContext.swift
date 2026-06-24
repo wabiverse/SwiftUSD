@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Ar
+#if canImport(Ar)
+  import Ar
+#else
+  import OpenUSD
+#endif
 import Foundation
 
 public typealias ArDefaultResolverContext = Pixar.ArDefaultResolverContext

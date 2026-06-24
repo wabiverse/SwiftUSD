@@ -11,7 +11,11 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import Sdf
+#if canImport(Sdf)
+  import Sdf
+#else
+  import OpenUSD
+#endif
 
 public typealias SdfPath = Pixar.SdfPath
 

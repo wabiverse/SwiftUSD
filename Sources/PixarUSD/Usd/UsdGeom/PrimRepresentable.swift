@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Usd
+#if canImport(Usd)
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 @attached(member, names: arbitrary, conformances: PrimRepresentable)
 public macro Prim() = #externalMacro(module: "PixarMacros", type: "PixarPrimMacro")

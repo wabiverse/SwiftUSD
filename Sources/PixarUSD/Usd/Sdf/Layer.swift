@@ -11,7 +11,11 @@
  * ---------------------------------------------------------------- */
 
 import CxxStdlib
-import Sdf
+#if canImport(Sdf)
+  import Sdf
+#else
+  import OpenUSD
+#endif
 
 public typealias SdfLayer = Pixar.SdfLayer
 public typealias SdfLayerHandle = Pixar.SdfLayerHandle

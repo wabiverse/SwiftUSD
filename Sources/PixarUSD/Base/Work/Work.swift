@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Work
+#if canImport(Work)
+  import Work
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Work``

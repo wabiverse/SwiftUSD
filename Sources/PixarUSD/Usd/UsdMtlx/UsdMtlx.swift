@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdMtlx
+#if canImport(UsdMtlx)
+  import UsdMtlx
+#else
+  import OpenUSD
+#endif
 
 public enum UsdMtlx
 {}

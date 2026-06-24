@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdProc
+#if canImport(UsdProc)
+  import UsdProc
+#else
+  import OpenUSD
+#endif
 
 public enum UsdProc
 {}

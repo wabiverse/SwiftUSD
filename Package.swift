@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 import CompilerPluginSupport
 import Foundation
 import PackageDescription
@@ -9,7 +9,7 @@ import PackageDescription
 let _abiFlag: CXXSetting = .define("_LIBCPP_ABI_NO_COMPRESSED_PAIR_PADDING")
 
 let package = Package(
-  name: "SwiftUSD",
+  name: "swift-usd",
   platforms: [
     .macOS(.v14),
     .visionOS(.v1),
@@ -353,8 +353,8 @@ let package = Package(
       targets: ["UsdView"]
     ),
     .executable(
-      name: "OpenUSD",
-      targets: ["OpenUSD"]
+      name: "ousd",
+      targets: ["ousd"]
     ),
     .executable(
       name: "Examples",
@@ -382,6 +382,7 @@ let package = Package(
     ),
   ],
   dependencies: [
+    .package(url: "https://github.com/apple/SwiftUsd.git", from: "7.0.1"),
     .package(url: "https://github.com/furbytm/swift-cross-ui.git", from: "0.7.2"),
     .package(url: "https://github.com/furbytm/MetaverseKit.git", from: "2.0.5"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "601.0.0"..<"604.0.0"),
@@ -2391,7 +2392,7 @@ let package = Package(
     ),
 
     .executableTarget(
-       name: "OpenUSD",
+       name: "ousd",
        dependencies: [
          .product(name: "Version", package: "Version"),
          .product(name: "ArgumentParser", package: "swift-argument-parser"),
@@ -2439,7 +2440,7 @@ let package = Package(
          ]
        ),
        dependencies: [
-         .target(name: "OpenUSD")
+         .target(name: "ousd")
        ]
      ),
 
@@ -2523,92 +2524,7 @@ let package = Package(
     
     .target(
       name: "PixarUSD",
-      dependencies: [
-        // ---------- base. ------
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Js"),
-        .target(name: "Gf"),
-        .target(name: "Trace"),
-        .target(name: "Vt"),
-        .target(name: "Work"),
-        .target(name: "Pegtl"),
-        .target(name: "Plug"),
-        .target(name: "Ts"),
-        // ----------- usd. ------
-        .target(name: "Ar"),
-        .target(name: "Kind"),
-        .target(name: "Sdf"),
-        .target(name: "Pcp"),
-        .target(name: "Usd"),
-        .target(name: "Sdr"),
-        .target(name: "SdrGlslfx"),
-        // .target(name: "SdrOsl"),
-        .target(name: "UsdGeom"),
-        .target(name: "UsdShade"),
-        .target(name: "UsdLux"),
-        .target(name: "UsdHydra"),
-        .target(name: "UsdAbc"),
-        .target(name: "UsdDraco"),
-        .target(name: "UsdMedia"),
-        .target(name: "UsdMtlx"),
-        .target(name: "UsdPhysics"),
-        .target(name: "UsdProc"),
-        .target(name: "UsdProfiles"),
-        .target(name: "UsdRender"),
-        .target(name: "UsdRi"),
-        .target(name: "UsdSkel"),
-        .target(name: "UsdUI"),
-        .target(name: "UsdUtils"),
-        .target(name: "UsdVol"),
-        // ------- imaging. ------
-        .target(name: "CameraUtil"),
-        .target(name: "Garch"),
-        .target(name: "GeomUtil"),
-        .target(name: "Glf"),
-        .target(name: "Hf"),
-        .target(name: "Hd"),
-        .target(name: "HdAr"),
-        .target(name: "HdMtlx"),
-        .target(name: "HdSi"),
-        .target(name: "HdSt"),
-        .target(name: "HdStorm"),
-        .target(name: "Hdx"),
-        .target(name: "Hgi"),
-        .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
-        // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
-        .target(name: "HgiGL"),
-        .target(name: "HgiInterop"),
-        .target(name: "Hio"),
-        .target(name: "PxOsd"),
-        // --- usd imaging. ------
-        .target(name: "UsdShaders"),
-        .target(name: "UsdImaging"),
-        .target(name: "UsdImagingGL"),
-        .target(name: "UsdIRImaging"),
-        // ----------- exec. ------
-        .target(name: "Vdf"),
-        .target(name: "Esf"),
-        .target(name: "Ef"),
-        .target(name: "EsfUsd"),
-        .target(name: "Exec"),
-        .target(name: "ExecUsd"),
-        .target(name: "ExecGeom"),
-        .target(name: "ExecIr"),
-        .target(name: "UsdExecImaging"),
-        // --- usd validation. ------
-        .target(name: "UsdValidation"),
-        .target(name: "UsdGeomValidators"),
-        .target(name: "UsdPhysicsValidators"),
-        .target(name: "UsdShadeValidators"),
-        .target(name: "UsdSkelValidators"),
-        .target(name: "UsdUtilsValidators"),
-        .target(name: "UsdLuxValidators"),
-        // -------- macros. ------
-        .target(name: "PixarMacros"),
-        // -----------------------
-        .target(name: "USDOverlays"),
-      ],
+      dependencies: Arch.OS.getOpenUSDTargets(),
       cxxSettings: [
         _abiFlag,
         // enable to debug swift retain/release calls.
@@ -2732,6 +2648,112 @@ enum Arch
       #else
         []
       #endif
+    }
+    
+    // use apple's precompiled binaries on darwin platforms,
+    // build from source elsewhere or if SWIFTUSD_BUILD_FROM_SOURCE=1
+    public static func getOpenUSDTargets() -> [Target.Dependency]
+    {
+      #if os(macOS)
+        let usePrecompiledOpenUSD = false// ProcessInfo.processInfo.environment["SWIFTUSD_BUILD_FROM_SOURCE"] != "1"
+      #else
+        // precompiled binaries aren't yet supported on
+        // Linux, Android, Windows, or WebAssembly.
+        let usePrecompiledOpenUSD = false
+      #endif
+      
+      if !usePrecompiledOpenUSD {
+        return [
+          // ---------- base. ------
+          .target(name: "Arch"),
+          .target(name: "Tf"),
+          .target(name: "Js"),
+          .target(name: "Gf"),
+          .target(name: "Trace"),
+          .target(name: "Vt"),
+          .target(name: "Work"),
+          .target(name: "Pegtl"),
+          .target(name: "Plug"),
+          .target(name: "Ts"),
+          // ----------- usd. ------
+          .target(name: "Ar"),
+          .target(name: "Kind"),
+          .target(name: "Sdf"),
+          .target(name: "Pcp"),
+          .target(name: "Usd"),
+          .target(name: "Sdr"),
+          .target(name: "SdrGlslfx"),
+          // .target(name: "SdrOsl"),
+          .target(name: "UsdGeom"),
+          .target(name: "UsdShade"),
+          .target(name: "UsdLux"),
+          .target(name: "UsdHydra"),
+          .target(name: "UsdAbc"),
+          .target(name: "UsdDraco"),
+          .target(name: "UsdMedia"),
+          .target(name: "UsdMtlx"),
+          .target(name: "UsdPhysics"),
+          .target(name: "UsdProc"),
+          .target(name: "UsdProfiles"),
+          .target(name: "UsdRender"),
+          .target(name: "UsdRi"),
+          .target(name: "UsdSkel"),
+          .target(name: "UsdUI"),
+          .target(name: "UsdUtils"),
+          .target(name: "UsdVol"),
+          // ------- imaging. ------
+          .target(name: "CameraUtil"),
+          .target(name: "Garch"),
+          .target(name: "GeomUtil"),
+          .target(name: "Glf"),
+          .target(name: "Hf"),
+          .target(name: "Hd"),
+          .target(name: "HdAr"),
+          .target(name: "HdMtlx"),
+          .target(name: "HdSi"),
+          .target(name: "HdSt"),
+          .target(name: "HdStorm"),
+          .target(name: "Hdx"),
+          .target(name: "Hgi"),
+          .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
+          // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
+          .target(name: "HgiGL"),
+          .target(name: "HgiInterop"),
+          .target(name: "Hio"),
+          .target(name: "PxOsd"),
+          // --- usd imaging. ------
+          .target(name: "UsdShaders"),
+          .target(name: "UsdImaging"),
+          .target(name: "UsdImagingGL"),
+          .target(name: "UsdIRImaging"),
+          // ----------- exec. ------
+          .target(name: "Vdf"),
+          .target(name: "Esf"),
+          .target(name: "Ef"),
+          .target(name: "EsfUsd"),
+          .target(name: "Exec"),
+          .target(name: "ExecUsd"),
+          .target(name: "ExecGeom"),
+          .target(name: "ExecIr"),
+          .target(name: "UsdExecImaging"),
+          // --- usd validation. ------
+          .target(name: "UsdValidation"),
+          .target(name: "UsdGeomValidators"),
+          .target(name: "UsdPhysicsValidators"),
+          .target(name: "UsdShadeValidators"),
+          .target(name: "UsdSkelValidators"),
+          .target(name: "UsdUtilsValidators"),
+          .target(name: "UsdLuxValidators"),
+          // -------- macros. ------
+          .target(name: "PixarMacros"),
+          // -----------------------
+          .target(name: "USDOverlays"),
+        ]
+      } else {
+        return [
+          .product(name: "OpenUSD", package: "SwiftUsd", condition: .when(platforms: Arch.OS.apple.platform)),
+        ]
+      }
     }
     
     public static func getExcludes(for target: String) -> [String]

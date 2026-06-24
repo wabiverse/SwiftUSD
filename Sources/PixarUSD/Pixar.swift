@@ -12,7 +12,14 @@
 
 import Foundation
 import CxxStdlib
-@_exported import pxr
+
+#if canImport(pxr)
+  @_exported import pxr
+#else
+  import OpenUSD
+  
+  public typealias Pixar = pxr
+#endif
 
 /* --- xxx --- */
 

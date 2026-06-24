@@ -18,30 +18,30 @@
 </div>
 
 <h4 align="center">
-  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-android.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-android.yml?style=flat-square&label=android&labelColor=3DDC84&logoColor=FFFFFF&logo=android">
+  <a href="https://github.com/wabiverse/swift-usd/actions/workflows/swift-android.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/swift-usd/swift-android.yml?style=flat-square&label=android&labelColor=3DDC84&logoColor=FFFFFF&logo=android">
   </a>
-  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-ubuntu.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ubuntu.yml?style=flat-square&label=ubuntu%20&labelColor=E95420&logoColor=FFFFFF&logo=ubuntu">
+  <a href="https://github.com/wabiverse/swift-usd/actions/workflows/swift-ubuntu.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/swift-usd/swift-ubuntu.yml?style=flat-square&label=ubuntu%20&labelColor=E95420&logoColor=FFFFFF&logo=ubuntu">
   </a>
-  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-macos.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-macos.yml?style=flat-square&label=macOS&labelColor=000000&logo=apple">
+  <a href="https://github.com/wabiverse/swift-usd/actions/workflows/swift-macos.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/swift-usd/swift-macos.yml?style=flat-square&label=macOS&labelColor=000000&logo=apple">
   </a>
-  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-ios.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ios.yml?style=flat-square&label=iOS&labelColor=000000&logo=apple">
+  <a href="https://github.com/wabiverse/swift-usd/actions/workflows/swift-ios.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/swift-usd/swift-ios.yml?style=flat-square&label=iOS&labelColor=000000&logo=apple">
   </a>
-  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-visionos.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-visionos.yml?style=flat-square&label=visionOS&labelColor=000000&logo=apple">
+  <a href="https://github.com/wabiverse/swift-usd/actions/workflows/swift-visionos.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/swift-usd/swift-visionos.yml?style=flat-square&label=visionOS&labelColor=000000&logo=apple">
   </a>
-  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-debug-windows.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-debug-windows.yml?style=flat-square&label=windows&labelColor=357EC7&logo=gitforwindows">
+  <a href="https://github.com/wabiverse/swift-usd/actions/workflows/swift-debug-windows.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/swift-usd/swift-debug-windows.yml?style=flat-square&label=windows&labelColor=357EC7&logo=gitforwindows">
   </a>
   <br>
-    <a href="https://wabiverse.github.io/SwiftUSD/documentation/pixarusd/">
+    <a href="https://wabiverse.github.io/swift-usd/documentation/pixarusd/">
     <img src="https://img.shields.io/badge/v24%2E8%2E14-DocumentationSource?style=flat-square&label=docs&labelColor=F05138&logo=swift&color=gray&logoColor=white">
   </a>
-  <a href="https://github.com/wabiverse/SwiftUSD/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors-anon/wabiverse/SwiftUSD?color=8A2BE2&style=flat-square" alt="contributors" style="height: 20px;">
+  <a href="https://github.com/wabiverse/swift-usd/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors-anon/wabiverse/swift-usd?color=8A2BE2&style=flat-square" alt="contributors" style="height: 20px;">
   </a>
   <a href="https://discord.gg/#">
     <img src="https://img.shields.io/badge/discord-7289da.svg?style=flat-square&logo=discord" alt="discord" style="height: 20px;">
@@ -140,14 +140,14 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "26.5.1")
+    .package(url: "https://github.com/wabiverse/swift-usd.git", from: "26.5.1")
   ],
   targets: [
     .executableTarget(
       name: "MySwiftApp",
       dependencies: [
         // add the monolithic PixarUSD product as a dependency.
-        .product(name: "PixarUSD", package: "SwiftUSD"),
+        .product(name: "PixarUSD", package: "swift-usd"),
       ],
       swiftSettings: [
         // enable swift/c++ interop.
@@ -190,8 +190,8 @@ let package = Package(
   <div align="left">
 
   ```pwsh
-  git clone https://github.com/wabiverse/SwiftUSD
-  cd SwiftUSD
+  git clone https://github.com/wabiverse/swift-usd.git
+  cd swift-usd
 
   swift run -c release UsdView
   ```
@@ -224,8 +224,8 @@ let package = Package(
 
   Finally, to run and bundle **UsdView** or any other app (such as your own!) with the bundler installed locally, run the following commands:
   ```pwsh
-  git clone https://github.com/wabiverse/SwiftUSD
-  cd SwiftUSD
+  git clone https://github.com/wabiverse/swift-usd.git
+  cd swift-usd
   ```
 
   #### **macOS**

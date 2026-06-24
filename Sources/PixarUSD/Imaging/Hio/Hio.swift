@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Hio
+#if canImport(Hio)
+  import Hio
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Hio``

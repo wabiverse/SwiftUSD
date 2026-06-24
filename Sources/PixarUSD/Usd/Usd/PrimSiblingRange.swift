@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Usd
+#if canImport(Usd)
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdPrimSiblingRange = Pixar.UsdPrimSiblingRange
 

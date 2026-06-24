@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Plug
+#if canImport(Plug)
+  import Plug
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Plug``

@@ -11,8 +11,12 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import Sdf
-import Usd
+#if canImport(Usd)
+  import Sdf
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 /**
  * A ``Usd/Stage`` for declaratively authoring scene description.

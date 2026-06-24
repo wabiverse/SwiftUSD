@@ -12,8 +12,12 @@
 
 import CxxStdlib
 import Foundation
-import Sdf
-import Usd
+#if canImport(Usd)
+  import Sdf
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdStageCache = Pixar.UsdStageCache
 public typealias UsdStageCacheContext = Pixar.UsdStageCacheContext

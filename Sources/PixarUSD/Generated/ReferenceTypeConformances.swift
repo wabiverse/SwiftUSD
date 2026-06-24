@@ -18,10 +18,11 @@
 // SPDX-License-Identifier: Apache-2.0
 //===----------------------------------------------------------------------===//
 
+#if canImport(pxr)
 @_exported import pxr
+@_exported import USDOverlays
 import Tf
 import Usd
-@_exported import USDOverlays
 
 
 extension Pixar.TfRefBase: Overlay._SwiftUSDReferenceTypeProtocol {
@@ -80,3 +81,5 @@ extension __SwiftUSD_Typedef___ZN3Pixar8UsdStageE_WeakPtr: Overlay._TfWeakPtrPro
 extension __SwiftUSD_Typedef___ZN3Pixar8UsdStageE_ConstWeakPtr: Overlay._TfConstWeakPtrProtocol {
   public typealias _TfWeakBaseType = Pixar.UsdStage
 }
+
+#endif

@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdUtils
+#if canImport(UsdUtils)
+  import UsdUtils
+#else
+  import OpenUSD
+#endif
 
 public enum UsdUtils
 {}

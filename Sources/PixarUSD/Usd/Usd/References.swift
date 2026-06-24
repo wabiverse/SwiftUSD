@@ -12,7 +12,11 @@
 
 import CxxStdlib
 import Foundation
-import Usd
+#if canImport(Usd)
+  import Usd
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdReferences = Pixar.UsdReferences
 

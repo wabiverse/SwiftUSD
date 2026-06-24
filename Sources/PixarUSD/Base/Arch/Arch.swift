@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Arch
+#if canImport(Arch)
+  import Arch
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Arch``

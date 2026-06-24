@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdPhysics
+#if canImport(UsdPhysics)
+  import UsdPhysics
+#else
+  import OpenUSD
+#endif
 
 public enum UsdPhysics
 {}

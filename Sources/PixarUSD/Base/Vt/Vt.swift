@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Vt
+#if canImport(Vt)
+  import Vt
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Vt``

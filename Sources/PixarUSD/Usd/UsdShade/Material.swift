@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdShade
+#if canImport(UsdShade)
+  import UsdShade
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdShadeMaterial = Pixar.UsdShadeMaterial
 

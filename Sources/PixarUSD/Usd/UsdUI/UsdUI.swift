@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdUI
+#if canImport(UsdUI)
+  import UsdUI
+#else
+  import OpenUSD
+#endif
 
 public enum UsdUI
 {}

@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Kind
+#if canImport(Kind)
+  import Kind
+#else
+  import OpenUSD
+#endif
 
 private extension Kind
 {

@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdRi
+#if canImport(UsdRi)
+  import UsdRi
+#else
+  import OpenUSD
+#endif
 
 public enum UsdRi
 {}

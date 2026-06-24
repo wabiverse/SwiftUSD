@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdMedia
+#if canImport(UsdMedia)
+  import UsdMedia
+#else
+  import OpenUSD
+#endif
 
 public enum UsdMedia
 {}

@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Hf
+#if canImport(Hf)
+  import Hf
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Hf``

@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdShaders
+#if canImport(UsdShaders)
+  import UsdShaders
+#else
+  import OpenUSD
+#endif
 
 public enum UsdShaders
 {}

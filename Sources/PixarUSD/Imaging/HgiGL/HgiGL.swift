@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import HgiGL
+#if canImport(HgiGL)
+  import HgiGL
+#else
+  import OpenUSD
+#endif
 
 public enum HgiGL
 {

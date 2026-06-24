@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import HgiInterop
+#if canImport(HgiInterop)
+  import HgiInterop
+#else
+  import OpenUSD
+#endif
 
 public enum HgiInterop
 {}

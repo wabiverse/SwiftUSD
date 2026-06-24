@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdImagingGL
+#if canImport(UsdImagingGL)
+  import UsdImagingGL
+#else
+  import OpenUSD
+#endif
 
 public typealias UsdImagingGLRenderParams = Pixar.UsdImagingGLRenderParams
 

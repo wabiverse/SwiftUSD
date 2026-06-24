@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Pcp
+#if canImport(Pcp)
+  import Pcp
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Pcp``

@@ -12,7 +12,11 @@
 
 import CxxStdlib
 import Foundation
-import Vt
+#if canImport(Vt)
+  import Vt
+#else
+  import OpenUSD
+#endif
 
 public typealias VtDictionary = Pixar.VtDictionary
 

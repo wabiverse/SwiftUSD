@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Hgi
+#if canImport(Hgi)
+  import Hgi
+#else
+  import OpenUSD
+#endif
 
 public enum Hgi
 {}

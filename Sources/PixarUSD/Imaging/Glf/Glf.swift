@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Glf
+#if canImport(Glf)
+  import Glf
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``Glf``

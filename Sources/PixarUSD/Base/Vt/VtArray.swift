@@ -10,8 +10,12 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
-import Vt
+#if canImport(Gf)
+  import Gf
+  import Vt
+#else
+  import OpenUSD
+#endif
 
 public typealias VtVec3fArray = Pixar.VtVec3fArray
 public typealias VtFloatArray = Pixar.VtFloatArray

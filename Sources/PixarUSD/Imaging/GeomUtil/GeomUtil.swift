@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import GeomUtil
+#if canImport(GeomUtil)
+  import GeomUtil
+#else
+  import OpenUSD
+#endif
 
 public enum GeomUtil
 {}

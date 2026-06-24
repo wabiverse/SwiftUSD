@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import CameraUtil
+#if canImport(CameraUtil)
+  import CameraUtil
+#else
+  import OpenUSD
+#endif
 
 /**
  * # ``CameraUtil``

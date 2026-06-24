@@ -12,7 +12,11 @@
 
 #if canImport(Metal)
   import Metal
-  import HgiMetal
+  #if canImport(HgiMetal)
+    import HgiMetal
+  #else
+    import OpenUSD
+  #endif
 
   public enum HgiMetal
   {

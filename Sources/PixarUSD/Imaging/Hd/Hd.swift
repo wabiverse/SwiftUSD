@@ -10,7 +10,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Hd
+#if canImport(Hd)
+  import Hd
+#else
+  import OpenUSD
+#endif
 
 public enum Hd
 {}
