@@ -377,8 +377,8 @@ let package = Package(
     // ),
     // ------- Monolithic USD -----
     .library(
-      name: "PixarUSD",
-      targets: ["PixarUSD"]
+      name: "OpenUSDKit",
+      targets: ["OpenUSDKit"]
     ),
   ],
   dependencies: [
@@ -2370,7 +2370,7 @@ let package = Package(
     .executableTarget(
       name: "UsdView",
       dependencies: [
-        .target(name: "PixarUSD"),
+        .target(name: "OpenUSDKit"),
         .product(name: "SwiftCrossUI", package: "swift-cross-ui"),
         .product(name: "AppKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.macOS])),
         .product(name: "UIKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .watchOS])),
@@ -2523,7 +2523,7 @@ let package = Package(
     ),
     
     .target(
-      name: "PixarUSD",
+      name: "OpenUSDKit",
       dependencies: Arch.OS.getOpenUSDTargets(),
       cxxSettings: [
         _abiFlag,
@@ -2543,7 +2543,7 @@ let package = Package(
     .executableTarget(
       name: "Examples",
       dependencies: [
-        .target(name: "PixarUSD"),
+        .target(name: "OpenUSDKit"),
       ],
       cxxSettings: [
         _abiFlag,
@@ -2558,9 +2558,9 @@ let package = Package(
     ),
 
     .testTarget(
-      name: "PixarUSDTests",
+      name: "OpenUSDKitTests",
       dependencies: [
-        .target(name: "PixarUSD"),
+        .target(name: "OpenUSDKit"),
       ],
       cxxSettings: [
         _abiFlag,

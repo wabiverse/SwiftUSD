@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
+import OpenUSDKit
 #if canImport(Metal)
 import Metal
 import MetalKit

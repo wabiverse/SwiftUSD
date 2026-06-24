@@ -68,7 +68,7 @@ native UI, and real-time workflows. Unbound from any single vendor's GPU or plat
 ##### Example of creating a new USD stage with a transform and a sphere in Swift.
 ```swift
 import Foundation
-import PixarUSD
+import OpenUSDKit
 
 @main
 enum Creator
@@ -122,7 +122,7 @@ open Package.swift
 ```
 
 
-##### Then, in your project's **`Package.swift`** file, add the monolithic **PixarUSD** product as a target dependency.
+##### Then, in your project's **`Package.swift`** file, add the monolithic **OpenUSDKit** product as a target dependency.
 ```swift
 // swift-tools-version: 6.0
 import PackageDescription
@@ -149,8 +149,8 @@ let package = Package(
     .executableTarget(
       name: "MySwiftApp",
       dependencies: [
-        // add the monolithic PixarUSD product as a dependency.
-        .product(name: "PixarUSD", package: "swift-usd"),
+        // add the monolithic OpenUSDKit product as a dependency.
+        .product(name: "OpenUSDKit", package: "swift-usd"),
       ],
       swiftSettings: [
         // enable swift/c++ interop.

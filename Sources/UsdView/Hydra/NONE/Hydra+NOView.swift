@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
+import OpenUSDKit
 
 public extension Hydra
 {

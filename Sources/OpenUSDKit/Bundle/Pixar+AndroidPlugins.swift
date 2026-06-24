@@ -65,7 +65,7 @@
       guard !filesDir.isEmpty
       else
       {
-        print("PixarUSD: androidFilesDir not set — plugin registration skipped.")
+        print("OpenUSDKit: androidFilesDir not set — plugin registration skipped.")
         return
       }
 
@@ -85,7 +85,7 @@
         }
         catch
         {
-          print("PixarUSD: failed to write \(dirname)/plugInfo.json: \(error)")
+          print("OpenUSDKit: failed to write \(dirname)/plugInfo.json: \(error)")
         }
       }
 

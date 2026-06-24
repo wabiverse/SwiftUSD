@@ -1,4 +1,4 @@
-# ``PixarUSD``
+# ``OpenUSDKit``
 
 Robustly and scalably interchange 3D scenes while fostering highly collaborative workflows.
 

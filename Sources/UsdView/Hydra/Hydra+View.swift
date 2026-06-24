@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
+import OpenUSDKit
 import SwiftCrossUI
 
 #if canImport(Metal)

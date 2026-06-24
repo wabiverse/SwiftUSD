@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
+import OpenUSDKit
 
 /* ----------- xxx ----------
  *    AR RESOLVER EXAMPLES
@@ -41,7 +41,7 @@ public enum ArResolverExamples
 
     Msg.logger.info("creating new ar custom resolver.")
     let resolver = CustomResolver()
-    let resolvedPath = resolver._resolve(std.string("HelloPixarUSD.usda"))
+    let resolvedPath = resolver._resolve(std.string("HelloOpenUSDKit.usda"))
     Msg.logger.info("resolved path: \(resolvedPath.empty() ? "empty" : resolvedPath.path)")
 
     Msg.logger.info("ar resolver examples succesfully completed.")

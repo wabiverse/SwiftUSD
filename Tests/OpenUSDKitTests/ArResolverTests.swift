@@ -11,4 +11,4 @@
  * ---------------------------------------------------------------- */
 
 import XCTest
-@testable import PixarUSD
+@testable import OpenUSDKit

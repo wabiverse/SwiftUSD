@@ -1,5 +1,5 @@
 import Foundation
-import PixarUSD
+import OpenUSDKit
 
 extension UsdView
 {
@@ -9,7 +9,7 @@ extension UsdView
    * APIs such as SwiftUI, and save the stage to disk. */
   func declareScene()
   {
-    USDStage("\(documentsDirPath())/DeclarativePixarUSD", ext: .usda)
+    USDStage("\(documentsDirPath())/DeclarativeOpenUSDKit", ext: .usda)
     {
       USDPrim("DeclarativeScene")
       {

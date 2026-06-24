@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
+import OpenUSDKit
 import SwiftCrossUI
 
 /// `true` on platforms where vertical space is at a premium and panels

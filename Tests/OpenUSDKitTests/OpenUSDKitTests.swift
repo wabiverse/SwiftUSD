@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 import XCTest
-@testable import PixarUSD
+@testable import OpenUSDKit
 
 /* ---- xxx ----
  *  ARCH  TESTS
