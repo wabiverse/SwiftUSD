@@ -148,15 +148,21 @@ public extension Gf.Frustum
     SetPosition(position)
   }
 
+#if canImport(Gf)
   private borrowing func getPositionCopy() -> Gf.Vec3d
   {
     __GetPositionUnsafe().pointee
   }
+#endif
 
   /// Returns the position of the frustum in world space.
   func getPosition() -> Gf.Vec3d
   {
-    getPositionCopy()
+    #if canImport(Gf)
+      getPositionCopy()
+    #else
+      GetPosition()
+    #endif
   }
 
   /// Sets the orientation of the frustum in world space as
@@ -167,16 +173,22 @@ public extension Gf.Frustum
     SetRotation(rotation)
   }
 
+#if canImport(Gf)
   private borrowing func getRotationCopy() -> Pixar.GfRotation
   {
     __GetRotationUnsafe().pointee
   }
+#endif
 
   /// Returns the orientation of the frustum in world space
   /// as a rotation to apply to the -z axis.
   func getRotation() -> Pixar.GfRotation
   {
-    getRotationCopy()
+    #if canImport(Gf)
+      getRotationCopy()
+    #else
+      GetRotation()
+    #endif
   }
 
   /// Sets the position and rotation of the frustum from a camera matrix
@@ -196,15 +208,21 @@ public extension Gf.Frustum
     SetWindow(window)
   }
 
+#if canImport(Gf)
   private borrowing func getWindowCopy() -> Pixar.GfRange2d
   {
     __GetWindowUnsafe().pointee
   }
+#endif
 
   /// Returns the window rectangle in the reference plane.
   func getWindow() -> Pixar.GfRange2d
   {
-    getWindowCopy()
+    #if canImport(Gf)
+      getWindowCopy()
+    #else
+      GetWindow()
+    #endif
   }
 
   /// Returns the depth of the reference plane.
@@ -219,15 +237,21 @@ public extension Gf.Frustum
     SetNearFar(nearFar)
   }
 
+#if canImport(Gf)
   private borrowing func getNearFarCopy() -> Pixar.GfRange1d
   {
     __GetNearFarUnsafe().pointee
   }
+#endif
 
   /// Returns the near/far interval.
   func getNearFar() -> Pixar.GfRange1d
   {
-    getNearFarCopy()
+    #if canImport(Gf)
+      getNearFarCopy()
+    #else
+      GetNearFar()
+    #endif
   }
 
   /// Sets the view distance.

@@ -19,6 +19,8 @@ import CxxStdlib
   import OpenUSD
   
   public typealias Pixar = pxr
+
+  let SWIFTUSD_EVOLUTION: Int32 = 1
 #endif
 
 /* --- xxx --- */
