@@ -19,7 +19,7 @@ jobs:
           sudo cp ./swift-bundler /usr/local/bin/
           rm ./swift-bundler
       - name: 📦 Build & Bundle
-        run: swift bundler bundle -c release --xcodebuild
+        run: swift build -c release --product UsdView
       - name: 📚 Build Monolithic Library
         run: set -o pipefail && swift build -c release --build-system swiftbuild --product swiftusd_m --arch arm64 | xcbeautify --preserve-unbeautified --renderer github-actions
       - name: 📂 Create Single Shared C++ Include Directory
