@@ -78,3 +78,20 @@ public extension Pixar
     }
   }
 }
+
+#if canImport(OpenUSD)
+extension Overlay
+{
+  public static func MakeStringVector() -> String_Vector
+  {
+    String_Vector()
+  }
+  
+  public static func PushBackPath(_ paths: String_Vector, _ path: UnsafePointer<CChar>) -> String_Vector
+  {
+    var result = paths
+    result.push_back(std.string(path))
+    return result
+  }
+}
+#endif

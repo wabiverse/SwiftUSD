@@ -31,7 +31,7 @@ public extension Pixar
    * The current version of ``OpenUSDKit``.
    *
    * The semantic versioning used for ``OpenUSDKit`` tracks both the upstream
-   * OpenUSD version, as well as the evolution iteration of the ``OpenUSDKit``
+   * OpenUSD version, as well as the evolution iteration of the ``swift-usd``
    * SwiftPM package, which is setup as follows:
    * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION`` */
   static let version = String(format: "%d.%02d.%d",
