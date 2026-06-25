@@ -50,27 +50,27 @@ public extension UsdImagingGL.Engine
     )
   }
 
-  func setEnablePresentation(_ value: Bool)
+  mutating func setEnablePresentation(_ value: Bool)
   {
     SetEnablePresentation(value)
   }
 
-  func setRendererAov(_ aovName: Hd.AovTokens)
+  mutating func setRendererAov(_ aovName: Hd.AovTokens)
   {
     SetRendererAov(aovName.token)
   }
 
-  func render(rootPrim: Usd.Prim, params: UsdImagingGL.RenderParams)
+  mutating func render(rootPrim: Usd.Prim, params: UsdImagingGL.RenderParams)
   {
     Render(rootPrim, params)
   }
 
-  func setCameraState(modelViewMatrix: Gf.Matrix4d, projectionMatrix: Gf.Matrix4d)
+  mutating func setCameraState(modelViewMatrix: Gf.Matrix4d, projectionMatrix: Gf.Matrix4d)
   {
     SetCameraState(modelViewMatrix, projectionMatrix)
   }
 
-  func setRenderViewport(_ viewport: Gf.Vec4d)
+  mutating func setRenderViewport(_ viewport: Gf.Vec4d)
   {
     SetRenderViewport(viewport)
   }
@@ -84,7 +84,7 @@ public extension UsdImagingGL.Engine
     case dontConform
   }
 
-  func setWindowPolicy(_ policy: CameraUtilWindowConformPolicy)
+  mutating func setWindowPolicy(_ policy: CameraUtilWindowConformPolicy)
   {
     switch policy
     {
@@ -96,13 +96,43 @@ public extension UsdImagingGL.Engine
     }
   }
 
-  func setLightingState(lights: Pixar.GlfSimpleLightVector, material: Pixar.GlfSimpleMaterial, sceneAmbient: Pixar.GfVec4f)
+  mutating func setLightingState(lights: Pixar.GlfSimpleLightVector, material: Pixar.GlfSimpleMaterial, sceneAmbient: Pixar.GfVec4f)
   {
     SetLightingState(lights, material, sceneAmbient)
   }
-
-  func getAovTexture(_ aovName: Hd.AovTokens) -> Pixar.HgiTexture?
+  
+  // todo(furbytm): align the return type with apple/swiftusd
+  // and remove this HydraAovTexture typealias by calling the
+  // 'GetAovTexture' method for both compilation contexts.
+  mutating func getAovTexture(_ aovName: Hd.AovTokens) -> HydraAovTexture
   {
-    GetAovTexturePtr(aovName.token)
+    #if canImport(UsdImagingGL)
+      GetAovTexturePtr(aovName.token)
+    #else
+      GetAovTexture(aovName.token)
+    #endif
   }
 }
+
+#if canImport(OpenUSD)
+public typealias HydraAovTexture = Pixar.HgiTextureHandle
+
+extension Pixar
+{
+  public typealias UsdImagingGLEngine = Overlay.UsdImagingGLEngineWrapper
+}
+
+extension Pixar.UsdImagingGLEngine
+{
+  // have this defer to the C++ constructor for the apple/swiftusd
+  // UsdImagingGLEngineWrapper by aliasing our static method for
+  // `UsdImagingGLEngine.Create` to the type itself.
+  public typealias Create = UsdImagingGLEngine
+}
+#else
+// todo(furbytm): align the return type for UsdImagingGLEngine's
+// getAovTexture method with apple/swiftusd - we should not have
+// to return an optional HgiTexture. Make it return the standard
+// HgiTextureHandle that the OpenUSD API expects instead.
+public typealias HydraAovTexture = Optional<Pixar.HgiTexture>
+#endif
