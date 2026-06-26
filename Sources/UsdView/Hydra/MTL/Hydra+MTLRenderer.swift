@@ -110,8 +110,15 @@ public extension Hydra
     @MainActor @discardableResult
     func drawFrame(in view: MTKView, timeCode: Double) -> Bool
     {
+      #if canImport(Hgi)
+      guard let hgi = hydra?.getHgi()
+      else { inFlightSemaphore.signal(); return false }
+      #else
+      // apple/swiftusd's hgi types are value types:
+      // https://github.com/apple/SwiftUsd/issues/27
       guard var hgi = hydra?.getHgi()
       else { inFlightSemaphore.signal(); return false }
+      #endif
 
       hgi.StartFrame()
 

@@ -35,6 +35,8 @@ public enum Hydra
     #if canImport(UsdImagingGL)
     private let engine: UsdImagingGL.Engine
     #else
+    // apple/swiftusd's engine type is a value type:
+    // https://github.com/apple/SwiftUsd/issues/27
     private var engine: UsdImagingGL.Engine
     #endif
     
