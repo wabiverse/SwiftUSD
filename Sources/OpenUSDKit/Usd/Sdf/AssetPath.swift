@@ -32,3 +32,13 @@ public extension Sdf.AssetPath
     self = path.withCString { Overlay.MakeAssetPath($0) }
   }
 }
+
+#if !canImport(Ar)
+extension Overlay
+{
+  public static func MakeAssetPath(_ path: UnsafePointer<CChar>) -> Sdf.AssetPath
+  {
+    Sdf.AssetPath(std.string(path))
+  }
+}
+#endif

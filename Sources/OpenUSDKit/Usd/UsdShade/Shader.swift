@@ -129,3 +129,13 @@ public extension UsdShade.Shader
     ConnectableAPI()
   }
 }
+
+#if !canImport(UsdShade)
+extension Overlay
+{
+  public static func CreateIdAttr(_ shader: Pixar.UsdShadeShader, _ defaultValue: UnsafePointer<CChar>, _ writeSparsely: Bool) -> Pixar.UsdAttribute
+  {
+    shader.CreateIdAttr(Pixar.VtValue(std.string(defaultValue)), writeSparsely)
+  }
+}
+#endif

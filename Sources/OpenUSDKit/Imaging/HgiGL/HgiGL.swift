@@ -16,6 +16,10 @@
   import OpenUSD
 #endif
 
+#if canImport(HgiGL)
+// HgiGL does not appear to be importable
+// with apple/swiftusd, so remove it if
+// compiling for that context.
 public enum HgiGL
 {
   public static func createHgi() -> Pixar.HgiGL
@@ -41,3 +45,4 @@ public extension Pixar.HgiGL
     Overlay.GetValue(self)
   }
 }
+#endif

@@ -43,3 +43,18 @@ public extension Usd.Attribute
     Set(value, time)
   }
 }
+
+#if !canImport(Usd)
+extension Overlay
+{
+  public static func SetDocumentation(_ attr: Pixar.UsdAttribute, _ doc: UnsafePointer<CChar>)
+  {
+    attr.SetDocumentation(std.string(doc))
+  }
+  
+  public static func SetAttributeString(_ attr: Pixar.UsdAttribute, _ value: UnsafePointer<CChar>, _ time: UsdTimeCode) -> Bool
+  {
+    attr.Set(std.string(value), time)
+  }
+}
+#endif

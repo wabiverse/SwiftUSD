@@ -2654,15 +2654,17 @@ enum Arch
     // build from source elsewhere or if SWIFTUSD_BUILD_FROM_SOURCE=1
     public static func getOpenUSDTargets() -> [Target.Dependency]
     {
+      let isOnAndroid = ProcessInfo.processInfo.environment["SWIFTUSD_ANDROID_SUPPORT_ENABLED"] == "1"
+      
       #if os(macOS)
-        let usePrecompiledOpenUSD = false// ProcessInfo.processInfo.environment["SWIFTUSD_BUILD_FROM_SOURCE"] != "1"
+        let usePrecompiledOpenUSD = ProcessInfo.processInfo.environment["SWIFTUSD_BUILD_FROM_SOURCE"] != "1"
       #else
         // precompiled binaries aren't yet supported on
         // Linux, Android, Windows, or WebAssembly.
         let usePrecompiledOpenUSD = false
       #endif
       
-      if !usePrecompiledOpenUSD {
+      if isOnAndroid || !usePrecompiledOpenUSD {
         return [
           // ---------- base. ------
           .target(name: "Arch"),

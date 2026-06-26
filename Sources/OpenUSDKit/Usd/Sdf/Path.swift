@@ -33,17 +33,29 @@ public extension Sdf.Path
 
   static func emptyPath() -> Sdf.Path
   {
-    Sdf.Path.EmptyPath().pointee
+    #if canImport(Sdf)
+      Sdf.Path.EmptyPath().pointee
+    #else
+      Sdf.Path.EmptyPath()
+    #endif
   }
 
   static func absoluteRootPath() -> Sdf.Path
   {
-    Sdf.Path.AbsoluteRootPath().pointee
+    #if canImport(Sdf)
+      Sdf.Path.AbsoluteRootPath().pointee
+    #else
+      Sdf.Path.AbsoluteRootPath()
+    #endif
   }
 
   static func reflexiveRelativePath() -> Sdf.Path
   {
-    Sdf.Path.ReflexiveRelativePath().pointee
+    #if canImport(Sdf)
+      Sdf.Path.ReflexiveRelativePath().pointee
+    #else
+      Sdf.Path.ReflexiveRelativePath()
+    #endif
   }
 
   func getAsString() -> String
@@ -66,3 +78,24 @@ public extension Sdf.Path
     String(cString: Overlay.GetPathNameText(self))
   }
 }
+
+#if !canImport(Sdf)
+extension Overlay
+{
+  public static func MakePath(_ path: UnsafePointer<CChar>) -> Sdf.Path
+  {
+    Sdf.Path(std.string(path))
+  }
+  
+  public static func GetPathText(_ path: Sdf.Path) -> UnsafePointer<CChar>
+  {
+    String(path.GetString()).withCString { $0 }
+  }
+  
+  // apple/swiftusd is missing Sdf.Path.GetName
+  public static func GetPathNameText(_ path: Sdf.Path) -> UnsafePointer<CChar>
+  {
+    String(String(path.GetString()).split(separator: "/").last ?? "").withCString { $0 }
+  }
+}
+#endif

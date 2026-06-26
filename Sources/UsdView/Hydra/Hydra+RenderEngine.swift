@@ -31,8 +31,13 @@ public enum Hydra
 #else // !canImport(Metal)
     private let hgi: Pixar.HgiGL
 #endif // canImport(Metal)
-
+    
+    #if canImport(UsdImagingGL)
     private let engine: UsdImagingGL.Engine
+    #else
+    private var engine: UsdImagingGL.Engine
+    #endif
+    
     private var viewCamera: Hydra.Camera
 
     private var worldCenter: Pixar.GfVec3d = .init(0.0, 0.0, 0.0)
@@ -77,8 +82,14 @@ public enum Hydra
       setupCamera()
       setupMaterial()
     }
-
-    public func render(at timeCode: Double, viewSize: CGSize) -> Pixar.HgiTexture?
+    
+    #if canImport(Hgi)
+    public typealias RenderTexture = Optional<Pixar.HgiTexture>
+    #else
+    public typealias RenderTexture = Pixar.HgiTextureHandle
+    #endif
+    
+    public func render(at timeCode: Double, viewSize: CGSize) -> RenderTexture
     {
       // draws the scene using hydra.
       let cameraTransform = viewCamera.getTransform()
@@ -226,22 +237,38 @@ public enum Hydra
       var bboxCache = computeBBoxCache()
 
       var bbox = bboxCache.ComputeWorldBound(stage.getPseudoRoot())
-
+      
+      #if canImport(Gf)
       if bbox.GetRange().pointee.IsEmpty() || isInfiniteBBox(bbox)
       {
         bbox = Pixar.GfBBox3d(.init(.init(-10, -10, -10), .init(10, 10, 10)))
       }
+      #else
+      if bbox.GetRange().IsEmpty() || isInfiniteBBox(bbox)
+      {
+        bbox = Pixar.GfBBox3d(.init(.init(-10, -10, -10), .init(10, 10, 10)))
+      }
+      #endif
 
       let world = bbox.ComputeAlignedRange()
-
+      
+      #if canImport(Gf)
       worldCenter = (world.GetMin().pointee + world.GetMax().pointee) / 2.0
+      #else
+      worldCenter = (world.GetMin() + world.GetMax()) / 2.0
+      #endif
       worldSize = world.GetSize().GetLength()
     }
 
     func isInfiniteBBox(_ bbox: Pixar.GfBBox3d) -> Bool
     {
+     #if canImport(Gf)
       Double(bbox.GetRange().pointee.GetMin().pointee.GetLength()).isInfinite ||
         Double(bbox.GetRange().pointee.GetMax().pointee.GetLength()).isInfinite
+      #else
+      Double(bbox.GetRange().GetMin().GetLength()).isInfinite ||
+        Double(bbox.GetRange().GetMax().GetLength()).isInfinite
+      #endif
     }
 
     func computeBBoxCache() -> Pixar.UsdGeomBBoxCache

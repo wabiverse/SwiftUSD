@@ -13,6 +13,11 @@
 import Foundation
 import OpenUSDKit
 
+#if !canImport(Gf)
+import OpenUSD
+public typealias GfVec3d = pxrInternal_v0_26_5__pxrReserved__.GfVec3d
+#endif
+
 public extension Hydra
 {
   class Camera
@@ -64,6 +69,7 @@ public extension Hydra
 
     public func getRotation() -> Pixar.GfRotation
     {
+      #if canImport(Gf)
       var gfRotation = Pixar.GfRotation(Pixar.GfVec3d.ZAxis(), params.rotation[2])
       gfRotation *= Pixar.GfRotation(Pixar.GfVec3d.XAxis(), params.rotation[0])
       gfRotation *= Pixar.GfRotation(Pixar.GfVec3d.YAxis(), params.rotation[1])
@@ -72,8 +78,20 @@ public extension Hydra
       {
         gfRotation *= Pixar.GfRotation(Pixar.GfVec3d.XAxis(), 90.0)
       }
-
+      
       return gfRotation
+      #else
+      var gfRotation = pxr.GfMatrix4d.MakeRotate(pxr.GfRotation(.ZAxis(), params.rotation[2]))
+      gfRotation *= pxr.GfMatrix4d.MakeRotate(pxr.GfRotation(.XAxis(), params.rotation[0]))
+      gfRotation *= pxr.GfMatrix4d.MakeRotate(pxr.GfRotation(.YAxis(), params.rotation[1]))
+      
+      if isZUp
+      {
+        gfRotation *= pxr.GfMatrix4d.MakeRotate(Pixar.GfRotation(Pixar.GfVec3d.XAxis(), 90.0))
+      }
+      
+      return gfRotation.ExtractRotation()
+      #endif
     }
 
     public func getShaderParams() -> Params

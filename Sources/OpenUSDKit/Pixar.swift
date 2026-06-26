@@ -16,7 +16,7 @@ import CxxStdlib
 #if canImport(pxr)
   @_exported import pxr
 #else
-  import OpenUSD
+  @_exported import OpenUSD
   
   public typealias Pixar = pxr
 

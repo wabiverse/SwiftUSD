@@ -12,6 +12,8 @@
 
 import Foundation
 import OpenUSDKit
+
+#if canImport(HgiGL)
 import HgiGL
 
 public extension Hydra
@@ -58,3 +60,4 @@ public extension Hydra
     }
   }
 }
+#endif

@@ -79,7 +79,7 @@ public extension Pixar
   }
 }
 
-#if canImport(OpenUSD)
+#if !canImport(Arch)
 extension Overlay
 {
   public static func MakeStringVector() -> String_Vector

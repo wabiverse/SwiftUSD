@@ -12,8 +12,8 @@
 
 import Foundation
 
-// import Tf
-#if canImport(Plug)
+#if canImport(Tf)
+  import Tf
   import Plug
 #else
   import OpenUSD
@@ -51,6 +51,7 @@ public extension Tf
   typealias Token = TfToken
 }
 
+#if canImport(Tf)
 extension TfToken: Equatable
 {
   public static func == (lhs: TfToken, rhs: TfToken) -> Bool
@@ -66,6 +67,7 @@ extension TfToken: Hashable
     hasher.combine(Hash())
   }
 }
+#endif
 
 public extension TfToken
 {
@@ -84,3 +86,18 @@ public extension TfToken
     IsEmpty()
   }
 }
+
+#if !canImport(Tf)
+extension Overlay
+{
+  public static func MakeToken(_ value: UnsafePointer<CChar>) -> Tf.Token
+  {
+    Tf.Token(value)
+  }
+  
+  public static func GetTokenText(_ value: Tf.Token) -> UnsafePointer<CChar>
+  {
+    String(value.GetString()).withCString { $0 }
+  }
+}
+#endif

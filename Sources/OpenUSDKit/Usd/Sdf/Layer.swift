@@ -42,7 +42,11 @@ public extension SdfLayerHandle
    * file exists and the layer is not dirty unless `force` is true. */
   func save(force: Bool = false)
   {
-    pointee.Save(force)
+    #if canImport(Sdf)
+      pointee.Save(force)
+    #else
+      Overlay.Dereference(self).Save(force)
+    #endif
   }
 
   /**
@@ -67,6 +71,21 @@ public extension SdfLayerHandle
    * the layer to be reloaded from disk regardless of whether it has changed. */
   func reload(force: Bool = false)
   {
-    pointee.Reload(force)
+    #if canImport(Sdf)
+      pointee.Reload(force)
+    #else
+      Overlay.Dereference(self).Reload(force)
+    #endif
   }
 }
+
+
+#if !canImport(Sdf)
+extension Overlay
+{
+  public static func SetDocumentation(_ layer: SdfLayerHandle, _ doc: UnsafePointer<CChar>)
+  {
+    Overlay.Dereference(layer).SetDocumentation(std.string(doc))
+  }
+}
+#endif

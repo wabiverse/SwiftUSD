@@ -26,3 +26,13 @@ public extension ArResolvedPath
     String(cString: Overlay.GetResolvedPathText(self))
   }
 }
+
+#if !canImport(Ar)
+extension Overlay
+{
+  public static func GetResolvedPathText(_ path: Pixar.ArResolvedPath) -> UnsafePointer<CChar>
+  {
+    String(path.GetPathString()).withCString { $0 }
+  }
+}
+#endif

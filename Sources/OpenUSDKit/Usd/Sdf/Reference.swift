@@ -35,3 +35,13 @@ public extension Sdf.Reference
     self = assetPath.withCString { Overlay.MakeReference($0, primPath, layerOffset, customData) }
   }
 }
+
+#if !canImport(Sdf)
+extension Overlay
+{
+  public static func MakeReference(_ assetPath: UnsafePointer<CChar>, _ primPath: Pixar.SdfPath, _ layerOffset: Pixar.SdfLayerOffset, _ customData: Pixar.VtDictionary) -> Pixar.SdfReference
+  {
+    return Pixar.SdfReference(std.string(assetPath), primPath, layerOffset, customData)
+  }
+}
+#endif

@@ -564,3 +564,56 @@ public extension Usd.Stage
     result = String(cString: Overlay.ExportStageToString(self, addSourceFileComment))
   }
 }
+
+#if !canImport(Usd)
+extension Pixar.UsdLoadPolicy
+{
+  public static let withDescendants = Pixar.UsdLoadPolicy(rawValue: 0)
+  public static let withoutDescendants = Pixar.UsdLoadPolicy(rawValue: 1)
+}
+
+extension Overlay
+{
+  public static func CreateNewStage(_ identifier: UnsafePointer<CChar>, _ load: Pixar.UsdStage.InitialLoadSet) -> Pixar.UsdStageRefPtr
+  {
+    Pixar.UsdStage.CreateNew(std.string(identifier), load)
+  }
+  
+  public static func CreateInMemoryStage(_ identifier: UnsafePointer<CChar>, _ load: Pixar.UsdStage.InitialLoadSet) -> Pixar.UsdStageRefPtr
+  {
+    Pixar.UsdStage.CreateInMemory(std.string(identifier), load)
+  }
+  
+  public static func OpenStage(_ filepath: UnsafePointer<CChar>, _ load: Pixar.UsdStage.InitialLoadSet) -> Pixar.UsdStageRefPtr
+  {
+    Pixar.UsdStage.Open(std.string(filepath), load)
+  }
+  
+  public static func StageSetMetadata(_ stage: Pixar.UsdStage, _ key: Pixar.TfToken, _ value: Double) -> Bool
+  {
+    stage.SetMetadata(key, Pixar.VtValue(value))
+  }
+  
+  public static func StageSetMetadata(_ stage: Pixar.UsdStage, _ key: Pixar.TfToken, _ value: Int32) -> Bool
+  {
+    stage.SetMetadata(key, Pixar.VtValue(value))
+  }
+  
+  public static func StageSetMetadata(_ stage: Pixar.UsdStage, _ key: Pixar.TfToken, _ value: Float) -> Bool
+  {
+    stage.SetMetadata(key, Pixar.VtValue(value))
+  }
+  
+  public static func StageSetMetadata(_ stage: Pixar.UsdStage, _ key: Pixar.TfToken, _ value: Tf.Token) -> Bool
+  {
+    stage.SetMetadata(key, Pixar.VtValue(value))
+  }
+  
+  public static func ExportStageToString(_ stage: Pixar.UsdStage, _ addSourceFileComment: Bool) -> UnsafePointer<CChar>
+  {
+    var buf = std.string()
+    stage.ExportToString(&buf, addSourceFileComment)
+    return String(buf).withCString { $0 }
+  }
+}
+#endif

@@ -86,6 +86,7 @@ public extension Usd
   typealias StageWeakPtr = UsdStageWeakPtr
 }
 
+#if canImport(Usd)
 extension Usd.Prim: Hashable
 {
   public func hash(into hasher: inout Hasher) {
@@ -97,6 +98,7 @@ extension Usd.Prim: Hashable
     lhs.name == rhs.name
   }
 }
+#endif
 
 extension Usd.Prim: Prim
 {
@@ -132,6 +134,7 @@ extension Usd.Prim: Prim
     GetReferences()
   }
 
+#if canImport(Usd)
   private borrowing func GetNameCopy() -> Tf.Token
   {
     __GetNameUnsafe().pointee
@@ -141,6 +144,7 @@ extension Usd.Prim: Prim
   {
     __GetTypeNameUnsafe().pointee
   }
+#endif
 
   public var path: Sdf.Path
   {
@@ -149,12 +153,23 @@ extension Usd.Prim: Prim
 
   public var name: Tf.Token
   {
-    GetNameCopy()
+    #if canImport(Usd)
+      GetNameCopy()
+    #else
+      GetName()
+    #endif
   }
 
   public var typeName: Tf.Token
   {
-    get { GetTypeNameCopy() }
+    get
+    {
+      #if canImport(Usd)
+        GetTypeNameCopy()
+      #else
+        GetTypeName()
+      #endif
+    }
     set { SetTypeName(newValue) }
   }
 
@@ -163,3 +178,15 @@ extension Usd.Prim: Prim
     IteratorSequence(GetChildren()).map { $0 }
   }
 }
+
+
+#if !canImport(Usd)
+extension Overlay
+{
+  public static func SetDocumentation(_ prim: Usd.Prim, _ doc: UnsafePointer<CChar>)
+  {
+    prim.SetDocumentation(std.string(doc))
+  }
+}
+#endif
+

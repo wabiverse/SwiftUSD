@@ -24,6 +24,30 @@ public extension UsdGeom
 }
 
 #if canImport(OpenUSD)
+extension UsdGeomXformOp.`Type`
+{
+  public static let invalid    = TypeInvalid
+  public static let translateX = TypeTranslateX
+  public static let translateY = TypeTranslateY
+  public static let translateZ = TypeTranslateZ
+  public static let translate  = TypeTranslate
+  public static let scaleX     = TypeScaleX
+  public static let scaleY     = TypeScaleY
+  public static let scaleZ     = TypeScaleZ
+  public static let scale      = TypeScale
+  public static let rotateX    = TypeRotateX
+  public static let rotateY    = TypeRotateY
+  public static let rotateZ    = TypeRotateZ
+  public static let rotateXYZ  = TypeRotateXYZ
+  public static let rotateXZY  = TypeRotateXZY
+  public static let rotateYXZ  = TypeRotateYXZ
+  public static let rotateYZX  = TypeRotateYZX
+  public static let rotateZXY  = TypeRotateZXY
+  public static let rotateZYX  = TypeRotateZYX
+  public static let orient     = TypeOrient
+  public static let transform  = TypeTransform
+}
+
 extension UsdGeomXformOp.Precision
 {
   public static let double = UsdGeomXformOp.Precision(rawValue: 0)

@@ -110,7 +110,7 @@ public extension Hydra
     @MainActor @discardableResult
     func drawFrame(in view: MTKView, timeCode: Double) -> Bool
     {
-      guard let hgi = hydra?.getHgi()
+      guard var hgi = hydra?.getHgi()
       else { inFlightSemaphore.signal(); return false }
 
       hgi.StartFrame()
@@ -174,7 +174,8 @@ public extension Hydra
         commandBuffer.present(drawable, atTime: 1.0 / Double(view.preferredFramesPerSecond))
       #endif // os(macOS)
     }
-
+    
+    #if canImport(Usd)
     public func getMetalTexture(from hgiTexture: Pixar.HgiTexture) -> MTLTexture?
     {
       let rawResource = hgiTexture.GetRawResource()
@@ -185,6 +186,13 @@ public extension Hydra
 
       return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? any MTLTexture
     }
+    #else
+    public func getMetalTexture(from handle: Pixar.HgiTextureHandle) -> MTLTexture?
+    {
+      // get the hgi texture from the hgi texture handle.
+      return Overlay.HgiTextureHandleGetTextureId(handle)
+    }
+    #endif
   }
 }
 #endif // canImport(Metal)

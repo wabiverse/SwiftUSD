@@ -20,7 +20,12 @@ import Foundation
 #endif
 
 public typealias UsdStageCache = Pixar.UsdStageCache
+
+#if canImport(Usd)
+// apple/swiftusd does not expose
+// UsdStageCacheContext to swift.
 public typealias UsdStageCacheContext = Pixar.UsdStageCacheContext
+#endif
 
 public extension UsdStageCache
 {
@@ -35,6 +40,9 @@ public extension UsdStageCache
   // }
 }
 
+#if canImport(Usd)
+// apple/swiftusd does not expose
+// UsdStageCacheContext to swift.
 public extension UsdStageCacheContext
 {
   @discardableResult
@@ -43,3 +51,4 @@ public extension UsdStageCacheContext
     Pixar.UsdStageCacheContext.Create(&cache)
   }
 }
+#endif

@@ -22,7 +22,8 @@ public extension Ar
   {
     // 1. we get the base type.
     let base = Overlay.FindTypeByName("ArResolver")
-
+    
+    #if canImport(Ar)
     guard
       // 2. we verify the base type is valid.
       let all = base.pointee.IsUnknown() == false
@@ -31,6 +32,16 @@ public extension Ar
       // 4. we ensure the list is not empty.
       all().empty() == false
     else { return [] }
+    #else
+    guard
+      // 2. we verify the base type is valid.
+      let all = base.IsUnknown() == false
+      // 3. we get all that derive from the base type.
+      ? Pixar.TfType.GetDirectlyDerivedTypes(base) : nil,
+      // 4. we ensure the list is not empty.
+      all().empty() == false
+    else { return [] }
+    #endif
 
     var result: [String] = []
     let resolvers = all()
@@ -41,3 +52,19 @@ public extension Ar
     return result
   }
 }
+
+
+#if !canImport(Ar)
+extension Overlay
+{
+  public static func FindTypeByName(_ name: UnsafePointer<CChar>) -> Pixar.TfType
+  {
+    Pixar.TfType.FindByName(std.string(name))
+  }
+  
+  public static func GetTypeName(_ type: Pixar.TfType) -> UnsafePointer<CChar>
+  {
+    String(type.GetTypeName()).withCString { $0 }
+  }
+}
+#endif

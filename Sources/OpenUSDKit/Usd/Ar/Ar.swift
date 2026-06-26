@@ -17,7 +17,10 @@
 #endif
 
 public typealias ArResolver = Pixar.ArResolver
+
+#if canImport(Ar)
 public typealias ArDefaultResolver = Pixar.ArDefaultResolver
+#endif
 
 /**
  * # ``Ar``
@@ -32,5 +35,16 @@ public typealias ArDefaultResolver = Pixar.ArDefaultResolver
 public enum Ar
 {
   public typealias Resolver = ArResolver
+  
+  #if canImport(Ar)
   public typealias DefaultResolver = ArDefaultResolver
+  #endif
 }
+
+#if !canImport(Ar)
+extension Pixar
+{
+  public typealias ArResolver = Overlay.ArResolverWrapper
+}
+#endif
+
