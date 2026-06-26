@@ -48,27 +48,27 @@
       Overlay.GetValue(self)
     }
   }
+
+  #if !canImport(Hgi)
+    extension Pixar
+    {
+      public typealias HgiMetal = Overlay.HgiMetalWrapper
+    }
+
+    extension Pixar.HgiMetal
+    {
+      public static func Create() -> Pixar.HgiMetal
+      {
+        Overlay.HgiMetalWrapper(nil)
+      }
+    }
+
+    extension Overlay
+    {
+      public static func GetValue(_ value: Pixar.HgiMetal) -> VtValue
+      {
+        value.VtValueWrappingHgiRawPtr()
+      }
+    }
+  #endif
 #endif /* canImport(Metal) */
-
-#if !canImport(HgiMetal)
-extension Pixar
-{
-  public typealias HgiMetal = Overlay.HgiMetalWrapper
-}
-
-extension Pixar.HgiMetal
-{
-  public static func Create() -> Pixar.HgiMetal
-  {
-    Overlay.HgiMetalWrapper(nil)
-  }
-}
-
-extension Overlay
-{
-  public static func GetValue(_ value: Pixar.HgiMetal) -> VtValue
-  {
-    value.VtValueWrappingHgiRawPtr()
-  }
-}
-#endif

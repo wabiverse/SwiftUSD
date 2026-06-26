@@ -23,7 +23,7 @@ public extension UsdGeom
   typealias XformOp = UsdGeomXformOp
 }
 
-#if canImport(OpenUSD)
+#if !canImport(UsdGeom)
 extension UsdGeomXformOp.`Type`
 {
   public static let invalid    = TypeInvalid
