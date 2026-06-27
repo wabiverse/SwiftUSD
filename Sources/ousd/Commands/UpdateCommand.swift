@@ -826,6 +826,7 @@ public enum Pxr: String, CaseIterable
       Patch.arResolver(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.usdStageCacheContext(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       Patch.usdImagingGL(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
+      Patch.execUsd(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent, target: target)
       Patch.plugRegistry(to: &pxrSrc, fileBaseName: fileURL.lastPathComponent)
       
       // cleans up openusd c++ enums for clean swifty apis.
@@ -1597,6 +1598,22 @@ public enum Pxr: String, CaseIterable
         default:
           return
       }
+    }
+
+    public static func execUsd(to source: inout String, fileBaseName: String, target: String)
+    {
+      guard fileBaseName == "system.h", target == "ExecUsd" else { return }
+
+      // ExecUsdSystem is the concrete type Swift holds. SWIFT_UNSAFE_REFERENCE
+      // tells Swift it's a reference type with externally managed lifetime.
+      source = source.replacingOccurrences(
+        of: "#include \"pxr/exec/exec/system.h\"",
+        with: "#include \"pxr/exec/exec/system.h\"\n#include \"pxr/base/arch/swiftInterop.h\""
+      )
+      source = source.replacingOccurrences(
+        of: "class ExecUsdSystem : public ExecSystem\n{",
+        with: "class SWIFT_UNSAFE_REFERENCE ExecUsdSystem : public ExecSystem\n{"
+      )
     }
 
     public static func sdfTypes(to source: inout String, fileBaseName: String, target: String)

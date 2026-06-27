@@ -2728,6 +2728,7 @@ enum Arch
           .target(name: "UsdImaging"),
           .target(name: "UsdImagingGL"),
           .target(name: "UsdIRImaging"),
+          .target(name: "UsdExecImaging"),
           // ----------- exec. ------
           .target(name: "Vdf"),
           .target(name: "Esf"),
@@ -2737,7 +2738,6 @@ enum Arch
           .target(name: "ExecUsd"),
           .target(name: "ExecGeom"),
           .target(name: "ExecIr"),
-          .target(name: "UsdExecImaging"),
           // --- usd validation. ------
           .target(name: "UsdValidation"),
           .target(name: "UsdGeomValidators"),

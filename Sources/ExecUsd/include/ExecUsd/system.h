@@ -17,6 +17,7 @@
 #include "Tf/declarePtrs.h"
 #include "Exec/request.h"
 #include "Exec/system.h"
+#include "Arch/swiftInterop.h"
 
 #include <memory>
 #include <vector>
@@ -42,7 +43,7 @@ class UsdTimeCode;
 /// practice. As a rule of thumb, the ExecUsdSystem lives right alongside the
 /// UsdStage in most use-cases. 
 /// 
-class ExecUsdSystem : public ExecSystem
+class SWIFT_UNSAFE_REFERENCE ExecUsdSystem : public ExecSystem
 {
 public:
     EXECUSD_API
