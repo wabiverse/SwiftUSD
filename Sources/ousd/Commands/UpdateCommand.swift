@@ -2530,6 +2530,10 @@ public enum Pxr: String, CaseIterable
         of: "TF_RUNTIME_ERROR(errs);",
         with: "TF_RUNTIME_ERROR(\"%s\", errs.c_str());"
       )
+      source = source.replacingOccurrences(
+        of: "TF_WARN(\n                \"No value set for output \" + output.GetDebugName() +\n                \" of type \" + output.GetSpec().GetType().GetTypeName() +\n                \" named \" + output.GetName().GetString());",
+        with: "TF_WARN(\"%s\", (\"No value set for output \" + output.GetDebugName() +\n                \" of type \" + output.GetSpec().GetType().GetTypeName() +\n                \" named \" + output.GetName().GetString()).c_str());"
+      )
 
       // TBB: MetaverseKit places tbb under OneTBB/; deprecated atomic/mutex/task_scheduler_init -> std.
       source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
