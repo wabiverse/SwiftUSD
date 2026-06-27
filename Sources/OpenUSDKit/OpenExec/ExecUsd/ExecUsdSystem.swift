@@ -4,6 +4,7 @@ import ExecUsd
 import OpenUSD
 #endif
 
+#if canImport(ExecUsd)
 public typealias ExecUsdSystem = Pixar.ExecUsdSystem
 
 public extension ExecUsd
@@ -15,3 +16,4 @@ public extension ExecUsd.System
 {
 	
 }
+#endif
