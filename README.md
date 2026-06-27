@@ -124,7 +124,7 @@ open Package.swift
 
 ##### Then, in your project's **`Package.swift`** file, add the monolithic **OpenUSDKit** product as a target dependency.
 ```swift
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 import PackageDescription
 
 let package = Package(
@@ -143,16 +143,22 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/swift-usd.git", from: "26.5.1")
+    .package(url: "https://github.com/wabiverse/swift-usd.git", from: "26.5.2-beta.1")
   ],
   targets: [
     .executableTarget(
       name: "MySwiftApp",
       dependencies: [
-        // add the monolithic OpenUSDKit product as a dependency, on 'dev'.
-        // .product(name: "OpenUSDKit", package: "swift-usd"),
-        // otherwise use the monolithic PixarUSD product as a dependency, with '26.5.1'.
-        .product(name: "PixarUSD", package: "swift-usd"),
+        // add the monolithic OpenUSDKit product as a dependency.
+        .product(name: "OpenUSDKit", package: "swift-usd"),
+      ],
+      cxxSettings: [
+        // required because swiftc's embedded clang (swift 6+)
+        // defines _LIBCPP_ABI_NO_COMPRESSED_PAIR_PADDING for
+        // swift modules, but c++ module builds dont, causing
+        // odr violations on any stdlib include. this flag is
+        // required to align both compilation contexts.
+        .define("_LIBCPP_ABI_NO_COMPRESSED_PAIR_PADDING")
       ],
       swiftSettings: [
         // enable swift/c++ interop.
