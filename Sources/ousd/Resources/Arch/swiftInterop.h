@@ -61,7 +61,7 @@
 #endif /* __APPLE__ */
 
 /** ----------
- * 
+ *
  * Carefully define the swift cxx interop macros, by first checking
  * if they have already been defined by the Swift compiler, if not,
  * then we define them ourselves.
@@ -76,17 +76,10 @@
 #if _CXX_INTEROP_HAS_ATTRIBUTE(swift_attr)
 
 #if !defined(SWIFT_SELF_CONTAINED)
-/// Specifies that a C++ `class` or `struct` owns and controls the lifetime of all
-/// of the objects it references. Such type should not reference any objects whose
-/// lifetime is controlled externally. This annotation allows Swift to import methods
-/// that return a `class` or `struct` type that is annotated with this macro.
 #define SWIFT_SELF_CONTAINED __attribute__((swift_attr("import_owned")))
 #endif /* SWIFT_SELF_CONTAINED */
 
 #if !defined(SWIFT_RETURNS_INDEPENDENT_VALUE)
-/// Specifies that a C++ method returns a value that is presumed to contain
-/// objects whose lifetime is not dependent on `this` or other parameters passed
-/// to the method.
 #define SWIFT_RETURNS_INDEPENDENT_VALUE __attribute__((swift_attr("import_unsafe")))
 #endif /* SWIFT_RETURNS_INDEPENDENT_VALUE */
 
@@ -94,33 +87,15 @@
 #define _CXX_INTEROP_STRINGIFY(_x) #_x
 #endif /* _CXX_INTEROP_STRINGIFY */
 
+#if !defined(_CXX_INTEROP_CONCAT_)
+#define _CXX_INTEROP_CONCAT_(a,b,c,d,e,f,g,i,j,k,l,m,n,o,p,...)         \
+  #a "," #b "," #c "," #d "," #e "," #f "," #g "," #i "," #j "," #k "," \
+  #l "," #m "," #n "," #o "," #p
+#define _CXX_INTEROP_CONCAT(...) \
+  _CXX_INTEROP_CONCAT_(__VA_ARGS__,,,,,,,,,,,,,,,,,)
+#endif /* _CXX_INTEROP_CONCAT_ */
+
 #if !defined(SWIFT_SHARED_REFERENCE)
-/// Specifies that a C++ `class` or `struct` is reference-counted using
-/// the given `retain` and `release` functions. This annotation lets Swift import
-/// such a type as reference counted type in Swift, taking advantage of Swift's
-/// automatic reference counting.
-///
-/// This example shows how to use this macro to let Swift know that
-/// a non-copyable reference counted C++ class can be imported as a reference counted type in Swift:
-///  ```c++
-///    class SWIFT_SHARED_REFERENCE(retainSharedObject, releaseSharedObject)
-///    SharedObject : NonCopyable, IntrusiveReferenceCounted<SharedObject> {
-///    public:
-///      static SharedObject* create();
-///      void doSomething();
-///    };
-///
-///    void retainSharedObject(SharedObject *);
-///    void releaseSharedObject(SharedObject *);
-///  ```
-///
-///  Then, the Swift programmer would be able to use it in the following manner:
-///
-///  ```swift
-///    let object = SharedObject.create()
-///    object.doSomething()
-///    // The Swift compiler will release object here.
-///  ```
 #define SWIFT_SHARED_REFERENCE(_retain, _release)                                \
   __attribute__((swift_attr("import_reference")))                          \
   __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain:_retain))))      \
@@ -128,42 +103,14 @@
 #endif /* SWIFT_SHARED_REFERENCE */
 
 #if !defined(SWIFT_RETURNS_RETAINED)
-/// Specifies that a C++ function returning a `SWIFT_SHARED_REFERENCE` type
-/// transfers a +1 reference to its caller, so Swift must not perform an
-/// additional `retain` on the returned value.
 #define SWIFT_RETURNS_RETAINED __attribute__((swift_attr("returns_retained"))) __attribute__((cf_returns_retained))
 #endif /* SWIFT_RETURNS_RETAINED */
 
 #if !defined(SWIFT_RETURNS_UNRETAINED)
-/// Specifies that a C++ function returning a `SWIFT_SHARED_REFERENCE` type
-/// returns a +0 (borrowed) reference, so Swift must perform a `retain` on
-/// the returned value to take ownership of it.
 #define SWIFT_RETURNS_UNRETAINED __attribute__((swift_attr("returns_unretained"))) __attribute__((cf_returns_not_retained))
 #endif /* SWIFT_RETURNS_UNRETAINED */
 
 #if !defined(SWIFT_IMMORTAL_REFERENCE)
-/// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
-/// is presumed to be immortal, i.e. the reference to such object is presumed to
-/// always be valid. This annotation lets Swift import such a type as a reference
-/// type in Swift.
-////
-/// This example shows how to use this macro to let Swift know that
-/// a non-copyable singleton C++ class can be imported as a reference type in Swift:
-///  ```c++
-///    class SWIFT_IMMORTAL_REFERENCE
-///    LoggerSingleton : NonCopyable {
-///    public:
-///      static LoggerSingleton &getInstance();
-///      void log(int x);
-///    };
-///  ```
-///
-///  Then, the Swift programmer would be able to use it in the following manner:
-///
-///  ```swift
-///    let logger = LoggerSingleton.getInstance()
-///    logger.log(123)
-///  ```
 #define SWIFT_IMMORTAL_REFERENCE                                                \
   __attribute__((swift_attr("import_reference")))                         \
   __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain:immortal))))    \
@@ -171,9 +118,6 @@
 #endif /* SWIFT_IMMORTAL_REFERENCE */
 
 #if !defined(SWIFT_UNSAFE_REFERENCE)
-/// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
-/// is not managed automatically. The programmer must validate that any reference
-/// to such object is valid themselves. This annotation lets Swift import such a type as a reference type in Swift.
 #define SWIFT_UNSAFE_REFERENCE                                                  \
   __attribute__((swift_attr("import_reference")))                         \
   __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain:immortal))))    \
@@ -181,69 +125,69 @@
 #endif /* SWIFT_UNSAFE_REFERENCE */
 
 #if !defined(SWIFT_NAME)
-/// Specifies a name that will be used in Swift for this declaration instead of its original name.
 #define SWIFT_NAME(_name) __attribute__((swift_name(#_name)))
 #endif /* SWIFT_NAME */
 
 #if !defined(SWIFT_CONFORMS_TO_PROTOCOL)
-/// Specifies that a specific C++ `class` or `struct` conforms to a
-/// a specific Swift protocol.
-///
-/// This example shows how to use this macro to conform a class template to a Swift protocol:
-///  ```
-///    template<class T>
-///    class SWIFT_CONFORMS_TO_PROTOCOL(SwiftModule.ProtocolName)
-///    CustomClass {};
-///  ```
 #define SWIFT_CONFORMS_TO_PROTOCOL(_moduleName_protocolName) \
   __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(conforms_to:_moduleName_protocolName))))
 #endif /* SWIFT_CONFORMS_TO_PROTOCOL */
 
 #if !defined(SWIFT_COMPUTED_PROPERTY)
-/// Specifies that a specific C++ method should be imported as a computed
-/// property. If this macro is specified on a getter, a getter will be
-/// synthesized. If this macro is specified on a setter, both a getter and
-/// setter will be synthesized.
-///
-/// For example:
-///  ```
-///    int getX() SWIFT_COMPUTED_PROPERTY;
-///  ```
-/// Will be imported as `var x: CInt {...}`.
 #define SWIFT_COMPUTED_PROPERTY \
   __attribute__((swift_attr("import_computed_property")))
 #endif /* SWIFT_COMPUTED_PROPERTY */
 
 #if !defined(SWIFT_MUTATING)
-/// Specifies that a specific **constant** C++ member function should be imported as
-/// `mutating` Swift method. This annotation should be added to constant C++ member functions
-/// that mutate `mutable` fields in a C++ object, to let Swift know that this function is still mutating
-/// and thus that it should become a `mutating` method in Swift.
 #define SWIFT_MUTATING \
   __attribute__((swift_attr("mutating")))
 #endif /* SWIFT_MUTATING */
 
 #if !defined(SWIFT_UNCHECKED_SENDABLE)
-/// Specifies that a specific c++ type such class or struct should be imported as type marked 
-/// as `@unchecked Sendable` type in swift. If this annotation is used, the type is therefore allowed to
-/// use safely across async contexts.
-///
-/// For example 
-/// ```
-///   class SWIFT_UNCHECKED_SENDABLE CustomUserType
-///   { ... } 
-/// ``` 
-/// Will be imported as `struct CustomUserType: @unchecked Sendable`
 #define SWIFT_UNCHECKED_SENDABLE \
   __attribute__((swift_attr("@Sendable")))
 #endif /* SWIFT_UNCHECKED_SENDABLE */
 
 #if !defined(SWIFT_NONCOPYABLE)
-/// Specifies that a specific c++ type such class or struct should be imported
-/// as a non-copyable Swift value type.
 #define SWIFT_NONCOPYABLE \
   __attribute__((swift_attr("~Copyable")))
 #endif /* SWIFT_NONCOPYABLE */
+
+#if !defined(SWIFT_NONCOPYABLE_WITH_DESTROY)
+#define SWIFT_NONCOPYABLE_WITH_DESTROY(_destroy) \
+  __attribute__((swift_attr("~Copyable"))) \
+  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(destroy:_destroy))))
+#endif /* SWIFT_NONCOPYABLE_WITH_DESTROY */
+
+#if !defined(SWIFT_COPYABLE_IF)
+#define SWIFT_COPYABLE_IF(...) \
+  __attribute__((swift_attr("copyable_if:" _CXX_INTEROP_CONCAT(__VA_ARGS__))))
+#endif /* SWIFT_COPYABLE_IF */
+
+#if !defined(SWIFT_NONESCAPABLE)
+#define SWIFT_NONESCAPABLE \
+  __attribute__((swift_attr("~Escapable")))
+#endif /* SWIFT_NONESCAPABLE */
+
+#if !defined(SWIFT_ESCAPABLE)
+#define SWIFT_ESCAPABLE \
+  __attribute__((swift_attr("Escapable")))
+#endif /* SWIFT_ESCAPABLE */
+
+#if !defined(SWIFT_ESCAPABLE_IF)
+#define SWIFT_ESCAPABLE_IF(...) \
+  __attribute__((swift_attr("escapable_if:" _CXX_INTEROP_CONCAT(__VA_ARGS__))))
+#endif /* SWIFT_ESCAPABLE_IF */
+
+#if !defined(SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT)
+#define SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT \
+  __attribute__((swift_attr("returned_as_unretained_by_default")))
+#endif /* SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT */
+
+#if !defined(SWIFT_PRIVATE_FILEID)
+#define SWIFT_PRIVATE_FILEID(_fileID) \
+  __attribute__((swift_attr("private_fileid:" _fileID)))
+#endif /* SWIFT_PRIVATE_FILEID */
 
 #else /* !_CXX_INTEROP_HAS_ATTRIBUTE */
 
@@ -292,6 +236,42 @@
 #if !defined(SWIFT_NONCOPYABLE)
 #define SWIFT_NONCOPYABLE
 #endif // SWIFT_NONCOPYABLE
+
+#if !defined(SWIFT_NONCOPYABLE_WITH_DESTROY)
+#define SWIFT_NONCOPYABLE_WITH_DESTROY(_destroy)
+#endif // SWIFT_NONCOPYABLE_WITH_DESTROY
+
+#if !defined(SWIFT_COPYABLE_IF)
+#define SWIFT_COPYABLE_IF(...)
+#endif // SWIFT_COPYABLE_IF
+
+#if !defined(SWIFT_NONESCAPABLE)
+#define SWIFT_NONESCAPABLE
+#endif // SWIFT_NONESCAPABLE
+
+#if !defined(SWIFT_ESCAPABLE)
+#define SWIFT_ESCAPABLE
+#endif // SWIFT_ESCAPABLE
+
+#if !defined(SWIFT_ESCAPABLE_IF)
+#define SWIFT_ESCAPABLE_IF(...)
+#endif // SWIFT_ESCAPABLE_IF
+
+#if !defined(SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT)
+#define SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT
+#endif // SWIFT_RETURNED_AS_UNRETAINED_BY_DEFAULT
+
+#if !defined(SWIFT_PRIVATE_FILEID)
+#define SWIFT_PRIVATE_FILEID(_fileID)
+#endif // SWIFT_PRIVATE_FILEID
+
+#if !defined(SWIFT_RETURNS_RETAINED)
+#define SWIFT_RETURNS_RETAINED
+#endif // SWIFT_RETURNS_RETAINED
+
+#if !defined(SWIFT_RETURNS_UNRETAINED)
+#define SWIFT_RETURNS_UNRETAINED
+#endif // SWIFT_RETURNS_UNRETAINED
 
 #endif /* !_CXX_INTEROP_HAS_ATTRIBUTE */
 
